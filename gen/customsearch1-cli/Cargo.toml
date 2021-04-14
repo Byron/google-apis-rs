@@ -4,10 +4,10 @@
 [package]
 
 name = "google-customsearch1-cli"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with CustomSearch API (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/customsearch1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/customsearch1-cli"
 homepage = "https://developers.google.com/custom-search/v1/introduction"
 documentation = "http://byron.github.io/google-apis-rs/google_customsearch1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-customsearch1]
 path = "../customsearch1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"

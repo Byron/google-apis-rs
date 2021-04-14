@@ -1,8 +1,8 @@
-site_name: reseller v2.0.0+20160329
+site_name: reseller v2.0.3+20160329
 site_url: http://byron.github.io/google-apis-rs/google-reseller1_sandbox-cli
 site_description: A complete library to interact with reseller (protocol v1sandbox)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/reseller1_sandbox-cli
 
 docs_dir: docs
 site_dir: build_html

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,35 +105,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Appsactivity<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Appsactivity<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Appsactivity<C> {}
+impl<'a, > client::Hub for Appsactivity<> {}
 
-impl<'a, C> Appsactivity<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Appsactivity<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Appsactivity<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Appsactivity<> {
         Appsactivity {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/appsactivity/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethods<'a, C> {
+    pub fn activities(&'a self) -> ActivityMethods<'a> {
         ActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -420,20 +418,20 @@ impl client::Part for User {}
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C>
-    where C: 'a {
+pub struct ActivityMethods<'a>
+    where  {
 
-    hub: &'a Appsactivity<C>,
+    hub: &'a Appsactivity<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ActivityMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ActivityMethods<'a> {}
 
-impl<'a, C> ActivityMethods<'a, C> {
+impl<'a> ActivityMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of activities visible to the current logged in user. Visible activities are determined by the visibility settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter.
-    pub fn list(&self) -> ActivityListCall<'a, C> {
+    pub fn list(&self) -> ActivityListCall<'a> {
         ActivityListCall {
             hub: self.hub,
             _user_id: Default::default(),
@@ -497,10 +495,10 @@ impl<'a, C> ActivityMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityListCall<'a, C>
-    where C: 'a {
+pub struct ActivityListCall<'a>
+    where  {
 
-    hub: &'a Appsactivity<C>,
+    hub: &'a Appsactivity<>,
     _user_id: Option<String>,
     _source: Option<String>,
     _page_token: Option<String>,
@@ -513,9 +511,9 @@ pub struct ActivityListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActivityListCall<'a, C> {}
+impl<'a> client::CallBuilder for ActivityListCall<'a> {}
 
-impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActivityListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -575,8 +573,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -589,7 +586,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -598,7 +595,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -655,7 +652,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// The ID used for ACL checks (does not filter the resulting event list by the assigned value). Use the special value me to indicate the currently authenticated user.
     ///
     /// Sets the *user id* query property to the given value.
-    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._user_id = Some(new_value.to_string());
         self
     }
@@ -663,42 +660,42 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// - drive.google.com
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn source(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._source = Some(new_value.to_string());
         self
     }
     /// A token to retrieve a specific page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of events to return on a page. The response includes a continuation token if there are more events.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ActivityListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Indicates the strategy to use when grouping singleEvents items in the associated combinedEvent object.
     ///
     /// Sets the *grouping strategy* query property to the given value.
-    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn grouping_strategy(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._grouping_strategy = Some(new_value.to_string());
         self
     }
     /// Identifies the Drive item to return activities for.
     ///
     /// Sets the *drive.file id* query property to the given value.
-    pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn drive_file_id(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._drive_file_id = Some(new_value.to_string());
         self
     }
     /// Identifies the Drive folder containing the items for which to return activities.
     ///
     /// Sets the *drive.ancestor id* query property to the given value.
-    pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn drive_ancestor_id(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._drive_ancestor_id = Some(new_value.to_string());
         self
     }
@@ -708,7 +705,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -729,7 +726,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -749,7 +746,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

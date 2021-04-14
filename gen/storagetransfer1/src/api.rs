@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -101,41 +100,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Storagetransfer<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Storagetransfer<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Storagetransfer<C> {}
+impl<'a, > client::Hub for Storagetransfer<> {}
 
-impl<'a, C> Storagetransfer<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Storagetransfer<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Storagetransfer<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Storagetransfer<> {
         Storagetransfer {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://storagetransfer.googleapis.com/".to_string(),
             _root_url: "https://storagetransfer.googleapis.com/".to_string(),
         }
     }
 
-    pub fn google_service_accounts(&'a self) -> GoogleServiceAccountMethods<'a, C> {
+    pub fn google_service_accounts(&'a self) -> GoogleServiceAccountMethods<'a> {
         GoogleServiceAccountMethods { hub: &self }
     }
-    pub fn transfer_jobs(&'a self) -> TransferJobMethods<'a, C> {
+    pub fn transfer_jobs(&'a self) -> TransferJobMethods<'a> {
         TransferJobMethods { hub: &self }
     }
-    pub fn transfer_operations(&'a self) -> TransferOperationMethods<'a, C> {
+    pub fn transfer_operations(&'a self) -> TransferOperationMethods<'a> {
         TransferOperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -868,15 +866,15 @@ impl client::RequestValue for UpdateTransferJobRequest {}
 /// let rb = hub.google_service_accounts();
 /// # }
 /// ```
-pub struct GoogleServiceAccountMethods<'a, C>
-    where C: 'a {
+pub struct GoogleServiceAccountMethods<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
 }
 
-impl<'a, C> client::MethodsBuilder for GoogleServiceAccountMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for GoogleServiceAccountMethods<'a> {}
 
-impl<'a, C> GoogleServiceAccountMethods<'a, C> {
+impl<'a> GoogleServiceAccountMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -885,7 +883,7 @@ impl<'a, C> GoogleServiceAccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `projectId` - Required. The ID of the Google Cloud Platform Console project that the Google service account is associated with.
-    pub fn get(&self, project_id: &str) -> GoogleServiceAccountGetCall<'a, C> {
+    pub fn get(&self, project_id: &str) -> GoogleServiceAccountGetCall<'a> {
         GoogleServiceAccountGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -928,15 +926,15 @@ impl<'a, C> GoogleServiceAccountMethods<'a, C> {
 /// let rb = hub.transfer_jobs();
 /// # }
 /// ```
-pub struct TransferJobMethods<'a, C>
-    where C: 'a {
+pub struct TransferJobMethods<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TransferJobMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TransferJobMethods<'a> {}
 
-impl<'a, C> TransferJobMethods<'a, C> {
+impl<'a> TransferJobMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -945,7 +943,7 @@ impl<'a, C> TransferJobMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: TransferJob) -> TransferJobCreateCall<'a, C> {
+    pub fn create(&self, request: TransferJob) -> TransferJobCreateCall<'a> {
         TransferJobCreateCall {
             hub: self.hub,
             _request: request,
@@ -963,7 +961,7 @@ impl<'a, C> TransferJobMethods<'a, C> {
     ///
     /// * `jobName` - Required. " The job to get.
     /// * `projectId` - Required. The ID of the Google Cloud Platform Console project that owns the job.
-    pub fn get(&self, job_name: &str, project_id: &str) -> TransferJobGetCall<'a, C> {
+    pub fn get(&self, job_name: &str, project_id: &str) -> TransferJobGetCall<'a> {
         TransferJobGetCall {
             hub: self.hub,
             _job_name: job_name.to_string(),
@@ -981,7 +979,7 @@ impl<'a, C> TransferJobMethods<'a, C> {
     /// # Arguments
     ///
     /// * `filter` - Required. A list of query parameters specified as JSON text in the form of: `{"projectId":"my_project_id", "jobNames":["jobid1","jobid2",...], "jobStatuses":["status1","status2",...]}` Since `jobNames` and `jobStatuses` support multiple values, their values must be specified with array notation. `projectId` is required. `jobNames` and `jobStatuses` are optional. The valid values for `jobStatuses` are case-insensitive: ENABLED, DISABLED, and DELETED.
-    pub fn list(&self, filter: &str) -> TransferJobListCall<'a, C> {
+    pub fn list(&self, filter: &str) -> TransferJobListCall<'a> {
         TransferJobListCall {
             hub: self.hub,
             _filter: filter.to_string(),
@@ -1001,7 +999,7 @@ impl<'a, C> TransferJobMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `jobName` - Required. The name of job to update.
-    pub fn patch(&self, request: UpdateTransferJobRequest, job_name: &str) -> TransferJobPatchCall<'a, C> {
+    pub fn patch(&self, request: UpdateTransferJobRequest, job_name: &str) -> TransferJobPatchCall<'a> {
         TransferJobPatchCall {
             hub: self.hub,
             _request: request,
@@ -1020,7 +1018,7 @@ impl<'a, C> TransferJobMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `jobName` - Required. The name of the transfer job.
-    pub fn run(&self, request: RunTransferJobRequest, job_name: &str) -> TransferJobRunCall<'a, C> {
+    pub fn run(&self, request: RunTransferJobRequest, job_name: &str) -> TransferJobRunCall<'a> {
         TransferJobRunCall {
             hub: self.hub,
             _request: request,
@@ -1064,15 +1062,15 @@ impl<'a, C> TransferJobMethods<'a, C> {
 /// let rb = hub.transfer_operations();
 /// # }
 /// ```
-pub struct TransferOperationMethods<'a, C>
-    where C: 'a {
+pub struct TransferOperationMethods<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TransferOperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TransferOperationMethods<'a> {}
 
-impl<'a, C> TransferOperationMethods<'a, C> {
+impl<'a> TransferOperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1082,7 +1080,7 @@ impl<'a, C> TransferOperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> TransferOperationCancelCall<'a, C> {
+    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> TransferOperationCancelCall<'a> {
         TransferOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1100,7 +1098,7 @@ impl<'a, C> TransferOperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> TransferOperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> TransferOperationGetCall<'a> {
         TransferOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1118,7 +1116,7 @@ impl<'a, C> TransferOperationMethods<'a, C> {
     ///
     /// * `name` - Not used.
     /// * `filter` - Required. A list of query parameters specified as JSON text in the form of: `{"projectId":"my_project_id", "jobNames":["jobid1","jobid2",...], "operationNames":["opid1","opid2",...], "transferStatuses":["status1","status2",...]}` Since `jobNames`, `operationNames`, and `transferStatuses` support multiple values, they must be specified with array notation. `projectId` is required. `jobNames`, `operationNames`, and `transferStatuses` are optional. The valid values for `transferStatuses` are case-insensitive: IN_PROGRESS, PAUSED, SUCCESS, FAILED, and ABORTED.
-    pub fn list(&self, name: &str, filter: &str) -> TransferOperationListCall<'a, C> {
+    pub fn list(&self, name: &str, filter: &str) -> TransferOperationListCall<'a> {
         TransferOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1139,7 +1137,7 @@ impl<'a, C> TransferOperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the transfer operation.
-    pub fn pause(&self, request: PauseTransferOperationRequest, name: &str) -> TransferOperationPauseCall<'a, C> {
+    pub fn pause(&self, request: PauseTransferOperationRequest, name: &str) -> TransferOperationPauseCall<'a> {
         TransferOperationPauseCall {
             hub: self.hub,
             _request: request,
@@ -1158,7 +1156,7 @@ impl<'a, C> TransferOperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the transfer operation.
-    pub fn resume(&self, request: ResumeTransferOperationRequest, name: &str) -> TransferOperationResumeCall<'a, C> {
+    pub fn resume(&self, request: ResumeTransferOperationRequest, name: &str) -> TransferOperationResumeCall<'a> {
         TransferOperationResumeCall {
             hub: self.hub,
             _request: request,
@@ -1210,19 +1208,19 @@ impl<'a, C> TransferOperationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GoogleServiceAccountGetCall<'a, C>
-    where C: 'a {
+pub struct GoogleServiceAccountGetCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GoogleServiceAccountGetCall<'a, C> {}
+impl<'a> client::CallBuilder for GoogleServiceAccountGetCall<'a> {}
 
-impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GoogleServiceAccountGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1283,8 +1281,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1297,7 +1294,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1306,7 +1303,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1366,7 +1363,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> GoogleServiceAccountGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> GoogleServiceAccountGetCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1376,7 +1373,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleServiceAccountGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleServiceAccountGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1401,7 +1398,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GoogleServiceAccountGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GoogleServiceAccountGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1421,7 +1418,7 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleServiceAccountGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleServiceAccountGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1471,19 +1468,19 @@ impl<'a, C> GoogleServiceAccountGetCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobCreateCall<'a, C>
-    where C: 'a {
+pub struct TransferJobCreateCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _request: TransferJob,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferJobCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferJobCreateCall<'a> {}
 
-impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferJobCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1533,8 +1530,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1548,7 +1544,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1559,7 +1555,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1618,7 +1614,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TransferJob) -> TransferJobCreateCall<'a, C> {
+    pub fn request(mut self, new_value: TransferJob) -> TransferJobCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1628,7 +1624,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1653,7 +1649,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1673,7 +1669,7 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1717,10 +1713,10 @@ impl<'a, C> TransferJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobGetCall<'a, C>
-    where C: 'a {
+pub struct TransferJobGetCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _job_name: String,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1728,9 +1724,9 @@ pub struct TransferJobGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferJobGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferJobGetCall<'a> {}
 
-impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferJobGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1796,8 +1792,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1810,7 +1805,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1819,7 +1814,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1879,7 +1874,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobGetCall<'a, C> {
+    pub fn job_name(mut self, new_value: &str) -> TransferJobGetCall<'a> {
         self._job_name = new_value.to_string();
         self
     }
@@ -1889,7 +1884,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> TransferJobGetCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1899,7 +1894,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1924,7 +1919,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1944,7 +1939,7 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1990,10 +1985,10 @@ impl<'a, C> TransferJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobListCall<'a, C>
-    where C: 'a {
+pub struct TransferJobListCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _filter: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2002,9 +1997,9 @@ pub struct TransferJobListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferJobListCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferJobListCall<'a> {}
 
-impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferJobListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2050,8 +2045,7 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2064,7 +2058,7 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2073,7 +2067,7 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2133,21 +2127,21 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter(mut self, new_value: &str) -> TransferJobListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> TransferJobListCall<'a> {
         self._filter = new_value.to_string();
         self
     }
     /// The list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TransferJobListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TransferJobListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The max allowed value is 256.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TransferJobListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> TransferJobListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2157,7 +2151,7 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2182,7 +2176,7 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2202,7 +2196,7 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2252,10 +2246,10 @@ impl<'a, C> TransferJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobPatchCall<'a, C>
-    where C: 'a {
+pub struct TransferJobPatchCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _request: UpdateTransferJobRequest,
     _job_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2263,9 +2257,9 @@ pub struct TransferJobPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferJobPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferJobPatchCall<'a> {}
 
-impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferJobPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2341,8 +2335,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2356,7 +2349,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2367,7 +2360,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2426,7 +2419,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateTransferJobRequest) -> TransferJobPatchCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateTransferJobRequest) -> TransferJobPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2436,7 +2429,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobPatchCall<'a, C> {
+    pub fn job_name(mut self, new_value: &str) -> TransferJobPatchCall<'a> {
         self._job_name = new_value.to_string();
         self
     }
@@ -2446,7 +2439,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2471,7 +2464,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2491,7 +2484,7 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2541,10 +2534,10 @@ impl<'a, C> TransferJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferJobRunCall<'a, C>
-    where C: 'a {
+pub struct TransferJobRunCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _request: RunTransferJobRequest,
     _job_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2552,9 +2545,9 @@ pub struct TransferJobRunCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferJobRunCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferJobRunCall<'a> {}
 
-impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferJobRunCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2630,8 +2623,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2645,7 +2637,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2656,7 +2648,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2715,7 +2707,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunTransferJobRequest) -> TransferJobRunCall<'a, C> {
+    pub fn request(mut self, new_value: RunTransferJobRequest) -> TransferJobRunCall<'a> {
         self._request = new_value;
         self
     }
@@ -2725,7 +2717,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_name(mut self, new_value: &str) -> TransferJobRunCall<'a, C> {
+    pub fn job_name(mut self, new_value: &str) -> TransferJobRunCall<'a> {
         self._job_name = new_value.to_string();
         self
     }
@@ -2735,7 +2727,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobRunCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferJobRunCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2760,7 +2752,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferJobRunCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferJobRunCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2780,7 +2772,7 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobRunCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferJobRunCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2830,10 +2822,10 @@ impl<'a, C> TransferJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationCancelCall<'a, C>
-    where C: 'a {
+pub struct TransferOperationCancelCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2841,9 +2833,9 @@ pub struct TransferOperationCancelCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferOperationCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferOperationCancelCall<'a> {}
 
-impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferOperationCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2919,8 +2911,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2934,7 +2925,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2945,7 +2936,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3004,7 +2995,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> TransferOperationCancelCall<'a, C> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> TransferOperationCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -3014,7 +3005,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationCancelCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationCancelCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3024,7 +3015,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3049,7 +3040,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3069,7 +3060,7 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationCancelCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationCancelCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3113,19 +3104,19 @@ impl<'a, C> TransferOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationGetCall<'a, C>
-    where C: 'a {
+pub struct TransferOperationGetCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferOperationGetCall<'a> {}
 
-impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3190,8 +3181,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3204,7 +3194,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3213,7 +3203,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3273,7 +3263,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3283,7 +3273,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3308,7 +3298,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3328,7 +3318,7 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3374,10 +3364,10 @@ impl<'a, C> TransferOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationListCall<'a, C>
-    where C: 'a {
+pub struct TransferOperationListCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _name: String,
     _filter: String,
     _page_token: Option<String>,
@@ -3387,9 +3377,9 @@ pub struct TransferOperationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferOperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferOperationListCall<'a> {}
 
-impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferOperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3461,8 +3451,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3475,7 +3464,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3484,7 +3473,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3544,7 +3533,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3554,21 +3543,21 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn filter(mut self, new_value: &str) -> TransferOperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> TransferOperationListCall<'a> {
         self._filter = new_value.to_string();
         self
     }
     /// The list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TransferOperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TransferOperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The list page size. The max allowed value is 256.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TransferOperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> TransferOperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3578,7 +3567,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3603,7 +3592,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3623,7 +3612,7 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3673,10 +3662,10 @@ impl<'a, C> TransferOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationPauseCall<'a, C>
-    where C: 'a {
+pub struct TransferOperationPauseCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _request: PauseTransferOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3684,9 +3673,9 @@ pub struct TransferOperationPauseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferOperationPauseCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferOperationPauseCall<'a> {}
 
-impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferOperationPauseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3762,8 +3751,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3777,7 +3765,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3788,7 +3776,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3847,7 +3835,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PauseTransferOperationRequest) -> TransferOperationPauseCall<'a, C> {
+    pub fn request(mut self, new_value: PauseTransferOperationRequest) -> TransferOperationPauseCall<'a> {
         self._request = new_value;
         self
     }
@@ -3857,7 +3845,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationPauseCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationPauseCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3867,7 +3855,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationPauseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationPauseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3892,7 +3880,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationPauseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationPauseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3912,7 +3900,7 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationPauseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationPauseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3962,10 +3950,10 @@ impl<'a, C> TransferOperationPauseCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TransferOperationResumeCall<'a, C>
-    where C: 'a {
+pub struct TransferOperationResumeCall<'a>
+    where  {
 
-    hub: &'a Storagetransfer<C>,
+    hub: &'a Storagetransfer<>,
     _request: ResumeTransferOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3973,9 +3961,9 @@ pub struct TransferOperationResumeCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TransferOperationResumeCall<'a, C> {}
+impl<'a> client::CallBuilder for TransferOperationResumeCall<'a> {}
 
-impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TransferOperationResumeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4051,8 +4039,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4066,7 +4053,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4077,7 +4064,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4136,7 +4123,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResumeTransferOperationRequest) -> TransferOperationResumeCall<'a, C> {
+    pub fn request(mut self, new_value: ResumeTransferOperationRequest) -> TransferOperationResumeCall<'a> {
         self._request = new_value;
         self
     }
@@ -4146,7 +4133,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TransferOperationResumeCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TransferOperationResumeCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4156,7 +4143,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationResumeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TransferOperationResumeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4181,7 +4168,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationResumeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TransferOperationResumeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4201,7 +4188,7 @@ impl<'a, C> TransferOperationResumeCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationResumeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TransferOperationResumeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

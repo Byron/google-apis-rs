@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -94,38 +93,37 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct SemanticTile<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct SemanticTile<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for SemanticTile<C> {}
+impl<'a, > client::Hub for SemanticTile<> {}
 
-impl<'a, C> SemanticTile<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > SemanticTile<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SemanticTile<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SemanticTile<> {
         SemanticTile {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://vectortile.googleapis.com/".to_string(),
             _root_url: "https://vectortile.googleapis.com/".to_string(),
         }
     }
 
-    pub fn featuretiles(&'a self) -> FeaturetileMethods<'a, C> {
+    pub fn featuretiles(&'a self) -> FeaturetileMethods<'a> {
         FeaturetileMethods { hub: &self }
     }
-    pub fn terraintiles(&'a self) -> TerraintileMethods<'a, C> {
+    pub fn terraintiles(&'a self) -> TerraintileMethods<'a> {
         TerraintileMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -582,15 +580,15 @@ impl client::Part for Vertex3DList {}
 /// let rb = hub.featuretiles();
 /// # }
 /// ```
-pub struct FeaturetileMethods<'a, C>
-    where C: 'a {
+pub struct FeaturetileMethods<'a>
+    where  {
 
-    hub: &'a SemanticTile<C>,
+    hub: &'a SemanticTile<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FeaturetileMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FeaturetileMethods<'a> {}
 
-impl<'a, C> FeaturetileMethods<'a, C> {
+impl<'a> FeaturetileMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -599,7 +597,7 @@ impl<'a, C> FeaturetileMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the tile. The tile resource name is prefixed by its collection ID `tiles/` followed by the resource ID, which encodes the tile's global x and y coordinates and zoom level as `@,,z`. For example, `tiles/@1,2,3z`.
-    pub fn get(&self, name: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> FeaturetileGetCall<'a> {
         FeaturetileGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -658,15 +656,15 @@ impl<'a, C> FeaturetileMethods<'a, C> {
 /// let rb = hub.terraintiles();
 /// # }
 /// ```
-pub struct TerraintileMethods<'a, C>
-    where C: 'a {
+pub struct TerraintileMethods<'a>
+    where  {
 
-    hub: &'a SemanticTile<C>,
+    hub: &'a SemanticTile<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TerraintileMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TerraintileMethods<'a> {}
 
-impl<'a, C> TerraintileMethods<'a, C> {
+impl<'a> TerraintileMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -675,7 +673,7 @@ impl<'a, C> TerraintileMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the tile. The tile resource name is prefixed by its collection ID `terraintiles/` followed by the resource ID, which encodes the tile's global x and y coordinates and zoom level as `@,,z`. For example, `terraintiles/@1,2,3z`.
-    pub fn get(&self, name: &str) -> TerraintileGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> TerraintileGetCall<'a> {
         TerraintileGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -753,10 +751,10 @@ impl<'a, C> TerraintileMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FeaturetileGetCall<'a, C>
-    where C: 'a {
+pub struct FeaturetileGetCall<'a>
+    where  {
 
-    hub: &'a SemanticTile<C>,
+    hub: &'a SemanticTile<>,
     _name: String,
     _region_code: Option<String>,
     _language_code: Option<String>,
@@ -779,9 +777,9 @@ pub struct FeaturetileGetCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for FeaturetileGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FeaturetileGetCall<'a> {}
 
-impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FeaturetileGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -904,7 +902,7 @@ impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -913,7 +911,7 @@ impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -973,126 +971,126 @@ impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The Unicode country/region code (CLDR) of the location from which the request is coming from, such as "US" and "419". For more information, see http://www.unicode.org/reports/tr35/#unicode_region_subtag.
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn region_code(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._region_code = Some(new_value.to_string());
         self
     }
     /// Required. The BCP-47 language code corresponding to the language in which the name was requested, such as "en-US" or "sr-Latn". For more information, see http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
     ///
     /// Sets the *language code* query property to the given value.
-    pub fn language_code(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn language_code(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._language_code = Some(new_value.to_string());
         self
     }
     /// Flag indicating whether unclipped buildings should be returned. If this is set, building render ops will extend beyond the tile boundary. Buildings will only be returned on the tile that contains their centroid.
     ///
     /// Sets the *enable unclipped buildings* query property to the given value.
-    pub fn enable_unclipped_buildings(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn enable_unclipped_buildings(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._enable_unclipped_buildings = Some(new_value);
         self
     }
     /// Flag indicating whether the returned tile will contain road features that are marked private. Private roads are indicated by the Feature.segment_info.road_info.is_private field.
     ///
     /// Sets the *enable private roads* query property to the given value.
-    pub fn enable_private_roads(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn enable_private_roads(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._enable_private_roads = Some(new_value);
         self
     }
     /// Flag indicating whether political features should be returned.
     ///
     /// Sets the *enable political features* query property to the given value.
-    pub fn enable_political_features(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn enable_political_features(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._enable_political_features = Some(new_value);
         self
     }
     /// Flag indicating whether 3D building models should be enabled. If this is set structures will be returned as 3D modeled volumes rather than 2.5D extruded areas where possible.
     ///
     /// Sets the *enable modeled volumes* query property to the given value.
-    pub fn enable_modeled_volumes(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn enable_modeled_volumes(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._enable_modeled_volumes = Some(new_value);
         self
     }
     /// Flag indicating whether human-readable names should be returned for features. If this is set, the display_name field on the feature will be filled out.
     ///
     /// Sets the *enable feature names* query property to the given value.
-    pub fn enable_feature_names(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn enable_feature_names(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._enable_feature_names = Some(new_value);
         self
     }
     /// Flag indicating whether detailed highway types should be returned. If this is set, the CONTROLLED_ACCESS_HIGHWAY type may be returned. If not, then these highways will have the generic HIGHWAY type. This exists for backwards compatibility reasons.
     ///
     /// Sets the *enable detailed highway types* query property to the given value.
-    pub fn enable_detailed_highway_types(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn enable_detailed_highway_types(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._enable_detailed_highway_types = Some(new_value);
         self
     }
     /// Optional version id identifying the tile that is already in the client's cache. This field should be populated with the most recent version_id value returned by the API for the requested tile. If the version id is empty the server always returns a newly rendered tile. If it is provided the server checks if the tile contents would be identical to one that's already on the client, and if so, returns a stripped-down response tile with STATUS_OK_DATA_UNCHANGED instead.
     ///
     /// Sets the *client tile version id* query property to the given value.
-    pub fn client_tile_version_id(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_tile_version_id(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_tile_version_id = Some(new_value.to_string());
         self
     }
     /// Required. A client-generated user ID. The ID should be generated and persisted during the first user session or whenever a pre-existing ID is not found. The exact format is up to the client. This must be non-empty in a GetFeatureTileRequest (whether via the header or GetFeatureTileRequest.client_info).
     ///
     /// Sets the *client info.user id* query property to the given value.
-    pub fn client_info_user_id(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_user_id(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_user_id = Some(new_value.to_string());
         self
     }
     /// Platform where the application is running.
     ///
     /// Sets the *client info.platform* query property to the given value.
-    pub fn client_info_platform(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_platform(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_platform = Some(new_value.to_string());
         self
     }
     /// Operating system name and version as reported by the OS. For example, "Mac OS X 10.10.4". The exact format is platform-dependent.
     ///
     /// Sets the *client info.operating system* query property to the given value.
-    pub fn client_info_operating_system(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_operating_system(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_operating_system = Some(new_value.to_string());
         self
     }
     /// Device model as reported by the device. The exact format is platform-dependent.
     ///
     /// Sets the *client info.device model* query property to the given value.
-    pub fn client_info_device_model(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_device_model(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_device_model = Some(new_value.to_string());
         self
     }
     /// Application version number, such as "1.2.3". The exact format is application-dependent.
     ///
     /// Sets the *client info.application version* query property to the given value.
-    pub fn client_info_application_version(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_application_version(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_application_version = Some(new_value.to_string());
         self
     }
     /// Application ID, such as the package name on Android and the bundle identifier on iOS platforms.
     ///
     /// Sets the *client info.application id* query property to the given value.
-    pub fn client_info_application_id(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_application_id(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_application_id = Some(new_value.to_string());
         self
     }
     /// API client name and version. For example, the SDK calling the API. The exact format is up to the client.
     ///
     /// Sets the *client info.api client* query property to the given value.
-    pub fn client_info_api_client(mut self, new_value: &str) -> FeaturetileGetCall<'a, C> {
+    pub fn client_info_api_client(mut self, new_value: &str) -> FeaturetileGetCall<'a> {
         self._client_info_api_client = Some(new_value.to_string());
         self
     }
     /// Flag indicating whether the returned tile will always contain 2.5D footprints for structures. If enabled_modeled_volumes is set, this will mean that structures will have both their 3D models and 2.5D footprints returned.
     ///
     /// Sets the *always include building footprints* query property to the given value.
-    pub fn always_include_building_footprints(mut self, new_value: bool) -> FeaturetileGetCall<'a, C> {
+    pub fn always_include_building_footprints(mut self, new_value: bool) -> FeaturetileGetCall<'a> {
         self._always_include_building_footprints = Some(new_value);
         self
     }
@@ -1102,7 +1100,7 @@ impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeaturetileGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeaturetileGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1127,7 +1125,7 @@ impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FeaturetileGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FeaturetileGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1179,10 +1177,10 @@ impl<'a, C> FeaturetileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TerraintileGetCall<'a, C>
-    where C: 'a {
+pub struct TerraintileGetCall<'a>
+    where  {
 
-    hub: &'a SemanticTile<C>,
+    hub: &'a SemanticTile<>,
     _name: String,
     _terrain_formats: Vec<String>,
     _min_elevation_resolution_cells: Option<i32>,
@@ -1199,9 +1197,9 @@ pub struct TerraintileGetCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for TerraintileGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TerraintileGetCall<'a> {}
 
-impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TerraintileGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1308,7 +1306,7 @@ impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1317,7 +1315,7 @@ impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1377,7 +1375,7 @@ impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1385,77 +1383,77 @@ impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Append the given value to the *terrain formats* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_terrain_formats(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn add_terrain_formats(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._terrain_formats.push(new_value.to_string());
         self
     }
     /// The minimum allowed resolution for the returned elevation heightmap. Possible values: between 0 and 1024 (and not more than max_elevation_resolution_cells). Zero is supported for backward compatibility. Under-sized heightmaps will be non-uniformly up-sampled such that each edge is no shorter than this value. Non-uniformity is chosen to maximise the amount of preserved data. For example: Original resolution: 30px (width) * 10px (height) min_elevation_resolution: 30 New resolution: 30px (width) * 30px (height)
     ///
     /// Sets the *min elevation resolution cells* query property to the given value.
-    pub fn min_elevation_resolution_cells(mut self, new_value: i32) -> TerraintileGetCall<'a, C> {
+    pub fn min_elevation_resolution_cells(mut self, new_value: i32) -> TerraintileGetCall<'a> {
         self._min_elevation_resolution_cells = Some(new_value);
         self
     }
     /// The maximum allowed resolution for the returned elevation heightmap. Possible values: between 1 and 1024 (and not less than min_elevation_resolution_cells). Over-sized heightmaps will be non-uniformly down-sampled such that each edge is no longer than this value. Non-uniformity is chosen to maximise the amount of preserved data. For example: Original resolution: 100px (width) * 30px (height) max_elevation_resolution: 30 New resolution: 30px (width) * 30px (height)
     ///
     /// Sets the *max elevation resolution cells* query property to the given value.
-    pub fn max_elevation_resolution_cells(mut self, new_value: i32) -> TerraintileGetCall<'a, C> {
+    pub fn max_elevation_resolution_cells(mut self, new_value: i32) -> TerraintileGetCall<'a> {
         self._max_elevation_resolution_cells = Some(new_value);
         self
     }
     /// Required. A client-generated user ID. The ID should be generated and persisted during the first user session or whenever a pre-existing ID is not found. The exact format is up to the client. This must be non-empty in a GetFeatureTileRequest (whether via the header or GetFeatureTileRequest.client_info).
     ///
     /// Sets the *client info.user id* query property to the given value.
-    pub fn client_info_user_id(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_user_id(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_user_id = Some(new_value.to_string());
         self
     }
     /// Platform where the application is running.
     ///
     /// Sets the *client info.platform* query property to the given value.
-    pub fn client_info_platform(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_platform(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_platform = Some(new_value.to_string());
         self
     }
     /// Operating system name and version as reported by the OS. For example, "Mac OS X 10.10.4". The exact format is platform-dependent.
     ///
     /// Sets the *client info.operating system* query property to the given value.
-    pub fn client_info_operating_system(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_operating_system(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_operating_system = Some(new_value.to_string());
         self
     }
     /// Device model as reported by the device. The exact format is platform-dependent.
     ///
     /// Sets the *client info.device model* query property to the given value.
-    pub fn client_info_device_model(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_device_model(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_device_model = Some(new_value.to_string());
         self
     }
     /// Application version number, such as "1.2.3". The exact format is application-dependent.
     ///
     /// Sets the *client info.application version* query property to the given value.
-    pub fn client_info_application_version(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_application_version(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_application_version = Some(new_value.to_string());
         self
     }
     /// Application ID, such as the package name on Android and the bundle identifier on iOS platforms.
     ///
     /// Sets the *client info.application id* query property to the given value.
-    pub fn client_info_application_id(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_application_id(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_application_id = Some(new_value.to_string());
         self
     }
     /// API client name and version. For example, the SDK calling the API. The exact format is up to the client.
     ///
     /// Sets the *client info.api client* query property to the given value.
-    pub fn client_info_api_client(mut self, new_value: &str) -> TerraintileGetCall<'a, C> {
+    pub fn client_info_api_client(mut self, new_value: &str) -> TerraintileGetCall<'a> {
         self._client_info_api_client = Some(new_value.to_string());
         self
     }
     /// The precision of terrain altitudes in centimeters. Possible values: between 1 (cm level precision) and 1,000,000 (10-kilometer level precision).
     ///
     /// Sets the *altitude precision centimeters* query property to the given value.
-    pub fn altitude_precision_centimeters(mut self, new_value: i32) -> TerraintileGetCall<'a, C> {
+    pub fn altitude_precision_centimeters(mut self, new_value: i32) -> TerraintileGetCall<'a> {
         self._altitude_precision_centimeters = Some(new_value);
         self
     }
@@ -1465,7 +1463,7 @@ impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TerraintileGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TerraintileGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1490,7 +1488,7 @@ impl<'a, C> TerraintileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TerraintileGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TerraintileGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

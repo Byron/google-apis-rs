@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud IAP* crate version *2.0.0+20210326*, where *20210326* is the exact revision of the *iap:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Cloud IAP* crate version *2.0.3+20210326*, where *20210326* is the exact revision of the *iap:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Cloud IAP* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iap).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/iap1_beta1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/iap1_beta1).
 //! # Features
 //! 
 //! Use the following functionality with ease from the central [hub](CloudIAP) ... 

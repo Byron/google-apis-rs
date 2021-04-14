@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,35 +105,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GameServices<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct GameServices<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for GameServices<C> {}
+impl<'a, > client::Hub for GameServices<> {}
 
-impl<'a, C> GameServices<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > GameServices<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GameServices<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GameServices<> {
         GameServices {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://gameservices.googleapis.com/".to_string(),
             _root_url: "https://gameservices.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1404,15 +1402,15 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1422,7 +1420,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/`.
-    pub fn locations_game_server_deployments_configs_create(&self, request: GameServerConfig, parent: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> {
+    pub fn locations_game_server_deployments_configs_create(&self, request: GameServerConfig, parent: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
         ProjectLocationGameServerDeploymentConfigCreateCall {
             hub: self.hub,
             _request: request,
@@ -1441,7 +1439,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server config to delete, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/{config}`.
-    pub fn locations_game_server_deployments_configs_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> {
+    pub fn locations_game_server_deployments_configs_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
         ProjectLocationGameServerDeploymentConfigDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1458,7 +1456,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server config to retrieve, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/{config}`.
-    pub fn locations_game_server_deployments_configs_get(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> {
+    pub fn locations_game_server_deployments_configs_get(&self, name: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
         ProjectLocationGameServerDeploymentConfigGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1475,7 +1473,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/configs/*`.
-    pub fn locations_game_server_deployments_configs_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn locations_game_server_deployments_configs_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         ProjectLocationGameServerDeploymentConfigListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1497,7 +1495,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}`.
-    pub fn locations_game_server_deployments_create(&self, request: GameServerDeployment, parent: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a, C> {
+    pub fn locations_game_server_deployments_create(&self, request: GameServerDeployment, parent: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
         ProjectLocationGameServerDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1516,7 +1514,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server delpoyment to delete, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
-    pub fn locations_game_server_deployments_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a, C> {
+    pub fn locations_game_server_deployments_delete(&self, name: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a> {
         ProjectLocationGameServerDeploymentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1534,7 +1532,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the game server delpoyment, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
-    pub fn locations_game_server_deployments_fetch_deployment_state(&self, request: FetchDeploymentStateRequest, name: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> {
+    pub fn locations_game_server_deployments_fetch_deployment_state(&self, request: FetchDeploymentStateRequest, name: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
         ProjectLocationGameServerDeploymentFetchDeploymentStateCall {
             hub: self.hub,
             _request: request,
@@ -1552,7 +1550,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server delpoyment to retrieve, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`.
-    pub fn locations_game_server_deployments_get(&self, name: &str) -> ProjectLocationGameServerDeploymentGetCall<'a, C> {
+    pub fn locations_game_server_deployments_get(&self, name: &str) -> ProjectLocationGameServerDeploymentGetCall<'a> {
         ProjectLocationGameServerDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1569,7 +1567,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_game_server_deployments_get_iam_policy(&self, resource: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> {
+    pub fn locations_game_server_deployments_get_iam_policy(&self, resource: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
         ProjectLocationGameServerDeploymentGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1587,7 +1585,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server delpoyment to retrieve, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/rollout`.
-    pub fn locations_game_server_deployments_get_rollout(&self, name: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> {
+    pub fn locations_game_server_deployments_get_rollout(&self, name: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
         ProjectLocationGameServerDeploymentGetRolloutCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1604,7 +1602,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}`.
-    pub fn locations_game_server_deployments_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn locations_game_server_deployments_list(&self, parent: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
         ProjectLocationGameServerDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1626,7 +1624,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the game server deployment, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}`. For example, `projects/my-project/locations/global/gameServerDeployments/my-deployment`.
-    pub fn locations_game_server_deployments_patch(&self, request: GameServerDeployment, name: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a, C> {
+    pub fn locations_game_server_deployments_patch(&self, request: GameServerDeployment, name: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
         ProjectLocationGameServerDeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -1646,7 +1644,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the game server deployment rollout, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/rollout`. For example, `projects/my-project/locations/global/gameServerDeployments/my-deployment/rollout`.
-    pub fn locations_game_server_deployments_preview_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {
+    pub fn locations_game_server_deployments_preview_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
         ProjectLocationGameServerDeploymentPreviewRolloutCall {
             hub: self.hub,
             _request: request,
@@ -1667,7 +1665,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_game_server_deployments_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> {
+    pub fn locations_game_server_deployments_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
         ProjectLocationGameServerDeploymentSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1686,7 +1684,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_game_server_deployments_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> {
+    pub fn locations_game_server_deployments_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
         ProjectLocationGameServerDeploymentTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1705,7 +1703,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the game server deployment rollout, in the following form: `projects/{project}/locations/{location}/gameServerDeployments/{deployment}/rollout`. For example, `projects/my-project/locations/global/gameServerDeployments/my-deployment/rollout`.
-    pub fn locations_game_server_deployments_update_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> {
+    pub fn locations_game_server_deployments_update_rollout(&self, request: GameServerDeploymentRollout, name: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
         ProjectLocationGameServerDeploymentUpdateRolloutCall {
             hub: self.hub,
             _request: request,
@@ -1725,7 +1723,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a, C> {
+    pub fn locations_operations_cancel(&self, request: CancelOperationRequest, name: &str) -> ProjectLocationOperationCancelCall<'a> {
         ProjectLocationOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1743,7 +1741,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn locations_operations_delete(&self, name: &str) -> ProjectLocationOperationDeleteCall<'a, C> {
+    pub fn locations_operations_delete(&self, name: &str) -> ProjectLocationOperationDeleteCall<'a> {
         ProjectLocationOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1760,7 +1758,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a, C> {
+    pub fn locations_operations_get(&self, name: &str) -> ProjectLocationOperationGetCall<'a> {
         ProjectLocationOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1777,7 +1775,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn locations_operations_list(&self, name: &str) -> ProjectLocationOperationListCall<'a, C> {
+    pub fn locations_operations_list(&self, name: &str) -> ProjectLocationOperationListCall<'a> {
         ProjectLocationOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1798,7 +1796,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}/realms/{realm-id}`.
-    pub fn locations_realms_game_server_clusters_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
         ProjectLocationRealmGameServerClusterCreateCall {
             hub: self.hub,
             _request: request,
@@ -1817,7 +1815,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server cluster to delete, in the following form: `projects/{project}/locations/{location}/gameServerClusters/{cluster}`.
-    pub fn locations_realms_game_server_clusters_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
         ProjectLocationRealmGameServerClusterDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1834,7 +1832,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server cluster to retrieve, in the following form: `projects/{project}/locations/{location}/realms/{realm-id}/gameServerClusters/{cluster}`.
-    pub fn locations_realms_game_server_clusters_get(&self, name: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_get(&self, name: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
         ProjectLocationRealmGameServerClusterGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1851,7 +1849,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: "projects/{project}/locations/{location}/realms/{realm}".
-    pub fn locations_realms_game_server_clusters_list(&self, parent: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_list(&self, parent: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         ProjectLocationRealmGameServerClusterListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1873,7 +1871,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the game server cluster, in the following form: `projects/{project}/locations/{location}/realms/{realm}/gameServerClusters/{cluster}`. For example, `projects/my-project/locations/{location}/realms/zanzibar/gameServerClusters/my-onprem-cluster`.
-    pub fn locations_realms_game_server_clusters_patch(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_patch(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
         ProjectLocationRealmGameServerClusterPatchCall {
             hub: self.hub,
             _request: request,
@@ -1893,7 +1891,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}/realms/{realm}`.
-    pub fn locations_realms_game_server_clusters_preview_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_preview_create(&self, request: GameServerCluster, parent: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
         ProjectLocationRealmGameServerClusterPreviewCreateCall {
             hub: self.hub,
             _request: request,
@@ -1913,7 +1911,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the game server cluster to delete, in the following form: `projects/{project}/locations/{location}/gameServerClusters/{cluster}`.
-    pub fn locations_realms_game_server_clusters_preview_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_preview_delete(&self, name: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
         ProjectLocationRealmGameServerClusterPreviewDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1932,7 +1930,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the game server cluster, in the following form: `projects/{project}/locations/{location}/realms/{realm}/gameServerClusters/{cluster}`. For example, `projects/my-project/locations/{location}/realms/zanzibar/gameServerClusters/my-onprem-cluster`.
-    pub fn locations_realms_game_server_clusters_preview_update(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {
+    pub fn locations_realms_game_server_clusters_preview_update(&self, request: GameServerCluster, name: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
         ProjectLocationRealmGameServerClusterPreviewUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1953,7 +1951,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}`.
-    pub fn locations_realms_create(&self, request: Realm, parent: &str) -> ProjectLocationRealmCreateCall<'a, C> {
+    pub fn locations_realms_create(&self, request: Realm, parent: &str) -> ProjectLocationRealmCreateCall<'a> {
         ProjectLocationRealmCreateCall {
             hub: self.hub,
             _request: request,
@@ -1972,7 +1970,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the realm to delete, in the following form: `projects/{project}/locations/{location}/realms/{realm}`.
-    pub fn locations_realms_delete(&self, name: &str) -> ProjectLocationRealmDeleteCall<'a, C> {
+    pub fn locations_realms_delete(&self, name: &str) -> ProjectLocationRealmDeleteCall<'a> {
         ProjectLocationRealmDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1989,7 +1987,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the realm to retrieve, in the following form: `projects/{project}/locations/{location}/realms/{realm}`.
-    pub fn locations_realms_get(&self, name: &str) -> ProjectLocationRealmGetCall<'a, C> {
+    pub fn locations_realms_get(&self, name: &str) -> ProjectLocationRealmGetCall<'a> {
         ProjectLocationRealmGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2006,7 +2004,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, in the following form: `projects/{project}/locations/{location}`.
-    pub fn locations_realms_list(&self, parent: &str) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn locations_realms_list(&self, parent: &str) -> ProjectLocationRealmListCall<'a> {
         ProjectLocationRealmListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2028,7 +2026,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the realm, in the following form: `projects/{project}/locations/{location}/realms/{realm}`. For example, `projects/my-project/locations/{location}/realms/my-realm`.
-    pub fn locations_realms_patch(&self, request: Realm, name: &str) -> ProjectLocationRealmPatchCall<'a, C> {
+    pub fn locations_realms_patch(&self, request: Realm, name: &str) -> ProjectLocationRealmPatchCall<'a> {
         ProjectLocationRealmPatchCall {
             hub: self.hub,
             _request: request,
@@ -2048,7 +2046,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the realm, in the following form: `projects/{project}/locations/{location}/realms/{realm}`. For example, `projects/my-project/locations/{location}/realms/my-realm`.
-    pub fn locations_realms_preview_update(&self, request: Realm, name: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, C> {
+    pub fn locations_realms_preview_update(&self, request: Realm, name: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
         ProjectLocationRealmPreviewUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2068,7 +2066,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2085,7 +2083,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2147,10 +2145,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentConfigCreateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerConfig,
     _parent: String,
     _config_id: Option<String>,
@@ -2159,9 +2157,9 @@ pub struct ProjectLocationGameServerDeploymentConfigCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2240,8 +2238,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2255,7 +2252,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2266,7 +2263,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2325,7 +2322,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerConfig) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerConfig) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2335,14 +2332,14 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the game server config resource to be created.
     ///
     /// Sets the *config id* query property to the given value.
-    pub fn config_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> {
+    pub fn config_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
         self._config_id = Some(new_value.to_string());
         self
     }
@@ -2352,7 +2349,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2377,7 +2374,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2397,7 +2394,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2441,19 +2438,19 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigCreateCall<'a, C> where C: 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentConfigDeleteCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2518,8 +2515,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2532,7 +2528,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2541,7 +2537,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2601,7 +2597,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2611,7 +2607,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2636,7 +2632,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2656,7 +2652,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2700,19 +2696,19 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigDeleteCall<'a, C> where C: 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentConfigGetCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentConfigGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigGetCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2777,8 +2773,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2791,7 +2786,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2800,7 +2795,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2860,7 +2855,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2870,7 +2865,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2895,7 +2890,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2915,7 +2910,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2963,10 +2958,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigGetCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentConfigListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentConfigListCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2977,9 +2972,9 @@ pub struct ProjectLocationGameServerDeploymentConfigListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentConfigListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentConfigListCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentConfigListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3056,8 +3051,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3070,7 +3064,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3079,7 +3073,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3139,35 +3133,35 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, server will pick an appropriate default. Server may return fewer items than requested. A caller should only rely on response's next_page_token to determine if there are more GameServerConfigs left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3177,7 +3171,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentConfigListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3202,7 +3196,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3222,7 +3216,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentConfigListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3273,10 +3267,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentConfigListCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentCreateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerDeployment,
     _parent: String,
     _deployment_id: Option<String>,
@@ -3285,9 +3279,9 @@ pub struct ProjectLocationGameServerDeploymentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3366,8 +3360,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3381,7 +3374,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3392,7 +3385,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3451,7 +3444,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3461,14 +3454,14 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the game server delpoyment resource to be created.
     ///
     /// Sets the *deployment id* query property to the given value.
-    pub fn deployment_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a, C> {
+    pub fn deployment_id(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
         self._deployment_id = Some(new_value.to_string());
         self
     }
@@ -3478,7 +3471,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3503,7 +3496,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3523,7 +3516,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3567,19 +3560,19 @@ impl<'a, C> ProjectLocationGameServerDeploymentCreateCall<'a, C> where C: Borrow
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentDeleteCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3644,8 +3637,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3658,7 +3650,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3667,7 +3659,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3727,7 +3719,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3737,7 +3729,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3762,7 +3754,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3782,7 +3774,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3832,10 +3824,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentDeleteCall<'a, C> where C: Borrow
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: FetchDeploymentStateRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3843,9 +3835,9 @@ pub struct ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3921,8 +3913,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3936,7 +3927,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3947,7 +3938,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4006,7 +3997,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FetchDeploymentStateRequest) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> {
+    pub fn request(mut self, new_value: FetchDeploymentStateRequest) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4016,7 +4007,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4026,7 +4017,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4051,7 +4042,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4071,7 +4062,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4115,19 +4106,19 @@ impl<'a, C> ProjectLocationGameServerDeploymentFetchDeploymentStateCall<'a, C> w
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentGetCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentGetCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4192,8 +4183,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4206,7 +4196,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4215,7 +4205,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4275,7 +4265,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4285,7 +4275,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4310,7 +4300,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4330,7 +4320,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4375,10 +4365,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetCall<'a, C> where C: BorrowMut
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4386,9 +4376,9 @@ pub struct ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4456,8 +4446,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4470,7 +4459,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4479,7 +4468,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4539,14 +4528,14 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The policy format version to be returned. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -4556,7 +4545,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4581,7 +4570,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4601,7 +4590,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4645,19 +4634,19 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetIamPolicyCall<'a, C> where C: 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentGetRolloutCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentGetRolloutCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentGetRolloutCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4722,8 +4711,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4736,7 +4724,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4745,7 +4733,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4805,7 +4793,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4815,7 +4803,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4840,7 +4828,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4860,7 +4848,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentGetRolloutCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4908,10 +4896,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentGetRolloutCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentListCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4922,9 +4910,9 @@ pub struct ProjectLocationGameServerDeploymentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentListCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5001,8 +4989,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5015,7 +5002,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5024,7 +5011,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5084,35 +5071,35 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, the server will pick an appropriate default. The server may return fewer items than requested. A caller should only rely on response's next_page_token to determine if there are more GameServerDeployments left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationGameServerDeploymentListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -5122,7 +5109,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5147,7 +5134,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5167,7 +5154,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5218,10 +5205,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentListCall<'a, C> where C: BorrowMu
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentPatchCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerDeployment,
     _name: String,
     _update_mask: Option<String>,
@@ -5230,9 +5217,9 @@ pub struct ProjectLocationGameServerDeploymentPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5311,8 +5298,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5326,7 +5312,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5337,7 +5323,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5396,7 +5382,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerDeployment) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5406,14 +5392,14 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5423,7 +5409,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5448,7 +5434,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5468,7 +5454,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5520,10 +5506,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentPatchCall<'a, C> where C: BorrowM
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerDeploymentRollout,
     _name: String,
     _update_mask: Option<String>,
@@ -5533,9 +5519,9 @@ pub struct ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5617,8 +5603,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5632,7 +5617,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5643,7 +5628,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5702,7 +5687,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
         self._request = new_value;
         self
     }
@@ -5712,21 +5697,21 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Mask of fields to update. At least one path must be supplied in this field. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview. Defaults to the immediately after the proposed rollout completes.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -5736,7 +5721,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5761,7 +5746,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5781,7 +5766,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5831,10 +5816,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentPreviewRolloutCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5842,9 +5827,9 @@ pub struct ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5920,8 +5905,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5935,7 +5919,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5946,7 +5930,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6005,7 +5989,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -6015,7 +5999,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -6025,7 +6009,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6050,7 +6034,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6070,7 +6054,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6120,10 +6104,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentSetIamPolicyCall<'a, C> where C: 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6131,9 +6115,9 @@ pub struct ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6209,8 +6193,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6224,7 +6207,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6235,7 +6218,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6294,7 +6277,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -6304,7 +6287,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -6314,7 +6297,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6339,7 +6322,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6359,7 +6342,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6410,10 +6393,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentTestIamPermissionCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerDeploymentRollout,
     _name: String,
     _update_mask: Option<String>,
@@ -6422,9 +6405,9 @@ pub struct ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {}
 
-impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6503,8 +6486,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6518,7 +6500,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6529,7 +6511,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6588,7 +6570,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerDeploymentRollout) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
         self._request = new_value;
         self
     }
@@ -6598,14 +6580,14 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6615,7 +6597,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6640,7 +6622,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6660,7 +6642,7 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6710,10 +6692,10 @@ impl<'a, C> ProjectLocationGameServerDeploymentUpdateRolloutCall<'a, C> where C:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationCancelCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationOperationCancelCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6721,9 +6703,9 @@ pub struct ProjectLocationOperationCancelCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationOperationCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationOperationCancelCall<'a> {}
 
-impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationOperationCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6799,8 +6781,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6814,7 +6795,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6825,7 +6806,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6884,7 +6865,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a, C> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> ProjectLocationOperationCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -6894,7 +6875,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationCancelCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6904,7 +6885,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6929,7 +6910,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6949,7 +6930,7 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationCancelCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6993,19 +6974,19 @@ impl<'a, C> ProjectLocationOperationCancelCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationOperationDeleteCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationOperationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationOperationDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationOperationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7070,8 +7051,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7084,7 +7064,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7093,7 +7073,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7153,7 +7133,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7163,7 +7143,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7188,7 +7168,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7208,7 +7188,7 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7252,19 +7232,19 @@ impl<'a, C> ProjectLocationOperationDeleteCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationOperationGetCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationOperationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7329,8 +7309,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7343,7 +7322,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7352,7 +7331,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7412,7 +7391,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7422,7 +7401,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7447,7 +7426,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7467,7 +7446,7 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7514,10 +7493,10 @@ impl<'a, C> ProjectLocationOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationOperationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationOperationListCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7527,9 +7506,9 @@ pub struct ProjectLocationOperationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationOperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationOperationListCall<'a> {}
 
-impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationOperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7603,8 +7582,7 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7617,7 +7595,7 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7626,7 +7604,7 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7686,28 +7664,28 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationOperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationOperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7717,7 +7695,7 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationOperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7742,7 +7720,7 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationOperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7762,7 +7740,7 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationOperationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7813,10 +7791,10 @@ impl<'a, C> ProjectLocationOperationListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterCreateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerCluster,
     _parent: String,
     _game_server_cluster_id: Option<String>,
@@ -7825,9 +7803,9 @@ pub struct ProjectLocationRealmGameServerClusterCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7906,8 +7884,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7921,7 +7898,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7932,7 +7909,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7991,7 +7968,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8001,14 +7978,14 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the game server cluster resource to be created.
     ///
     /// Sets the *game server cluster id* query property to the given value.
-    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C> {
+    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
         self._game_server_cluster_id = Some(new_value.to_string());
         self
     }
@@ -8018,7 +7995,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8043,7 +8020,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8063,7 +8040,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8107,19 +8084,19 @@ impl<'a, C> ProjectLocationRealmGameServerClusterCreateCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterDeleteCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8184,8 +8161,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8198,7 +8174,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8207,7 +8183,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8267,7 +8243,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8277,7 +8253,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8302,7 +8278,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8322,7 +8298,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8366,19 +8342,19 @@ impl<'a, C> ProjectLocationRealmGameServerClusterDeleteCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterGetCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterGetCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8443,8 +8419,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8457,7 +8432,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8466,7 +8441,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8526,7 +8501,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8536,7 +8511,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8561,7 +8536,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8581,7 +8556,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8629,10 +8604,10 @@ impl<'a, C> ProjectLocationRealmGameServerClusterGetCall<'a, C> where C: BorrowM
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterListCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8643,9 +8618,9 @@ pub struct ProjectLocationRealmGameServerClusterListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterListCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8722,8 +8697,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8736,7 +8710,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8745,7 +8719,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8805,35 +8779,35 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, the server will pick an appropriate default. The server may return fewer items than requested. A caller should only rely on response's next_page_token to determine if there are more GameServerClusters left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8843,7 +8817,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8868,7 +8842,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8888,7 +8862,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8939,10 +8913,10 @@ impl<'a, C> ProjectLocationRealmGameServerClusterListCall<'a, C> where C: Borrow
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterPatchCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerCluster,
     _name: String,
     _update_mask: Option<String>,
@@ -8951,9 +8925,9 @@ pub struct ProjectLocationRealmGameServerClusterPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9032,8 +9006,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9047,7 +9020,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9058,7 +9031,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9117,7 +9090,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -9127,14 +9100,14 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9144,7 +9117,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9169,7 +9142,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9189,7 +9162,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9241,10 +9214,10 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPatchCall<'a, C> where C: Borro
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerCluster,
     _parent: String,
     _preview_time: Option<String>,
@@ -9254,9 +9227,9 @@ pub struct ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9338,8 +9311,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9353,7 +9325,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9364,7 +9336,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9423,7 +9395,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -9433,21 +9405,21 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
         self._preview_time = Some(new_value.to_string());
         self
     }
     /// Required. The ID of the game server cluster resource to be created.
     ///
     /// Sets the *game server cluster id* query property to the given value.
-    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {
+    pub fn game_server_cluster_id(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
         self._game_server_cluster_id = Some(new_value.to_string());
         self
     }
@@ -9457,7 +9429,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9482,7 +9454,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9502,7 +9474,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9547,10 +9519,10 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewCreateCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _preview_time: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9558,9 +9530,9 @@ pub struct ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9628,8 +9600,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9642,7 +9613,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9651,7 +9622,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9711,14 +9682,14 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -9728,7 +9699,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9753,7 +9724,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9773,7 +9744,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9825,10 +9796,10 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewDeleteCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: GameServerCluster,
     _name: String,
     _update_mask: Option<String>,
@@ -9838,9 +9809,9 @@ pub struct ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9922,8 +9893,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9937,7 +9907,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9948,7 +9918,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10007,7 +9977,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: GameServerCluster) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10017,21 +9987,21 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Mask of fields to update. At least one path must be supplied in this field. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -10041,7 +10011,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10066,7 +10036,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10086,7 +10056,7 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10137,10 +10107,10 @@ impl<'a, C> ProjectLocationRealmGameServerClusterPreviewUpdateCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmCreateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: Realm,
     _parent: String,
     _realm_id: Option<String>,
@@ -10149,9 +10119,9 @@ pub struct ProjectLocationRealmCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10230,8 +10200,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10245,7 +10214,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10256,7 +10225,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10315,7 +10284,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10325,14 +10294,14 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The ID of the realm resource to be created.
     ///
     /// Sets the *realm id* query property to the given value.
-    pub fn realm_id(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a, C> {
+    pub fn realm_id(mut self, new_value: &str) -> ProjectLocationRealmCreateCall<'a> {
         self._realm_id = Some(new_value.to_string());
         self
     }
@@ -10342,7 +10311,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10367,7 +10336,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10387,7 +10356,7 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10431,19 +10400,19 @@ impl<'a, C> ProjectLocationRealmCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmDeleteCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10508,8 +10477,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10522,7 +10490,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10531,7 +10499,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10591,7 +10559,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10601,7 +10569,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10626,7 +10594,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10646,7 +10614,7 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10690,19 +10658,19 @@ impl<'a, C> ProjectLocationRealmDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmGetCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmGetCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10767,8 +10735,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10781,7 +10748,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10790,7 +10757,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10850,7 +10817,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10860,7 +10827,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10885,7 +10852,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10905,7 +10872,7 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10953,10 +10920,10 @@ impl<'a, C> ProjectLocationRealmGetCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmListCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10967,9 +10934,9 @@ pub struct ProjectLocationRealmListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmListCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11046,8 +11013,7 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11060,7 +11026,7 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11069,7 +11035,7 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11129,35 +11095,35 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return. If unspecified, server will pick an appropriate default. Server may return fewer items than requested. A caller should only rely on response's next_page_token to determine if there are more realms left to be queried.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRealmListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Specifies the ordering of results following syntax at https://cloud.google.com/apis/design/design_patterns#sorting_order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to apply to list results.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRealmListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11167,7 +11133,7 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11192,7 +11158,7 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11212,7 +11178,7 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11263,10 +11229,10 @@ impl<'a, C> ProjectLocationRealmListCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmPatchCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: Realm,
     _name: String,
     _update_mask: Option<String>,
@@ -11275,9 +11241,9 @@ pub struct ProjectLocationRealmPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11356,8 +11322,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11371,7 +11336,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11382,7 +11347,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11441,7 +11406,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -11451,14 +11416,14 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11468,7 +11433,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11493,7 +11458,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11513,7 +11478,7 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11565,10 +11530,10 @@ impl<'a, C> ProjectLocationRealmPatchCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRealmPreviewUpdateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRealmPreviewUpdateCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _request: Realm,
     _name: String,
     _update_mask: Option<String>,
@@ -11578,9 +11543,9 @@ pub struct ProjectLocationRealmPreviewUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRealmPreviewUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRealmPreviewUpdateCall<'a> {}
 
-impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRealmPreviewUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11662,8 +11627,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11677,7 +11641,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11688,7 +11652,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11747,7 +11711,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPreviewUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Realm) -> ProjectLocationRealmPreviewUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -11757,21 +11721,21 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The update mask applies to the resource. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. The target timestamp to compute the preview.
     ///
     /// Sets the *preview time* query property to the given value.
-    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a, C> {
+    pub fn preview_time(mut self, new_value: &str) -> ProjectLocationRealmPreviewUpdateCall<'a> {
         self._preview_time = Some(new_value.to_string());
         self
     }
@@ -11781,7 +11745,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPreviewUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRealmPreviewUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11806,7 +11770,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPreviewUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRealmPreviewUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11826,7 +11790,7 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmPreviewUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRealmPreviewUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11870,19 +11834,19 @@ impl<'a, C> ProjectLocationRealmPreviewUpdateCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGetCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11947,8 +11911,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11961,7 +11924,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11970,7 +11933,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12030,7 +11993,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -12040,7 +12003,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12065,7 +12028,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12085,7 +12048,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12133,10 +12096,10 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationListCall<'a>
+    where  {
 
-    hub: &'a GameServices<C>,
+    hub: &'a GameServices<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12147,9 +12110,9 @@ pub struct ProjectLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
 
-impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12226,8 +12189,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12240,7 +12202,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12249,7 +12211,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12309,35 +12271,35 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service will select a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// If true, the returned list will include locations which are not yet revealed.
     ///
     /// Sets the *include unrevealed locations* query property to the given value.
-    pub fn include_unrevealed_locations(mut self, new_value: bool) -> ProjectLocationListCall<'a, C> {
+    pub fn include_unrevealed_locations(mut self, new_value: bool) -> ProjectLocationListCall<'a> {
         self._include_unrevealed_locations = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12347,7 +12309,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12372,7 +12334,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12392,7 +12354,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

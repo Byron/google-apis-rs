@@ -4,10 +4,10 @@
 [package]
 
 name = "google-serviceregistryalpha-cli"
-version = "2.0.0+20160401"
+version = "2.0.3+20160401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Registry (protocol alpha)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/serviceregistryalpha-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/serviceregistryalpha-cli"
 homepage = "https://developers.google.com/cloud-serviceregistry/"
 documentation = "http://byron.github.io/google-apis-rs/google_serviceregistryalpha_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-serviceregistryalpha]
 path = "../serviceregistryalpha"
-version = "2.0.0+20160401"
+version = "2.0.3+20160401"

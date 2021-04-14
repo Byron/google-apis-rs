@@ -1,8 +1,8 @@
-site_name: Blogger v2.0.0+20210331
+site_name: Blogger v2.0.3+20210331
 site_url: http://byron.github.io/google-apis-rs/google-blogger3-cli
 site_description: A complete library to interact with Blogger (protocol v3)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/blogger3-cli
 
 docs_dir: docs
 site_dir: build_html

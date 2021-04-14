@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct ChromePolicy<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct ChromePolicy<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for ChromePolicy<C> {}
+impl<'a, > client::Hub for ChromePolicy<> {}
 
-impl<'a, C> ChromePolicy<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > ChromePolicy<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ChromePolicy<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ChromePolicy<> {
         ChromePolicy {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://chromepolicy.googleapis.com/".to_string(),
             _root_url: "https://chromepolicy.googleapis.com/".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a, C> {
+    pub fn customers(&'a self) -> CustomerMethods<'a> {
         CustomerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -655,15 +653,15 @@ impl client::Part for Proto2OneofDescriptorProto {}
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a, C>
-    where C: 'a {
+pub struct CustomerMethods<'a>
+    where  {
 
-    hub: &'a ChromePolicy<C>,
+    hub: &'a ChromePolicy<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CustomerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CustomerMethods<'a> {}
 
-impl<'a, C> CustomerMethods<'a, C> {
+impl<'a> CustomerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -673,7 +671,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `customer` - ID of the G Suite account or literal "my_customer" for the customer associated to the request.
-    pub fn policies_orgunits_batch_inherit(&self, request: GoogleChromePolicyV1BatchInheritOrgUnitPoliciesRequest, customer: &str) -> CustomerPolicyOrgunitBatchInheritCall<'a, C> {
+    pub fn policies_orgunits_batch_inherit(&self, request: GoogleChromePolicyV1BatchInheritOrgUnitPoliciesRequest, customer: &str) -> CustomerPolicyOrgunitBatchInheritCall<'a> {
         CustomerPolicyOrgunitBatchInheritCall {
             hub: self.hub,
             _request: request,
@@ -692,7 +690,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `customer` - ID of the G Suite account or literal "my_customer" for the customer associated to the request.
-    pub fn policies_orgunits_batch_modify(&self, request: GoogleChromePolicyV1BatchModifyOrgUnitPoliciesRequest, customer: &str) -> CustomerPolicyOrgunitBatchModifyCall<'a, C> {
+    pub fn policies_orgunits_batch_modify(&self, request: GoogleChromePolicyV1BatchModifyOrgUnitPoliciesRequest, customer: &str) -> CustomerPolicyOrgunitBatchModifyCall<'a> {
         CustomerPolicyOrgunitBatchModifyCall {
             hub: self.hub,
             _request: request,
@@ -711,7 +709,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `customer` - ID of the G Suite account or literal "my_customer" for the customer associated to the request.
-    pub fn policies_resolve(&self, request: GoogleChromePolicyV1ResolveRequest, customer: &str) -> CustomerPolicyResolveCall<'a, C> {
+    pub fn policies_resolve(&self, request: GoogleChromePolicyV1ResolveRequest, customer: &str) -> CustomerPolicyResolveCall<'a> {
         CustomerPolicyResolveCall {
             hub: self.hub,
             _request: request,
@@ -729,7 +727,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The policy schema resource name to query.
-    pub fn policy_schemas_get(&self, name: &str) -> CustomerPolicySchemaGetCall<'a, C> {
+    pub fn policy_schemas_get(&self, name: &str) -> CustomerPolicySchemaGetCall<'a> {
         CustomerPolicySchemaGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -746,7 +744,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The customer for which the listing request will apply.
-    pub fn policy_schemas_list(&self, parent: &str) -> CustomerPolicySchemaListCall<'a, C> {
+    pub fn policy_schemas_list(&self, parent: &str) -> CustomerPolicySchemaListCall<'a> {
         CustomerPolicySchemaListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -806,10 +804,10 @@ impl<'a, C> CustomerMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPolicyOrgunitBatchInheritCall<'a, C>
-    where C: 'a {
+pub struct CustomerPolicyOrgunitBatchInheritCall<'a>
+    where  {
 
-    hub: &'a ChromePolicy<C>,
+    hub: &'a ChromePolicy<>,
     _request: GoogleChromePolicyV1BatchInheritOrgUnitPoliciesRequest,
     _customer: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -817,9 +815,9 @@ pub struct CustomerPolicyOrgunitBatchInheritCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerPolicyOrgunitBatchInheritCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerPolicyOrgunitBatchInheritCall<'a> {}
 
-impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerPolicyOrgunitBatchInheritCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -895,8 +893,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -910,7 +907,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -921,7 +918,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -980,7 +977,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleChromePolicyV1BatchInheritOrgUnitPoliciesRequest) -> CustomerPolicyOrgunitBatchInheritCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleChromePolicyV1BatchInheritOrgUnitPoliciesRequest) -> CustomerPolicyOrgunitBatchInheritCall<'a> {
         self._request = new_value;
         self
     }
@@ -990,7 +987,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerPolicyOrgunitBatchInheritCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> CustomerPolicyOrgunitBatchInheritCall<'a> {
         self._customer = new_value.to_string();
         self
     }
@@ -1000,7 +997,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicyOrgunitBatchInheritCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicyOrgunitBatchInheritCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1025,7 +1022,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicyOrgunitBatchInheritCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicyOrgunitBatchInheritCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1045,7 +1042,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicyOrgunitBatchInheritCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicyOrgunitBatchInheritCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1095,10 +1092,10 @@ impl<'a, C> CustomerPolicyOrgunitBatchInheritCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPolicyOrgunitBatchModifyCall<'a, C>
-    where C: 'a {
+pub struct CustomerPolicyOrgunitBatchModifyCall<'a>
+    where  {
 
-    hub: &'a ChromePolicy<C>,
+    hub: &'a ChromePolicy<>,
     _request: GoogleChromePolicyV1BatchModifyOrgUnitPoliciesRequest,
     _customer: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1106,9 +1103,9 @@ pub struct CustomerPolicyOrgunitBatchModifyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerPolicyOrgunitBatchModifyCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerPolicyOrgunitBatchModifyCall<'a> {}
 
-impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerPolicyOrgunitBatchModifyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1184,8 +1181,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1199,7 +1195,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1210,7 +1206,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1269,7 +1265,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleChromePolicyV1BatchModifyOrgUnitPoliciesRequest) -> CustomerPolicyOrgunitBatchModifyCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleChromePolicyV1BatchModifyOrgUnitPoliciesRequest) -> CustomerPolicyOrgunitBatchModifyCall<'a> {
         self._request = new_value;
         self
     }
@@ -1279,7 +1275,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerPolicyOrgunitBatchModifyCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> CustomerPolicyOrgunitBatchModifyCall<'a> {
         self._customer = new_value.to_string();
         self
     }
@@ -1289,7 +1285,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicyOrgunitBatchModifyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicyOrgunitBatchModifyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1314,7 +1310,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicyOrgunitBatchModifyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicyOrgunitBatchModifyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1334,7 +1330,7 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicyOrgunitBatchModifyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicyOrgunitBatchModifyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1384,10 +1380,10 @@ impl<'a, C> CustomerPolicyOrgunitBatchModifyCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPolicyResolveCall<'a, C>
-    where C: 'a {
+pub struct CustomerPolicyResolveCall<'a>
+    where  {
 
-    hub: &'a ChromePolicy<C>,
+    hub: &'a ChromePolicy<>,
     _request: GoogleChromePolicyV1ResolveRequest,
     _customer: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1395,9 +1391,9 @@ pub struct CustomerPolicyResolveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerPolicyResolveCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerPolicyResolveCall<'a> {}
 
-impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerPolicyResolveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1473,8 +1469,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1488,7 +1483,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1499,7 +1494,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1558,7 +1553,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleChromePolicyV1ResolveRequest) -> CustomerPolicyResolveCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleChromePolicyV1ResolveRequest) -> CustomerPolicyResolveCall<'a> {
         self._request = new_value;
         self
     }
@@ -1568,7 +1563,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> CustomerPolicyResolveCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> CustomerPolicyResolveCall<'a> {
         self._customer = new_value.to_string();
         self
     }
@@ -1578,7 +1573,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicyResolveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicyResolveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1603,7 +1598,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicyResolveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicyResolveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1623,7 +1618,7 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicyResolveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicyResolveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1667,19 +1662,19 @@ impl<'a, C> CustomerPolicyResolveCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPolicySchemaGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerPolicySchemaGetCall<'a>
+    where  {
 
-    hub: &'a ChromePolicy<C>,
+    hub: &'a ChromePolicy<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerPolicySchemaGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerPolicySchemaGetCall<'a> {}
 
-impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerPolicySchemaGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1744,8 +1739,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1758,7 +1752,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1767,7 +1761,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1827,7 +1821,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerPolicySchemaGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerPolicySchemaGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1837,7 +1831,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicySchemaGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicySchemaGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1862,7 +1856,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicySchemaGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicySchemaGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1882,7 +1876,7 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicySchemaGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicySchemaGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1929,10 +1923,10 @@ impl<'a, C> CustomerPolicySchemaGetCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPolicySchemaListCall<'a, C>
-    where C: 'a {
+pub struct CustomerPolicySchemaListCall<'a>
+    where  {
 
-    hub: &'a ChromePolicy<C>,
+    hub: &'a ChromePolicy<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1942,9 +1936,9 @@ pub struct CustomerPolicySchemaListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerPolicySchemaListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerPolicySchemaListCall<'a> {}
 
-impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerPolicySchemaListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2018,8 +2012,7 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2032,7 +2025,7 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2041,7 +2034,7 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2101,28 +2094,28 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerPolicySchemaListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerPolicySchemaListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The page token used to retrieve a specific page of the listing request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerPolicySchemaListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerPolicySchemaListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of policy schemas to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerPolicySchemaListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerPolicySchemaListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The schema filter used to find a particular schema based on fields like its resource name, description and `additionalTargetKeyNames`.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerPolicySchemaListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerPolicySchemaListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2132,7 +2125,7 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicySchemaListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPolicySchemaListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2157,7 +2150,7 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicySchemaListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPolicySchemaListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2177,7 +2170,7 @@ impl<'a, C> CustomerPolicySchemaListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicySchemaListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPolicySchemaListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

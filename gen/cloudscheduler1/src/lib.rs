@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Scheduler* crate version *2.0.0+20210315*, where *20210315* is the exact revision of the *cloudscheduler:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Cloud Scheduler* crate version *2.0.3+20210315*, where *20210315* is the exact revision of the *cloudscheduler:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Cloud Scheduler* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/scheduler/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudscheduler1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudscheduler1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudScheduler) ... 

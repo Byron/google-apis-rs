@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -114,41 +113,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Plus<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Plus<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Plus<C> {}
+impl<'a, > client::Hub for Plus<> {}
 
-impl<'a, C> Plus<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Plus<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Plus<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Plus<> {
         Plus {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/plus/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn activities(&'a self) -> ActivityMethods<'a, C> {
+    pub fn activities(&'a self) -> ActivityMethods<'a> {
         ActivityMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a, C> {
+    pub fn comments(&'a self) -> CommentMethods<'a> {
         CommentMethods { hub: &self }
     }
-    pub fn people(&'a self) -> PeopleMethods<'a, C> {
+    pub fn people(&'a self) -> PeopleMethods<'a> {
         PeopleMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1401,15 +1399,15 @@ impl client::Part for PlacePosition {}
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C>
-    where C: 'a {
+pub struct ActivityMethods<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ActivityMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ActivityMethods<'a> {}
 
-impl<'a, C> ActivityMethods<'a, C> {
+impl<'a> ActivityMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1418,7 +1416,7 @@ impl<'a, C> ActivityMethods<'a, C> {
     /// # Arguments
     ///
     /// * `activityId` - The ID of the activity to get.
-    pub fn get(&self, activity_id: &str) -> ActivityGetCall<'a, C> {
+    pub fn get(&self, activity_id: &str) -> ActivityGetCall<'a> {
         ActivityGetCall {
             hub: self.hub,
             _activity_id: activity_id.to_string(),
@@ -1436,7 +1434,7 @@ impl<'a, C> ActivityMethods<'a, C> {
     ///
     /// * `userId` - The ID of the user to get activities for. The special value "me" can be used to indicate the authenticated user.
     /// * `collection` - The collection of activities to list.
-    pub fn list(&self, user_id: &str, collection: &str) -> ActivityListCall<'a, C> {
+    pub fn list(&self, user_id: &str, collection: &str) -> ActivityListCall<'a> {
         ActivityListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1456,7 +1454,7 @@ impl<'a, C> ActivityMethods<'a, C> {
     /// # Arguments
     ///
     /// * `query` - Full-text search query string.
-    pub fn search(&self, query: &str) -> ActivitySearchCall<'a, C> {
+    pub fn search(&self, query: &str) -> ActivitySearchCall<'a> {
         ActivitySearchCall {
             hub: self.hub,
             _query: query.to_string(),
@@ -1503,15 +1501,15 @@ impl<'a, C> ActivityMethods<'a, C> {
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a, C>
-    where C: 'a {
+pub struct CommentMethods<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CommentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CommentMethods<'a> {}
 
-impl<'a, C> CommentMethods<'a, C> {
+impl<'a> CommentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1520,7 +1518,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `commentId` - The ID of the comment to get.
-    pub fn get(&self, comment_id: &str) -> CommentGetCall<'a, C> {
+    pub fn get(&self, comment_id: &str) -> CommentGetCall<'a> {
         CommentGetCall {
             hub: self.hub,
             _comment_id: comment_id.to_string(),
@@ -1537,7 +1535,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `activityId` - The ID of the activity to get comments for.
-    pub fn list(&self, activity_id: &str) -> CommentListCall<'a, C> {
+    pub fn list(&self, activity_id: &str) -> CommentListCall<'a> {
         CommentListCall {
             hub: self.hub,
             _activity_id: activity_id.to_string(),
@@ -1583,15 +1581,15 @@ impl<'a, C> CommentMethods<'a, C> {
 /// let rb = hub.people();
 /// # }
 /// ```
-pub struct PeopleMethods<'a, C>
-    where C: 'a {
+pub struct PeopleMethods<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PeopleMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PeopleMethods<'a> {}
 
-impl<'a, C> PeopleMethods<'a, C> {
+impl<'a> PeopleMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1600,7 +1598,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `userId` - The ID of the person to get the profile for. The special value "me" can be used to indicate the authenticated user.
-    pub fn get(&self, user_id: &str) -> PeopleGetCall<'a, C> {
+    pub fn get(&self, user_id: &str) -> PeopleGetCall<'a> {
         PeopleGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1618,7 +1616,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     ///
     /// * `userId` - Get the collection of people for the person identified. Use "me" to indicate the authenticated user.
     /// * `collection` - The collection of people to list.
-    pub fn list(&self, user_id: &str, collection: &str) -> PeopleListCall<'a, C> {
+    pub fn list(&self, user_id: &str, collection: &str) -> PeopleListCall<'a> {
         PeopleListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1640,7 +1638,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     ///
     /// * `activityId` - The ID of the activity to get the list of people for.
     /// * `collection` - The collection of people to list.
-    pub fn list_by_activity(&self, activity_id: &str, collection: &str) -> PeopleListByActivityCall<'a, C> {
+    pub fn list_by_activity(&self, activity_id: &str, collection: &str) -> PeopleListByActivityCall<'a> {
         PeopleListByActivityCall {
             hub: self.hub,
             _activity_id: activity_id.to_string(),
@@ -1660,7 +1658,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `query` - Specify a query string for full text search of public text in all profiles.
-    pub fn search(&self, query: &str) -> PeopleSearchCall<'a, C> {
+    pub fn search(&self, query: &str) -> PeopleSearchCall<'a> {
         PeopleSearchCall {
             hub: self.hub,
             _query: query.to_string(),
@@ -1714,19 +1712,19 @@ impl<'a, C> PeopleMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityGetCall<'a, C>
-    where C: 'a {
+pub struct ActivityGetCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _activity_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActivityGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ActivityGetCall<'a> {}
 
-impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActivityGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1787,8 +1785,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1801,7 +1798,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1810,7 +1807,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1870,7 +1867,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn activity_id(mut self, new_value: &str) -> ActivityGetCall<'a, C> {
+    pub fn activity_id(mut self, new_value: &str) -> ActivityGetCall<'a> {
         self._activity_id = new_value.to_string();
         self
     }
@@ -1880,7 +1877,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1901,7 +1898,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1921,7 +1918,7 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1967,10 +1964,10 @@ impl<'a, C> ActivityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityListCall<'a, C>
-    where C: 'a {
+pub struct ActivityListCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _user_id: String,
     _collection: String,
     _page_token: Option<String>,
@@ -1980,9 +1977,9 @@ pub struct ActivityListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActivityListCall<'a, C> {}
+impl<'a> client::CallBuilder for ActivityListCall<'a> {}
 
-impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActivityListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2050,8 +2047,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2064,7 +2060,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2073,7 +2069,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2133,7 +2129,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2143,21 +2139,21 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._collection = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of activities to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -2167,7 +2163,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2188,7 +2184,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2208,7 +2204,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2256,10 +2252,10 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivitySearchCall<'a, C>
-    where C: 'a {
+pub struct ActivitySearchCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _query: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -2270,9 +2266,9 @@ pub struct ActivitySearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActivitySearchCall<'a, C> {}
+impl<'a> client::CallBuilder for ActivitySearchCall<'a> {}
 
-impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActivitySearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2324,8 +2320,7 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2338,7 +2333,7 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2347,7 +2342,7 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2407,35 +2402,35 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn query(mut self, new_value: &str) -> ActivitySearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> ActivitySearchCall<'a> {
         self._query = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response. This token can be of any length.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivitySearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ActivitySearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Specifies how to order search results.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ActivitySearchCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ActivitySearchCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of activities to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ActivitySearchCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> ActivitySearchCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Specify the preferred language to search with. See search language codes for available values.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ActivitySearchCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ActivitySearchCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -2445,7 +2440,7 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivitySearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivitySearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2466,7 +2461,7 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivitySearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivitySearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2486,7 +2481,7 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivitySearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivitySearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2530,19 +2525,19 @@ impl<'a, C> ActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentGetCall<'a, C>
-    where C: 'a {
+pub struct CommentGetCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _comment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentGetCall<'a> {}
 
-impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2603,8 +2598,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2617,7 +2611,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2626,7 +2620,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2686,7 +2680,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -2696,7 +2690,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2717,7 +2711,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2737,7 +2731,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2784,10 +2778,10 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListCall<'a, C>
-    where C: 'a {
+pub struct CommentListCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _activity_id: String,
     _sort_order: Option<String>,
     _page_token: Option<String>,
@@ -2797,9 +2791,9 @@ pub struct CommentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentListCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentListCall<'a> {}
 
-impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2869,8 +2863,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2883,7 +2876,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2892,7 +2885,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2952,28 +2945,28 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn activity_id(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn activity_id(mut self, new_value: &str) -> CommentListCall<'a> {
         self._activity_id = new_value.to_string();
         self
     }
     /// The order in which to sort the list of comments.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn sort_order(mut self, new_value: &str) -> CommentListCall<'a> {
         self._sort_order = Some(new_value.to_string());
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of comments to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -2983,7 +2976,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3004,7 +2997,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3024,7 +3017,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3068,19 +3061,19 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleGetCall<'a, C>
-    where C: 'a {
+pub struct PeopleGetCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleGetCall<'a> {}
 
-impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3141,8 +3134,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3155,7 +3147,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3164,7 +3156,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3224,7 +3216,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> PeopleGetCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> PeopleGetCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3234,7 +3226,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3255,7 +3247,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3275,7 +3267,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3322,10 +3314,10 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleListCall<'a, C>
-    where C: 'a {
+pub struct PeopleListCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _user_id: String,
     _collection: String,
     _page_token: Option<String>,
@@ -3336,9 +3328,9 @@ pub struct PeopleListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleListCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleListCall<'a> {}
 
-impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3409,8 +3401,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3423,7 +3414,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3432,7 +3423,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3492,7 +3483,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> PeopleListCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> PeopleListCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3502,28 +3493,28 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> PeopleListCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> PeopleListCall<'a> {
         self._collection = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order to return people in.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PeopleListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> PeopleListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PeopleListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> PeopleListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -3533,7 +3524,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3554,7 +3545,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3574,7 +3565,7 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3620,10 +3611,10 @@ impl<'a, C> PeopleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleListByActivityCall<'a, C>
-    where C: 'a {
+pub struct PeopleListByActivityCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _activity_id: String,
     _collection: String,
     _page_token: Option<String>,
@@ -3633,9 +3624,9 @@ pub struct PeopleListByActivityCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleListByActivityCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleListByActivityCall<'a> {}
 
-impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleListByActivityCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3703,8 +3694,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3717,7 +3707,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3726,7 +3716,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3786,7 +3776,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn activity_id(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C> {
+    pub fn activity_id(mut self, new_value: &str) -> PeopleListByActivityCall<'a> {
         self._activity_id = new_value.to_string();
         self
     }
@@ -3796,21 +3786,21 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> PeopleListByActivityCall<'a> {
         self._collection = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleListByActivityCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleListByActivityCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PeopleListByActivityCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> PeopleListByActivityCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -3820,7 +3810,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListByActivityCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListByActivityCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3841,7 +3831,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleListByActivityCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleListByActivityCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3861,7 +3851,7 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListByActivityCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListByActivityCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3908,10 +3898,10 @@ impl<'a, C> PeopleListByActivityCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleSearchCall<'a, C>
-    where C: 'a {
+pub struct PeopleSearchCall<'a>
+    where  {
 
-    hub: &'a Plus<C>,
+    hub: &'a Plus<>,
     _query: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -3921,9 +3911,9 @@ pub struct PeopleSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleSearchCall<'a> {}
 
-impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3972,8 +3962,7 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3986,7 +3975,7 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3995,7 +3984,7 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4055,28 +4044,28 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn query(mut self, new_value: &str) -> PeopleSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> PeopleSearchCall<'a> {
         self._query = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of "nextPageToken" from the previous response. This token can be of any length.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of people to include in the response, which is used for paging. For any response, the actual number returned might be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PeopleSearchCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> PeopleSearchCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Specify the preferred language to search with. See search language codes for available values.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> PeopleSearchCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> PeopleSearchCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -4086,7 +4075,7 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4107,7 +4096,7 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4127,7 +4116,7 @@ impl<'a, C> PeopleSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

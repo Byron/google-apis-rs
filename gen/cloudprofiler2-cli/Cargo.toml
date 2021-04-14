@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudprofiler2-cli"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Profiler (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudprofiler2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprofiler2-cli"
 homepage = "https://cloud.google.com/profiler/"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudprofiler2]
 path = "../cloudprofiler2"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"

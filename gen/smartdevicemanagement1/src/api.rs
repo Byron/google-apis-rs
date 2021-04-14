@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -99,35 +98,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct SmartDeviceManagement<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct SmartDeviceManagement<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for SmartDeviceManagement<C> {}
+impl<'a, > client::Hub for SmartDeviceManagement<> {}
 
-impl<'a, C> SmartDeviceManagement<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > SmartDeviceManagement<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SmartDeviceManagement<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SmartDeviceManagement<> {
         SmartDeviceManagement {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://smartdevicemanagement.googleapis.com/".to_string(),
             _root_url: "https://smartdevicemanagement.googleapis.com/".to_string(),
         }
     }
 
-    pub fn enterprises(&'a self) -> EnterpriseMethods<'a, C> {
+    pub fn enterprises(&'a self) -> EnterpriseMethods<'a> {
         EnterpriseMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -373,15 +371,15 @@ impl client::ResponseResult for GoogleHomeEnterpriseSdmV1Structure {}
 /// let rb = hub.enterprises();
 /// # }
 /// ```
-pub struct EnterpriseMethods<'a, C>
-    where C: 'a {
+pub struct EnterpriseMethods<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for EnterpriseMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for EnterpriseMethods<'a> {}
 
-impl<'a, C> EnterpriseMethods<'a, C> {
+impl<'a> EnterpriseMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -391,7 +389,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the device requested. For example: "enterprises/XYZ/devices/123"
-    pub fn devices_execute_command(&self, request: GoogleHomeEnterpriseSdmV1ExecuteDeviceCommandRequest, name: &str) -> EnterpriseDeviceExecuteCommandCall<'a, C> {
+    pub fn devices_execute_command(&self, request: GoogleHomeEnterpriseSdmV1ExecuteDeviceCommandRequest, name: &str) -> EnterpriseDeviceExecuteCommandCall<'a> {
         EnterpriseDeviceExecuteCommandCall {
             hub: self.hub,
             _request: request,
@@ -409,7 +407,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the device requested. For example: "enterprises/XYZ/devices/123"
-    pub fn devices_get(&self, name: &str) -> EnterpriseDeviceGetCall<'a, C> {
+    pub fn devices_get(&self, name: &str) -> EnterpriseDeviceGetCall<'a> {
         EnterpriseDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -426,7 +424,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent enterprise to list devices under. E.g. "enterprises/XYZ".
-    pub fn devices_list(&self, parent: &str) -> EnterpriseDeviceListCall<'a, C> {
+    pub fn devices_list(&self, parent: &str) -> EnterpriseDeviceListCall<'a> {
         EnterpriseDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -446,7 +444,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the room requested. For example: "enterprises/XYZ/structures/ABC/rooms/123".
-    pub fn structures_rooms_get(&self, name: &str) -> EnterpriseStructureRoomGetCall<'a, C> {
+    pub fn structures_rooms_get(&self, name: &str) -> EnterpriseStructureRoomGetCall<'a> {
         EnterpriseStructureRoomGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -463,7 +461,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent resource name of the rooms requested. For example: "enterprises/XYZ/structures/ABC".
-    pub fn structures_rooms_list(&self, parent: &str) -> EnterpriseStructureRoomListCall<'a, C> {
+    pub fn structures_rooms_list(&self, parent: &str) -> EnterpriseStructureRoomListCall<'a> {
         EnterpriseStructureRoomListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -482,7 +480,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the structure requested. For example: "enterprises/XYZ/structures/ABC".
-    pub fn structures_get(&self, name: &str) -> EnterpriseStructureGetCall<'a, C> {
+    pub fn structures_get(&self, name: &str) -> EnterpriseStructureGetCall<'a> {
         EnterpriseStructureGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -499,7 +497,7 @@ impl<'a, C> EnterpriseMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent enterprise to list structures under. E.g. "enterprises/XYZ".
-    pub fn structures_list(&self, parent: &str) -> EnterpriseStructureListCall<'a, C> {
+    pub fn structures_list(&self, parent: &str) -> EnterpriseStructureListCall<'a> {
         EnterpriseStructureListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -559,10 +557,10 @@ impl<'a, C> EnterpriseMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseDeviceExecuteCommandCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseDeviceExecuteCommandCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _request: GoogleHomeEnterpriseSdmV1ExecuteDeviceCommandRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -570,9 +568,9 @@ pub struct EnterpriseDeviceExecuteCommandCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseDeviceExecuteCommandCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseDeviceExecuteCommandCall<'a> {}
 
-impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseDeviceExecuteCommandCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -648,8 +646,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -663,7 +660,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -674,7 +671,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -733,7 +730,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleHomeEnterpriseSdmV1ExecuteDeviceCommandRequest) -> EnterpriseDeviceExecuteCommandCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleHomeEnterpriseSdmV1ExecuteDeviceCommandRequest) -> EnterpriseDeviceExecuteCommandCall<'a> {
         self._request = new_value;
         self
     }
@@ -743,7 +740,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> EnterpriseDeviceExecuteCommandCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> EnterpriseDeviceExecuteCommandCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -753,7 +750,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceExecuteCommandCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceExecuteCommandCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -778,7 +775,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceExecuteCommandCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceExecuteCommandCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -798,7 +795,7 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseDeviceExecuteCommandCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseDeviceExecuteCommandCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -842,19 +839,19 @@ impl<'a, C> EnterpriseDeviceExecuteCommandCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseDeviceGetCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseDeviceGetCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseDeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseDeviceGetCall<'a> {}
 
-impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseDeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -919,8 +916,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -933,7 +929,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -942,7 +938,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1002,7 +998,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> EnterpriseDeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> EnterpriseDeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1012,7 +1008,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1037,7 +1033,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1057,7 +1053,7 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseDeviceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseDeviceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1104,10 +1100,10 @@ impl<'a, C> EnterpriseDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseDeviceListCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseDeviceListCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1117,9 +1113,9 @@ pub struct EnterpriseDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseDeviceListCall<'a> {}
 
-impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1193,8 +1189,7 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1207,7 +1202,7 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1216,7 +1211,7 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1276,28 +1271,28 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> EnterpriseDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> EnterpriseDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional token of the page to retrieve.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EnterpriseDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EnterpriseDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional requested page size. Server may return fewer devices than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> EnterpriseDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> EnterpriseDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional filter to list devices. Filters can be done on: Device custom name (substring match): 'customName=wing'
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> EnterpriseDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> EnterpriseDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1307,7 +1302,7 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1332,7 +1327,7 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1352,7 +1347,7 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1396,19 +1391,19 @@ impl<'a, C> EnterpriseDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseStructureRoomGetCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseStructureRoomGetCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseStructureRoomGetCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseStructureRoomGetCall<'a> {}
 
-impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseStructureRoomGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1473,8 +1468,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1487,7 +1481,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1496,7 +1490,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1556,7 +1550,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> EnterpriseStructureRoomGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> EnterpriseStructureRoomGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1566,7 +1560,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureRoomGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureRoomGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1591,7 +1585,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureRoomGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureRoomGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1611,7 +1605,7 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureRoomGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureRoomGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1657,10 +1651,10 @@ impl<'a, C> EnterpriseStructureRoomGetCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseStructureRoomListCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseStructureRoomListCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1669,9 +1663,9 @@ pub struct EnterpriseStructureRoomListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseStructureRoomListCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseStructureRoomListCall<'a> {}
 
-impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseStructureRoomListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1742,8 +1736,7 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1756,7 +1749,7 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1765,7 +1758,7 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1825,21 +1818,21 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> EnterpriseStructureRoomListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> EnterpriseStructureRoomListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The token of the page to retrieve.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EnterpriseStructureRoomListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EnterpriseStructureRoomListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer rooms than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> EnterpriseStructureRoomListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> EnterpriseStructureRoomListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1849,7 +1842,7 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureRoomListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureRoomListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1874,7 +1867,7 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureRoomListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureRoomListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1894,7 +1887,7 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureRoomListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureRoomListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1938,19 +1931,19 @@ impl<'a, C> EnterpriseStructureRoomListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseStructureGetCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseStructureGetCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseStructureGetCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseStructureGetCall<'a> {}
 
-impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseStructureGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2015,8 +2008,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2029,7 +2021,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2038,7 +2030,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2098,7 +2090,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> EnterpriseStructureGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> EnterpriseStructureGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2108,7 +2100,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2133,7 +2125,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2153,7 +2145,7 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2200,10 +2192,10 @@ impl<'a, C> EnterpriseStructureGetCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EnterpriseStructureListCall<'a, C>
-    where C: 'a {
+pub struct EnterpriseStructureListCall<'a>
+    where  {
 
-    hub: &'a SmartDeviceManagement<C>,
+    hub: &'a SmartDeviceManagement<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2213,9 +2205,9 @@ pub struct EnterpriseStructureListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EnterpriseStructureListCall<'a, C> {}
+impl<'a> client::CallBuilder for EnterpriseStructureListCall<'a> {}
 
-impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EnterpriseStructureListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2289,8 +2281,7 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2303,7 +2294,7 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2312,7 +2303,7 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2372,28 +2363,28 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> EnterpriseStructureListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> EnterpriseStructureListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The token of the page to retrieve.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EnterpriseStructureListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EnterpriseStructureListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer structures than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> EnterpriseStructureListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> EnterpriseStructureListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional filter to list structures.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> EnterpriseStructureListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> EnterpriseStructureListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2403,7 +2394,7 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseStructureListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2428,7 +2419,7 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseStructureListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2448,7 +2439,7 @@ impl<'a, C> EnterpriseStructureListCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EnterpriseStructureListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

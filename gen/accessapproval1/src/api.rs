@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,41 +104,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AccessApproval<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AccessApproval<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AccessApproval<C> {}
+impl<'a, > client::Hub for AccessApproval<> {}
 
-impl<'a, C> AccessApproval<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AccessApproval<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AccessApproval<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AccessApproval<> {
         AccessApproval {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://accessapproval.googleapis.com/".to_string(),
             _root_url: "https://accessapproval.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a, C> {
+    pub fn folders(&'a self) -> FolderMethods<'a> {
         FolderMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a, C> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -459,15 +457,15 @@ impl client::Part for ResourceProperties {}
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a, C>
-    where C: 'a {
+pub struct FolderMethods<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FolderMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
 
-impl<'a, C> FolderMethods<'a, C> {
+impl<'a> FolderMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -477,7 +475,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the approval request to approve.
-    pub fn approval_requests_approve(&self, request: ApproveApprovalRequestMessage, name: &str) -> FolderApprovalRequestApproveCall<'a, C> {
+    pub fn approval_requests_approve(&self, request: ApproveApprovalRequestMessage, name: &str) -> FolderApprovalRequestApproveCall<'a> {
         FolderApprovalRequestApproveCall {
             hub: self.hub,
             _request: request,
@@ -496,7 +494,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the ApprovalRequest to dismiss.
-    pub fn approval_requests_dismiss(&self, request: DismissApprovalRequestMessage, name: &str) -> FolderApprovalRequestDismisCall<'a, C> {
+    pub fn approval_requests_dismiss(&self, request: DismissApprovalRequestMessage, name: &str) -> FolderApprovalRequestDismisCall<'a> {
         FolderApprovalRequestDismisCall {
             hub: self.hub,
             _request: request,
@@ -514,7 +512,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the approval request to retrieve.
-    pub fn approval_requests_get(&self, name: &str) -> FolderApprovalRequestGetCall<'a, C> {
+    pub fn approval_requests_get(&self, name: &str) -> FolderApprovalRequestGetCall<'a> {
         FolderApprovalRequestGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -531,7 +529,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent resource. This may be "projects/{project}", "folders/{folder}", or "organizations/{organization}".
-    pub fn approval_requests_list(&self, parent: &str) -> FolderApprovalRequestListCall<'a, C> {
+    pub fn approval_requests_list(&self, parent: &str) -> FolderApprovalRequestListCall<'a> {
         FolderApprovalRequestListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -551,7 +549,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the AccessApprovalSettings to delete.
-    pub fn delete_access_approval_settings(&self, name: &str) -> FolderDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn delete_access_approval_settings(&self, name: &str) -> FolderDeleteAccessApprovalSettingCall<'a> {
         FolderDeleteAccessApprovalSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -568,7 +566,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the AccessApprovalSettings to retrieve.
-    pub fn get_access_approval_settings(&self, name: &str) -> FolderGetAccessApprovalSettingCall<'a, C> {
+    pub fn get_access_approval_settings(&self, name: &str) -> FolderGetAccessApprovalSettingCall<'a> {
         FolderGetAccessApprovalSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -586,7 +584,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the settings. Format is one of: * "projects/{project}/accessApprovalSettings" * "folders/{folder}/accessApprovalSettings" * "organizations/{organization}/accessApprovalSettings"
-    pub fn update_access_approval_settings(&self, request: AccessApprovalSettings, name: &str) -> FolderUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn update_access_approval_settings(&self, request: AccessApprovalSettings, name: &str) -> FolderUpdateAccessApprovalSettingCall<'a> {
         FolderUpdateAccessApprovalSettingCall {
             hub: self.hub,
             _request: request,
@@ -631,15 +629,15 @@ impl<'a, C> FolderMethods<'a, C> {
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a, C>
-    where C: 'a {
+pub struct OrganizationMethods<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrganizationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
 
-impl<'a, C> OrganizationMethods<'a, C> {
+impl<'a> OrganizationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -649,7 +647,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the approval request to approve.
-    pub fn approval_requests_approve(&self, request: ApproveApprovalRequestMessage, name: &str) -> OrganizationApprovalRequestApproveCall<'a, C> {
+    pub fn approval_requests_approve(&self, request: ApproveApprovalRequestMessage, name: &str) -> OrganizationApprovalRequestApproveCall<'a> {
         OrganizationApprovalRequestApproveCall {
             hub: self.hub,
             _request: request,
@@ -668,7 +666,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the ApprovalRequest to dismiss.
-    pub fn approval_requests_dismiss(&self, request: DismissApprovalRequestMessage, name: &str) -> OrganizationApprovalRequestDismisCall<'a, C> {
+    pub fn approval_requests_dismiss(&self, request: DismissApprovalRequestMessage, name: &str) -> OrganizationApprovalRequestDismisCall<'a> {
         OrganizationApprovalRequestDismisCall {
             hub: self.hub,
             _request: request,
@@ -686,7 +684,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the approval request to retrieve.
-    pub fn approval_requests_get(&self, name: &str) -> OrganizationApprovalRequestGetCall<'a, C> {
+    pub fn approval_requests_get(&self, name: &str) -> OrganizationApprovalRequestGetCall<'a> {
         OrganizationApprovalRequestGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -703,7 +701,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent resource. This may be "projects/{project}", "folders/{folder}", or "organizations/{organization}".
-    pub fn approval_requests_list(&self, parent: &str) -> OrganizationApprovalRequestListCall<'a, C> {
+    pub fn approval_requests_list(&self, parent: &str) -> OrganizationApprovalRequestListCall<'a> {
         OrganizationApprovalRequestListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -723,7 +721,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the AccessApprovalSettings to delete.
-    pub fn delete_access_approval_settings(&self, name: &str) -> OrganizationDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn delete_access_approval_settings(&self, name: &str) -> OrganizationDeleteAccessApprovalSettingCall<'a> {
         OrganizationDeleteAccessApprovalSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -740,7 +738,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the AccessApprovalSettings to retrieve.
-    pub fn get_access_approval_settings(&self, name: &str) -> OrganizationGetAccessApprovalSettingCall<'a, C> {
+    pub fn get_access_approval_settings(&self, name: &str) -> OrganizationGetAccessApprovalSettingCall<'a> {
         OrganizationGetAccessApprovalSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -758,7 +756,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the settings. Format is one of: * "projects/{project}/accessApprovalSettings" * "folders/{folder}/accessApprovalSettings" * "organizations/{organization}/accessApprovalSettings"
-    pub fn update_access_approval_settings(&self, request: AccessApprovalSettings, name: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn update_access_approval_settings(&self, request: AccessApprovalSettings, name: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a> {
         OrganizationUpdateAccessApprovalSettingCall {
             hub: self.hub,
             _request: request,
@@ -803,15 +801,15 @@ impl<'a, C> OrganizationMethods<'a, C> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -821,7 +819,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the approval request to approve.
-    pub fn approval_requests_approve(&self, request: ApproveApprovalRequestMessage, name: &str) -> ProjectApprovalRequestApproveCall<'a, C> {
+    pub fn approval_requests_approve(&self, request: ApproveApprovalRequestMessage, name: &str) -> ProjectApprovalRequestApproveCall<'a> {
         ProjectApprovalRequestApproveCall {
             hub: self.hub,
             _request: request,
@@ -840,7 +838,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Name of the ApprovalRequest to dismiss.
-    pub fn approval_requests_dismiss(&self, request: DismissApprovalRequestMessage, name: &str) -> ProjectApprovalRequestDismisCall<'a, C> {
+    pub fn approval_requests_dismiss(&self, request: DismissApprovalRequestMessage, name: &str) -> ProjectApprovalRequestDismisCall<'a> {
         ProjectApprovalRequestDismisCall {
             hub: self.hub,
             _request: request,
@@ -858,7 +856,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the approval request to retrieve.
-    pub fn approval_requests_get(&self, name: &str) -> ProjectApprovalRequestGetCall<'a, C> {
+    pub fn approval_requests_get(&self, name: &str) -> ProjectApprovalRequestGetCall<'a> {
         ProjectApprovalRequestGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -875,7 +873,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent resource. This may be "projects/{project}", "folders/{folder}", or "organizations/{organization}".
-    pub fn approval_requests_list(&self, parent: &str) -> ProjectApprovalRequestListCall<'a, C> {
+    pub fn approval_requests_list(&self, parent: &str) -> ProjectApprovalRequestListCall<'a> {
         ProjectApprovalRequestListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -895,7 +893,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the AccessApprovalSettings to delete.
-    pub fn delete_access_approval_settings(&self, name: &str) -> ProjectDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn delete_access_approval_settings(&self, name: &str) -> ProjectDeleteAccessApprovalSettingCall<'a> {
         ProjectDeleteAccessApprovalSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -912,7 +910,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Name of the AccessApprovalSettings to retrieve.
-    pub fn get_access_approval_settings(&self, name: &str) -> ProjectGetAccessApprovalSettingCall<'a, C> {
+    pub fn get_access_approval_settings(&self, name: &str) -> ProjectGetAccessApprovalSettingCall<'a> {
         ProjectGetAccessApprovalSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -930,7 +928,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the settings. Format is one of: * "projects/{project}/accessApprovalSettings" * "folders/{folder}/accessApprovalSettings" * "organizations/{organization}/accessApprovalSettings"
-    pub fn update_access_approval_settings(&self, request: AccessApprovalSettings, name: &str) -> ProjectUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn update_access_approval_settings(&self, request: AccessApprovalSettings, name: &str) -> ProjectUpdateAccessApprovalSettingCall<'a> {
         ProjectUpdateAccessApprovalSettingCall {
             hub: self.hub,
             _request: request,
@@ -989,10 +987,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderApprovalRequestApproveCall<'a, C>
-    where C: 'a {
+pub struct FolderApprovalRequestApproveCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: ApproveApprovalRequestMessage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1000,9 +998,9 @@ pub struct FolderApprovalRequestApproveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderApprovalRequestApproveCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderApprovalRequestApproveCall<'a> {}
 
-impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderApprovalRequestApproveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1078,8 +1076,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1093,7 +1090,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1104,7 +1101,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1163,7 +1160,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ApproveApprovalRequestMessage) -> FolderApprovalRequestApproveCall<'a, C> {
+    pub fn request(mut self, new_value: ApproveApprovalRequestMessage) -> FolderApprovalRequestApproveCall<'a> {
         self._request = new_value;
         self
     }
@@ -1173,7 +1170,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderApprovalRequestApproveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderApprovalRequestApproveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1183,7 +1180,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestApproveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestApproveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1208,7 +1205,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestApproveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestApproveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1228,7 +1225,7 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestApproveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestApproveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1278,10 +1275,10 @@ impl<'a, C> FolderApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderApprovalRequestDismisCall<'a, C>
-    where C: 'a {
+pub struct FolderApprovalRequestDismisCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: DismissApprovalRequestMessage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1289,9 +1286,9 @@ pub struct FolderApprovalRequestDismisCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderApprovalRequestDismisCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderApprovalRequestDismisCall<'a> {}
 
-impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderApprovalRequestDismisCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1367,8 +1364,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1382,7 +1378,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1393,7 +1389,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1452,7 +1448,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DismissApprovalRequestMessage) -> FolderApprovalRequestDismisCall<'a, C> {
+    pub fn request(mut self, new_value: DismissApprovalRequestMessage) -> FolderApprovalRequestDismisCall<'a> {
         self._request = new_value;
         self
     }
@@ -1462,7 +1458,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderApprovalRequestDismisCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderApprovalRequestDismisCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1472,7 +1468,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestDismisCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestDismisCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1497,7 +1493,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestDismisCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestDismisCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1517,7 +1513,7 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestDismisCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestDismisCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1561,19 +1557,19 @@ impl<'a, C> FolderApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderApprovalRequestGetCall<'a, C>
-    where C: 'a {
+pub struct FolderApprovalRequestGetCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderApprovalRequestGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderApprovalRequestGetCall<'a> {}
 
-impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderApprovalRequestGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1638,8 +1634,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1652,7 +1647,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1661,7 +1656,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1721,7 +1716,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderApprovalRequestGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderApprovalRequestGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1731,7 +1726,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1756,7 +1751,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1776,7 +1771,7 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1823,10 +1818,10 @@ impl<'a, C> FolderApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderApprovalRequestListCall<'a, C>
-    where C: 'a {
+pub struct FolderApprovalRequestListCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1836,9 +1831,9 @@ pub struct FolderApprovalRequestListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderApprovalRequestListCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderApprovalRequestListCall<'a> {}
 
-impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderApprovalRequestListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1912,8 +1907,7 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1926,7 +1920,7 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1935,7 +1929,7 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1995,28 +1989,28 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderApprovalRequestListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FolderApprovalRequestListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying the page of results to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderApprovalRequestListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderApprovalRequestListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderApprovalRequestListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderApprovalRequestListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter on the type of approval requests to retrieve. Must be one of the following values: * [not set]: Requests that are pending or have active approvals. * ALL: All requests. * PENDING: Only pending requests. * ACTIVE: Only active (i.e. currently approved) requests. * DISMISSED: Only requests that have been dismissed, or requests that are not approved and past expiration. * EXPIRED: Only requests that have been approved, and the approval has expired. * HISTORY: Active, dismissed and expired requests.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> FolderApprovalRequestListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> FolderApprovalRequestListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2026,7 +2020,7 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderApprovalRequestListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2051,7 +2045,7 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderApprovalRequestListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2071,7 +2065,7 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderApprovalRequestListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2115,19 +2109,19 @@ impl<'a, C> FolderApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderDeleteAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct FolderDeleteAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderDeleteAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderDeleteAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderDeleteAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2192,8 +2186,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2206,7 +2199,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2215,7 +2208,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2275,7 +2268,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderDeleteAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2285,7 +2278,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderDeleteAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2310,7 +2303,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderDeleteAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderDeleteAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2330,7 +2323,7 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderDeleteAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderDeleteAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2374,19 +2367,19 @@ impl<'a, C> FolderDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderGetAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct FolderGetAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderGetAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderGetAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderGetAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2451,8 +2444,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2465,7 +2457,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2474,7 +2466,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2534,7 +2526,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderGetAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderGetAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2544,7 +2536,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderGetAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderGetAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2569,7 +2561,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderGetAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderGetAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2589,7 +2581,7 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2640,10 +2632,10 @@ impl<'a, C> FolderGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderUpdateAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct FolderUpdateAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: AccessApprovalSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -2652,9 +2644,9 @@ pub struct FolderUpdateAccessApprovalSettingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderUpdateAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderUpdateAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderUpdateAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2733,8 +2725,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2748,7 +2739,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2759,7 +2750,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2818,7 +2809,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessApprovalSettings) -> FolderUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn request(mut self, new_value: AccessApprovalSettings) -> FolderUpdateAccessApprovalSettingCall<'a> {
         self._request = new_value;
         self
     }
@@ -2828,14 +2819,14 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderUpdateAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the settings. Only the top level fields of AccessApprovalSettings (notification_emails & enrolled_services) are supported. For each field, if it is included, the currently stored value will be entirely overwritten with the value of the field passed in this request. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If this field is left unset, only the notification_emails field will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> FolderUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> FolderUpdateAccessApprovalSettingCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2845,7 +2836,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderUpdateAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2870,7 +2861,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderUpdateAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderUpdateAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2890,7 +2881,7 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderUpdateAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderUpdateAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2940,10 +2931,10 @@ impl<'a, C> FolderUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationApprovalRequestApproveCall<'a, C>
-    where C: 'a {
+pub struct OrganizationApprovalRequestApproveCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: ApproveApprovalRequestMessage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2951,9 +2942,9 @@ pub struct OrganizationApprovalRequestApproveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationApprovalRequestApproveCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationApprovalRequestApproveCall<'a> {}
 
-impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationApprovalRequestApproveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3029,8 +3020,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3044,7 +3034,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3055,7 +3045,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3114,7 +3104,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ApproveApprovalRequestMessage) -> OrganizationApprovalRequestApproveCall<'a, C> {
+    pub fn request(mut self, new_value: ApproveApprovalRequestMessage) -> OrganizationApprovalRequestApproveCall<'a> {
         self._request = new_value;
         self
     }
@@ -3124,7 +3114,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationApprovalRequestApproveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationApprovalRequestApproveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3134,7 +3124,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestApproveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestApproveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3159,7 +3149,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestApproveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestApproveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3179,7 +3169,7 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestApproveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestApproveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3229,10 +3219,10 @@ impl<'a, C> OrganizationApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationApprovalRequestDismisCall<'a, C>
-    where C: 'a {
+pub struct OrganizationApprovalRequestDismisCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: DismissApprovalRequestMessage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3240,9 +3230,9 @@ pub struct OrganizationApprovalRequestDismisCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationApprovalRequestDismisCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationApprovalRequestDismisCall<'a> {}
 
-impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationApprovalRequestDismisCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3318,8 +3308,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3333,7 +3322,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3344,7 +3333,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3403,7 +3392,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DismissApprovalRequestMessage) -> OrganizationApprovalRequestDismisCall<'a, C> {
+    pub fn request(mut self, new_value: DismissApprovalRequestMessage) -> OrganizationApprovalRequestDismisCall<'a> {
         self._request = new_value;
         self
     }
@@ -3413,7 +3402,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationApprovalRequestDismisCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationApprovalRequestDismisCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3423,7 +3412,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestDismisCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestDismisCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3448,7 +3437,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestDismisCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestDismisCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3468,7 +3457,7 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestDismisCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestDismisCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3512,19 +3501,19 @@ impl<'a, C> OrganizationApprovalRequestDismisCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationApprovalRequestGetCall<'a, C>
-    where C: 'a {
+pub struct OrganizationApprovalRequestGetCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationApprovalRequestGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationApprovalRequestGetCall<'a> {}
 
-impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationApprovalRequestGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3589,8 +3578,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3603,7 +3591,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3612,7 +3600,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3672,7 +3660,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationApprovalRequestGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationApprovalRequestGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3682,7 +3670,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3707,7 +3695,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3727,7 +3715,7 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3774,10 +3762,10 @@ impl<'a, C> OrganizationApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationApprovalRequestListCall<'a, C>
-    where C: 'a {
+pub struct OrganizationApprovalRequestListCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3787,9 +3775,9 @@ pub struct OrganizationApprovalRequestListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationApprovalRequestListCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationApprovalRequestListCall<'a> {}
 
-impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationApprovalRequestListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3863,8 +3851,7 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3877,7 +3864,7 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3886,7 +3873,7 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3946,28 +3933,28 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationApprovalRequestListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationApprovalRequestListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying the page of results to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationApprovalRequestListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationApprovalRequestListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationApprovalRequestListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationApprovalRequestListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter on the type of approval requests to retrieve. Must be one of the following values: * [not set]: Requests that are pending or have active approvals. * ALL: All requests. * PENDING: Only pending requests. * ACTIVE: Only active (i.e. currently approved) requests. * DISMISSED: Only requests that have been dismissed, or requests that are not approved and past expiration. * EXPIRED: Only requests that have been approved, and the approval has expired. * HISTORY: Active, dismissed and expired requests.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OrganizationApprovalRequestListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OrganizationApprovalRequestListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3977,7 +3964,7 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationApprovalRequestListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4002,7 +3989,7 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationApprovalRequestListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4022,7 +4009,7 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationApprovalRequestListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4066,19 +4053,19 @@ impl<'a, C> OrganizationApprovalRequestListCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationDeleteAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct OrganizationDeleteAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationDeleteAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationDeleteAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationDeleteAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4143,8 +4130,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4157,7 +4143,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4166,7 +4152,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4226,7 +4212,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationDeleteAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4236,7 +4222,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationDeleteAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4261,7 +4247,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeleteAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeleteAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4281,7 +4267,7 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationDeleteAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationDeleteAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4325,19 +4311,19 @@ impl<'a, C> OrganizationDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMu
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationGetAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct OrganizationGetAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationGetAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationGetAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationGetAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4402,8 +4388,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4416,7 +4401,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4425,7 +4410,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4485,7 +4470,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationGetAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationGetAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4495,7 +4480,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationGetAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationGetAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4520,7 +4505,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationGetAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4540,7 +4525,7 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationGetAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationGetAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4591,10 +4576,10 @@ impl<'a, C> OrganizationGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationUpdateAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct OrganizationUpdateAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: AccessApprovalSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -4603,9 +4588,9 @@ pub struct OrganizationUpdateAccessApprovalSettingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationUpdateAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationUpdateAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationUpdateAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4684,8 +4669,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4699,7 +4683,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4710,7 +4694,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4769,7 +4753,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessApprovalSettings) -> OrganizationUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn request(mut self, new_value: AccessApprovalSettings) -> OrganizationUpdateAccessApprovalSettingCall<'a> {
         self._request = new_value;
         self
     }
@@ -4779,14 +4763,14 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the settings. Only the top level fields of AccessApprovalSettings (notification_emails & enrolled_services) are supported. For each field, if it is included, the currently stored value will be entirely overwritten with the value of the field passed in this request. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If this field is left unset, only the notification_emails field will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> OrganizationUpdateAccessApprovalSettingCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4796,7 +4780,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationUpdateAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4821,7 +4805,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationUpdateAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4841,7 +4825,7 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationUpdateAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationUpdateAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4891,10 +4875,10 @@ impl<'a, C> OrganizationUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMu
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectApprovalRequestApproveCall<'a, C>
-    where C: 'a {
+pub struct ProjectApprovalRequestApproveCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: ApproveApprovalRequestMessage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4902,9 +4886,9 @@ pub struct ProjectApprovalRequestApproveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectApprovalRequestApproveCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectApprovalRequestApproveCall<'a> {}
 
-impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectApprovalRequestApproveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4980,8 +4964,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4995,7 +4978,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5006,7 +4989,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5065,7 +5048,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ApproveApprovalRequestMessage) -> ProjectApprovalRequestApproveCall<'a, C> {
+    pub fn request(mut self, new_value: ApproveApprovalRequestMessage) -> ProjectApprovalRequestApproveCall<'a> {
         self._request = new_value;
         self
     }
@@ -5075,7 +5058,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectApprovalRequestApproveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectApprovalRequestApproveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5085,7 +5068,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestApproveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestApproveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5110,7 +5093,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestApproveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestApproveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5130,7 +5113,7 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestApproveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestApproveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5180,10 +5163,10 @@ impl<'a, C> ProjectApprovalRequestApproveCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectApprovalRequestDismisCall<'a, C>
-    where C: 'a {
+pub struct ProjectApprovalRequestDismisCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: DismissApprovalRequestMessage,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5191,9 +5174,9 @@ pub struct ProjectApprovalRequestDismisCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectApprovalRequestDismisCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectApprovalRequestDismisCall<'a> {}
 
-impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectApprovalRequestDismisCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5269,8 +5252,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5284,7 +5266,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5295,7 +5277,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5354,7 +5336,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DismissApprovalRequestMessage) -> ProjectApprovalRequestDismisCall<'a, C> {
+    pub fn request(mut self, new_value: DismissApprovalRequestMessage) -> ProjectApprovalRequestDismisCall<'a> {
         self._request = new_value;
         self
     }
@@ -5364,7 +5346,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectApprovalRequestDismisCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectApprovalRequestDismisCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5374,7 +5356,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestDismisCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestDismisCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5399,7 +5381,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestDismisCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestDismisCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5419,7 +5401,7 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestDismisCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestDismisCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5463,19 +5445,19 @@ impl<'a, C> ProjectApprovalRequestDismisCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectApprovalRequestGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectApprovalRequestGetCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectApprovalRequestGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectApprovalRequestGetCall<'a> {}
 
-impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectApprovalRequestGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5540,8 +5522,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5554,7 +5535,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5563,7 +5544,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5623,7 +5604,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectApprovalRequestGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectApprovalRequestGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5633,7 +5614,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5658,7 +5639,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5678,7 +5659,7 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5725,10 +5706,10 @@ impl<'a, C> ProjectApprovalRequestGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectApprovalRequestListCall<'a, C>
-    where C: 'a {
+pub struct ProjectApprovalRequestListCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5738,9 +5719,9 @@ pub struct ProjectApprovalRequestListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectApprovalRequestListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectApprovalRequestListCall<'a> {}
 
-impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectApprovalRequestListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5814,8 +5795,7 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5828,7 +5808,7 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5837,7 +5817,7 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5897,28 +5877,28 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectApprovalRequestListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectApprovalRequestListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying the page of results to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectApprovalRequestListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectApprovalRequestListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectApprovalRequestListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectApprovalRequestListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter on the type of approval requests to retrieve. Must be one of the following values: * [not set]: Requests that are pending or have active approvals. * ALL: All requests. * PENDING: Only pending requests. * ACTIVE: Only active (i.e. currently approved) requests. * DISMISSED: Only requests that have been dismissed, or requests that are not approved and past expiration. * EXPIRED: Only requests that have been approved, and the approval has expired. * HISTORY: Active, dismissed and expired requests.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectApprovalRequestListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectApprovalRequestListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -5928,7 +5908,7 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectApprovalRequestListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5953,7 +5933,7 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectApprovalRequestListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5973,7 +5953,7 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectApprovalRequestListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6017,19 +5997,19 @@ impl<'a, C> ProjectApprovalRequestListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectDeleteAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct ProjectDeleteAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectDeleteAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectDeleteAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectDeleteAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6094,8 +6074,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6108,7 +6087,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6117,7 +6096,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6177,7 +6156,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectDeleteAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6187,7 +6166,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDeleteAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectDeleteAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6212,7 +6191,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDeleteAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6232,7 +6211,7 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDeleteAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDeleteAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6276,19 +6255,19 @@ impl<'a, C> ProjectDeleteAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct ProjectGetAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectGetAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectGetAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectGetAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6353,8 +6332,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6367,7 +6345,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6376,7 +6354,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6436,7 +6414,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectGetAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectGetAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6446,7 +6424,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6471,7 +6449,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6491,7 +6469,7 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6542,10 +6520,10 @@ impl<'a, C> ProjectGetAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUpdateAccessApprovalSettingCall<'a, C>
-    where C: 'a {
+pub struct ProjectUpdateAccessApprovalSettingCall<'a>
+    where  {
 
-    hub: &'a AccessApproval<C>,
+    hub: &'a AccessApproval<>,
     _request: AccessApprovalSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -6554,9 +6532,9 @@ pub struct ProjectUpdateAccessApprovalSettingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectUpdateAccessApprovalSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectUpdateAccessApprovalSettingCall<'a> {}
 
-impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectUpdateAccessApprovalSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6635,8 +6613,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6650,7 +6627,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6661,7 +6638,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6720,7 +6697,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AccessApprovalSettings) -> ProjectUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn request(mut self, new_value: AccessApprovalSettings) -> ProjectUpdateAccessApprovalSettingCall<'a> {
         self._request = new_value;
         self
     }
@@ -6730,14 +6707,14 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectUpdateAccessApprovalSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The update mask applies to the settings. Only the top level fields of AccessApprovalSettings (notification_emails & enrolled_services) are supported. For each field, if it is included, the currently stored value will be entirely overwritten with the value of the field passed in this request. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If this field is left unset, only the notification_emails field will be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectUpdateAccessApprovalSettingCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6747,7 +6724,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateAccessApprovalSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateAccessApprovalSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6772,7 +6749,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateAccessApprovalSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateAccessApprovalSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6792,7 +6769,7 @@ impl<'a, C> ProjectUpdateAccessApprovalSettingCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUpdateAccessApprovalSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUpdateAccessApprovalSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

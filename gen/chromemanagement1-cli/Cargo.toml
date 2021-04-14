@@ -4,10 +4,10 @@
 [package]
 
 name = "google-chromemanagement1-cli"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Chrome Management (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/chromemanagement1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/chromemanagement1-cli"
 homepage = "http://developers.google.com/chrome/management/"
 documentation = "http://byron.github.io/google-apis-rs/google_chromemanagement1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-chromemanagement1]
 path = "../chromemanagement1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"

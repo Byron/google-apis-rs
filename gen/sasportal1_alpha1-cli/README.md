@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-sasportal1_alpha1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/sasportal1_alpha1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/sasportal1_alpha1-cli).
 
 # Usage
 
-This documentation was generated from the *sasportal* API at revision *20210330*. The CLI is at version *2.0.0*.
+This documentation was generated from the *sasportal* API at revision *20210330*. The CLI is at version *2.0.3*.
 
 ```bash
 sasportal1-alpha1 [options]

@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-fusiontables2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/fusiontables2-cli).
 
 # Usage
 
-This documentation was generated from the *fusiontables* API at revision *20171117*. The CLI is at version *2.0.0*.
+This documentation was generated from the *fusiontables* API at revision *20171117*. The CLI is at version *2.0.3*.
 
 ```bash
 fusiontables2 [options]

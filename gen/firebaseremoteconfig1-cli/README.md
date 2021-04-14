@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-firebaseremoteconfig1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/firebaseremoteconfig1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/firebaseremoteconfig1-cli).
 
 # Usage
 
-This documentation was generated from the *Firebase Remote Config* API at revision *20171129*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Firebase Remote Config* API at revision *20171129*. The CLI is at version *2.0.3*.
 
 ```bash
 firebaseremoteconfig1 [options]

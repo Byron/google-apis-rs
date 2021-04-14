@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudresourcemanager3-cli"
-version = "2.0.0+20210328"
+version = "2.0.3+20210328"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Resource Manager (protocol v3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager3-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourcemanager3-cli"
 homepage = "https://cloud.google.com/resource-manager"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudresourcemanager3]
 path = "../cloudresourcemanager3"
-version = "2.0.0+20210328"
+version = "2.0.3+20210328"

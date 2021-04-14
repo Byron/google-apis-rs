@@ -4,12 +4,12 @@
 [package]
 
 name = "google-recommender1"
-version = "2.0.0+20210319"
+version = "2.0.3+20210319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Recommender (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/recommender1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/recommender1"
 homepage = "https://cloud.google.com/recommender/docs/"
-documentation = "https://docs.rs/google-recommender1/2.0.0+20210319"
+documentation = "https://docs.rs/google-recommender1/2.0.3+20210319"
 license = "MIT"
 keywords = ["recommender", "google", "protocol", "web", "api"]
 autobins = false

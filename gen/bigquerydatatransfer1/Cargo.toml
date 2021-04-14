@@ -4,12 +4,12 @@
 [package]
 
 name = "google-bigquerydatatransfer1"
-version = "2.0.0+20210324"
+version = "2.0.3+20210324"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with BigQuery Data Transfer (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquerydatatransfer1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/bigquerydatatransfer1"
 homepage = "https://cloud.google.com/bigquery-transfer/"
-documentation = "https://docs.rs/google-bigquerydatatransfer1/2.0.0+20210324"
+documentation = "https://docs.rs/google-bigquerydatatransfer1/2.0.3+20210324"
 license = "MIT"
 keywords = ["bigquerydatatransfer", "google", "protocol", "web", "api"]
 autobins = false

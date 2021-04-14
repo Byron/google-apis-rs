@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AnalyticsData<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AnalyticsData<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AnalyticsData<C> {}
+impl<'a, > client::Hub for AnalyticsData<> {}
 
-impl<'a, C> AnalyticsData<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AnalyticsData<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AnalyticsData<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AnalyticsData<> {
         AnalyticsData {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://analyticsdata.googleapis.com/".to_string(),
             _root_url: "https://analyticsdata.googleapis.com/".to_string(),
         }
     }
 
-    pub fn properties(&'a self) -> PropertyMethods<'a, C> {
+    pub fn properties(&'a self) -> PropertyMethods<'a> {
         PropertyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1184,15 +1182,15 @@ impl client::Part for StringFilter {}
 /// let rb = hub.properties();
 /// # }
 /// ```
-pub struct PropertyMethods<'a, C>
-    where C: 'a {
+pub struct PropertyMethods<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PropertyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PropertyMethods<'a> {}
 
-impl<'a, C> PropertyMethods<'a, C> {
+impl<'a> PropertyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1202,7 +1200,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunPivotReportRequest may either be unspecified or consistent with this property. Example: properties/1234
-    pub fn batch_run_pivot_reports(&self, request: BatchRunPivotReportsRequest, property: &str) -> PropertyBatchRunPivotReportCall<'a, C> {
+    pub fn batch_run_pivot_reports(&self, request: BatchRunPivotReportsRequest, property: &str) -> PropertyBatchRunPivotReportCall<'a> {
         PropertyBatchRunPivotReportCall {
             hub: self.hub,
             _request: request,
@@ -1221,7 +1219,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). This property must be specified for the batch. The property within RunReportRequest may either be unspecified or consistent with this property. Example: properties/1234
-    pub fn batch_run_reports(&self, request: BatchRunReportsRequest, property: &str) -> PropertyBatchRunReportCall<'a, C> {
+    pub fn batch_run_reports(&self, request: BatchRunReportsRequest, property: &str) -> PropertyBatchRunReportCall<'a> {
         PropertyBatchRunReportCall {
             hub: self.hub,
             _request: request,
@@ -1239,7 +1237,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the metadata to retrieve. This name field is specified in the URL path and not URL parameters. Property is a numeric Google Analytics GA4 Property identifier. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234/metadata Set the Property ID to 0 for dimensions and metrics common to all properties. In this special mode, this method will not return custom dimensions and metrics.
-    pub fn get_metadata(&self, name: &str) -> PropertyGetMetadataCall<'a, C> {
+    pub fn get_metadata(&self, name: &str) -> PropertyGetMetadataCall<'a> {
         PropertyGetMetadataCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1257,7 +1255,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
-    pub fn run_pivot_report(&self, request: RunPivotReportRequest, property: &str) -> PropertyRunPivotReportCall<'a, C> {
+    pub fn run_pivot_report(&self, request: RunPivotReportRequest, property: &str) -> PropertyRunPivotReportCall<'a> {
         PropertyRunPivotReportCall {
             hub: self.hub,
             _request: request,
@@ -1276,7 +1274,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Example: properties/1234
-    pub fn run_realtime_report(&self, request: RunRealtimeReportRequest, property: &str) -> PropertyRunRealtimeReportCall<'a, C> {
+    pub fn run_realtime_report(&self, request: RunRealtimeReportRequest, property: &str) -> PropertyRunRealtimeReportCall<'a> {
         PropertyRunRealtimeReportCall {
             hub: self.hub,
             _request: request,
@@ -1295,7 +1293,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `property` - A Google Analytics GA4 property identifier whose events are tracked. Specified in the URL path and not the body. To learn more, see [where to find your Property ID](https://developers.google.com/analytics/devguides/reporting/data/v1/property-id). Within a batch request, this property should either be unspecified or consistent with the batch-level property. Example: properties/1234
-    pub fn run_report(&self, request: RunReportRequest, property: &str) -> PropertyRunReportCall<'a, C> {
+    pub fn run_report(&self, request: RunReportRequest, property: &str) -> PropertyRunReportCall<'a> {
         PropertyRunReportCall {
             hub: self.hub,
             _request: request,
@@ -1353,10 +1351,10 @@ impl<'a, C> PropertyMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyBatchRunPivotReportCall<'a, C>
-    where C: 'a {
+pub struct PropertyBatchRunPivotReportCall<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
     _request: BatchRunPivotReportsRequest,
     _property: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1364,9 +1362,9 @@ pub struct PropertyBatchRunPivotReportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyBatchRunPivotReportCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyBatchRunPivotReportCall<'a> {}
 
-impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyBatchRunPivotReportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1442,8 +1440,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1457,7 +1454,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1468,7 +1465,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1527,7 +1524,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchRunPivotReportsRequest) -> PropertyBatchRunPivotReportCall<'a, C> {
+    pub fn request(mut self, new_value: BatchRunPivotReportsRequest) -> PropertyBatchRunPivotReportCall<'a> {
         self._request = new_value;
         self
     }
@@ -1537,7 +1534,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn property(mut self, new_value: &str) -> PropertyBatchRunPivotReportCall<'a, C> {
+    pub fn property(mut self, new_value: &str) -> PropertyBatchRunPivotReportCall<'a> {
         self._property = new_value.to_string();
         self
     }
@@ -1547,7 +1544,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyBatchRunPivotReportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyBatchRunPivotReportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1572,7 +1569,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyBatchRunPivotReportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyBatchRunPivotReportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1592,7 +1589,7 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyBatchRunPivotReportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyBatchRunPivotReportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1642,10 +1639,10 @@ impl<'a, C> PropertyBatchRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyBatchRunReportCall<'a, C>
-    where C: 'a {
+pub struct PropertyBatchRunReportCall<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
     _request: BatchRunReportsRequest,
     _property: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1653,9 +1650,9 @@ pub struct PropertyBatchRunReportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyBatchRunReportCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyBatchRunReportCall<'a> {}
 
-impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyBatchRunReportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1731,8 +1728,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1746,7 +1742,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1757,7 +1753,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1816,7 +1812,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchRunReportsRequest) -> PropertyBatchRunReportCall<'a, C> {
+    pub fn request(mut self, new_value: BatchRunReportsRequest) -> PropertyBatchRunReportCall<'a> {
         self._request = new_value;
         self
     }
@@ -1826,7 +1822,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn property(mut self, new_value: &str) -> PropertyBatchRunReportCall<'a, C> {
+    pub fn property(mut self, new_value: &str) -> PropertyBatchRunReportCall<'a> {
         self._property = new_value.to_string();
         self
     }
@@ -1836,7 +1832,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyBatchRunReportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyBatchRunReportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1861,7 +1857,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyBatchRunReportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyBatchRunReportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1881,7 +1877,7 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyBatchRunReportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyBatchRunReportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1925,19 +1921,19 @@ impl<'a, C> PropertyBatchRunReportCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGetMetadataCall<'a, C>
-    where C: 'a {
+pub struct PropertyGetMetadataCall<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyGetMetadataCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyGetMetadataCall<'a> {}
 
-impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyGetMetadataCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2002,8 +1998,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2016,7 +2011,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2025,7 +2020,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2085,7 +2080,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGetMetadataCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyGetMetadataCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2095,7 +2090,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetMetadataCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetMetadataCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2120,7 +2115,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetMetadataCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetMetadataCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2140,7 +2135,7 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetMetadataCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetMetadataCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2190,10 +2185,10 @@ impl<'a, C> PropertyGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyRunPivotReportCall<'a, C>
-    where C: 'a {
+pub struct PropertyRunPivotReportCall<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
     _request: RunPivotReportRequest,
     _property: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2201,9 +2196,9 @@ pub struct PropertyRunPivotReportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyRunPivotReportCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyRunPivotReportCall<'a> {}
 
-impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyRunPivotReportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2279,8 +2274,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2294,7 +2288,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2305,7 +2299,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2364,7 +2358,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunPivotReportRequest) -> PropertyRunPivotReportCall<'a, C> {
+    pub fn request(mut self, new_value: RunPivotReportRequest) -> PropertyRunPivotReportCall<'a> {
         self._request = new_value;
         self
     }
@@ -2374,7 +2368,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn property(mut self, new_value: &str) -> PropertyRunPivotReportCall<'a, C> {
+    pub fn property(mut self, new_value: &str) -> PropertyRunPivotReportCall<'a> {
         self._property = new_value.to_string();
         self
     }
@@ -2384,7 +2378,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyRunPivotReportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyRunPivotReportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2409,7 +2403,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyRunPivotReportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyRunPivotReportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2429,7 +2423,7 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyRunPivotReportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyRunPivotReportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2479,10 +2473,10 @@ impl<'a, C> PropertyRunPivotReportCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyRunRealtimeReportCall<'a, C>
-    where C: 'a {
+pub struct PropertyRunRealtimeReportCall<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
     _request: RunRealtimeReportRequest,
     _property: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2490,9 +2484,9 @@ pub struct PropertyRunRealtimeReportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyRunRealtimeReportCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyRunRealtimeReportCall<'a> {}
 
-impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyRunRealtimeReportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2568,8 +2562,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2583,7 +2576,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2594,7 +2587,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2653,7 +2646,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunRealtimeReportRequest) -> PropertyRunRealtimeReportCall<'a, C> {
+    pub fn request(mut self, new_value: RunRealtimeReportRequest) -> PropertyRunRealtimeReportCall<'a> {
         self._request = new_value;
         self
     }
@@ -2663,7 +2656,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn property(mut self, new_value: &str) -> PropertyRunRealtimeReportCall<'a, C> {
+    pub fn property(mut self, new_value: &str) -> PropertyRunRealtimeReportCall<'a> {
         self._property = new_value.to_string();
         self
     }
@@ -2673,7 +2666,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyRunRealtimeReportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyRunRealtimeReportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2698,7 +2691,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyRunRealtimeReportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyRunRealtimeReportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2718,7 +2711,7 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyRunRealtimeReportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyRunRealtimeReportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2768,10 +2761,10 @@ impl<'a, C> PropertyRunRealtimeReportCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyRunReportCall<'a, C>
-    where C: 'a {
+pub struct PropertyRunReportCall<'a>
+    where  {
 
-    hub: &'a AnalyticsData<C>,
+    hub: &'a AnalyticsData<>,
     _request: RunReportRequest,
     _property: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2779,9 +2772,9 @@ pub struct PropertyRunReportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyRunReportCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyRunReportCall<'a> {}
 
-impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyRunReportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2857,8 +2850,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2872,7 +2864,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2883,7 +2875,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2942,7 +2934,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunReportRequest) -> PropertyRunReportCall<'a, C> {
+    pub fn request(mut self, new_value: RunReportRequest) -> PropertyRunReportCall<'a> {
         self._request = new_value;
         self
     }
@@ -2952,7 +2944,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn property(mut self, new_value: &str) -> PropertyRunReportCall<'a, C> {
+    pub fn property(mut self, new_value: &str) -> PropertyRunReportCall<'a> {
         self._property = new_value.to_string();
         self
     }
@@ -2962,7 +2954,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyRunReportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyRunReportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2987,7 +2979,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyRunReportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyRunReportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3007,7 +2999,7 @@ impl<'a, C> PropertyRunReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyRunReportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyRunReportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

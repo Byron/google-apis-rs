@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-firebasedynamiclinks1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedynamiclinks1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/firebasedynamiclinks1-cli).
 
 # Usage
 
-This documentation was generated from the *Firebase Dynamic Links* API at revision *20210329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Firebase Dynamic Links* API at revision *20210329*. The CLI is at version *2.0.3*.
 
 ```bash
 firebasedynamiclinks1 [options]

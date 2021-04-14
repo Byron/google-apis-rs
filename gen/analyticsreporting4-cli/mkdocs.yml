@@ -1,8 +1,8 @@
-site_name: AnalyticsReporting v2.0.0+20210310
+site_name: AnalyticsReporting v2.0.3+20210310
 site_url: http://byron.github.io/google-apis-rs/google-analyticsreporting4-cli
 site_description: A complete library to interact with AnalyticsReporting (protocol v4)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/analyticsreporting4-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsreporting4-cli
 
 docs_dir: docs
 site_dir: build_html

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -100,35 +99,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GroupsMigration<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct GroupsMigration<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for GroupsMigration<C> {}
+impl<'a, > client::Hub for GroupsMigration<> {}
 
-impl<'a, C> GroupsMigration<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > GroupsMigration<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GroupsMigration<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GroupsMigration<> {
         GroupsMigration {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://groupsmigration.googleapis.com/".to_string(),
             _root_url: "https://groupsmigration.googleapis.com/".to_string(),
         }
     }
 
-    pub fn archive(&'a self) -> ArchiveMethods<'a, C> {
+    pub fn archive(&'a self) -> ArchiveMethods<'a> {
         ArchiveMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -212,15 +210,15 @@ impl client::ResponseResult for Groups {}
 /// let rb = hub.archive();
 /// # }
 /// ```
-pub struct ArchiveMethods<'a, C>
-    where C: 'a {
+pub struct ArchiveMethods<'a>
+    where  {
 
-    hub: &'a GroupsMigration<C>,
+    hub: &'a GroupsMigration<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ArchiveMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ArchiveMethods<'a> {}
 
-impl<'a, C> ArchiveMethods<'a, C> {
+impl<'a> ArchiveMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -229,7 +227,7 @@ impl<'a, C> ArchiveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `groupId` - The group ID
-    pub fn insert(&self, group_id: &str) -> ArchiveInsertCall<'a, C> {
+    pub fn insert(&self, group_id: &str) -> ArchiveInsertCall<'a> {
         ArchiveInsertCall {
             hub: self.hub,
             _group_id: group_id.to_string(),
@@ -281,19 +279,19 @@ impl<'a, C> ArchiveMethods<'a, C> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ArchiveInsertCall<'a, C>
-    where C: 'a {
+pub struct ArchiveInsertCall<'a>
+    where  {
 
-    hub: &'a GroupsMigration<C>,
+    hub: &'a GroupsMigration<>,
     _group_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ArchiveInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for ArchiveInsertCall<'a> {}
 
-impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ArchiveInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -361,8 +359,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -375,7 +372,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -396,7 +393,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                             req_builder.body(hyper::body::Body::from(Vec::new()))
                         };
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -466,7 +463,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_id(mut self, new_value: &str) -> ArchiveInsertCall<'a, C> {
+    pub fn group_id(mut self, new_value: &str) -> ArchiveInsertCall<'a> {
         self._group_id = new_value.to_string();
         self
     }
@@ -476,7 +473,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ArchiveInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ArchiveInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -501,7 +498,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ArchiveInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -521,7 +518,7 @@ impl<'a, C> ArchiveInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ArchiveInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ArchiveInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,44 +104,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct WebRisk<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct WebRisk<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for WebRisk<C> {}
+impl<'a, > client::Hub for WebRisk<> {}
 
-impl<'a, C> WebRisk<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > WebRisk<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> WebRisk<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> WebRisk<> {
         WebRisk {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://webrisk.googleapis.com/".to_string(),
             _root_url: "https://webrisk.googleapis.com/".to_string(),
         }
     }
 
-    pub fn hashes(&'a self) -> HasheMethods<'a, C> {
+    pub fn hashes(&'a self) -> HasheMethods<'a> {
         HasheMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
-    pub fn threat_lists(&'a self) -> ThreatListMethods<'a, C> {
+    pub fn threat_lists(&'a self) -> ThreatListMethods<'a> {
         ThreatListMethods { hub: &self }
     }
-    pub fn uris(&'a self) -> UriMethods<'a, C> {
+    pub fn uris(&'a self) -> UriMethods<'a> {
         UriMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -547,20 +545,20 @@ impl client::Part for GoogleRpcStatus {}
 /// let rb = hub.hashes();
 /// # }
 /// ```
-pub struct HasheMethods<'a, C>
-    where C: 'a {
+pub struct HasheMethods<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
 }
 
-impl<'a, C> client::MethodsBuilder for HasheMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for HasheMethods<'a> {}
 
-impl<'a, C> HasheMethods<'a, C> {
+impl<'a> HasheMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the full hashes that match the requested hash prefix. This is used after a hash prefix is looked up in a threatList and there is a match. The client side threatList only holds partial hashes so the client must query this method to determine if there is a full hash match of a threat.
-    pub fn search(&self) -> HasheSearchCall<'a, C> {
+    pub fn search(&self) -> HasheSearchCall<'a> {
         HasheSearchCall {
             hub: self.hub,
             _threat_types: Default::default(),
@@ -604,15 +602,15 @@ impl<'a, C> HasheMethods<'a, C> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -622,7 +620,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> ProjectOperationCancelCall<'a, C> {
+    pub fn operations_cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> ProjectOperationCancelCall<'a> {
         ProjectOperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -639,7 +637,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a, C> {
+    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a> {
         ProjectOperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -655,7 +653,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, C> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -672,7 +670,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a, C> {
+    pub fn operations_list(&self, name: &str) -> ProjectOperationListCall<'a> {
         ProjectOperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -692,7 +690,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
-    pub fn submissions_create(&self, request: GoogleCloudWebriskV1Submission, parent: &str) -> ProjectSubmissionCreateCall<'a, C> {
+    pub fn submissions_create(&self, request: GoogleCloudWebriskV1Submission, parent: &str) -> ProjectSubmissionCreateCall<'a> {
         ProjectSubmissionCreateCall {
             hub: self.hub,
             _request: request,
@@ -711,7 +709,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
-    pub fn uris_submit(&self, request: GoogleCloudWebriskV1SubmitUriRequest, parent: &str) -> ProjectUriSubmitCall<'a, C> {
+    pub fn uris_submit(&self, request: GoogleCloudWebriskV1SubmitUriRequest, parent: &str) -> ProjectUriSubmitCall<'a> {
         ProjectUriSubmitCall {
             hub: self.hub,
             _request: request,
@@ -755,20 +753,20 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// let rb = hub.threat_lists();
 /// # }
 /// ```
-pub struct ThreatListMethods<'a, C>
-    where C: 'a {
+pub struct ThreatListMethods<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ThreatListMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ThreatListMethods<'a> {}
 
-impl<'a, C> ThreatListMethods<'a, C> {
+impl<'a> ThreatListMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the most recent threat list diffs. These diffs should be applied to a local database of hashes to keep it up-to-date. If the local database is empty or excessively out-of-date, a complete snapshot of the database will be returned. This Method only updates a single ThreatList at a time. To update multiple ThreatList databases, this method needs to be called once for each list.
-    pub fn compute_diff(&self) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn compute_diff(&self) -> ThreatListComputeDiffCall<'a> {
         ThreatListComputeDiffCall {
             hub: self.hub,
             _version_token: Default::default(),
@@ -815,20 +813,20 @@ impl<'a, C> ThreatListMethods<'a, C> {
 /// let rb = hub.uris();
 /// # }
 /// ```
-pub struct UriMethods<'a, C>
-    where C: 'a {
+pub struct UriMethods<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UriMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UriMethods<'a> {}
 
-impl<'a, C> UriMethods<'a, C> {
+impl<'a> UriMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// This method is used to check whether a URI is on a given threatList. Multiple threatLists may be searched in a single query. The response will list all requested threatLists the URI was found to match. If the URI is not found on any of the requested ThreatList an empty response will be returned.
-    pub fn search(&self) -> UriSearchCall<'a, C> {
+    pub fn search(&self) -> UriSearchCall<'a> {
         UriSearchCall {
             hub: self.hub,
             _uri: Default::default(),
@@ -882,10 +880,10 @@ impl<'a, C> UriMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct HasheSearchCall<'a, C>
-    where C: 'a {
+pub struct HasheSearchCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _threat_types: Vec<String>,
     _hash_prefix: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -893,9 +891,9 @@ pub struct HasheSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for HasheSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for HasheSearchCall<'a> {}
 
-impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> HasheSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -942,8 +940,7 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -956,7 +953,7 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -965,7 +962,7 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1023,14 +1020,14 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *threat types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_threat_types(mut self, new_value: &str) -> HasheSearchCall<'a, C> {
+    pub fn add_threat_types(mut self, new_value: &str) -> HasheSearchCall<'a> {
         self._threat_types.push(new_value.to_string());
         self
     }
     /// A hash prefix, consisting of the most significant 4-32 bytes of a SHA256 hash. For JSON requests, this field is base64-encoded. Note that if this parameter is provided by a URI, it must be encoded using the web safe base64 variant (RFC 4648).
     ///
     /// Sets the *hash prefix* query property to the given value.
-    pub fn hash_prefix(mut self, new_value: &str) -> HasheSearchCall<'a, C> {
+    pub fn hash_prefix(mut self, new_value: &str) -> HasheSearchCall<'a> {
         self._hash_prefix = Some(new_value.to_string());
         self
     }
@@ -1040,7 +1037,7 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> HasheSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> HasheSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1065,7 +1062,7 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> HasheSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> HasheSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1085,7 +1082,7 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> HasheSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> HasheSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1135,19 +1132,19 @@ impl<'a, C> HasheSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationCancelCall<'a, C>
-    where C: 'a {
+pub struct ProjectOperationCancelCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _request: GoogleLongrunningCancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ProjectOperationCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectOperationCancelCall<'a> {}
 
-impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectOperationCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1231,7 +1228,7 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1242,7 +1239,7 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1301,7 +1298,7 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> ProjectOperationCancelCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> ProjectOperationCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -1311,7 +1308,7 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationCancelCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1321,7 +1318,7 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1346,7 +1343,7 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1387,18 +1384,18 @@ impl<'a, C> ProjectOperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectOperationDeleteCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ProjectOperationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectOperationDeleteCall<'a> {}
 
-impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectOperationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1470,7 +1467,7 @@ impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1479,7 +1476,7 @@ impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1539,7 +1536,7 @@ impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1549,7 +1546,7 @@ impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1574,7 +1571,7 @@ impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1615,19 +1612,19 @@ impl<'a, C> ProjectOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectOperationGetCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
 
-impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1692,8 +1689,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1706,7 +1702,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1715,7 +1711,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1775,7 +1771,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1785,7 +1781,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1810,7 +1806,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1830,7 +1826,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1877,10 +1873,10 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectOperationListCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1889,9 +1885,9 @@ pub struct ProjectOperationListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ProjectOperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectOperationListCall<'a> {}
 
-impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectOperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1972,7 +1968,7 @@ impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1981,7 +1977,7 @@ impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2041,28 +2037,28 @@ impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectOperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectOperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2072,7 +2068,7 @@ impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2097,7 +2093,7 @@ impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2144,10 +2140,10 @@ impl<'a, C> ProjectOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSubmissionCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSubmissionCreateCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _request: GoogleCloudWebriskV1Submission,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2155,9 +2151,9 @@ pub struct ProjectSubmissionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSubmissionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSubmissionCreateCall<'a> {}
 
-impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSubmissionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2233,8 +2229,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2248,7 +2243,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2259,7 +2254,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2318,7 +2313,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudWebriskV1Submission) -> ProjectSubmissionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudWebriskV1Submission) -> ProjectSubmissionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2328,7 +2323,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSubmissionCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSubmissionCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2338,7 +2333,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSubmissionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSubmissionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2363,7 +2358,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubmissionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubmissionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2383,7 +2378,7 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubmissionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubmissionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2433,10 +2428,10 @@ impl<'a, C> ProjectSubmissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUriSubmitCall<'a, C>
-    where C: 'a {
+pub struct ProjectUriSubmitCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _request: GoogleCloudWebriskV1SubmitUriRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2444,9 +2439,9 @@ pub struct ProjectUriSubmitCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectUriSubmitCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectUriSubmitCall<'a> {}
 
-impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectUriSubmitCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2522,8 +2517,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2537,7 +2531,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2548,7 +2542,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2607,7 +2601,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudWebriskV1SubmitUriRequest) -> ProjectUriSubmitCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudWebriskV1SubmitUriRequest) -> ProjectUriSubmitCall<'a> {
         self._request = new_value;
         self
     }
@@ -2617,7 +2611,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectUriSubmitCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectUriSubmitCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2627,7 +2621,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUriSubmitCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUriSubmitCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2652,7 +2646,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUriSubmitCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUriSubmitCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2672,7 +2666,7 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUriSubmitCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectUriSubmitCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2721,10 +2715,10 @@ impl<'a, C> ProjectUriSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThreatListComputeDiffCall<'a, C>
-    where C: 'a {
+pub struct ThreatListComputeDiffCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _version_token: Option<String>,
     _threat_type: Option<String>,
     _constraints_supported_compressions: Vec<String>,
@@ -2735,9 +2729,9 @@ pub struct ThreatListComputeDiffCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ThreatListComputeDiffCall<'a, C> {}
+impl<'a> client::CallBuilder for ThreatListComputeDiffCall<'a> {}
 
-impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ThreatListComputeDiffCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2793,8 +2787,7 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2807,7 +2800,7 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2816,7 +2809,7 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2873,14 +2866,14 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// The current version token of the client for the requested list (the client version that was received from the last successful diff). If the client does not have a version token (this is the first time calling ComputeThreatListDiff), this may be left empty and a full database snapshot will be returned.
     ///
     /// Sets the *version token* query property to the given value.
-    pub fn version_token(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn version_token(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a> {
         self._version_token = Some(new_value.to_string());
         self
     }
     /// Required. The threat list to update. Only a single ThreatType should be specified per request. If you want to handle multiple ThreatTypes, you must make one request per ThreatType.
     ///
     /// Sets the *threat type* query property to the given value.
-    pub fn threat_type(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn threat_type(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a> {
         self._threat_type = Some(new_value.to_string());
         self
     }
@@ -2888,21 +2881,21 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Append the given value to the *constraints.supported compressions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_constraints_supported_compressions(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn add_constraints_supported_compressions(mut self, new_value: &str) -> ThreatListComputeDiffCall<'a> {
         self._constraints_supported_compressions.push(new_value.to_string());
         self
     }
     /// The maximum size in number of entries. The diff will not contain more entries than this value. This should be a power of 2 between 2**10 and 2**20. If zero, no diff size limit is set.
     ///
     /// Sets the *constraints.max diff entries* query property to the given value.
-    pub fn constraints_max_diff_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn constraints_max_diff_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a> {
         self._constraints_max_diff_entries = Some(new_value);
         self
     }
     /// Sets the maximum number of entries that the client is willing to have in the local database. This should be a power of 2 between 2**10 and 2**20. If zero, no database size limit is set.
     ///
     /// Sets the *constraints.max database entries* query property to the given value.
-    pub fn constraints_max_database_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn constraints_max_database_entries(mut self, new_value: i32) -> ThreatListComputeDiffCall<'a> {
         self._constraints_max_database_entries = Some(new_value);
         self
     }
@@ -2912,7 +2905,7 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListComputeDiffCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThreatListComputeDiffCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2937,7 +2930,7 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThreatListComputeDiffCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatListComputeDiffCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2957,7 +2950,7 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ThreatListComputeDiffCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ThreatListComputeDiffCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3003,10 +2996,10 @@ impl<'a, C> ThreatListComputeDiffCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UriSearchCall<'a, C>
-    where C: 'a {
+pub struct UriSearchCall<'a>
+    where  {
 
-    hub: &'a WebRisk<C>,
+    hub: &'a WebRisk<>,
     _uri: Option<String>,
     _threat_types: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3014,9 +3007,9 @@ pub struct UriSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UriSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for UriSearchCall<'a> {}
 
-impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UriSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3063,8 +3056,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3077,7 +3069,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3086,7 +3078,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3143,7 +3135,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Required. The URI to be checked for matches.
     ///
     /// Sets the *uri* query property to the given value.
-    pub fn uri(mut self, new_value: &str) -> UriSearchCall<'a, C> {
+    pub fn uri(mut self, new_value: &str) -> UriSearchCall<'a> {
         self._uri = Some(new_value.to_string());
         self
     }
@@ -3151,7 +3143,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *threat types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_threat_types(mut self, new_value: &str) -> UriSearchCall<'a, C> {
+    pub fn add_threat_types(mut self, new_value: &str) -> UriSearchCall<'a> {
         self._threat_types.push(new_value.to_string());
         self
     }
@@ -3161,7 +3153,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UriSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UriSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3186,7 +3178,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UriSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UriSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3206,7 +3198,7 @@ impl<'a, C> UriSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UriSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UriSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

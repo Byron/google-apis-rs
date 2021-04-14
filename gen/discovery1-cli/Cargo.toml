@@ -4,10 +4,10 @@
 [package]
 
 name = "google-discovery1-cli"
-version = "2.0.0+20200806"
+version = "2.0.3+20200806"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/discovery1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/discovery1-cli"
 homepage = "https://developers.google.com/discovery/"
 documentation = "http://byron.github.io/google-apis-rs/google_discovery1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-discovery1]
 path = "../discovery1"
-version = "2.0.0+20200806"
+version = "2.0.3+20200806"

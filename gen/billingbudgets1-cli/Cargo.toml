@@ -4,10 +4,10 @@
 [package]
 
 name = "google-billingbudgets1-cli"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with CloudBillingBudget (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/billingbudgets1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/billingbudgets1-cli"
 homepage = "https://cloud.google.com/billing/docs/how-to/budget-api-overview"
 documentation = "http://byron.github.io/google-apis-rs/google_billingbudgets1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-billingbudgets1]
 path = "../billingbudgets1"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"

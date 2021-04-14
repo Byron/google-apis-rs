@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::ChromePolicy<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::ChromePolicy,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -647,7 +646,7 @@ async fn main() {
     
     let mut app = App::new("chromepolicy1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210329")
+           .version("2.0.3+20210329")
            .about("The Chrome Policy API is a suite of services that allows Chrome administrators to control the policies applied to their managed Chrome OS devices and Chrome browsers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_chromepolicy1_cli")
            .arg(Arg::with_name("url")

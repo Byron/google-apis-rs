@@ -1,8 +1,8 @@
-site_name: On-Demand Scanning v2.0.0+20210329
+site_name: On-Demand Scanning v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-ondemandscanning1-cli
 site_description: A complete library to interact with On-Demand Scanning (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/ondemandscanning1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ondemandscanning1-cli
 
 docs_dir: docs
 site_dir: build_html

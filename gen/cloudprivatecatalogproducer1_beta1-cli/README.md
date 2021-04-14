@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-cloudprivatecatalogproducer1_beta1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudprivatecatalogproducer1_beta1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprivatecatalogproducer1_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud PrivateCatalog Producer* API at revision *20200405*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud PrivateCatalog Producer* API at revision *20200405*. The CLI is at version *2.0.3*.
 
 ```bash
 cloudprivatecatalogproducer1-beta1 [options]

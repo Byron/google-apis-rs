@@ -1,8 +1,8 @@
-site_name: Remote Build Execution v2.0.0+20210329
+site_name: Remote Build Execution v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-remotebuildexecution2-cli
 site_description: A complete library to interact with Remote Build Execution (protocol v2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/remotebuildexecution2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/remotebuildexecution2-cli
 
 docs_dir: docs
 site_dir: build_html

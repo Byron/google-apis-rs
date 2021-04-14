@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,35 +104,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct ServiceDirectory<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct ServiceDirectory<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for ServiceDirectory<C> {}
+impl<'a, > client::Hub for ServiceDirectory<> {}
 
-impl<'a, C> ServiceDirectory<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > ServiceDirectory<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ServiceDirectory<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ServiceDirectory<> {
         ServiceDirectory {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://servicedirectory.googleapis.com/".to_string(),
             _root_url: "https://servicedirectory.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -591,15 +589,15 @@ impl client::ResponseResult for TestIamPermissionsResponse {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -609,7 +607,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the service that this endpoint provides.
-    pub fn locations_namespaces_services_endpoints_create(&self, request: Endpoint, parent: &str) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> {
+    pub fn locations_namespaces_services_endpoints_create(&self, request: Endpoint, parent: &str) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a> {
         ProjectLocationNamespaceServiceEndpointCreateCall {
             hub: self.hub,
             _request: request,
@@ -628,7 +626,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the endpoint to delete.
-    pub fn locations_namespaces_services_endpoints_delete(&self, name: &str) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> {
+    pub fn locations_namespaces_services_endpoints_delete(&self, name: &str) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a> {
         ProjectLocationNamespaceServiceEndpointDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -645,7 +643,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the endpoint to get.
-    pub fn locations_namespaces_services_endpoints_get(&self, name: &str) -> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> {
+    pub fn locations_namespaces_services_endpoints_get(&self, name: &str) -> ProjectLocationNamespaceServiceEndpointGetCall<'a> {
         ProjectLocationNamespaceServiceEndpointGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -662,7 +660,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the service whose endpoints you'd like to list.
-    pub fn locations_namespaces_services_endpoints_list(&self, parent: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn locations_namespaces_services_endpoints_list(&self, parent: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         ProjectLocationNamespaceServiceEndpointListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -684,7 +682,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The resource name for the endpoint in the format `projects/*/locations/*/namespaces/*/services/*/endpoints/*`.
-    pub fn locations_namespaces_services_endpoints_patch(&self, request: Endpoint, name: &str) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> {
+    pub fn locations_namespaces_services_endpoints_patch(&self, request: Endpoint, name: &str) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a> {
         ProjectLocationNamespaceServiceEndpointPatchCall {
             hub: self.hub,
             _request: request,
@@ -704,7 +702,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the namespace this service will belong to.
-    pub fn locations_namespaces_services_create(&self, request: Service, parent: &str) -> ProjectLocationNamespaceServiceCreateCall<'a, C> {
+    pub fn locations_namespaces_services_create(&self, request: Service, parent: &str) -> ProjectLocationNamespaceServiceCreateCall<'a> {
         ProjectLocationNamespaceServiceCreateCall {
             hub: self.hub,
             _request: request,
@@ -723,7 +721,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the service to delete.
-    pub fn locations_namespaces_services_delete(&self, name: &str) -> ProjectLocationNamespaceServiceDeleteCall<'a, C> {
+    pub fn locations_namespaces_services_delete(&self, name: &str) -> ProjectLocationNamespaceServiceDeleteCall<'a> {
         ProjectLocationNamespaceServiceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -740,7 +738,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the service to get.
-    pub fn locations_namespaces_services_get(&self, name: &str) -> ProjectLocationNamespaceServiceGetCall<'a, C> {
+    pub fn locations_namespaces_services_get(&self, name: &str) -> ProjectLocationNamespaceServiceGetCall<'a> {
         ProjectLocationNamespaceServiceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -758,7 +756,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_namespaces_services_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> {
+    pub fn locations_namespaces_services_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a> {
         ProjectLocationNamespaceServiceGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -776,7 +774,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the namespace whose services you'd like to list.
-    pub fn locations_namespaces_services_list(&self, parent: &str) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn locations_namespaces_services_list(&self, parent: &str) -> ProjectLocationNamespaceServiceListCall<'a> {
         ProjectLocationNamespaceServiceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -798,7 +796,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The resource name for the service in the format `projects/*/locations/*/namespaces/*/services/*`.
-    pub fn locations_namespaces_services_patch(&self, request: Service, name: &str) -> ProjectLocationNamespaceServicePatchCall<'a, C> {
+    pub fn locations_namespaces_services_patch(&self, request: Service, name: &str) -> ProjectLocationNamespaceServicePatchCall<'a> {
         ProjectLocationNamespaceServicePatchCall {
             hub: self.hub,
             _request: request,
@@ -818,7 +816,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the service to resolve.
-    pub fn locations_namespaces_services_resolve(&self, request: ResolveServiceRequest, name: &str) -> ProjectLocationNamespaceServiceResolveCall<'a, C> {
+    pub fn locations_namespaces_services_resolve(&self, request: ResolveServiceRequest, name: &str) -> ProjectLocationNamespaceServiceResolveCall<'a> {
         ProjectLocationNamespaceServiceResolveCall {
             hub: self.hub,
             _request: request,
@@ -837,7 +835,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_namespaces_services_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> {
+    pub fn locations_namespaces_services_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a> {
         ProjectLocationNamespaceServiceSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -856,7 +854,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_namespaces_services_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> {
+    pub fn locations_namespaces_services_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a> {
         ProjectLocationNamespaceServiceTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -875,7 +873,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the project and location the namespace will be created in.
-    pub fn locations_namespaces_create(&self, request: Namespace, parent: &str) -> ProjectLocationNamespaceCreateCall<'a, C> {
+    pub fn locations_namespaces_create(&self, request: Namespace, parent: &str) -> ProjectLocationNamespaceCreateCall<'a> {
         ProjectLocationNamespaceCreateCall {
             hub: self.hub,
             _request: request,
@@ -894,7 +892,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the namespace to delete.
-    pub fn locations_namespaces_delete(&self, name: &str) -> ProjectLocationNamespaceDeleteCall<'a, C> {
+    pub fn locations_namespaces_delete(&self, name: &str) -> ProjectLocationNamespaceDeleteCall<'a> {
         ProjectLocationNamespaceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -911,7 +909,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the namespace to retrieve.
-    pub fn locations_namespaces_get(&self, name: &str) -> ProjectLocationNamespaceGetCall<'a, C> {
+    pub fn locations_namespaces_get(&self, name: &str) -> ProjectLocationNamespaceGetCall<'a> {
         ProjectLocationNamespaceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -929,7 +927,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_namespaces_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceGetIamPolicyCall<'a, C> {
+    pub fn locations_namespaces_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceGetIamPolicyCall<'a> {
         ProjectLocationNamespaceGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -947,7 +945,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the project and location whose namespaces you'd like to list.
-    pub fn locations_namespaces_list(&self, parent: &str) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn locations_namespaces_list(&self, parent: &str) -> ProjectLocationNamespaceListCall<'a> {
         ProjectLocationNamespaceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -969,7 +967,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The resource name for the namespace in the format `projects/*/locations/*/namespaces/*`.
-    pub fn locations_namespaces_patch(&self, request: Namespace, name: &str) -> ProjectLocationNamespacePatchCall<'a, C> {
+    pub fn locations_namespaces_patch(&self, request: Namespace, name: &str) -> ProjectLocationNamespacePatchCall<'a> {
         ProjectLocationNamespacePatchCall {
             hub: self.hub,
             _request: request,
@@ -989,7 +987,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_namespaces_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceSetIamPolicyCall<'a, C> {
+    pub fn locations_namespaces_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationNamespaceSetIamPolicyCall<'a> {
         ProjectLocationNamespaceSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1008,7 +1006,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_namespaces_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationNamespaceTestIamPermissionCall<'a, C> {
+    pub fn locations_namespaces_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationNamespaceTestIamPermissionCall<'a> {
         ProjectLocationNamespaceTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1026,7 +1024,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1043,7 +1041,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1104,10 +1102,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceEndpointCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceEndpointCreateCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: Endpoint,
     _parent: String,
     _endpoint_id: Option<String>,
@@ -1116,9 +1114,9 @@ pub struct ProjectLocationNamespaceServiceEndpointCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceEndpointCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceEndpointCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1197,8 +1195,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1212,7 +1209,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1223,7 +1220,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1282,7 +1279,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Endpoint) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Endpoint) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1292,14 +1289,14 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The Resource ID must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     ///
     /// Sets the *endpoint id* query property to the given value.
-    pub fn endpoint_id(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> {
+    pub fn endpoint_id(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a> {
         self._endpoint_id = Some(new_value.to_string());
         self
     }
@@ -1309,7 +1306,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1334,7 +1331,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1354,7 +1351,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1398,19 +1395,19 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointCreateCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceEndpointDeleteCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceEndpointDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceEndpointDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1475,8 +1472,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1489,7 +1485,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1498,7 +1494,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1558,7 +1554,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1568,7 +1564,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1593,7 +1589,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1613,7 +1609,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1657,19 +1653,19 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointDeleteCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceEndpointGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceEndpointGetCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceEndpointGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceEndpointGetCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceEndpointGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1734,8 +1730,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1748,7 +1743,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1757,7 +1752,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1817,7 +1812,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1827,7 +1822,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1852,7 +1847,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1872,7 +1867,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1920,10 +1915,10 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointGetCall<'a, C> where C: Borro
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceEndpointListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceEndpointListCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1934,9 +1929,9 @@ pub struct ProjectLocationNamespaceServiceEndpointListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceEndpointListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceEndpointListCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceEndpointListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2013,8 +2008,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2027,7 +2021,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2036,7 +2030,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2096,35 +2090,35 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The order to list results by. General `order_by` string syntax: ` () (,)` * `` allows values: `name`, `address`, `port` * `` ascending or descending order by ``. If this is left blank, `asc` is used Note that an empty `order_by` string results in default order, which is order by `name` in ascending order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to list results by. General `filter` string syntax: ` ()` * `` can be `name`, `address`, `port`, or `metadata.` for map field * `` can be `<`, `>`, `<=`, `>=`, `!=`, `=`, `:`. Of which `:` means `HAS`, and is roughly the same as `=` * `` must be the same data type as field * `` can be `AND`, `OR`, `NOT` Examples of valid filters: * `metadata.owner` returns endpoints that have a metadata with the key `owner`, this is the same as `metadata:owner` * `metadata.protocol=gRPC` returns endpoints that have key/value `protocol=gRPC` * `address=192.108.1.105` returns endpoints that have this address * `port>8080` returns endpoints that have port number larger than 8080 * `name>projects/my-project/locations/us-east1/namespaces/my-namespace/services/my-service/endpoints/endpoint-c` returns endpoints that have name that is alphabetically later than the string, so "endpoint-e" is returned but "endpoint-a" is not * `metadata.owner!=sd AND metadata.foo=bar` returns endpoints that have `owner` in metadata key but value is not `sd` AND have key/value `foo=bar` * `doesnotexist.foo=bar` returns an empty list. Note that endpoint doesn't have a field called "doesnotexist". Since the filter does not match any endpoints, it returns no results For more information about filtering, see [API Filtering](https://aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2134,7 +2128,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2159,7 +2153,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2179,7 +2173,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2230,10 +2224,10 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointListCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceEndpointPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceEndpointPatchCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: Endpoint,
     _name: String,
     _update_mask: Option<String>,
@@ -2242,9 +2236,9 @@ pub struct ProjectLocationNamespaceServiceEndpointPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceEndpointPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceEndpointPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2323,8 +2317,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2338,7 +2331,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2349,7 +2342,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2408,7 +2401,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Endpoint) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Endpoint) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2418,14 +2411,14 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2435,7 +2428,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2460,7 +2453,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2480,7 +2473,7 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceEndpointPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2531,10 +2524,10 @@ impl<'a, C> ProjectLocationNamespaceServiceEndpointPatchCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceCreateCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: Service,
     _parent: String,
     _service_id: Option<String>,
@@ -2543,9 +2536,9 @@ pub struct ProjectLocationNamespaceServiceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2624,8 +2617,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2639,7 +2631,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2650,7 +2642,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2709,7 +2701,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Service) -> ProjectLocationNamespaceServiceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Service) -> ProjectLocationNamespaceServiceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2719,14 +2711,14 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The Resource ID must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     ///
     /// Sets the *service id* query property to the given value.
-    pub fn service_id(mut self, new_value: &str) -> ProjectLocationNamespaceServiceCreateCall<'a, C> {
+    pub fn service_id(mut self, new_value: &str) -> ProjectLocationNamespaceServiceCreateCall<'a> {
         self._service_id = Some(new_value.to_string());
         self
     }
@@ -2736,7 +2728,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2761,7 +2753,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2781,7 +2773,7 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2825,19 +2817,19 @@ impl<'a, C> ProjectLocationNamespaceServiceCreateCall<'a, C> where C: BorrowMut<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceDeleteCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2902,8 +2894,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2916,7 +2907,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2925,7 +2916,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2985,7 +2976,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2995,7 +2986,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3020,7 +3011,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3040,7 +3031,7 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3084,19 +3075,19 @@ impl<'a, C> ProjectLocationNamespaceServiceDeleteCall<'a, C> where C: BorrowMut<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceGetCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceGetCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3161,8 +3152,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3175,7 +3165,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3184,7 +3174,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3244,7 +3234,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3254,7 +3244,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3279,7 +3269,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3299,7 +3289,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3349,10 +3339,10 @@ impl<'a, C> ProjectLocationNamespaceServiceGetCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3360,9 +3350,9 @@ pub struct ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceGetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3438,8 +3428,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3453,7 +3442,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3464,7 +3453,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3523,7 +3512,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -3533,7 +3522,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -3543,7 +3532,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3568,7 +3557,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3588,7 +3577,7 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3636,10 +3625,10 @@ impl<'a, C> ProjectLocationNamespaceServiceGetIamPolicyCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceListCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3650,9 +3639,9 @@ pub struct ProjectLocationNamespaceServiceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceListCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3729,8 +3718,7 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3743,7 +3731,7 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3752,7 +3740,7 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3812,35 +3800,35 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNamespaceServiceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The order to list results by. General `order_by` string syntax: ` () (,)` * `` allows value: `name` * `` ascending or descending order by ``. If this is left blank, `asc` is used Note that an empty `order_by` string results in default order, which is order by `name` in ascending order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to list results by. General `filter` string syntax: ` ()` * `` can be `name` or `metadata.` for map field * `` can be `<`, `>`, `<=`, `>=`, `!=`, `=`, `:`. Of which `:` means `HAS`, and is roughly the same as `=` * `` must be the same data type as field * `` can be `AND`, `OR`, `NOT` Examples of valid filters: * `metadata.owner` returns services that have a metadata with the key `owner`, this is the same as `metadata:owner` * `metadata.protocol=gRPC` returns services that have key/value `protocol=gRPC` * `name>projects/my-project/locations/us-east1/namespaces/my-namespace/services/service-c` returns services that have name that is alphabetically later than the string, so "service-e" is returned but "service-a" is not * `metadata.owner!=sd AND metadata.foo=bar` returns services that have `owner` in metadata key but value is not `sd` AND have key/value `foo=bar` * `doesnotexist.foo=bar` returns an empty list. Note that service doesn't have a field called "doesnotexist". Since the filter does not match any services, it returns no results For more information about filtering, see [API Filtering](https://aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationNamespaceServiceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3850,7 +3838,7 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3875,7 +3863,7 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3895,7 +3883,7 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3946,10 +3934,10 @@ impl<'a, C> ProjectLocationNamespaceServiceListCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServicePatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServicePatchCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: Service,
     _name: String,
     _update_mask: Option<String>,
@@ -3958,9 +3946,9 @@ pub struct ProjectLocationNamespaceServicePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServicePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServicePatchCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServicePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4039,8 +4027,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4054,7 +4041,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4065,7 +4052,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4124,7 +4111,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Service) -> ProjectLocationNamespaceServicePatchCall<'a, C> {
+    pub fn request(mut self, new_value: Service) -> ProjectLocationNamespaceServicePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4134,14 +4121,14 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServicePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServicePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationNamespaceServicePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationNamespaceServicePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4151,7 +4138,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServicePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServicePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4176,7 +4163,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServicePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServicePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4196,7 +4183,7 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServicePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServicePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4246,10 +4233,10 @@ impl<'a, C> ProjectLocationNamespaceServicePatchCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceResolveCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceResolveCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: ResolveServiceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4257,9 +4244,9 @@ pub struct ProjectLocationNamespaceServiceResolveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceResolveCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceResolveCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceResolveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4335,8 +4322,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4350,7 +4336,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4361,7 +4347,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4420,7 +4406,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResolveServiceRequest) -> ProjectLocationNamespaceServiceResolveCall<'a, C> {
+    pub fn request(mut self, new_value: ResolveServiceRequest) -> ProjectLocationNamespaceServiceResolveCall<'a> {
         self._request = new_value;
         self
     }
@@ -4430,7 +4416,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceResolveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceServiceResolveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4440,7 +4426,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceResolveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceResolveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4465,7 +4451,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceResolveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceResolveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4485,7 +4471,7 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceResolveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceResolveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4535,10 +4521,10 @@ impl<'a, C> ProjectLocationNamespaceServiceResolveCall<'a, C> where C: BorrowMut
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4546,9 +4532,9 @@ pub struct ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceSetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4624,8 +4610,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4639,7 +4624,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4650,7 +4635,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4709,7 +4694,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -4719,7 +4704,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -4729,7 +4714,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4754,7 +4739,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4774,7 +4759,7 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4824,10 +4809,10 @@ impl<'a, C> ProjectLocationNamespaceServiceSetIamPolicyCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceServiceTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4835,9 +4820,9 @@ pub struct ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceServiceTestIamPermissionCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceServiceTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4913,8 +4898,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4928,7 +4912,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4939,7 +4923,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4998,7 +4982,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -5008,7 +4992,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -5018,7 +5002,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5043,7 +5027,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5063,7 +5047,7 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceServiceTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5114,10 +5098,10 @@ impl<'a, C> ProjectLocationNamespaceServiceTestIamPermissionCall<'a, C> where C:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceCreateCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: Namespace,
     _parent: String,
     _namespace_id: Option<String>,
@@ -5126,9 +5110,9 @@ pub struct ProjectLocationNamespaceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5207,8 +5191,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5222,7 +5205,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5233,7 +5216,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5292,7 +5275,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Namespace) -> ProjectLocationNamespaceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Namespace) -> ProjectLocationNamespaceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5302,14 +5285,14 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. The Resource ID must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression `[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?` which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.
     ///
     /// Sets the *namespace id* query property to the given value.
-    pub fn namespace_id(mut self, new_value: &str) -> ProjectLocationNamespaceCreateCall<'a, C> {
+    pub fn namespace_id(mut self, new_value: &str) -> ProjectLocationNamespaceCreateCall<'a> {
         self._namespace_id = Some(new_value.to_string());
         self
     }
@@ -5319,7 +5302,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5344,7 +5327,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5364,7 +5347,7 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5408,19 +5391,19 @@ impl<'a, C> ProjectLocationNamespaceCreateCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceDeleteCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5485,8 +5468,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5499,7 +5481,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5508,7 +5490,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5568,7 +5550,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5578,7 +5560,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5603,7 +5585,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5623,7 +5605,7 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5667,19 +5649,19 @@ impl<'a, C> ProjectLocationNamespaceDeleteCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceGetCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceGetCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5744,8 +5726,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5758,7 +5739,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5767,7 +5748,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5827,7 +5808,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespaceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5837,7 +5818,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5862,7 +5843,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5882,7 +5863,7 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5932,10 +5913,10 @@ impl<'a, C> ProjectLocationNamespaceGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5943,9 +5924,9 @@ pub struct ProjectLocationNamespaceGetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceGetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6021,8 +6002,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6036,7 +6016,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6047,7 +6027,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6106,7 +6086,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationNamespaceGetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectLocationNamespaceGetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -6116,7 +6096,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -6126,7 +6106,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6151,7 +6131,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6171,7 +6151,7 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6219,10 +6199,10 @@ impl<'a, C> ProjectLocationNamespaceGetIamPolicyCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceListCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6233,9 +6213,9 @@ pub struct ProjectLocationNamespaceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceListCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6312,8 +6292,7 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6326,7 +6305,7 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6335,7 +6314,7 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6395,35 +6374,35 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. The next_page_token value returned from a previous List request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of items to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationNamespaceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The order to list results by. General `order_by` string syntax: ` () (,)` * `` allows value: `name` * `` ascending or descending order by ``. If this is left blank, `asc` is used Note that an empty `order_by` string results in default order, which is order by `name` in ascending order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. The filter to list results by. General `filter` string syntax: ` ()` * `` can be `name` or `labels.` for map field * `` can be `<`, `>`, `<=`, `>=`, `!=`, `=`, `:`. Of which `:` means `HAS`, and is roughly the same as `=` * `` must be the same data type as field * `` can be `AND`, `OR`, `NOT` Examples of valid filters: * `labels.owner` returns namespaces that have a label with the key `owner`, this is the same as `labels:owner` * `labels.owner=sd` returns namespaces that have key/value `owner=sd` * `name>projects/my-project/locations/us-east1/namespaces/namespace-c` returns namespaces that have name that is alphabetically later than the string, so "namespace-e" is returned but "namespace-a" is not * `labels.owner!=sd AND labels.foo=bar` returns namespaces that have `owner` in label key but value is not `sd` AND have key/value `foo=bar` * `doesnotexist.foo=bar` returns an empty list. Note that namespace doesn't have a field called "doesnotexist". Since the filter does not match any namespaces, it returns no results For more information about filtering, see [API Filtering](https://aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationNamespaceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6433,7 +6412,7 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6458,7 +6437,7 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6478,7 +6457,7 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6529,10 +6508,10 @@ impl<'a, C> ProjectLocationNamespaceListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespacePatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespacePatchCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: Namespace,
     _name: String,
     _update_mask: Option<String>,
@@ -6541,9 +6520,9 @@ pub struct ProjectLocationNamespacePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespacePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespacePatchCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespacePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6622,8 +6601,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6637,7 +6615,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6648,7 +6626,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6707,7 +6685,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Namespace) -> ProjectLocationNamespacePatchCall<'a, C> {
+    pub fn request(mut self, new_value: Namespace) -> ProjectLocationNamespacePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -6717,14 +6695,14 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespacePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationNamespacePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. List of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationNamespacePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationNamespacePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6734,7 +6712,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespacePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespacePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6759,7 +6737,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespacePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespacePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6779,7 +6757,7 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespacePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespacePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6829,10 +6807,10 @@ impl<'a, C> ProjectLocationNamespacePatchCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6840,9 +6818,9 @@ pub struct ProjectLocationNamespaceSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceSetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6918,8 +6896,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6933,7 +6910,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6944,7 +6921,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7003,7 +6980,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationNamespaceSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationNamespaceSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -7013,7 +6990,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -7023,7 +7000,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7048,7 +7025,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7068,7 +7045,7 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7118,10 +7095,10 @@ impl<'a, C> ProjectLocationNamespaceSetIamPolicyCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationNamespaceTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationNamespaceTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7129,9 +7106,9 @@ pub struct ProjectLocationNamespaceTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationNamespaceTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationNamespaceTestIamPermissionCall<'a> {}
 
-impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationNamespaceTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7207,8 +7184,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7222,7 +7198,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7233,7 +7209,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7292,7 +7268,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationNamespaceTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationNamespaceTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -7302,7 +7278,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationNamespaceTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -7312,7 +7288,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationNamespaceTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7337,7 +7313,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationNamespaceTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7357,7 +7333,7 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationNamespaceTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7401,19 +7377,19 @@ impl<'a, C> ProjectLocationNamespaceTestIamPermissionCall<'a, C> where C: Borrow
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGetCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7478,8 +7454,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7492,7 +7467,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7501,7 +7476,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7561,7 +7536,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7571,7 +7546,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7596,7 +7571,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7616,7 +7591,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7663,10 +7638,10 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationListCall<'a>
+    where  {
 
-    hub: &'a ServiceDirectory<C>,
+    hub: &'a ServiceDirectory<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7676,9 +7651,9 @@ pub struct ProjectLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
 
-impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7752,8 +7727,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7766,7 +7740,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7775,7 +7749,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7835,28 +7809,28 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service will select a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7866,7 +7840,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7891,7 +7865,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7911,7 +7885,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

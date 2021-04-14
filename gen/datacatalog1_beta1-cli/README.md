@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-datacatalog1_beta1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/datacatalog1_beta1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/datacatalog1_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *Data Catalog* API at revision *20210316*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Data Catalog* API at revision *20210316*. The CLI is at version *2.0.3*.
 
 ```bash
 datacatalog1-beta1 [options]

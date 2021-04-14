@@ -1,8 +1,8 @@
-site_name: Cloud Iot v2.0.0+20210323
+site_name: Cloud Iot v2.0.3+20210323
 site_url: http://byron.github.io/google-apis-rs/google-cloudiot1-cli
 site_description: A complete library to interact with Cloud Iot (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudiot1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudiot1-cli
 
 docs_dir: docs
 site_dir: build_html

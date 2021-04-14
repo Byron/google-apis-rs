@@ -1,8 +1,8 @@
-site_name: Sheets v2.0.0+20210322
+site_name: Sheets v2.0.3+20210322
 site_url: http://byron.github.io/google-apis-rs/google-sheets4-cli
 site_description: A complete library to interact with Sheets (protocol v4)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/sheets4-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/sheets4-cli
 
 docs_dir: docs
 site_dir: build_html

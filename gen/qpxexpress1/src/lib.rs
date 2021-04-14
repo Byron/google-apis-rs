@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *QPX Express* crate version *2.0.0+20160708*, where *20160708* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *QPX Express* crate version *2.0.3+20160708*, where *20160708* is the exact revision of the *qpxExpress:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *QPX Express* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/qpx-express).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/qpxexpress1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/qpxexpress1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](QPXExpress) ... 

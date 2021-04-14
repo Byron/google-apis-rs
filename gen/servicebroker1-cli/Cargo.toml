@@ -4,10 +4,10 @@
 [package]
 
 name = "google-servicebroker1-cli"
-version = "2.0.0+20190624"
+version = "2.0.3+20190624"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Broker (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/servicebroker1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/servicebroker1-cli"
 homepage = "https://cloud.google.com/kubernetes-engine/docs/concepts/add-on/service-broker"
 documentation = "http://byron.github.io/google-apis-rs/google_servicebroker1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-servicebroker1]
 path = "../servicebroker1"
-version = "2.0.0+20190624"
+version = "2.0.3+20190624"

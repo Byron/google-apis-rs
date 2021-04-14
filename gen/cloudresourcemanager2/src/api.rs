@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -107,38 +106,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudResourceManager<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudResourceManager<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudResourceManager<C> {}
+impl<'a, > client::Hub for CloudResourceManager<> {}
 
-impl<'a, C> CloudResourceManager<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudResourceManager<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudResourceManager<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudResourceManager<> {
         CloudResourceManager {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
             _root_url: "https://cloudresourcemanager.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a, C> {
+    pub fn folders(&'a self) -> FolderMethods<'a> {
         FolderMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -572,15 +570,15 @@ impl client::RequestValue for UndeleteFolderRequest {}
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a, C>
-    where C: 'a {
+pub struct FolderMethods<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FolderMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
 
-impl<'a, C> FolderMethods<'a, C> {
+impl<'a> FolderMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -589,7 +587,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Folder) -> FolderCreateCall<'a, C> {
+    pub fn create(&self, request: Folder) -> FolderCreateCall<'a> {
         FolderCreateCall {
             hub: self.hub,
             _request: request,
@@ -607,7 +605,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. the resource name of the Folder to be deleted. Must be of the form `folders/{folder_id}`.
-    pub fn delete(&self, name: &str) -> FolderDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> FolderDeleteCall<'a> {
         FolderDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -624,7 +622,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the Folder to retrieve. Must be of the form `folders/{folder_id}`.
-    pub fn get(&self, name: &str) -> FolderGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> FolderGetCall<'a> {
         FolderGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -642,7 +640,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> FolderGetIamPolicyCall<'a, C> {
+    pub fn get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> FolderGetIamPolicyCall<'a> {
         FolderGetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -656,7 +654,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the Folders that are direct descendants of supplied parent resource. List provides a strongly consistent view of the Folders underneath the specified parent resource. List returns Folders sorted based upon the (ascending) lexical ordering of their display_name. The caller must have `resourcemanager.folders.list` permission on the identified parent.
-    pub fn list(&self) -> FolderListCall<'a, C> {
+    pub fn list(&self) -> FolderListCall<'a> {
         FolderListCall {
             hub: self.hub,
             _show_deleted: Default::default(),
@@ -677,7 +675,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the Folder to move. Must be of the form folders/{folder_id}
-    pub fn move_(&self, request: MoveFolderRequest, name: &str) -> FolderMoveCall<'a, C> {
+    pub fn move_(&self, request: MoveFolderRequest, name: &str) -> FolderMoveCall<'a> {
         FolderMoveCall {
             hub: self.hub,
             _request: request,
@@ -696,7 +694,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name of the Folder. Its format is `folders/{folder_id}`, for example: "folders/1234".
-    pub fn patch(&self, request: Folder, name: &str) -> FolderPatchCall<'a, C> {
+    pub fn patch(&self, request: Folder, name: &str) -> FolderPatchCall<'a> {
         FolderPatchCall {
             hub: self.hub,
             _request: request,
@@ -715,7 +713,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: SearchFoldersRequest) -> FolderSearchCall<'a, C> {
+    pub fn search(&self, request: SearchFoldersRequest) -> FolderSearchCall<'a> {
         FolderSearchCall {
             hub: self.hub,
             _request: request,
@@ -733,7 +731,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> FolderSetIamPolicyCall<'a, C> {
+    pub fn set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> FolderSetIamPolicyCall<'a> {
         FolderSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -752,7 +750,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> FolderTestIamPermissionCall<'a, C> {
+    pub fn test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> FolderTestIamPermissionCall<'a> {
         FolderTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -771,7 +769,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the Folder to undelete. Must be of the form `folders/{folder_id}`.
-    pub fn undelete(&self, request: UndeleteFolderRequest, name: &str) -> FolderUndeleteCall<'a, C> {
+    pub fn undelete(&self, request: UndeleteFolderRequest, name: &str) -> FolderUndeleteCall<'a> {
         FolderUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -815,15 +813,15 @@ impl<'a, C> FolderMethods<'a, C> {
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -832,7 +830,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -890,10 +888,10 @@ impl<'a, C> OperationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderCreateCall<'a, C>
-    where C: 'a {
+pub struct FolderCreateCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: Folder,
     _parent: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -901,9 +899,9 @@ pub struct FolderCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderCreateCall<'a> {}
 
-impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -956,8 +954,7 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -971,7 +968,7 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -982,7 +979,7 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1041,14 +1038,14 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> FolderCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Folder) -> FolderCreateCall<'a> {
         self._request = new_value;
         self
     }
     /// Required. The resource name of the new Folder's parent. Must be of the form `folders/{folder_id}` or `organizations/{org_id}`.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> FolderCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FolderCreateCall<'a> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -1058,7 +1055,7 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1083,7 +1080,7 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1103,7 +1100,7 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1147,19 +1144,19 @@ impl<'a, C> FolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderDeleteCall<'a, C>
-    where C: 'a {
+pub struct FolderDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderDeleteCall<'a> {}
 
-impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1224,8 +1221,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1238,7 +1234,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1247,7 +1243,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1307,7 +1303,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1317,7 +1313,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1342,7 +1338,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1362,7 +1358,7 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1406,19 +1402,19 @@ impl<'a, C> FolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderGetCall<'a, C>
-    where C: 'a {
+pub struct FolderGetCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderGetCall<'a> {}
 
-impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1483,8 +1479,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1497,7 +1492,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1506,7 +1501,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1566,7 +1561,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1576,7 +1571,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1601,7 +1596,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1621,7 +1616,7 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1671,10 +1666,10 @@ impl<'a, C> FolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct FolderGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: GetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1682,9 +1677,9 @@ pub struct FolderGetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderGetIamPolicyCall<'a> {}
 
-impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1760,8 +1755,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1775,7 +1769,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1786,7 +1780,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1845,7 +1839,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> FolderGetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> FolderGetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -1855,7 +1849,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> FolderGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -1865,7 +1859,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1890,7 +1884,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1910,7 +1904,7 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1958,10 +1952,10 @@ impl<'a, C> FolderGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderListCall<'a, C>
-    where C: 'a {
+pub struct FolderListCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _show_deleted: Option<bool>,
     _parent: Option<String>,
     _page_token: Option<String>,
@@ -1971,9 +1965,9 @@ pub struct FolderListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderListCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderListCall<'a> {}
 
-impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2024,8 +2018,7 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2038,7 +2031,7 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2047,7 +2040,7 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2104,28 +2097,28 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Optional. Controls whether Folders in the DELETE_REQUESTED state should be returned. Defaults to false.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> FolderListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> FolderListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Required. The resource name of the Organization or Folder whose Folders are being listed. Must be of the form `folders/{folder_id}` or `organizations/{org_id}`. Access to this method is controlled by checking the `resourcemanager.folders.list` permission on the `parent`.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> FolderListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FolderListCall<'a> {
         self._parent = Some(new_value.to_string());
         self
     }
     /// Optional. A pagination token returned from a previous call to `ListFolders` that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of Folders to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2135,7 +2128,7 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2160,7 +2153,7 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2180,7 +2173,7 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2230,10 +2223,10 @@ impl<'a, C> FolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderMoveCall<'a, C>
-    where C: 'a {
+pub struct FolderMoveCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: MoveFolderRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2241,9 +2234,9 @@ pub struct FolderMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderMoveCall<'a> {}
 
-impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2319,8 +2312,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2334,7 +2326,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2345,7 +2337,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2404,7 +2396,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MoveFolderRequest) -> FolderMoveCall<'a, C> {
+    pub fn request(mut self, new_value: MoveFolderRequest) -> FolderMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -2414,7 +2406,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2424,7 +2416,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2449,7 +2441,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2469,7 +2461,7 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2520,10 +2512,10 @@ impl<'a, C> FolderMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderPatchCall<'a, C>
-    where C: 'a {
+pub struct FolderPatchCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: Folder,
     _name: String,
     _update_mask: Option<String>,
@@ -2532,9 +2524,9 @@ pub struct FolderPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderPatchCall<'a> {}
 
-impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2613,8 +2605,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2628,7 +2619,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2639,7 +2630,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2698,7 +2689,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> FolderPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Folder) -> FolderPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2708,14 +2699,14 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. Fields to be updated. Only the `display_name` can be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> FolderPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> FolderPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2725,7 +2716,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2750,7 +2741,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2770,7 +2761,7 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2820,19 +2811,19 @@ impl<'a, C> FolderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderSearchCall<'a, C>
-    where C: 'a {
+pub struct FolderSearchCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: SearchFoldersRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderSearchCall<'a> {}
 
-impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2882,8 +2873,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2897,7 +2887,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2908,7 +2898,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2967,7 +2957,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchFoldersRequest) -> FolderSearchCall<'a, C> {
+    pub fn request(mut self, new_value: SearchFoldersRequest) -> FolderSearchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2977,7 +2967,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3002,7 +2992,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3022,7 +3012,7 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3072,10 +3062,10 @@ impl<'a, C> FolderSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct FolderSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3083,9 +3073,9 @@ pub struct FolderSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderSetIamPolicyCall<'a> {}
 
-impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3161,8 +3151,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3176,7 +3165,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3187,7 +3176,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3246,7 +3235,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> FolderSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> FolderSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -3256,7 +3245,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> FolderSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -3266,7 +3255,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3291,7 +3280,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3311,7 +3300,7 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3361,10 +3350,10 @@ impl<'a, C> FolderSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct FolderTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3372,9 +3361,9 @@ pub struct FolderTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderTestIamPermissionCall<'a> {}
 
-impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3450,8 +3439,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3465,7 +3453,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3476,7 +3464,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3535,7 +3523,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> FolderTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> FolderTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -3545,7 +3533,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> FolderTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -3555,7 +3543,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3580,7 +3568,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3600,7 +3588,7 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3650,10 +3638,10 @@ impl<'a, C> FolderTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderUndeleteCall<'a, C>
-    where C: 'a {
+pub struct FolderUndeleteCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _request: UndeleteFolderRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3661,9 +3649,9 @@ pub struct FolderUndeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderUndeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderUndeleteCall<'a> {}
 
-impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderUndeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3739,8 +3727,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3754,7 +3741,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3765,7 +3752,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3824,7 +3811,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteFolderRequest) -> FolderUndeleteCall<'a, C> {
+    pub fn request(mut self, new_value: UndeleteFolderRequest) -> FolderUndeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -3834,7 +3821,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderUndeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderUndeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3844,7 +3831,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderUndeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderUndeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3869,7 +3856,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderUndeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderUndeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3889,7 +3876,7 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderUndeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderUndeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3933,19 +3920,19 @@ impl<'a, C> FolderUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C>
-    where C: 'a {
+pub struct OperationGetCall<'a>
+    where  {
 
-    hub: &'a CloudResourceManager<C>,
+    hub: &'a CloudResourceManager<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationGetCall<'a> {}
 
-impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4010,8 +3997,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4024,7 +4010,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4033,7 +4019,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4093,7 +4079,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4103,7 +4089,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4128,7 +4114,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4148,7 +4134,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

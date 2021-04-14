@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::DriveHub<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::DriveHub,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -8544,7 +8543,7 @@ async fn main() {
     
     let mut app = App::new("drive2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210322")
+           .version("2.0.3+20210322")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive2_cli")
            .arg(Arg::with_name("url")

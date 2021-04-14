@@ -4,10 +4,10 @@
 [package]
 
 name = "google-monitoring3-cli"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Monitoring (protocol v3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli"
 homepage = "https://cloud.google.com/monitoring/api/"
 documentation = "http://byron.github.io/google-apis-rs/google_monitoring3_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-monitoring3]
 path = "../monitoring3"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"

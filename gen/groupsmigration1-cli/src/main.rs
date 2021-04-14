@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::GroupsMigration<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::GroupsMigration,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -220,7 +219,7 @@ async fn main() {
     
     let mut app = App::new("groupsmigration1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210318")
+           .version("2.0.3+20210318")
            .about("The Groups Migration API allows domain administrators to archive emails into Google groups.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_groupsmigration1_cli")
            .arg(Arg::with_name("url")

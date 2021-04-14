@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -113,35 +112,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Appengine<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Appengine<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Appengine<C> {}
+impl<'a, > client::Hub for Appengine<> {}
 
-impl<'a, C> Appengine<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Appengine<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Appengine<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Appengine<> {
         Appengine {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://appengine.googleapis.com/".to_string(),
             _root_url: "https://appengine.googleapis.com/".to_string(),
         }
     }
 
-    pub fn apps(&'a self) -> AppMethods<'a, C> {
+    pub fn apps(&'a self) -> AppMethods<'a> {
         AppMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1208,15 +1206,15 @@ impl client::Part for Volume {}
 /// let rb = hub.apps();
 /// # }
 /// ```
-pub struct AppMethods<'a, C>
-    where C: 'a {
+pub struct AppMethods<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AppMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AppMethods<'a> {}
 
-impl<'a, C> AppMethods<'a, C> {
+impl<'a> AppMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1226,7 +1224,7 @@ impl<'a, C> AppMethods<'a, C> {
     ///
     /// * `appsId` - Part of `name`. Resource name for the location.
     /// * `locationsId` - Part of `name`. See documentation of `appsId`.
-    pub fn locations_get(&self, apps_id: &str, locations_id: &str) -> AppLocationGetCall<'a, C> {
+    pub fn locations_get(&self, apps_id: &str, locations_id: &str) -> AppLocationGetCall<'a> {
         AppLocationGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1244,7 +1242,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, apps_id: &str) -> AppLocationListCall<'a, C> {
+    pub fn locations_list(&self, apps_id: &str) -> AppLocationListCall<'a> {
         AppLocationListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1268,7 +1266,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_debug(&self, request: DebugInstanceRequest, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn modules_versions_instances_debug(&self, request: DebugInstanceRequest, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDebugCall<'a> {
         AppModuleVersionInstanceDebugCall {
             hub: self.hub,
             _request: request,
@@ -1292,7 +1290,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDeleteCall<'a, C> {
+    pub fn modules_versions_instances_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
         AppModuleVersionInstanceDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1315,7 +1313,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
     /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_get(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceGetCall<'a, C> {
+    pub fn modules_versions_instances_get(&self, apps_id: &str, modules_id: &str, versions_id: &str, instances_id: &str) -> AppModuleVersionInstanceGetCall<'a> {
         AppModuleVersionInstanceGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1337,7 +1335,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default/versions/v1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_instances_list(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn modules_versions_instances_list(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionInstanceListCall<'a> {
         AppModuleVersionInstanceListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1360,7 +1358,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_create(&self, request: Version, apps_id: &str, modules_id: &str) -> AppModuleVersionCreateCall<'a, C> {
+    pub fn modules_versions_create(&self, request: Version, apps_id: &str, modules_id: &str) -> AppModuleVersionCreateCall<'a> {
         AppModuleVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1381,7 +1379,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default/versions/v1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionDeleteCall<'a, C> {
+    pub fn modules_versions_delete(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionDeleteCall<'a> {
         AppModuleVersionDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1402,7 +1400,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default/versions/v1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_get(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionGetCall<'a, C> {
+    pub fn modules_versions_get(&self, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionGetCall<'a> {
         AppModuleVersionGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1423,7 +1421,7 @@ impl<'a, C> AppMethods<'a, C> {
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_list(&self, apps_id: &str, modules_id: &str) -> AppModuleVersionListCall<'a, C> {
+    pub fn modules_versions_list(&self, apps_id: &str, modules_id: &str) -> AppModuleVersionListCall<'a> {
         AppModuleVersionListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1451,7 +1449,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/modules/default/versions/1.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
     /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_versions_patch(&self, request: Version, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn modules_versions_patch(&self, request: Version, apps_id: &str, modules_id: &str, versions_id: &str) -> AppModuleVersionPatchCall<'a> {
         AppModuleVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1473,7 +1471,7 @@ impl<'a, C> AppMethods<'a, C> {
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_delete(&self, apps_id: &str, modules_id: &str) -> AppModuleDeleteCall<'a, C> {
+    pub fn modules_delete(&self, apps_id: &str, modules_id: &str) -> AppModuleDeleteCall<'a> {
         AppModuleDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1492,7 +1490,7 @@ impl<'a, C> AppMethods<'a, C> {
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_get(&self, apps_id: &str, modules_id: &str) -> AppModuleGetCall<'a, C> {
+    pub fn modules_get(&self, apps_id: &str, modules_id: &str) -> AppModuleGetCall<'a> {
         AppModuleGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1510,7 +1508,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp.
-    pub fn modules_list(&self, apps_id: &str) -> AppModuleListCall<'a, C> {
+    pub fn modules_list(&self, apps_id: &str) -> AppModuleListCall<'a> {
         AppModuleListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1531,7 +1529,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `appsId` - Part of `name`. Name of the resource to update. Example: apps/myapp/modules/default.
     /// * `modulesId` - Part of `name`. See documentation of `appsId`.
-    pub fn modules_patch(&self, request: Module, apps_id: &str, modules_id: &str) -> AppModulePatchCall<'a, C> {
+    pub fn modules_patch(&self, request: Module, apps_id: &str, modules_id: &str) -> AppModulePatchCall<'a> {
         AppModulePatchCall {
             hub: self.hub,
             _request: request,
@@ -1553,7 +1551,7 @@ impl<'a, C> AppMethods<'a, C> {
     ///
     /// * `appsId` - Part of `name`. The name of the operation resource.
     /// * `operationsId` - Part of `name`. See documentation of `appsId`.
-    pub fn operations_get(&self, apps_id: &str, operations_id: &str) -> AppOperationGetCall<'a, C> {
+    pub fn operations_get(&self, apps_id: &str, operations_id: &str) -> AppOperationGetCall<'a> {
         AppOperationGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1571,7 +1569,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. The name of the operation's parent resource.
-    pub fn operations_list(&self, apps_id: &str) -> AppOperationListCall<'a, C> {
+    pub fn operations_list(&self, apps_id: &str) -> AppOperationListCall<'a> {
         AppOperationListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1593,7 +1591,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Application) -> AppCreateCall<'a, C> {
+    pub fn create(&self, request: Application) -> AppCreateCall<'a> {
         AppCreateCall {
             hub: self.hub,
             _request: request,
@@ -1610,7 +1608,7 @@ impl<'a, C> AppMethods<'a, C> {
     /// # Arguments
     ///
     /// * `appsId` - Part of `name`. Name of the application to get. Example: apps/myapp.
-    pub fn get(&self, apps_id: &str) -> AppGetCall<'a, C> {
+    pub fn get(&self, apps_id: &str) -> AppGetCall<'a> {
         AppGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
@@ -1631,7 +1629,7 @@ impl<'a, C> AppMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `appsId` - Part of `name`. Name of the Application resource to update. Example: apps/myapp.
-    pub fn patch(&self, request: Application, apps_id: &str) -> AppPatchCall<'a, C> {
+    pub fn patch(&self, request: Application, apps_id: &str) -> AppPatchCall<'a> {
         AppPatchCall {
             hub: self.hub,
             _request: request,
@@ -1684,10 +1682,10 @@ impl<'a, C> AppMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppLocationGetCall<'a, C>
-    where C: 'a {
+pub struct AppLocationGetCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _locations_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1695,9 +1693,9 @@ pub struct AppLocationGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppLocationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AppLocationGetCall<'a> {}
 
-impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppLocationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1759,8 +1757,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1773,7 +1770,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1782,7 +1779,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1842,7 +1839,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppLocationGetCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppLocationGetCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -1852,7 +1849,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn locations_id(mut self, new_value: &str) -> AppLocationGetCall<'a, C> {
+    pub fn locations_id(mut self, new_value: &str) -> AppLocationGetCall<'a> {
         self._locations_id = new_value.to_string();
         self
     }
@@ -1862,7 +1859,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1887,7 +1884,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1907,7 +1904,7 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1954,10 +1951,10 @@ impl<'a, C> AppLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppLocationListCall<'a, C>
-    where C: 'a {
+pub struct AppLocationListCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1967,9 +1964,9 @@ pub struct AppLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for AppLocationListCall<'a> {}
 
-impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2039,8 +2036,7 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2053,7 +2049,7 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2062,7 +2058,7 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2122,28 +2118,28 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppLocationListCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppLocationListCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AppLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AppLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AppLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AppLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2153,7 +2149,7 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2178,7 +2174,7 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2198,7 +2194,7 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2248,10 +2244,10 @@ impl<'a, C> AppLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceDebugCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionInstanceDebugCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _request: DebugInstanceRequest,
     _apps_id: String,
     _modules_id: String,
@@ -2262,9 +2258,9 @@ pub struct AppModuleVersionInstanceDebugCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionInstanceDebugCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionInstanceDebugCall<'a> {}
 
-impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionInstanceDebugCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2339,8 +2335,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2354,7 +2349,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2365,7 +2360,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2424,7 +2419,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DebugInstanceRequest) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn request(mut self, new_value: DebugInstanceRequest) -> AppModuleVersionInstanceDebugCall<'a> {
         self._request = new_value;
         self
     }
@@ -2434,7 +2429,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -2444,7 +2439,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -2454,7 +2449,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -2464,7 +2459,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDebugCall<'a> {
         self._instances_id = new_value.to_string();
         self
     }
@@ -2474,7 +2469,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDebugCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDebugCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2499,7 +2494,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDebugCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDebugCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2519,7 +2514,7 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceDebugCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceDebugCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2563,10 +2558,10 @@ impl<'a, C> AppModuleVersionInstanceDebugCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceDeleteCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionInstanceDeleteCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -2576,9 +2571,9 @@ pub struct AppModuleVersionInstanceDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionInstanceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionInstanceDeleteCall<'a> {}
 
-impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionInstanceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2642,8 +2637,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2656,7 +2650,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2665,7 +2659,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2725,7 +2719,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -2735,7 +2729,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -2745,7 +2739,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -2755,7 +2749,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a, C> {
+    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceDeleteCall<'a> {
         self._instances_id = new_value.to_string();
         self
     }
@@ -2765,7 +2759,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2790,7 +2784,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2810,7 +2804,7 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2854,10 +2848,10 @@ impl<'a, C> AppModuleVersionInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceGetCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionInstanceGetCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -2867,9 +2861,9 @@ pub struct AppModuleVersionInstanceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionInstanceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionInstanceGetCall<'a> {}
 
-impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionInstanceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2933,8 +2927,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2947,7 +2940,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2956,7 +2949,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3016,7 +3009,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3026,7 +3019,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3036,7 +3029,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -3046,7 +3039,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a, C> {
+    pub fn instances_id(mut self, new_value: &str) -> AppModuleVersionInstanceGetCall<'a> {
         self._instances_id = new_value.to_string();
         self
     }
@@ -3056,7 +3049,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3081,7 +3074,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3101,7 +3094,7 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3147,10 +3140,10 @@ impl<'a, C> AppModuleVersionInstanceGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionInstanceListCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionInstanceListCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -3161,9 +3154,9 @@ pub struct AppModuleVersionInstanceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionInstanceListCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionInstanceListCall<'a> {}
 
-impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionInstanceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3232,8 +3225,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3246,7 +3238,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3255,7 +3247,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3315,7 +3307,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3325,7 +3317,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3335,21 +3327,21 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionInstanceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionInstanceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3359,7 +3351,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionInstanceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3384,7 +3376,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionInstanceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3404,7 +3396,7 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionInstanceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3454,10 +3446,10 @@ impl<'a, C> AppModuleVersionInstanceListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionCreateCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionCreateCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _request: Version,
     _apps_id: String,
     _modules_id: String,
@@ -3466,9 +3458,9 @@ pub struct AppModuleVersionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionCreateCall<'a> {}
 
-impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3541,8 +3533,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3556,7 +3547,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3567,7 +3558,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3626,7 +3617,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> AppModuleVersionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Version) -> AppModuleVersionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3636,7 +3627,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3646,7 +3637,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionCreateCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3656,7 +3647,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3681,7 +3672,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3701,7 +3692,7 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3745,10 +3736,10 @@ impl<'a, C> AppModuleVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionDeleteCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionDeleteCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -3757,9 +3748,9 @@ pub struct AppModuleVersionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionDeleteCall<'a> {}
 
-impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3822,8 +3813,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3836,7 +3826,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3845,7 +3835,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3905,7 +3895,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -3915,7 +3905,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -3925,7 +3915,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionDeleteCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
@@ -3935,7 +3925,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3960,7 +3950,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3980,7 +3970,7 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4025,10 +4015,10 @@ impl<'a, C> AppModuleVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionGetCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionGetCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _versions_id: String,
@@ -4038,9 +4028,9 @@ pub struct AppModuleVersionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionGetCall<'a> {}
 
-impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4106,8 +4096,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4120,7 +4109,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4129,7 +4118,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4189,7 +4178,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -4199,7 +4188,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -4209,14 +4198,14 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
     /// Controls the set of fields returned in the Get response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppModuleVersionGetCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> AppModuleVersionGetCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -4226,7 +4215,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4251,7 +4240,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4271,7 +4260,7 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4318,10 +4307,10 @@ impl<'a, C> AppModuleVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionListCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionListCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _view: Option<String>,
@@ -4332,9 +4321,9 @@ pub struct AppModuleVersionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionListCall<'a> {}
 
-impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4405,8 +4394,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4419,7 +4407,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4428,7 +4416,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4488,7 +4476,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -4498,28 +4486,28 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
     /// Controls the set of fields returned in the List response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> AppModuleVersionListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AppModuleVersionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AppModuleVersionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4529,7 +4517,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4554,7 +4542,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4574,7 +4562,7 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4629,10 +4617,10 @@ impl<'a, C> AppModuleVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleVersionPatchCall<'a, C>
-    where C: 'a {
+pub struct AppModuleVersionPatchCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _request: Version,
     _apps_id: String,
     _modules_id: String,
@@ -4643,9 +4631,9 @@ pub struct AppModuleVersionPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleVersionPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleVersionPatchCall<'a> {}
 
-impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleVersionPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4722,8 +4710,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4737,7 +4724,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4748,7 +4735,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4807,7 +4794,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Version) -> AppModuleVersionPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4817,7 +4804,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -4827,7 +4814,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -4837,14 +4824,14 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn versions_id(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
         self._versions_id = new_value.to_string();
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *mask* query property to the given value.
-    pub fn mask(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn mask(mut self, new_value: &str) -> AppModuleVersionPatchCall<'a> {
         self._mask = Some(new_value.to_string());
         self
     }
@@ -4854,7 +4841,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleVersionPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4879,7 +4866,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleVersionPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4899,7 +4886,7 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleVersionPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4943,10 +4930,10 @@ impl<'a, C> AppModuleVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleDeleteCall<'a, C>
-    where C: 'a {
+pub struct AppModuleDeleteCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4954,9 +4941,9 @@ pub struct AppModuleDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleDeleteCall<'a> {}
 
-impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5018,8 +5005,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5032,7 +5018,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5041,7 +5027,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5101,7 +5087,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -5111,7 +5097,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleDeleteCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -5121,7 +5107,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5146,7 +5132,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5166,7 +5152,7 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5210,10 +5196,10 @@ impl<'a, C> AppModuleDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleGetCall<'a, C>
-    where C: 'a {
+pub struct AppModuleGetCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _modules_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5221,9 +5207,9 @@ pub struct AppModuleGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleGetCall<'a> {}
 
-impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5285,8 +5271,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5299,7 +5284,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5308,7 +5293,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5368,7 +5353,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleGetCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleGetCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -5378,7 +5363,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModuleGetCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModuleGetCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
@@ -5388,7 +5373,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5413,7 +5398,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5433,7 +5418,7 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5479,10 +5464,10 @@ impl<'a, C> AppModuleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModuleListCall<'a, C>
-    where C: 'a {
+pub struct AppModuleListCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5491,9 +5476,9 @@ pub struct AppModuleListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModuleListCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModuleListCall<'a> {}
 
-impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModuleListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5560,8 +5545,7 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5574,7 +5558,7 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5583,7 +5567,7 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5643,21 +5627,21 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModuleListCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModuleListCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppModuleListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AppModuleListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppModuleListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AppModuleListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5667,7 +5651,7 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModuleListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5692,7 +5676,7 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModuleListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModuleListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5712,7 +5696,7 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModuleListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5764,10 +5748,10 @@ impl<'a, C> AppModuleListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppModulePatchCall<'a, C>
-    where C: 'a {
+pub struct AppModulePatchCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _request: Module,
     _apps_id: String,
     _modules_id: String,
@@ -5778,9 +5762,9 @@ pub struct AppModulePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppModulePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AppModulePatchCall<'a> {}
 
-impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppModulePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5859,8 +5843,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5874,7 +5857,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5885,7 +5868,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5944,7 +5927,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Module) -> AppModulePatchCall<'a, C> {
+    pub fn request(mut self, new_value: Module) -> AppModulePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5954,7 +5937,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppModulePatchCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppModulePatchCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -5964,21 +5947,21 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn modules_id(mut self, new_value: &str) -> AppModulePatchCall<'a, C> {
+    pub fn modules_id(mut self, new_value: &str) -> AppModulePatchCall<'a> {
         self._modules_id = new_value.to_string();
         self
     }
     /// Set to true to gradually shift traffic to one or more versions that you specify. By default, traffic is shifted immediately. For gradual traffic migration, the target versions must be located within instances that are configured for both warmup requests (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#inboundservicetype) and automatic scaling (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules.versions#automaticscaling). You must specify the shardBy (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1beta4/apps.modules#shardby) field in the Module resource. Gradual traffic migration is not supported in the App Engine flexible environment. For examples, see Migrating and Splitting Traffic (https://cloud.google.com/appengine/docs/admin-api/migrating-splitting-traffic).
     ///
     /// Sets the *migrate traffic* query property to the given value.
-    pub fn migrate_traffic(mut self, new_value: bool) -> AppModulePatchCall<'a, C> {
+    pub fn migrate_traffic(mut self, new_value: bool) -> AppModulePatchCall<'a> {
         self._migrate_traffic = Some(new_value);
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *mask* query property to the given value.
-    pub fn mask(mut self, new_value: &str) -> AppModulePatchCall<'a, C> {
+    pub fn mask(mut self, new_value: &str) -> AppModulePatchCall<'a> {
         self._mask = Some(new_value.to_string());
         self
     }
@@ -5988,7 +5971,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModulePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppModulePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6013,7 +5996,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppModulePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppModulePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6033,7 +6016,7 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppModulePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppModulePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6077,10 +6060,10 @@ impl<'a, C> AppModulePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppOperationGetCall<'a, C>
-    where C: 'a {
+pub struct AppOperationGetCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _operations_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6088,9 +6071,9 @@ pub struct AppOperationGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AppOperationGetCall<'a> {}
 
-impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6152,8 +6135,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6166,7 +6148,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6175,7 +6157,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6235,7 +6217,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppOperationGetCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppOperationGetCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
@@ -6245,7 +6227,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operations_id(mut self, new_value: &str) -> AppOperationGetCall<'a, C> {
+    pub fn operations_id(mut self, new_value: &str) -> AppOperationGetCall<'a> {
         self._operations_id = new_value.to_string();
         self
     }
@@ -6255,7 +6237,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6280,7 +6262,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6300,7 +6282,7 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6347,10 +6329,10 @@ impl<'a, C> AppOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppOperationListCall<'a, C>
-    where C: 'a {
+pub struct AppOperationListCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6360,9 +6342,9 @@ pub struct AppOperationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppOperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for AppOperationListCall<'a> {}
 
-impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppOperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6432,8 +6414,7 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6446,7 +6427,7 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6455,7 +6436,7 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6515,28 +6496,28 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppOperationListCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppOperationListCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppOperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AppOperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppOperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AppOperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AppOperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AppOperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6546,7 +6527,7 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppOperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6571,7 +6552,7 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppOperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppOperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6591,7 +6572,7 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6643,19 +6624,19 @@ impl<'a, C> AppOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppCreateCall<'a, C>
-    where C: 'a {
+pub struct AppCreateCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _request: Application,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AppCreateCall<'a> {}
 
-impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6705,8 +6686,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6720,7 +6700,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6731,7 +6711,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6790,7 +6770,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Application) -> AppCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Application) -> AppCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6800,7 +6780,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6825,7 +6805,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6845,7 +6825,7 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6890,10 +6870,10 @@ impl<'a, C> AppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppGetCall<'a, C>
-    where C: 'a {
+pub struct AppGetCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _apps_id: String,
     _ensure_resources_exist: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6901,9 +6881,9 @@ pub struct AppGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AppGetCall<'a> {}
 
-impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6967,8 +6947,7 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6981,7 +6960,7 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6990,7 +6969,7 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7050,14 +7029,14 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppGetCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppGetCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
     /// Certain resources associated with an application are created on-demand. Controls whether these resources should be created when performing the GET operation. If specified and any resources could not be created, the request will fail with an error code. Additionally, this parameter can cause the request to take longer to complete.
     ///
     /// Sets the *ensure resources exist* query property to the given value.
-    pub fn ensure_resources_exist(mut self, new_value: bool) -> AppGetCall<'a, C> {
+    pub fn ensure_resources_exist(mut self, new_value: bool) -> AppGetCall<'a> {
         self._ensure_resources_exist = Some(new_value);
         self
     }
@@ -7067,7 +7046,7 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7092,7 +7071,7 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7112,7 +7091,7 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7165,10 +7144,10 @@ impl<'a, C> AppGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AppPatchCall<'a, C>
-    where C: 'a {
+pub struct AppPatchCall<'a>
+    where  {
 
-    hub: &'a Appengine<C>,
+    hub: &'a Appengine<>,
     _request: Application,
     _apps_id: String,
     _mask: Option<String>,
@@ -7177,9 +7156,9 @@ pub struct AppPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AppPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AppPatchCall<'a> {}
 
-impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AppPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7254,8 +7233,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7269,7 +7247,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7280,7 +7258,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7339,7 +7317,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Application) -> AppPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Application) -> AppPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -7349,14 +7327,14 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppPatchCall<'a, C> {
+    pub fn apps_id(mut self, new_value: &str) -> AppPatchCall<'a> {
         self._apps_id = new_value.to_string();
         self
     }
     /// Standard field mask for the set of fields to be updated.
     ///
     /// Sets the *mask* query property to the given value.
-    pub fn mask(mut self, new_value: &str) -> AppPatchCall<'a, C> {
+    pub fn mask(mut self, new_value: &str) -> AppPatchCall<'a> {
         self._mask = Some(new_value.to_string());
         self
     }
@@ -7366,7 +7344,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AppPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7391,7 +7369,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7411,7 +7389,7 @@ impl<'a, C> AppPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

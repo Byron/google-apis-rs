@@ -1,8 +1,8 @@
-site_name: Pagespeed Insights v2.0.0+20210330
+site_name: Pagespeed Insights v2.0.3+20210330
 site_url: http://byron.github.io/google-apis-rs/google-pagespeedonline5-cli
 site_description: A complete library to interact with Pagespeed Insights (protocol v5)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline5-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/pagespeedonline5-cli
 
 docs_dir: docs
 site_dir: build_html

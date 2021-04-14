@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CommentAnalyzer<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::CommentAnalyzer,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -373,7 +372,7 @@ async fn main() {
     
     let mut app = App::new("commentanalyzer1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20200405")
+           .version("2.0.3+20200405")
            .about("The Perspective Comment Analyzer API provides information about the potential impact of a comment on a conversation (e.g. it can provide a score for the \"toxicity\" of a comment). Users can leverage the \"SuggestCommentScore\" method to submit corrections to improve Perspective over time. Users can set the \"doNotStore\" flag to ensure that all submitted comments are automatically deleted after scores are returned.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_commentanalyzer1_alpha1_cli")
            .arg(Arg::with_name("url")

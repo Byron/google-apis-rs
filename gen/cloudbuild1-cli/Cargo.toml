@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudbuild1-cli"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Build (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbuild1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudbuild1-cli"
 homepage = "https://cloud.google.com/cloud-build/docs/"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudbuild1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudbuild1]
 path = "../cloudbuild1"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"

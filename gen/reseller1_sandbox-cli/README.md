@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-reseller1_sandbox-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/reseller1_sandbox-cli).
 
 # Usage
 
-This documentation was generated from the *reseller* API at revision *20160329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *reseller* API at revision *20160329*. The CLI is at version *2.0.3*.
 
 ```bash
 reseller1-sandbox [options]

@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-cloudkms1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudkms1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudkms1-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20210318*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud KMS* API at revision *20210318*. The CLI is at version *2.0.3*.
 
 ```bash
 cloudkms1 [options]

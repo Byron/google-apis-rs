@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -83,41 +82,40 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct AndroidProvisioningPartner<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AndroidProvisioningPartner<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AndroidProvisioningPartner<C> {}
+impl<'a, > client::Hub for AndroidProvisioningPartner<> {}
 
-impl<'a, C> AndroidProvisioningPartner<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AndroidProvisioningPartner<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AndroidProvisioningPartner<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AndroidProvisioningPartner<> {
         AndroidProvisioningPartner {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://androiddeviceprovisioning.googleapis.com/".to_string(),
             _root_url: "https://androiddeviceprovisioning.googleapis.com/".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a, C> {
+    pub fn customers(&'a self) -> CustomerMethods<'a> {
         CustomerMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
-    pub fn partners(&'a self) -> PartnerMethods<'a, C> {
+    pub fn partners(&'a self) -> PartnerMethods<'a> {
         PartnerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1007,15 +1005,15 @@ impl client::Part for UpdateMetadataArguments {}
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a, C>
-    where C: 'a {
+pub struct CustomerMethods<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CustomerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CustomerMethods<'a> {}
 
-impl<'a, C> CustomerMethods<'a, C> {
+impl<'a> CustomerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1025,7 +1023,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The customer that manages the configuration. An API resource name in the format `customers/[CUSTOMER_ID]`.
-    pub fn configurations_create(&self, request: Configuration, parent: &str) -> CustomerConfigurationCreateCall<'a, C> {
+    pub fn configurations_create(&self, request: Configuration, parent: &str) -> CustomerConfigurationCreateCall<'a> {
         CustomerConfigurationCreateCall {
             hub: self.hub,
             _request: request,
@@ -1042,7 +1040,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The configuration to delete. An API resource name in the format `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`. If the configuration is applied to any devices, the API call fails.
-    pub fn configurations_delete(&self, name: &str) -> CustomerConfigurationDeleteCall<'a, C> {
+    pub fn configurations_delete(&self, name: &str) -> CustomerConfigurationDeleteCall<'a> {
         CustomerConfigurationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1058,7 +1056,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The configuration to get. An API resource name in the format `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`.
-    pub fn configurations_get(&self, name: &str) -> CustomerConfigurationGetCall<'a, C> {
+    pub fn configurations_get(&self, name: &str) -> CustomerConfigurationGetCall<'a> {
         CustomerConfigurationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1074,7 +1072,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The customer that manages the listed configurations. An API resource name in the format `customers/[CUSTOMER_ID]`.
-    pub fn configurations_list(&self, parent: &str) -> CustomerConfigurationListCall<'a, C> {
+    pub fn configurations_list(&self, parent: &str) -> CustomerConfigurationListCall<'a> {
         CustomerConfigurationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1091,7 +1089,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The API resource name in the format `customers/[CUSTOMER_ID]/configurations/[CONFIGURATION_ID]`. Assigned by the server.
-    pub fn configurations_patch(&self, request: Configuration, name: &str) -> CustomerConfigurationPatchCall<'a, C> {
+    pub fn configurations_patch(&self, request: Configuration, name: &str) -> CustomerConfigurationPatchCall<'a> {
         CustomerConfigurationPatchCall {
             hub: self.hub,
             _request: request,
@@ -1110,7 +1108,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The customer managing the device. An API resource name in the format `customers/[CUSTOMER_ID]`.
-    pub fn devices_apply_configuration(&self, request: CustomerApplyConfigurationRequest, parent: &str) -> CustomerDeviceApplyConfigurationCall<'a, C> {
+    pub fn devices_apply_configuration(&self, request: CustomerApplyConfigurationRequest, parent: &str) -> CustomerDeviceApplyConfigurationCall<'a> {
         CustomerDeviceApplyConfigurationCall {
             hub: self.hub,
             _request: request,
@@ -1127,7 +1125,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The device to get. An API resource name in the format `customers/[CUSTOMER_ID]/devices/[DEVICE_ID]`.
-    pub fn devices_get(&self, name: &str) -> CustomerDeviceGetCall<'a, C> {
+    pub fn devices_get(&self, name: &str) -> CustomerDeviceGetCall<'a> {
         CustomerDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1143,7 +1141,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The customer managing the devices. An API resource name in the format `customers/[CUSTOMER_ID]`.
-    pub fn devices_list(&self, parent: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn devices_list(&self, parent: &str) -> CustomerDeviceListCall<'a> {
         CustomerDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1162,7 +1160,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The customer managing the device in the format `customers/[CUSTOMER_ID]`.
-    pub fn devices_remove_configuration(&self, request: CustomerRemoveConfigurationRequest, parent: &str) -> CustomerDeviceRemoveConfigurationCall<'a, C> {
+    pub fn devices_remove_configuration(&self, request: CustomerRemoveConfigurationRequest, parent: &str) -> CustomerDeviceRemoveConfigurationCall<'a> {
         CustomerDeviceRemoveConfigurationCall {
             hub: self.hub,
             _request: request,
@@ -1180,7 +1178,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The customer managing the device. An API resource name in the format `customers/[CUSTOMER_ID]`.
-    pub fn devices_unclaim(&self, request: CustomerUnclaimDeviceRequest, parent: &str) -> CustomerDeviceUnclaimCall<'a, C> {
+    pub fn devices_unclaim(&self, request: CustomerUnclaimDeviceRequest, parent: &str) -> CustomerDeviceUnclaimCall<'a> {
         CustomerDeviceUnclaimCall {
             hub: self.hub,
             _request: request,
@@ -1197,7 +1195,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The customer that can use the DPCs in configurations. An API resource name in the format `customers/[CUSTOMER_ID]`.
-    pub fn dpcs_list(&self, parent: &str) -> CustomerDpcListCall<'a, C> {
+    pub fn dpcs_list(&self, parent: &str) -> CustomerDpcListCall<'a> {
         CustomerDpcListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1209,7 +1207,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the user's customer accounts.
-    pub fn list(&self) -> CustomerListCall<'a, C> {
+    pub fn list(&self) -> CustomerListCall<'a> {
         CustomerListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1252,15 +1250,15 @@ impl<'a, C> CustomerMethods<'a, C> {
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1269,7 +1267,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1311,15 +1309,15 @@ impl<'a, C> OperationMethods<'a, C> {
 /// let rb = hub.partners();
 /// # }
 /// ```
-pub struct PartnerMethods<'a, C>
-    where C: 'a {
+pub struct PartnerMethods<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PartnerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PartnerMethods<'a> {}
 
-impl<'a, C> PartnerMethods<'a, C> {
+impl<'a> PartnerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1329,7 +1327,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource ID in the format `partners/[PARTNER_ID]` that identifies the reseller.
-    pub fn customers_create(&self, request: CreateCustomerRequest, parent: &str) -> PartnerCustomerCreateCall<'a, C> {
+    pub fn customers_create(&self, request: CreateCustomerRequest, parent: &str) -> PartnerCustomerCreateCall<'a> {
         PartnerCustomerCreateCall {
             hub: self.hub,
             _request: request,
@@ -1346,7 +1344,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `partnerId` - Required. The ID of the reseller partner.
-    pub fn customers_list(&self, partner_id: &str) -> PartnerCustomerListCall<'a, C> {
+    pub fn customers_list(&self, partner_id: &str) -> PartnerCustomerListCall<'a> {
         PartnerCustomerListCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -1365,7 +1363,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the reseller partner.
-    pub fn devices_claim(&self, request: ClaimDeviceRequest, partner_id: &str) -> PartnerDeviceClaimCall<'a, C> {
+    pub fn devices_claim(&self, request: ClaimDeviceRequest, partner_id: &str) -> PartnerDeviceClaimCall<'a> {
         PartnerDeviceClaimCall {
             hub: self.hub,
             _request: request,
@@ -1383,7 +1381,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the reseller partner.
-    pub fn devices_claim_async(&self, request: ClaimDevicesRequest, partner_id: &str) -> PartnerDeviceClaimAsyncCall<'a, C> {
+    pub fn devices_claim_async(&self, request: ClaimDevicesRequest, partner_id: &str) -> PartnerDeviceClaimAsyncCall<'a> {
         PartnerDeviceClaimAsyncCall {
             hub: self.hub,
             _request: request,
@@ -1401,7 +1399,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the reseller partner.
-    pub fn devices_find_by_identifier(&self, request: FindDevicesByDeviceIdentifierRequest, partner_id: &str) -> PartnerDeviceFindByIdentifierCall<'a, C> {
+    pub fn devices_find_by_identifier(&self, request: FindDevicesByDeviceIdentifierRequest, partner_id: &str) -> PartnerDeviceFindByIdentifierCall<'a> {
         PartnerDeviceFindByIdentifierCall {
             hub: self.hub,
             _request: request,
@@ -1419,7 +1417,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the reseller partner.
-    pub fn devices_find_by_owner(&self, request: FindDevicesByOwnerRequest, partner_id: &str) -> PartnerDeviceFindByOwnerCall<'a, C> {
+    pub fn devices_find_by_owner(&self, request: FindDevicesByOwnerRequest, partner_id: &str) -> PartnerDeviceFindByOwnerCall<'a> {
         PartnerDeviceFindByOwnerCall {
             hub: self.hub,
             _request: request,
@@ -1436,7 +1434,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The device API resource name in the format `partners/[PARTNER_ID]/devices/[DEVICE_ID]`.
-    pub fn devices_get(&self, name: &str) -> PartnerDeviceGetCall<'a, C> {
+    pub fn devices_get(&self, name: &str) -> PartnerDeviceGetCall<'a> {
         PartnerDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1454,7 +1452,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `metadataOwnerId` - Required. The owner of the newly set metadata. Set this to the partner ID.
     /// * `deviceId` - Required. The ID of the device.
-    pub fn devices_metadata(&self, request: UpdateDeviceMetadataRequest, metadata_owner_id: &str, device_id: &str) -> PartnerDeviceMetadataCall<'a, C> {
+    pub fn devices_metadata(&self, request: UpdateDeviceMetadataRequest, metadata_owner_id: &str, device_id: &str) -> PartnerDeviceMetadataCall<'a> {
         PartnerDeviceMetadataCall {
             hub: self.hub,
             _request: request,
@@ -1473,7 +1471,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the reseller partner.
-    pub fn devices_unclaim(&self, request: UnclaimDeviceRequest, partner_id: &str) -> PartnerDeviceUnclaimCall<'a, C> {
+    pub fn devices_unclaim(&self, request: UnclaimDeviceRequest, partner_id: &str) -> PartnerDeviceUnclaimCall<'a> {
         PartnerDeviceUnclaimCall {
             hub: self.hub,
             _request: request,
@@ -1491,7 +1489,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The reseller partner ID.
-    pub fn devices_unclaim_async(&self, request: UnclaimDevicesRequest, partner_id: &str) -> PartnerDeviceUnclaimAsyncCall<'a, C> {
+    pub fn devices_unclaim_async(&self, request: UnclaimDevicesRequest, partner_id: &str) -> PartnerDeviceUnclaimAsyncCall<'a> {
         PartnerDeviceUnclaimAsyncCall {
             hub: self.hub,
             _request: request,
@@ -1509,7 +1507,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The reseller partner ID.
-    pub fn devices_update_metadata_async(&self, request: UpdateDeviceMetadataInBatchRequest, partner_id: &str) -> PartnerDeviceUpdateMetadataAsyncCall<'a, C> {
+    pub fn devices_update_metadata_async(&self, request: UpdateDeviceMetadataInBatchRequest, partner_id: &str) -> PartnerDeviceUpdateMetadataAsyncCall<'a> {
         PartnerDeviceUpdateMetadataAsyncCall {
             hub: self.hub,
             _request: request,
@@ -1526,7 +1524,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name in the format `partners/[PARTNER_ID]/vendors/[VENDOR_ID]`.
-    pub fn vendors_customers_list(&self, parent: &str) -> PartnerVendorCustomerListCall<'a, C> {
+    pub fn vendors_customers_list(&self, parent: &str) -> PartnerVendorCustomerListCall<'a> {
         PartnerVendorCustomerListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1544,7 +1542,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name in the format `partners/[PARTNER_ID]`.
-    pub fn vendors_list(&self, parent: &str) -> PartnerVendorListCall<'a, C> {
+    pub fn vendors_list(&self, parent: &str) -> PartnerVendorListCall<'a> {
         PartnerVendorListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1602,19 +1600,19 @@ impl<'a, C> PartnerMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerConfigurationCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerConfigurationCreateCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: Configuration,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerConfigurationCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerConfigurationCreateCall<'a> {}
 
-impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerConfigurationCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1698,7 +1696,7 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1709,7 +1707,7 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1768,7 +1766,7 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Configuration) -> CustomerConfigurationCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Configuration) -> CustomerConfigurationCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1778,7 +1776,7 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerConfigurationCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerConfigurationCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1788,7 +1786,7 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1813,7 +1811,7 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1854,18 +1852,18 @@ impl<'a, C> CustomerConfigurationCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerConfigurationDeleteCall<'a, C>
-    where C: 'a {
+pub struct CustomerConfigurationDeleteCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerConfigurationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerConfigurationDeleteCall<'a> {}
 
-impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerConfigurationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1937,7 +1935,7 @@ impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1946,7 +1944,7 @@ impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2006,7 +2004,7 @@ impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerConfigurationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerConfigurationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2016,7 +2014,7 @@ impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2041,7 +2039,7 @@ impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2082,18 +2080,18 @@ impl<'a, C> CustomerConfigurationDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerConfigurationGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerConfigurationGetCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerConfigurationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerConfigurationGetCall<'a> {}
 
-impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerConfigurationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2165,7 +2163,7 @@ impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2174,7 +2172,7 @@ impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2234,7 +2232,7 @@ impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerConfigurationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerConfigurationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2244,7 +2242,7 @@ impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2269,7 +2267,7 @@ impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2310,18 +2308,18 @@ impl<'a, C> CustomerConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerConfigurationListCall<'a, C>
-    where C: 'a {
+pub struct CustomerConfigurationListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerConfigurationListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerConfigurationListCall<'a> {}
 
-impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerConfigurationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2393,7 +2391,7 @@ impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clien
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2402,7 +2400,7 @@ impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2462,7 +2460,7 @@ impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerConfigurationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerConfigurationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2472,7 +2470,7 @@ impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2497,7 +2495,7 @@ impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2545,10 +2543,10 @@ impl<'a, C> CustomerConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerConfigurationPatchCall<'a, C>
-    where C: 'a {
+pub struct CustomerConfigurationPatchCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: Configuration,
     _name: String,
     _update_mask: Option<String>,
@@ -2556,9 +2554,9 @@ pub struct CustomerConfigurationPatchCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerConfigurationPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerConfigurationPatchCall<'a> {}
 
-impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerConfigurationPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2645,7 +2643,7 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2656,7 +2654,7 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2715,7 +2713,7 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Configuration) -> CustomerConfigurationPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Configuration) -> CustomerConfigurationPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2725,14 +2723,14 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerConfigurationPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerConfigurationPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The field mask applied to the target `Configuration` before updating the fields. To learn more about using field masks, read [FieldMask](/protocol-buffers/docs/reference/google.protobuf#fieldmask) in the Protocol Buffers documentation.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerConfigurationPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerConfigurationPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2742,7 +2740,7 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerConfigurationPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2767,7 +2765,7 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerConfigurationPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2814,19 +2812,19 @@ impl<'a, C> CustomerConfigurationPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceApplyConfigurationCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceApplyConfigurationCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: CustomerApplyConfigurationRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceApplyConfigurationCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceApplyConfigurationCall<'a> {}
 
-impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceApplyConfigurationCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2910,7 +2908,7 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2921,7 +2919,7 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2980,7 +2978,7 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomerApplyConfigurationRequest) -> CustomerDeviceApplyConfigurationCall<'a, C> {
+    pub fn request(mut self, new_value: CustomerApplyConfigurationRequest) -> CustomerDeviceApplyConfigurationCall<'a> {
         self._request = new_value;
         self
     }
@@ -2990,7 +2988,7 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceApplyConfigurationCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceApplyConfigurationCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3000,7 +2998,7 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceApplyConfigurationCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceApplyConfigurationCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3025,7 +3023,7 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceApplyConfigurationCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceApplyConfigurationCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3066,18 +3064,18 @@ impl<'a, C> CustomerDeviceApplyConfigurationCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceGetCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceGetCall<'a> {}
 
-impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3149,7 +3147,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3158,7 +3156,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3218,7 +3216,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3228,7 +3226,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3253,7 +3251,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3296,10 +3294,10 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceListCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<String>,
@@ -3307,9 +3305,9 @@ pub struct CustomerDeviceListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceListCall<'a> {}
 
-impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3387,7 +3385,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3396,7 +3394,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3456,21 +3454,21 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token specifying which result page to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to show in a page of results. Must be between 1 and 100 inclusive.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
         self._page_size = Some(new_value.to_string());
         self
     }
@@ -3480,7 +3478,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3505,7 +3503,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3552,19 +3550,19 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceRemoveConfigurationCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceRemoveConfigurationCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: CustomerRemoveConfigurationRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceRemoveConfigurationCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceRemoveConfigurationCall<'a> {}
 
-impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceRemoveConfigurationCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3648,7 +3646,7 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3659,7 +3657,7 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3718,7 +3716,7 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomerRemoveConfigurationRequest) -> CustomerDeviceRemoveConfigurationCall<'a, C> {
+    pub fn request(mut self, new_value: CustomerRemoveConfigurationRequest) -> CustomerDeviceRemoveConfigurationCall<'a> {
         self._request = new_value;
         self
     }
@@ -3728,7 +3726,7 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceRemoveConfigurationCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceRemoveConfigurationCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3738,7 +3736,7 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceRemoveConfigurationCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceRemoveConfigurationCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3763,7 +3761,7 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceRemoveConfigurationCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceRemoveConfigurationCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3810,19 +3808,19 @@ impl<'a, C> CustomerDeviceRemoveConfigurationCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceUnclaimCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceUnclaimCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: CustomerUnclaimDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceUnclaimCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceUnclaimCall<'a> {}
 
-impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceUnclaimCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3906,7 +3904,7 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3917,7 +3915,7 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3976,7 +3974,7 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomerUnclaimDeviceRequest) -> CustomerDeviceUnclaimCall<'a, C> {
+    pub fn request(mut self, new_value: CustomerUnclaimDeviceRequest) -> CustomerDeviceUnclaimCall<'a> {
         self._request = new_value;
         self
     }
@@ -3986,7 +3984,7 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceUnclaimCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceUnclaimCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3996,7 +3994,7 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceUnclaimCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceUnclaimCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4021,7 +4019,7 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceUnclaimCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceUnclaimCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4062,18 +4060,18 @@ impl<'a, C> CustomerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDpcListCall<'a, C>
-    where C: 'a {
+pub struct CustomerDpcListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerDpcListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDpcListCall<'a> {}
 
-impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDpcListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4145,7 +4143,7 @@ impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4154,7 +4152,7 @@ impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4214,7 +4212,7 @@ impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDpcListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDpcListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4224,7 +4222,7 @@ impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDpcListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDpcListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4249,7 +4247,7 @@ impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDpcListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDpcListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4292,19 +4290,19 @@ impl<'a, C> CustomerDpcListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerListCall<'a, C>
-    where C: 'a {
+pub struct CustomerListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CustomerListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerListCall<'a> {}
 
-impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4356,7 +4354,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4365,7 +4363,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4422,14 +4420,14 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// A token specifying which result page to return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of customers to show in a page of results. A number between 1 and 100 (inclusive).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4439,7 +4437,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4464,7 +4462,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4505,18 +4503,18 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C>
-    where C: 'a {
+pub struct OperationGetCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationGetCall<'a> {}
 
-impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4588,7 +4586,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4597,7 +4595,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4657,7 +4655,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4667,7 +4665,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4692,7 +4690,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4739,19 +4737,19 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerCustomerCreateCall<'a, C>
-    where C: 'a {
+pub struct PartnerCustomerCreateCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: CreateCustomerRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerCustomerCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerCustomerCreateCall<'a> {}
 
-impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerCustomerCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4835,7 +4833,7 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4846,7 +4844,7 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4905,7 +4903,7 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateCustomerRequest) -> PartnerCustomerCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateCustomerRequest) -> PartnerCustomerCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4915,7 +4913,7 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerCustomerCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PartnerCustomerCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4925,7 +4923,7 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerCustomerCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerCustomerCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4950,7 +4948,7 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerCustomerCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerCustomerCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4993,10 +4991,10 @@ impl<'a, C> PartnerCustomerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerCustomerListCall<'a, C>
-    where C: 'a {
+pub struct PartnerCustomerListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _partner_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5004,9 +5002,9 @@ pub struct PartnerCustomerListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerCustomerListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerCustomerListCall<'a> {}
 
-impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerCustomerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5084,7 +5082,7 @@ impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5093,7 +5091,7 @@ impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5153,21 +5151,21 @@ impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerCustomerListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerCustomerListCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results returned by the server.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerCustomerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerCustomerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to be returned. If not specified or 0, all the records are returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerCustomerListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerCustomerListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5177,7 +5175,7 @@ impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerCustomerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerCustomerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5202,7 +5200,7 @@ impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerCustomerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerCustomerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5249,19 +5247,19 @@ impl<'a, C> PartnerCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceClaimCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceClaimCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: ClaimDeviceRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceClaimCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceClaimCall<'a> {}
 
-impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceClaimCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5345,7 +5343,7 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5356,7 +5354,7 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5415,7 +5413,7 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClaimDeviceRequest) -> PartnerDeviceClaimCall<'a, C> {
+    pub fn request(mut self, new_value: ClaimDeviceRequest) -> PartnerDeviceClaimCall<'a> {
         self._request = new_value;
         self
     }
@@ -5425,7 +5423,7 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceClaimCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceClaimCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -5435,7 +5433,7 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceClaimCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceClaimCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5460,7 +5458,7 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceClaimCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceClaimCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5507,19 +5505,19 @@ impl<'a, C> PartnerDeviceClaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceClaimAsyncCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceClaimAsyncCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: ClaimDevicesRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceClaimAsyncCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceClaimAsyncCall<'a> {}
 
-impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceClaimAsyncCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5603,7 +5601,7 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5614,7 +5612,7 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5673,7 +5671,7 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClaimDevicesRequest) -> PartnerDeviceClaimAsyncCall<'a, C> {
+    pub fn request(mut self, new_value: ClaimDevicesRequest) -> PartnerDeviceClaimAsyncCall<'a> {
         self._request = new_value;
         self
     }
@@ -5683,7 +5681,7 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceClaimAsyncCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceClaimAsyncCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -5693,7 +5691,7 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceClaimAsyncCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceClaimAsyncCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5718,7 +5716,7 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceClaimAsyncCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceClaimAsyncCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5765,19 +5763,19 @@ impl<'a, C> PartnerDeviceClaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceFindByIdentifierCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceFindByIdentifierCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: FindDevicesByDeviceIdentifierRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceFindByIdentifierCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceFindByIdentifierCall<'a> {}
 
-impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceFindByIdentifierCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5861,7 +5859,7 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5872,7 +5870,7 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5931,7 +5929,7 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FindDevicesByDeviceIdentifierRequest) -> PartnerDeviceFindByIdentifierCall<'a, C> {
+    pub fn request(mut self, new_value: FindDevicesByDeviceIdentifierRequest) -> PartnerDeviceFindByIdentifierCall<'a> {
         self._request = new_value;
         self
     }
@@ -5941,7 +5939,7 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceFindByIdentifierCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceFindByIdentifierCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -5951,7 +5949,7 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceFindByIdentifierCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceFindByIdentifierCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5976,7 +5974,7 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceFindByIdentifierCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceFindByIdentifierCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6023,19 +6021,19 @@ impl<'a, C> PartnerDeviceFindByIdentifierCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceFindByOwnerCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceFindByOwnerCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: FindDevicesByOwnerRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceFindByOwnerCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceFindByOwnerCall<'a> {}
 
-impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceFindByOwnerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6119,7 +6117,7 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6130,7 +6128,7 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6189,7 +6187,7 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FindDevicesByOwnerRequest) -> PartnerDeviceFindByOwnerCall<'a, C> {
+    pub fn request(mut self, new_value: FindDevicesByOwnerRequest) -> PartnerDeviceFindByOwnerCall<'a> {
         self._request = new_value;
         self
     }
@@ -6199,7 +6197,7 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceFindByOwnerCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceFindByOwnerCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -6209,7 +6207,7 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceFindByOwnerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceFindByOwnerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6234,7 +6232,7 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceFindByOwnerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceFindByOwnerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6275,18 +6273,18 @@ impl<'a, C> PartnerDeviceFindByOwnerCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceGetCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceGetCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceGetCall<'a> {}
 
-impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6358,7 +6356,7 @@ impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6367,7 +6365,7 @@ impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6427,7 +6425,7 @@ impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PartnerDeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PartnerDeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6437,7 +6435,7 @@ impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6462,7 +6460,7 @@ impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6509,10 +6507,10 @@ impl<'a, C> PartnerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceMetadataCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceMetadataCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: UpdateDeviceMetadataRequest,
     _metadata_owner_id: String,
     _device_id: String,
@@ -6520,9 +6518,9 @@ pub struct PartnerDeviceMetadataCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceMetadataCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceMetadataCall<'a> {}
 
-impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceMetadataCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6607,7 +6605,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6618,7 +6616,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6677,7 +6675,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateDeviceMetadataRequest) -> PartnerDeviceMetadataCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateDeviceMetadataRequest) -> PartnerDeviceMetadataCall<'a> {
         self._request = new_value;
         self
     }
@@ -6687,7 +6685,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metadata_owner_id(mut self, new_value: &str) -> PartnerDeviceMetadataCall<'a, C> {
+    pub fn metadata_owner_id(mut self, new_value: &str) -> PartnerDeviceMetadataCall<'a> {
         self._metadata_owner_id = new_value.to_string();
         self
     }
@@ -6697,7 +6695,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn device_id(mut self, new_value: &str) -> PartnerDeviceMetadataCall<'a, C> {
+    pub fn device_id(mut self, new_value: &str) -> PartnerDeviceMetadataCall<'a> {
         self._device_id = new_value.to_string();
         self
     }
@@ -6707,7 +6705,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceMetadataCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceMetadataCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6732,7 +6730,7 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceMetadataCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceMetadataCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6779,19 +6777,19 @@ impl<'a, C> PartnerDeviceMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceUnclaimCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceUnclaimCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: UnclaimDeviceRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceUnclaimCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceUnclaimCall<'a> {}
 
-impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceUnclaimCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6875,7 +6873,7 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6886,7 +6884,7 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6945,7 +6943,7 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnclaimDeviceRequest) -> PartnerDeviceUnclaimCall<'a, C> {
+    pub fn request(mut self, new_value: UnclaimDeviceRequest) -> PartnerDeviceUnclaimCall<'a> {
         self._request = new_value;
         self
     }
@@ -6955,7 +6953,7 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceUnclaimCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceUnclaimCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -6965,7 +6963,7 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceUnclaimCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceUnclaimCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6990,7 +6988,7 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUnclaimCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUnclaimCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7037,19 +7035,19 @@ impl<'a, C> PartnerDeviceUnclaimCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceUnclaimAsyncCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceUnclaimAsyncCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: UnclaimDevicesRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceUnclaimAsyncCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceUnclaimAsyncCall<'a> {}
 
-impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceUnclaimAsyncCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7133,7 +7131,7 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -7144,7 +7142,7 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7203,7 +7201,7 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnclaimDevicesRequest) -> PartnerDeviceUnclaimAsyncCall<'a, C> {
+    pub fn request(mut self, new_value: UnclaimDevicesRequest) -> PartnerDeviceUnclaimAsyncCall<'a> {
         self._request = new_value;
         self
     }
@@ -7213,7 +7211,7 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceUnclaimAsyncCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceUnclaimAsyncCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -7223,7 +7221,7 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceUnclaimAsyncCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceUnclaimAsyncCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7248,7 +7246,7 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUnclaimAsyncCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUnclaimAsyncCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7295,19 +7293,19 @@ impl<'a, C> PartnerDeviceUnclaimAsyncCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerDeviceUpdateMetadataAsyncCall<'a, C>
-    where C: 'a {
+pub struct PartnerDeviceUpdateMetadataAsyncCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _request: UpdateDeviceMetadataInBatchRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerDeviceUpdateMetadataAsyncCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerDeviceUpdateMetadataAsyncCall<'a> {}
 
-impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerDeviceUpdateMetadataAsyncCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7391,7 +7389,7 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -7402,7 +7400,7 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7461,7 +7459,7 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateDeviceMetadataInBatchRequest) -> PartnerDeviceUpdateMetadataAsyncCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateDeviceMetadataInBatchRequest) -> PartnerDeviceUpdateMetadataAsyncCall<'a> {
         self._request = new_value;
         self
     }
@@ -7471,7 +7469,7 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceUpdateMetadataAsyncCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerDeviceUpdateMetadataAsyncCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -7481,7 +7479,7 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceUpdateMetadataAsyncCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerDeviceUpdateMetadataAsyncCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7506,7 +7504,7 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUpdateMetadataAsyncCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUpdateMetadataAsyncCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7549,10 +7547,10 @@ impl<'a, C> PartnerDeviceUpdateMetadataAsyncCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerVendorCustomerListCall<'a, C>
-    where C: 'a {
+pub struct PartnerVendorCustomerListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7560,9 +7558,9 @@ pub struct PartnerVendorCustomerListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerVendorCustomerListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerVendorCustomerListCall<'a> {}
 
-impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerVendorCustomerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7640,7 +7638,7 @@ impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Clien
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -7649,7 +7647,7 @@ impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7709,21 +7707,21 @@ impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerVendorCustomerListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PartnerVendorCustomerListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results returned by the server.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerVendorCustomerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerVendorCustomerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerVendorCustomerListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerVendorCustomerListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7733,7 +7731,7 @@ impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerVendorCustomerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerVendorCustomerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7758,7 +7756,7 @@ impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerVendorCustomerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerVendorCustomerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7801,10 +7799,10 @@ impl<'a, C> PartnerVendorCustomerListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerVendorListCall<'a, C>
-    where C: 'a {
+pub struct PartnerVendorListCall<'a>
+    where  {
 
-    hub: &'a AndroidProvisioningPartner<C>,
+    hub: &'a AndroidProvisioningPartner<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7812,9 +7810,9 @@ pub struct PartnerVendorListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for PartnerVendorListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerVendorListCall<'a> {}
 
-impl<'a, C> PartnerVendorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerVendorListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7892,7 +7890,7 @@ impl<'a, C> PartnerVendorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -7901,7 +7899,7 @@ impl<'a, C> PartnerVendorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7961,21 +7959,21 @@ impl<'a, C> PartnerVendorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PartnerVendorListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PartnerVendorListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results returned by the server.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerVendorListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerVendorListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerVendorListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerVendorListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7985,7 +7983,7 @@ impl<'a, C> PartnerVendorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerVendorListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerVendorListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8010,7 +8008,7 @@ impl<'a, C> PartnerVendorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerVendorListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerVendorListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

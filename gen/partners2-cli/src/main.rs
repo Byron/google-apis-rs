@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Partners<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Partners,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -2266,7 +2265,7 @@ async fn main() {
     
     let mut app = App::new("partners2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20180925")
+           .version("2.0.3+20180925")
            .about("Searches certified companies and creates contact leads with them, and also audits the usage of clients.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_partners2_cli")
            .arg(Arg::with_name("folder")

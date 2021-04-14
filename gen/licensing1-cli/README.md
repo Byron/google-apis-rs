@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-licensing1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/licensing1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/licensing1-cli).
 
 # Usage
 
-This documentation was generated from the *licensing* API at revision *20210329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *licensing* API at revision *20210329*. The CLI is at version *2.0.3*.
 
 ```bash
 licensing1 [options]

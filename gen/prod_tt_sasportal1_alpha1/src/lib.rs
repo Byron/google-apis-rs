@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SAS Portal Testing* crate version *2.0.0+20210330*, where *20210330* is the exact revision of the *prod_tt_sasportal:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *SAS Portal Testing* crate version *2.0.3+20210330*, where *20210330* is the exact revision of the *prod_tt_sasportal:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *SAS Portal Testing* *v1_alpha1* API can be found at the
 //! [official documentation site](https://developers.google.com/spectrum-access-system/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/prod_tt_sasportal1_alpha1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/prod_tt_sasportal1_alpha1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](SASPortalTesting) ... 

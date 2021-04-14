@@ -609,13 +609,13 @@ impl RangeResponseHeader {
 
 /// A utility type to perform a resumable upload from start to end.
 pub struct ResumableUploadHelper<'a, A: 'a> {
-    pub client: &'a mut hyper::client::Client<
+    pub client: &'a hyper::client::Client<
         hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>,
         hyper::body::Body,
     >,
     pub delegate: &'a mut dyn Delegate,
     pub start_at: Option<u64>,
-    pub auth: &'a mut A,
+    pub auth: &'a A,
     pub user_agent: &'a str,
     pub auth_header: String,
     pub url: &'a str,

@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-firebasedatabase1_beta-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedatabase1_beta-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/firebasedatabase1_beta-cli).
 
 # Usage
 
-This documentation was generated from the *Firebase Realtime Database* API at revision *20210329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Firebase Realtime Database* API at revision *20210329*. The CLI is at version *2.0.3*.
 
 ```bash
 firebasedatabase1-beta [options]

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,44 +108,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct SearchConsole<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct SearchConsole<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for SearchConsole<C> {}
+impl<'a, > client::Hub for SearchConsole<> {}
 
-impl<'a, C> SearchConsole<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > SearchConsole<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SearchConsole<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SearchConsole<> {
         SearchConsole {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://searchconsole.googleapis.com/".to_string(),
             _root_url: "https://searchconsole.googleapis.com/".to_string(),
         }
     }
 
-    pub fn searchanalytics(&'a self) -> SearchanalyticMethods<'a, C> {
+    pub fn searchanalytics(&'a self) -> SearchanalyticMethods<'a> {
         SearchanalyticMethods { hub: &self }
     }
-    pub fn sitemaps(&'a self) -> SitemapMethods<'a, C> {
+    pub fn sitemaps(&'a self) -> SitemapMethods<'a> {
         SitemapMethods { hub: &self }
     }
-    pub fn sites(&'a self) -> SiteMethods<'a, C> {
+    pub fn sites(&'a self) -> SiteMethods<'a> {
         SiteMethods { hub: &self }
     }
-    pub fn url_testing_tools(&'a self) -> UrlTestingToolMethods<'a, C> {
+    pub fn url_testing_tools(&'a self) -> UrlTestingToolMethods<'a> {
         UrlTestingToolMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -564,15 +562,15 @@ impl client::Part for WmxSitemapContent {}
 /// let rb = hub.searchanalytics();
 /// # }
 /// ```
-pub struct SearchanalyticMethods<'a, C>
-    where C: 'a {
+pub struct SearchanalyticMethods<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SearchanalyticMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SearchanalyticMethods<'a> {}
 
-impl<'a, C> SearchanalyticMethods<'a, C> {
+impl<'a> SearchanalyticMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -582,7 +580,7 @@ impl<'a, C> SearchanalyticMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
-    pub fn query(&self, request: SearchAnalyticsQueryRequest, site_url: &str) -> SearchanalyticQueryCall<'a, C> {
+    pub fn query(&self, request: SearchAnalyticsQueryRequest, site_url: &str) -> SearchanalyticQueryCall<'a> {
         SearchanalyticQueryCall {
             hub: self.hub,
             _request: request,
@@ -626,15 +624,15 @@ impl<'a, C> SearchanalyticMethods<'a, C> {
 /// let rb = hub.sitemaps();
 /// # }
 /// ```
-pub struct SitemapMethods<'a, C>
-    where C: 'a {
+pub struct SitemapMethods<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SitemapMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SitemapMethods<'a> {}
 
-impl<'a, C> SitemapMethods<'a, C> {
+impl<'a> SitemapMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -644,7 +642,7 @@ impl<'a, C> SitemapMethods<'a, C> {
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
     /// * `feedpath` - The URL of the actual sitemap. For example: `http://www.example.com/sitemap.xml`.
-    pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a, C> {
+    pub fn delete(&self, site_url: &str, feedpath: &str) -> SitemapDeleteCall<'a> {
         SitemapDeleteCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -663,7 +661,7 @@ impl<'a, C> SitemapMethods<'a, C> {
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
     /// * `feedpath` - The URL of the actual sitemap. For example: `http://www.example.com/sitemap.xml`.
-    pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a, C> {
+    pub fn get(&self, site_url: &str, feedpath: &str) -> SitemapGetCall<'a> {
         SitemapGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -681,7 +679,7 @@ impl<'a, C> SitemapMethods<'a, C> {
     /// # Arguments
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
-    pub fn list(&self, site_url: &str) -> SitemapListCall<'a, C> {
+    pub fn list(&self, site_url: &str) -> SitemapListCall<'a> {
         SitemapListCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -700,7 +698,7 @@ impl<'a, C> SitemapMethods<'a, C> {
     ///
     /// * `siteUrl` - The site's URL, including protocol. For example: `http://www.example.com/`.
     /// * `feedpath` - The URL of the actual sitemap. For example: `http://www.example.com/sitemap.xml`.
-    pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a, C> {
+    pub fn submit(&self, site_url: &str, feedpath: &str) -> SitemapSubmitCall<'a> {
         SitemapSubmitCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -744,15 +742,15 @@ impl<'a, C> SitemapMethods<'a, C> {
 /// let rb = hub.sites();
 /// # }
 /// ```
-pub struct SiteMethods<'a, C>
-    where C: 'a {
+pub struct SiteMethods<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SiteMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SiteMethods<'a> {}
 
-impl<'a, C> SiteMethods<'a, C> {
+impl<'a> SiteMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -761,7 +759,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URL of the site to add.
-    pub fn add(&self, site_url: &str) -> SiteAddCall<'a, C> {
+    pub fn add(&self, site_url: &str) -> SiteAddCall<'a> {
         SiteAddCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -778,7 +776,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`.
-    pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a, C> {
+    pub fn delete(&self, site_url: &str) -> SiteDeleteCall<'a> {
         SiteDeleteCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -795,7 +793,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `siteUrl` - The URI of the property as defined in Search Console. **Examples:** `http://www.example.com/` or `sc-domain:example.com`.
-    pub fn get(&self, site_url: &str) -> SiteGetCall<'a, C> {
+    pub fn get(&self, site_url: &str) -> SiteGetCall<'a> {
         SiteGetCall {
             hub: self.hub,
             _site_url: site_url.to_string(),
@@ -808,7 +806,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     ///  Lists the user's Search Console sites.
-    pub fn list(&self) -> SiteListCall<'a, C> {
+    pub fn list(&self) -> SiteListCall<'a> {
         SiteListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -850,15 +848,15 @@ impl<'a, C> SiteMethods<'a, C> {
 /// let rb = hub.url_testing_tools();
 /// # }
 /// ```
-pub struct UrlTestingToolMethods<'a, C>
-    where C: 'a {
+pub struct UrlTestingToolMethods<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UrlTestingToolMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UrlTestingToolMethods<'a> {}
 
-impl<'a, C> UrlTestingToolMethods<'a, C> {
+impl<'a> UrlTestingToolMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -867,7 +865,7 @@ impl<'a, C> UrlTestingToolMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn mobile_friendly_test_run(&self, request: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a, C> {
+    pub fn mobile_friendly_test_run(&self, request: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a> {
         UrlTestingToolMobileFriendlyTestRunCall {
             hub: self.hub,
             _request: request,
@@ -923,10 +921,10 @@ impl<'a, C> UrlTestingToolMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SearchanalyticQueryCall<'a, C>
-    where C: 'a {
+pub struct SearchanalyticQueryCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _request: SearchAnalyticsQueryRequest,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -934,9 +932,9 @@ pub struct SearchanalyticQueryCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SearchanalyticQueryCall<'a, C> {}
+impl<'a> client::CallBuilder for SearchanalyticQueryCall<'a> {}
 
-impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SearchanalyticQueryCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1008,8 +1006,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1023,7 +1020,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1034,7 +1031,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1093,7 +1090,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchAnalyticsQueryRequest) -> SearchanalyticQueryCall<'a, C> {
+    pub fn request(mut self, new_value: SearchAnalyticsQueryRequest) -> SearchanalyticQueryCall<'a> {
         self._request = new_value;
         self
     }
@@ -1103,7 +1100,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SearchanalyticQueryCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SearchanalyticQueryCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1113,7 +1110,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchanalyticQueryCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchanalyticQueryCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1138,7 +1135,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SearchanalyticQueryCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SearchanalyticQueryCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1158,7 +1155,7 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SearchanalyticQueryCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SearchanalyticQueryCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1202,10 +1199,10 @@ impl<'a, C> SearchanalyticQueryCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapDeleteCall<'a, C>
-    where C: 'a {
+pub struct SitemapDeleteCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1213,9 +1210,9 @@ pub struct SitemapDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SitemapDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SitemapDeleteCall<'a> {}
 
-impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SitemapDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1276,8 +1273,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1290,7 +1286,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1299,7 +1295,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1349,7 +1345,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapDeleteCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1359,7 +1355,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a, C> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapDeleteCall<'a> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1369,7 +1365,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1394,7 +1390,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1414,7 +1410,7 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1458,10 +1454,10 @@ impl<'a, C> SitemapDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapGetCall<'a, C>
-    where C: 'a {
+pub struct SitemapGetCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1469,9 +1465,9 @@ pub struct SitemapGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SitemapGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SitemapGetCall<'a> {}
 
-impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SitemapGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1533,8 +1529,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1547,7 +1542,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1556,7 +1551,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1616,7 +1611,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapGetCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -1626,7 +1621,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a, C> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapGetCall<'a> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -1636,7 +1631,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1661,7 +1656,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1681,7 +1676,7 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1726,10 +1721,10 @@ impl<'a, C> SitemapGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapListCall<'a, C>
-    where C: 'a {
+pub struct SitemapListCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _sitemap_index: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1737,9 +1732,9 @@ pub struct SitemapListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SitemapListCall<'a, C> {}
+impl<'a> client::CallBuilder for SitemapListCall<'a> {}
 
-impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SitemapListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1803,8 +1798,7 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1817,7 +1811,7 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1826,7 +1820,7 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1886,14 +1880,14 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapListCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
     ///  A URL of a site's sitemap index. For example: `http://www.example.com/sitemapindex.xml`.
     ///
     /// Sets the *sitemap index* query property to the given value.
-    pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a, C> {
+    pub fn sitemap_index(mut self, new_value: &str) -> SitemapListCall<'a> {
         self._sitemap_index = Some(new_value.to_string());
         self
     }
@@ -1903,7 +1897,7 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1928,7 +1922,7 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1948,7 +1942,7 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1992,10 +1986,10 @@ impl<'a, C> SitemapListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SitemapSubmitCall<'a, C>
-    where C: 'a {
+pub struct SitemapSubmitCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _feedpath: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2003,9 +1997,9 @@ pub struct SitemapSubmitCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SitemapSubmitCall<'a, C> {}
+impl<'a> client::CallBuilder for SitemapSubmitCall<'a> {}
 
-impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SitemapSubmitCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2066,8 +2060,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2080,7 +2073,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2089,7 +2082,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2139,7 +2132,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SitemapSubmitCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2149,7 +2142,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a, C> {
+    pub fn feedpath(mut self, new_value: &str) -> SitemapSubmitCall<'a> {
         self._feedpath = new_value.to_string();
         self
     }
@@ -2159,7 +2152,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapSubmitCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SitemapSubmitCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2184,7 +2177,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SitemapSubmitCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2204,7 +2197,7 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapSubmitCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SitemapSubmitCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2248,19 +2241,19 @@ impl<'a, C> SitemapSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteAddCall<'a, C>
-    where C: 'a {
+pub struct SiteAddCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteAddCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteAddCall<'a> {}
 
-impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteAddCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2320,8 +2313,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2334,7 +2326,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2343,7 +2335,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2393,7 +2385,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SiteAddCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2403,7 +2395,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteAddCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteAddCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2428,7 +2420,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteAddCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2448,7 +2440,7 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteAddCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteAddCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2492,19 +2484,19 @@ impl<'a, C> SiteAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDeleteCall<'a, C>
-    where C: 'a {
+pub struct SiteDeleteCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteDeleteCall<'a> {}
 
-impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2564,8 +2556,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2578,7 +2569,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2587,7 +2578,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2637,7 +2628,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SiteDeleteCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2647,7 +2638,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2672,7 +2663,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2692,7 +2683,7 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2736,19 +2727,19 @@ impl<'a, C> SiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteGetCall<'a, C>
-    where C: 'a {
+pub struct SiteGetCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _site_url: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteGetCall<'a> {}
 
-impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2809,8 +2800,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2823,7 +2813,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2832,7 +2822,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2892,7 +2882,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a, C> {
+    pub fn site_url(mut self, new_value: &str) -> SiteGetCall<'a> {
         self._site_url = new_value.to_string();
         self
     }
@@ -2902,7 +2892,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2927,7 +2917,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2947,7 +2937,7 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2991,18 +2981,18 @@ impl<'a, C> SiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteListCall<'a, C>
-    where C: 'a {
+pub struct SiteListCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteListCall<'a> {}
 
-impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3041,8 +3031,7 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3055,7 +3044,7 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3064,7 +3053,7 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3124,7 +3113,7 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3149,7 +3138,7 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3169,7 +3158,7 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3219,18 +3208,18 @@ impl<'a, C> SiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlTestingToolMobileFriendlyTestRunCall<'a, C>
-    where C: 'a {
+pub struct UrlTestingToolMobileFriendlyTestRunCall<'a>
+    where  {
 
-    hub: &'a SearchConsole<C>,
+    hub: &'a SearchConsole<>,
     _request: RunMobileFriendlyTestRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UrlTestingToolMobileFriendlyTestRunCall<'a, C> {}
+impl<'a> client::CallBuilder for UrlTestingToolMobileFriendlyTestRunCall<'a> {}
 
-impl<'a, C> UrlTestingToolMobileFriendlyTestRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UrlTestingToolMobileFriendlyTestRunCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3288,7 +3277,7 @@ impl<'a, C> UrlTestingToolMobileFriendlyTestRunCall<'a, C> where C: BorrowMut<hy
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3299,7 +3288,7 @@ impl<'a, C> UrlTestingToolMobileFriendlyTestRunCall<'a, C> where C: BorrowMut<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3358,7 +3347,7 @@ impl<'a, C> UrlTestingToolMobileFriendlyTestRunCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a, C> {
+    pub fn request(mut self, new_value: RunMobileFriendlyTestRequest) -> UrlTestingToolMobileFriendlyTestRunCall<'a> {
         self._request = new_value;
         self
     }
@@ -3368,7 +3357,7 @@ impl<'a, C> UrlTestingToolMobileFriendlyTestRunCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlTestingToolMobileFriendlyTestRunCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlTestingToolMobileFriendlyTestRunCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3393,7 +3382,7 @@ impl<'a, C> UrlTestingToolMobileFriendlyTestRunCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlTestingToolMobileFriendlyTestRunCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlTestingToolMobileFriendlyTestRunCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

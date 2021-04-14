@@ -4,10 +4,10 @@
 [package]
 
 name = "google-pagespeedonline4-cli"
-version = "2.0.0+20191206"
+version = "2.0.3+20191206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pagespeedonline (protocol v4)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline4-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pagespeedonline4-cli"
 homepage = "https://developers.google.com/speed/docs/insights/v4/getting-started"
 documentation = "http://byron.github.io/google-apis-rs/google_pagespeedonline4_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-pagespeedonline4]
 path = "../pagespeedonline4"
-version = "2.0.0+20191206"
+version = "2.0.3+20191206"

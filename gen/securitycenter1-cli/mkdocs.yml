@@ -1,8 +1,8 @@
-site_name: Security Command Center v2.0.0+20210326
+site_name: Security Command Center v2.0.3+20210326
 site_url: http://byron.github.io/google-apis-rs/google-securitycenter1-cli
 site_description: A complete library to interact with Security Command Center (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/securitycenter1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1-cli
 
 docs_dir: docs
 site_dir: build_html

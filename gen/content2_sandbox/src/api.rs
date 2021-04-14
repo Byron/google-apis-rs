@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,44 +105,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct ShoppingContent<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct ShoppingContent<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for ShoppingContent<C> {}
+impl<'a, > client::Hub for ShoppingContent<> {}
 
-impl<'a, C> ShoppingContent<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > ShoppingContent<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ShoppingContent<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ShoppingContent<> {
         ShoppingContent {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/content/v2sandbox/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a, C> {
+    pub fn orderinvoices(&'a self) -> OrderinvoiceMethods<'a> {
         OrderinvoiceMethods { hub: &self }
     }
-    pub fn orderpayments(&'a self) -> OrderpaymentMethods<'a, C> {
+    pub fn orderpayments(&'a self) -> OrderpaymentMethods<'a> {
         OrderpaymentMethods { hub: &self }
     }
-    pub fn orderreturns(&'a self) -> OrderreturnMethods<'a, C> {
+    pub fn orderreturns(&'a self) -> OrderreturnMethods<'a> {
         OrderreturnMethods { hub: &self }
     }
-    pub fn orders(&'a self) -> OrderMethods<'a, C> {
+    pub fn orders(&'a self) -> OrderMethods<'a> {
         OrderMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2991,15 +2989,15 @@ impl client::Part for UnitInvoiceTaxLine {}
 /// let rb = hub.orderinvoices();
 /// # }
 /// ```
-pub struct OrderinvoiceMethods<'a, C>
-    where C: 'a {
+pub struct OrderinvoiceMethods<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrderinvoiceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrderinvoiceMethods<'a> {}
 
-impl<'a, C> OrderinvoiceMethods<'a, C> {
+impl<'a> OrderinvoiceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3010,7 +3008,7 @@ impl<'a, C> OrderinvoiceMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C> {
+    pub fn createchargeinvoice(&self, request: OrderinvoicesCreateChargeInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
         OrderinvoiceCreatechargeinvoiceCall {
             hub: self.hub,
             _request: request,
@@ -3031,7 +3029,7 @@ impl<'a, C> OrderinvoiceMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C> {
+    pub fn createrefundinvoice(&self, request: OrderinvoicesCreateRefundInvoiceRequest, merchant_id: &str, order_id: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
         OrderinvoiceCreaterefundinvoiceCall {
             hub: self.hub,
             _request: request,
@@ -3076,15 +3074,15 @@ impl<'a, C> OrderinvoiceMethods<'a, C> {
 /// let rb = hub.orderpayments();
 /// # }
 /// ```
-pub struct OrderpaymentMethods<'a, C>
-    where C: 'a {
+pub struct OrderpaymentMethods<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrderpaymentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrderpaymentMethods<'a> {}
 
-impl<'a, C> OrderpaymentMethods<'a, C> {
+impl<'a> OrderpaymentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3095,7 +3093,7 @@ impl<'a, C> OrderpaymentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for for which payment authorization is happening.
-    pub fn notifyauthapproved(&self, request: OrderpaymentsNotifyAuthApprovedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthapprovedCall<'a, C> {
+    pub fn notifyauthapproved(&self, request: OrderpaymentsNotifyAuthApprovedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthapprovedCall<'a> {
         OrderpaymentNotifyauthapprovedCall {
             hub: self.hub,
             _request: request,
@@ -3116,7 +3114,7 @@ impl<'a, C> OrderpaymentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for which payment authorization was declined.
-    pub fn notifyauthdeclined(&self, request: OrderpaymentsNotifyAuthDeclinedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, C> {
+    pub fn notifyauthdeclined(&self, request: OrderpaymentsNotifyAuthDeclinedRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyauthdeclinedCall<'a> {
         OrderpaymentNotifyauthdeclinedCall {
             hub: self.hub,
             _request: request,
@@ -3137,7 +3135,7 @@ impl<'a, C> OrderpaymentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for which charge is happening.
-    pub fn notifycharge(&self, request: OrderpaymentsNotifyChargeRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifychargeCall<'a, C> {
+    pub fn notifycharge(&self, request: OrderpaymentsNotifyChargeRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifychargeCall<'a> {
         OrderpaymentNotifychargeCall {
             hub: self.hub,
             _request: request,
@@ -3158,7 +3156,7 @@ impl<'a, C> OrderpaymentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order for which charge is happening.
-    pub fn notifyrefund(&self, request: OrderpaymentsNotifyRefundRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyrefundCall<'a, C> {
+    pub fn notifyrefund(&self, request: OrderpaymentsNotifyRefundRequest, merchant_id: &str, order_id: &str) -> OrderpaymentNotifyrefundCall<'a> {
         OrderpaymentNotifyrefundCall {
             hub: self.hub,
             _request: request,
@@ -3203,15 +3201,15 @@ impl<'a, C> OrderpaymentMethods<'a, C> {
 /// let rb = hub.orderreturns();
 /// # }
 /// ```
-pub struct OrderreturnMethods<'a, C>
-    where C: 'a {
+pub struct OrderreturnMethods<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrderreturnMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrderreturnMethods<'a> {}
 
-impl<'a, C> OrderreturnMethods<'a, C> {
+impl<'a> OrderreturnMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3221,7 +3219,7 @@ impl<'a, C> OrderreturnMethods<'a, C> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `returnId` - Merchant order return ID generated by Google.
-    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a, C> {
+    pub fn get(&self, merchant_id: &str, return_id: &str) -> OrderreturnGetCall<'a> {
         OrderreturnGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3239,7 +3237,7 @@ impl<'a, C> OrderreturnMethods<'a, C> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> OrderreturnListCall<'a, C> {
+    pub fn list(&self, merchant_id: &str) -> OrderreturnListCall<'a> {
         OrderreturnListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3287,15 +3285,15 @@ impl<'a, C> OrderreturnMethods<'a, C> {
 /// let rb = hub.orders();
 /// # }
 /// ```
-pub struct OrderMethods<'a, C>
-    where C: 'a {
+pub struct OrderMethods<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrderMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrderMethods<'a> {}
 
-impl<'a, C> OrderMethods<'a, C> {
+impl<'a> OrderMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3306,7 +3304,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a, C> {
+    pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a> {
         OrderAcknowledgeCall {
             hub: self.hub,
             _request: request,
@@ -3326,7 +3324,7 @@ impl<'a, C> OrderMethods<'a, C> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to modify.
-    pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a, C> {
+    pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a> {
         OrderAdvancetestorderCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3346,7 +3344,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to cancel.
-    pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a, C> {
+    pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a> {
         OrderCancelCall {
             hub: self.hub,
             _request: request,
@@ -3367,7 +3365,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a, C> {
+    pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a> {
         OrderCancellineitemCall {
             hub: self.hub,
             _request: request,
@@ -3388,7 +3386,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to cancel.
-    pub fn canceltestorderbycustomer(&self, request: OrdersCancelTestOrderByCustomerRequest, merchant_id: &str, order_id: &str) -> OrderCanceltestorderbycustomerCall<'a, C> {
+    pub fn canceltestorderbycustomer(&self, request: OrdersCancelTestOrderByCustomerRequest, merchant_id: &str, order_id: &str) -> OrderCanceltestorderbycustomerCall<'a> {
         OrderCanceltestorderbycustomerCall {
             hub: self.hub,
             _request: request,
@@ -3408,7 +3406,7 @@ impl<'a, C> OrderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
-    pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a, C> {
+    pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a> {
         OrderCreatetestorderCall {
             hub: self.hub,
             _request: request,
@@ -3428,7 +3426,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn createtestreturn(&self, request: OrdersCreateTestReturnRequest, merchant_id: &str, order_id: &str) -> OrderCreatetestreturnCall<'a, C> {
+    pub fn createtestreturn(&self, request: OrdersCreateTestReturnRequest, merchant_id: &str, order_id: &str) -> OrderCreatetestreturnCall<'a> {
         OrderCreatetestreturnCall {
             hub: self.hub,
             _request: request,
@@ -3447,7 +3445,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn custombatch(&self, request: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a, C> {
+    pub fn custombatch(&self, request: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a> {
         OrderCustombatchCall {
             hub: self.hub,
             _request: request,
@@ -3465,7 +3463,7 @@ impl<'a, C> OrderMethods<'a, C> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a, C> {
+    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a> {
         OrderGetCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3484,7 +3482,7 @@ impl<'a, C> OrderMethods<'a, C> {
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `merchantOrderId` - The merchant order id to be looked for.
-    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, C> {
+    pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a> {
         OrderGetbymerchantorderidCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3503,7 +3501,7 @@ impl<'a, C> OrderMethods<'a, C> {
     ///
     /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
     /// * `templateName` - The name of the template to retrieve.
-    pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a, C> {
+    pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a> {
         OrderGettestordertemplateCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3524,7 +3522,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a, C> {
+    pub fn instorerefundlineitem(&self, request: OrdersInStoreRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderInstorerefundlineitemCall<'a> {
         OrderInstorerefundlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3543,7 +3541,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn list(&self, merchant_id: &str) -> OrderListCall<'a, C> {
+    pub fn list(&self, merchant_id: &str) -> OrderListCall<'a> {
         OrderListCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
@@ -3569,7 +3567,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to refund.
-    pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a, C> {
+    pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a> {
         OrderRefundCall {
             hub: self.hub,
             _request: request,
@@ -3590,7 +3588,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a, C> {
+    pub fn rejectreturnlineitem(&self, request: OrdersRejectReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderRejectreturnlineitemCall<'a> {
         OrderRejectreturnlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3611,7 +3609,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a, C> {
+    pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a> {
         OrderReturnlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3632,7 +3630,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn returnrefundlineitem(&self, request: OrdersReturnRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnrefundlineitemCall<'a, C> {
+    pub fn returnrefundlineitem(&self, request: OrdersReturnRefundLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnrefundlineitemCall<'a> {
         OrderReturnrefundlineitemCall {
             hub: self.hub,
             _request: request,
@@ -3653,7 +3651,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a, C> {
+    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a> {
         OrderSetlineitemmetadataCall {
             hub: self.hub,
             _request: request,
@@ -3674,7 +3672,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a, C> {
+    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a> {
         OrderShiplineitemCall {
             hub: self.hub,
             _request: request,
@@ -3695,7 +3693,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a, C> {
+    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
         OrderUpdatelineitemshippingdetailCall {
             hub: self.hub,
             _request: request,
@@ -3716,7 +3714,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a, C> {
+    pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a> {
         OrderUpdatemerchantorderidCall {
             hub: self.hub,
             _request: request,
@@ -3737,7 +3735,7 @@ impl<'a, C> OrderMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a, C> {
+    pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a> {
         OrderUpdateshipmentCall {
             hub: self.hub,
             _request: request,
@@ -3796,10 +3794,10 @@ impl<'a, C> OrderMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderinvoiceCreatechargeinvoiceCall<'a, C>
-    where C: 'a {
+pub struct OrderinvoiceCreatechargeinvoiceCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrderinvoicesCreateChargeInvoiceRequest,
     _merchant_id: String,
     _order_id: String,
@@ -3808,9 +3806,9 @@ pub struct OrderinvoiceCreatechargeinvoiceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderinvoiceCreatechargeinvoiceCall<'a> {}
 
-impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderinvoiceCreatechargeinvoiceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3883,8 +3881,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3898,7 +3895,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3909,7 +3906,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3968,7 +3965,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a, C> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateChargeInvoiceRequest) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
         self._request = new_value;
         self
     }
@@ -3978,7 +3975,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -3988,7 +3985,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -3998,7 +3995,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreatechargeinvoiceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4019,7 +4016,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreatechargeinvoiceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4039,7 +4036,7 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreatechargeinvoiceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4089,10 +4086,10 @@ impl<'a, C> OrderinvoiceCreatechargeinvoiceCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderinvoiceCreaterefundinvoiceCall<'a, C>
-    where C: 'a {
+pub struct OrderinvoiceCreaterefundinvoiceCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrderinvoicesCreateRefundInvoiceRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4101,9 +4098,9 @@ pub struct OrderinvoiceCreaterefundinvoiceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderinvoiceCreaterefundinvoiceCall<'a> {}
 
-impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderinvoiceCreaterefundinvoiceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4176,8 +4173,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4191,7 +4187,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4202,7 +4198,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4261,7 +4257,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a, C> {
+    pub fn request(mut self, new_value: OrderinvoicesCreateRefundInvoiceRequest) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
         self._request = new_value;
         self
     }
@@ -4271,7 +4267,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -4281,7 +4277,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -4291,7 +4287,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderinvoiceCreaterefundinvoiceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4312,7 +4308,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderinvoiceCreaterefundinvoiceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4332,7 +4328,7 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderinvoiceCreaterefundinvoiceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4382,10 +4378,10 @@ impl<'a, C> OrderinvoiceCreaterefundinvoiceCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifyauthapprovedCall<'a, C>
-    where C: 'a {
+pub struct OrderpaymentNotifyauthapprovedCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrderpaymentsNotifyAuthApprovedRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4394,9 +4390,9 @@ pub struct OrderpaymentNotifyauthapprovedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderpaymentNotifyauthapprovedCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderpaymentNotifyauthapprovedCall<'a> {}
 
-impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderpaymentNotifyauthapprovedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4469,8 +4465,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4484,7 +4479,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4495,7 +4490,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4554,7 +4549,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthApprovedRequest) -> OrderpaymentNotifyauthapprovedCall<'a, C> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthApprovedRequest) -> OrderpaymentNotifyauthapprovedCall<'a> {
         self._request = new_value;
         self
     }
@@ -4564,7 +4559,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -4574,7 +4569,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthapprovedCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -4584,7 +4579,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthapprovedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthapprovedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4605,7 +4600,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthapprovedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthapprovedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4625,7 +4620,7 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthapprovedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthapprovedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4675,10 +4670,10 @@ impl<'a, C> OrderpaymentNotifyauthapprovedCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifyauthdeclinedCall<'a, C>
-    where C: 'a {
+pub struct OrderpaymentNotifyauthdeclinedCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrderpaymentsNotifyAuthDeclinedRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4687,9 +4682,9 @@ pub struct OrderpaymentNotifyauthdeclinedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderpaymentNotifyauthdeclinedCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderpaymentNotifyauthdeclinedCall<'a> {}
 
-impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderpaymentNotifyauthdeclinedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4762,8 +4757,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4777,7 +4771,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4788,7 +4782,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4847,7 +4841,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthDeclinedRequest) -> OrderpaymentNotifyauthdeclinedCall<'a, C> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyAuthDeclinedRequest) -> OrderpaymentNotifyauthdeclinedCall<'a> {
         self._request = new_value;
         self
     }
@@ -4857,7 +4851,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -4867,7 +4861,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyauthdeclinedCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -4877,7 +4871,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthdeclinedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyauthdeclinedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4898,7 +4892,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthdeclinedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyauthdeclinedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4918,7 +4912,7 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthdeclinedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyauthdeclinedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4968,10 +4962,10 @@ impl<'a, C> OrderpaymentNotifyauthdeclinedCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifychargeCall<'a, C>
-    where C: 'a {
+pub struct OrderpaymentNotifychargeCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrderpaymentsNotifyChargeRequest,
     _merchant_id: String,
     _order_id: String,
@@ -4980,9 +4974,9 @@ pub struct OrderpaymentNotifychargeCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderpaymentNotifychargeCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderpaymentNotifychargeCall<'a> {}
 
-impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderpaymentNotifychargeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5055,8 +5049,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5070,7 +5063,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5081,7 +5074,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5140,7 +5133,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyChargeRequest) -> OrderpaymentNotifychargeCall<'a, C> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyChargeRequest) -> OrderpaymentNotifychargeCall<'a> {
         self._request = new_value;
         self
     }
@@ -5150,7 +5143,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -5160,7 +5153,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifychargeCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -5170,7 +5163,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifychargeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifychargeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5191,7 +5184,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifychargeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifychargeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5211,7 +5204,7 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifychargeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifychargeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5261,10 +5254,10 @@ impl<'a, C> OrderpaymentNotifychargeCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderpaymentNotifyrefundCall<'a, C>
-    where C: 'a {
+pub struct OrderpaymentNotifyrefundCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrderpaymentsNotifyRefundRequest,
     _merchant_id: String,
     _order_id: String,
@@ -5273,9 +5266,9 @@ pub struct OrderpaymentNotifyrefundCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderpaymentNotifyrefundCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderpaymentNotifyrefundCall<'a> {}
 
-impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderpaymentNotifyrefundCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5348,8 +5341,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5363,7 +5355,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5374,7 +5366,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5433,7 +5425,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrderpaymentsNotifyRefundRequest) -> OrderpaymentNotifyrefundCall<'a, C> {
+    pub fn request(mut self, new_value: OrderpaymentsNotifyRefundRequest) -> OrderpaymentNotifyrefundCall<'a> {
         self._request = new_value;
         self
     }
@@ -5443,7 +5435,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -5453,7 +5445,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderpaymentNotifyrefundCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -5463,7 +5455,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyrefundCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderpaymentNotifyrefundCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5484,7 +5476,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyrefundCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderpaymentNotifyrefundCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5504,7 +5496,7 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyrefundCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderpaymentNotifyrefundCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5548,10 +5540,10 @@ impl<'a, C> OrderpaymentNotifyrefundCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreturnGetCall<'a, C>
-    where C: 'a {
+pub struct OrderreturnGetCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _return_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5559,9 +5551,9 @@ pub struct OrderreturnGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderreturnGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderreturnGetCall<'a> {}
 
-impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderreturnGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5623,8 +5615,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5637,7 +5628,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5646,7 +5637,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5706,7 +5697,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnGetCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -5716,7 +5707,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a, C> {
+    pub fn return_id(mut self, new_value: &str) -> OrderreturnGetCall<'a> {
         self._return_id = new_value.to_string();
         self
     }
@@ -5726,7 +5717,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5747,7 +5738,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5767,7 +5758,7 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5816,10 +5807,10 @@ impl<'a, C> OrderreturnGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderreturnListCall<'a, C>
-    where C: 'a {
+pub struct OrderreturnListCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -5831,9 +5822,9 @@ pub struct OrderreturnListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderreturnListCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderreturnListCall<'a> {}
 
-impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderreturnListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5909,8 +5900,7 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5923,7 +5913,7 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5932,7 +5922,7 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5992,42 +5982,42 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnListCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderreturnListCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderreturnListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrderreturnListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Return the results in the specified order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> OrderreturnListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// The maximum number of order returns to return in the response, used for paging. The default value is 25 returns per page, and the maximum allowed value is 250 returns per page.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderreturnListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> OrderreturnListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Obtains order returns created after this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *created start date* query property to the given value.
-    pub fn created_start_date(mut self, new_value: &str) -> OrderreturnListCall<'a, C> {
+    pub fn created_start_date(mut self, new_value: &str) -> OrderreturnListCall<'a> {
         self._created_start_date = Some(new_value.to_string());
         self
     }
     /// Obtains order returns created before this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *created end date* query property to the given value.
-    pub fn created_end_date(mut self, new_value: &str) -> OrderreturnListCall<'a, C> {
+    pub fn created_end_date(mut self, new_value: &str) -> OrderreturnListCall<'a> {
         self._created_end_date = Some(new_value.to_string());
         self
     }
@@ -6037,7 +6027,7 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderreturnListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6058,7 +6048,7 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderreturnListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6078,7 +6068,7 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderreturnListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6128,10 +6118,10 @@ impl<'a, C> OrderreturnListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderAcknowledgeCall<'a, C>
-    where C: 'a {
+pub struct OrderAcknowledgeCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersAcknowledgeRequest,
     _merchant_id: String,
     _order_id: String,
@@ -6140,9 +6130,9 @@ pub struct OrderAcknowledgeCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderAcknowledgeCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderAcknowledgeCall<'a> {}
 
-impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderAcknowledgeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6215,8 +6205,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6230,7 +6219,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6241,7 +6230,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6300,7 +6289,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersAcknowledgeRequest) -> OrderAcknowledgeCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersAcknowledgeRequest) -> OrderAcknowledgeCall<'a> {
         self._request = new_value;
         self
     }
@@ -6310,7 +6299,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -6320,7 +6309,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderAcknowledgeCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -6330,7 +6319,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAcknowledgeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAcknowledgeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6351,7 +6340,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderAcknowledgeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderAcknowledgeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6371,7 +6360,7 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAcknowledgeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAcknowledgeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6415,10 +6404,10 @@ impl<'a, C> OrderAcknowledgeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderAdvancetestorderCall<'a, C>
-    where C: 'a {
+pub struct OrderAdvancetestorderCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6426,9 +6415,9 @@ pub struct OrderAdvancetestorderCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderAdvancetestorderCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderAdvancetestorderCall<'a> {}
 
-impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderAdvancetestorderCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6490,8 +6479,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6504,7 +6492,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6513,7 +6501,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6573,7 +6561,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -6583,7 +6571,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderAdvancetestorderCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -6593,7 +6581,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAdvancetestorderCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderAdvancetestorderCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6614,7 +6602,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderAdvancetestorderCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderAdvancetestorderCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6634,7 +6622,7 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAdvancetestorderCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderAdvancetestorderCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6684,10 +6672,10 @@ impl<'a, C> OrderAdvancetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCancelCall<'a, C>
-    where C: 'a {
+pub struct OrderCancelCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersCancelRequest,
     _merchant_id: String,
     _order_id: String,
@@ -6696,9 +6684,9 @@ pub struct OrderCancelCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderCancelCall<'a> {}
 
-impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6771,8 +6759,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6786,7 +6773,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6797,7 +6784,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6856,7 +6843,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelRequest) -> OrderCancelCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersCancelRequest) -> OrderCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -6866,7 +6853,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCancelCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCancelCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -6876,7 +6863,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCancelCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCancelCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -6886,7 +6873,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6907,7 +6894,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6927,7 +6914,7 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancelCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancelCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6977,10 +6964,10 @@ impl<'a, C> OrderCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCancellineitemCall<'a, C>
-    where C: 'a {
+pub struct OrderCancellineitemCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersCancelLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -6989,9 +6976,9 @@ pub struct OrderCancellineitemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderCancellineitemCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderCancellineitemCall<'a> {}
 
-impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderCancellineitemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7064,8 +7051,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7079,7 +7065,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7090,7 +7076,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7149,7 +7135,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelLineItemRequest) -> OrderCancellineitemCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersCancelLineItemRequest) -> OrderCancellineitemCall<'a> {
         self._request = new_value;
         self
     }
@@ -7159,7 +7145,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7169,7 +7155,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCancellineitemCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -7179,7 +7165,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancellineitemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCancellineitemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7200,7 +7186,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCancellineitemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCancellineitemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7220,7 +7206,7 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancellineitemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCancellineitemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7270,10 +7256,10 @@ impl<'a, C> OrderCancellineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCanceltestorderbycustomerCall<'a, C>
-    where C: 'a {
+pub struct OrderCanceltestorderbycustomerCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersCancelTestOrderByCustomerRequest,
     _merchant_id: String,
     _order_id: String,
@@ -7282,9 +7268,9 @@ pub struct OrderCanceltestorderbycustomerCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderCanceltestorderbycustomerCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderCanceltestorderbycustomerCall<'a> {}
 
-impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderCanceltestorderbycustomerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7357,8 +7343,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7372,7 +7357,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7383,7 +7368,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7442,7 +7427,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCancelTestOrderByCustomerRequest) -> OrderCanceltestorderbycustomerCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersCancelTestOrderByCustomerRequest) -> OrderCanceltestorderbycustomerCall<'a> {
         self._request = new_value;
         self
     }
@@ -7452,7 +7437,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7462,7 +7447,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCanceltestorderbycustomerCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -7472,7 +7457,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCanceltestorderbycustomerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCanceltestorderbycustomerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7493,7 +7478,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCanceltestorderbycustomerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCanceltestorderbycustomerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7513,7 +7498,7 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCanceltestorderbycustomerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCanceltestorderbycustomerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7563,10 +7548,10 @@ impl<'a, C> OrderCanceltestorderbycustomerCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCreatetestorderCall<'a, C>
-    where C: 'a {
+pub struct OrderCreatetestorderCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersCreateTestOrderRequest,
     _merchant_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7574,9 +7559,9 @@ pub struct OrderCreatetestorderCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderCreatetestorderCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderCreatetestorderCall<'a> {}
 
-impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderCreatetestorderCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7648,8 +7633,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7663,7 +7647,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7674,7 +7658,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7733,7 +7717,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCreateTestOrderRequest) -> OrderCreatetestorderCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersCreateTestOrderRequest) -> OrderCreatetestorderCall<'a> {
         self._request = new_value;
         self
     }
@@ -7743,7 +7727,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestorderCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestorderCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -7753,7 +7737,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestorderCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestorderCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7774,7 +7758,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestorderCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestorderCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7794,7 +7778,7 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestorderCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestorderCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7844,10 +7828,10 @@ impl<'a, C> OrderCreatetestorderCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCreatetestreturnCall<'a, C>
-    where C: 'a {
+pub struct OrderCreatetestreturnCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersCreateTestReturnRequest,
     _merchant_id: String,
     _order_id: String,
@@ -7856,9 +7840,9 @@ pub struct OrderCreatetestreturnCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderCreatetestreturnCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderCreatetestreturnCall<'a> {}
 
-impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderCreatetestreturnCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7931,8 +7915,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7946,7 +7929,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7957,7 +7940,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8016,7 +7999,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCreateTestReturnRequest) -> OrderCreatetestreturnCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersCreateTestReturnRequest) -> OrderCreatetestreturnCall<'a> {
         self._request = new_value;
         self
     }
@@ -8026,7 +8009,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -8036,7 +8019,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderCreatetestreturnCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -8046,7 +8029,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestreturnCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCreatetestreturnCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8067,7 +8050,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestreturnCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCreatetestreturnCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8087,7 +8070,7 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestreturnCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCreatetestreturnCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8137,19 +8120,19 @@ impl<'a, C> OrderCreatetestreturnCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderCustombatchCall<'a, C>
-    where C: 'a {
+pub struct OrderCustombatchCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersCustomBatchRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderCustombatchCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderCustombatchCall<'a> {}
 
-impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderCustombatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8199,8 +8182,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8214,7 +8196,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8225,7 +8207,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8284,7 +8266,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersCustomBatchRequest) -> OrderCustombatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -8294,7 +8276,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCustombatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderCustombatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8315,7 +8297,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderCustombatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderCustombatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8335,7 +8317,7 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCustombatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderCustombatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8379,10 +8361,10 @@ impl<'a, C> OrderCustombatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGetCall<'a, C>
-    where C: 'a {
+pub struct OrderGetCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8390,9 +8372,9 @@ pub struct OrderGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderGetCall<'a> {}
 
-impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8454,8 +8436,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8468,7 +8449,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8477,7 +8458,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8537,7 +8518,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -8547,7 +8528,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -8557,7 +8538,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8578,7 +8559,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8598,7 +8579,7 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8642,10 +8623,10 @@ impl<'a, C> OrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGetbymerchantorderidCall<'a, C>
-    where C: 'a {
+pub struct OrderGetbymerchantorderidCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _merchant_order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8653,9 +8634,9 @@ pub struct OrderGetbymerchantorderidCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderGetbymerchantorderidCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderGetbymerchantorderidCall<'a> {}
 
-impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderGetbymerchantorderidCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8717,8 +8698,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8731,7 +8711,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8740,7 +8720,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8800,7 +8780,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -8810,7 +8790,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a, C> {
+    pub fn merchant_order_id(mut self, new_value: &str) -> OrderGetbymerchantorderidCall<'a> {
         self._merchant_order_id = new_value.to_string();
         self
     }
@@ -8820,7 +8800,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetbymerchantorderidCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGetbymerchantorderidCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8841,7 +8821,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetbymerchantorderidCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8861,7 +8841,7 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetbymerchantorderidCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8906,10 +8886,10 @@ impl<'a, C> OrderGetbymerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderGettestordertemplateCall<'a, C>
-    where C: 'a {
+pub struct OrderGettestordertemplateCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _template_name: String,
     _country: Option<String>,
@@ -8918,9 +8898,9 @@ pub struct OrderGettestordertemplateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderGettestordertemplateCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderGettestordertemplateCall<'a> {}
 
-impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderGettestordertemplateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8985,8 +8965,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8999,7 +8978,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9008,7 +8987,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9068,7 +9047,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9078,14 +9057,14 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, C> {
+    pub fn template_name(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
         self._template_name = new_value.to_string();
         self
     }
     /// The country of the template to retrieve. Defaults to US.
     ///
     /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a, C> {
+    pub fn country(mut self, new_value: &str) -> OrderGettestordertemplateCall<'a> {
         self._country = Some(new_value.to_string());
         self
     }
@@ -9095,7 +9074,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGettestordertemplateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderGettestordertemplateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9116,7 +9095,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGettestordertemplateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGettestordertemplateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9136,7 +9115,7 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGettestordertemplateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGettestordertemplateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9186,10 +9165,10 @@ impl<'a, C> OrderGettestordertemplateCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderInstorerefundlineitemCall<'a, C>
-    where C: 'a {
+pub struct OrderInstorerefundlineitemCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersInStoreRefundLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -9198,9 +9177,9 @@ pub struct OrderInstorerefundlineitemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderInstorerefundlineitemCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderInstorerefundlineitemCall<'a> {}
 
-impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderInstorerefundlineitemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9273,8 +9252,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9288,7 +9266,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9299,7 +9277,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9358,7 +9336,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersInStoreRefundLineItemRequest) -> OrderInstorerefundlineitemCall<'a> {
         self._request = new_value;
         self
     }
@@ -9368,7 +9346,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9378,7 +9356,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderInstorerefundlineitemCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -9388,7 +9366,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderInstorerefundlineitemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderInstorerefundlineitemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9409,7 +9387,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderInstorerefundlineitemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9429,7 +9407,7 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderInstorerefundlineitemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9480,10 +9458,10 @@ impl<'a, C> OrderInstorerefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderListCall<'a, C>
-    where C: 'a {
+pub struct OrderListCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _merchant_id: String,
     _statuses: Vec<String>,
     _placed_date_start: Option<String>,
@@ -9497,9 +9475,9 @@ pub struct OrderListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderListCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderListCall<'a> {}
 
-impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9583,8 +9561,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9597,7 +9574,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9606,7 +9583,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9666,7 +9643,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderListCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderListCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -9674,35 +9651,35 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *statuses* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a, C> {
+    pub fn add_statuses(mut self, new_value: &str) -> OrderListCall<'a> {
         self._statuses.push(new_value.to_string());
         self
     }
     /// Obtains orders placed after this date (inclusively), in ISO 8601 format.
     ///
     /// Sets the *placed date start* query property to the given value.
-    pub fn placed_date_start(mut self, new_value: &str) -> OrderListCall<'a, C> {
+    pub fn placed_date_start(mut self, new_value: &str) -> OrderListCall<'a> {
         self._placed_date_start = Some(new_value.to_string());
         self
     }
     /// Obtains orders placed before this date (exclusively), in ISO 8601 format.
     ///
     /// Sets the *placed date end* query property to the given value.
-    pub fn placed_date_end(mut self, new_value: &str) -> OrderListCall<'a, C> {
+    pub fn placed_date_end(mut self, new_value: &str) -> OrderListCall<'a> {
         self._placed_date_end = Some(new_value.to_string());
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrderListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrderListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The ordering of the returned list. The only supported value are placedDate desc and placedDate asc for now, which returns orders sorted by placement date. "placedDate desc" stands for listing orders by placement date, from oldest to most recent. "placedDate asc" stands for listing orders by placement date, from most recent to oldest. In future releases we'll support other sorting criteria.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> OrderListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -9710,7 +9687,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Known issue: All List calls will return all Orders without limit regardless of the value of this field.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> OrderListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -9718,7 +9695,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// We recommend using this filter set to false, in conjunction with the acknowledge call, such that only un-acknowledged orders are returned.
     ///
     /// Sets the *acknowledged* query property to the given value.
-    pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a, C> {
+    pub fn acknowledged(mut self, new_value: bool) -> OrderListCall<'a> {
         self._acknowledged = Some(new_value);
         self
     }
@@ -9728,7 +9705,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9749,7 +9726,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9769,7 +9746,7 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9819,10 +9796,10 @@ impl<'a, C> OrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRefundCall<'a, C>
-    where C: 'a {
+pub struct OrderRefundCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersRefundRequest,
     _merchant_id: String,
     _order_id: String,
@@ -9831,9 +9808,9 @@ pub struct OrderRefundCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderRefundCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderRefundCall<'a> {}
 
-impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderRefundCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9906,8 +9883,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9921,7 +9897,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9932,7 +9908,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9991,7 +9967,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersRefundRequest) -> OrderRefundCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersRefundRequest) -> OrderRefundCall<'a> {
         self._request = new_value;
         self
     }
@@ -10001,7 +9977,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderRefundCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10011,7 +9987,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRefundCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10021,7 +9997,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRefundCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10042,7 +10018,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRefundCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10062,7 +10038,7 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRefundCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRefundCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10112,10 +10088,10 @@ impl<'a, C> OrderRefundCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderRejectreturnlineitemCall<'a, C>
-    where C: 'a {
+pub struct OrderRejectreturnlineitemCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersRejectReturnLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10124,9 +10100,9 @@ pub struct OrderRejectreturnlineitemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderRejectreturnlineitemCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderRejectreturnlineitemCall<'a> {}
 
-impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderRejectreturnlineitemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10199,8 +10175,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10214,7 +10189,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10225,7 +10200,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10284,7 +10259,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersRejectReturnLineItemRequest) -> OrderRejectreturnlineitemCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersRejectReturnLineItemRequest) -> OrderRejectreturnlineitemCall<'a> {
         self._request = new_value;
         self
     }
@@ -10294,7 +10269,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10304,7 +10279,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderRejectreturnlineitemCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10314,7 +10289,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRejectreturnlineitemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderRejectreturnlineitemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10335,7 +10310,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderRejectreturnlineitemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderRejectreturnlineitemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10355,7 +10330,7 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderRejectreturnlineitemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10405,10 +10380,10 @@ impl<'a, C> OrderRejectreturnlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderReturnlineitemCall<'a, C>
-    where C: 'a {
+pub struct OrderReturnlineitemCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersReturnLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10417,9 +10392,9 @@ pub struct OrderReturnlineitemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderReturnlineitemCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderReturnlineitemCall<'a> {}
 
-impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderReturnlineitemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10492,8 +10467,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10507,7 +10481,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10518,7 +10492,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10577,7 +10551,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersReturnLineItemRequest) -> OrderReturnlineitemCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersReturnLineItemRequest) -> OrderReturnlineitemCall<'a> {
         self._request = new_value;
         self
     }
@@ -10587,7 +10561,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10597,7 +10571,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderReturnlineitemCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10607,7 +10581,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnlineitemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnlineitemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10628,7 +10602,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnlineitemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnlineitemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10648,7 +10622,7 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnlineitemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnlineitemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10698,10 +10672,10 @@ impl<'a, C> OrderReturnlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderReturnrefundlineitemCall<'a, C>
-    where C: 'a {
+pub struct OrderReturnrefundlineitemCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersReturnRefundLineItemRequest,
     _merchant_id: String,
     _order_id: String,
@@ -10710,9 +10684,9 @@ pub struct OrderReturnrefundlineitemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderReturnrefundlineitemCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderReturnrefundlineitemCall<'a> {}
 
-impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderReturnrefundlineitemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10785,8 +10759,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10800,7 +10773,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10811,7 +10784,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10870,7 +10843,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersReturnRefundLineItemRequest) -> OrderReturnrefundlineitemCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersReturnRefundLineItemRequest) -> OrderReturnrefundlineitemCall<'a> {
         self._request = new_value;
         self
     }
@@ -10880,7 +10853,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -10890,7 +10863,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderReturnrefundlineitemCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -10900,7 +10873,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnrefundlineitemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderReturnrefundlineitemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10921,7 +10894,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnrefundlineitemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderReturnrefundlineitemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10941,7 +10914,7 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnrefundlineitemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderReturnrefundlineitemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10991,10 +10964,10 @@ impl<'a, C> OrderReturnrefundlineitemCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderSetlineitemmetadataCall<'a, C>
-    where C: 'a {
+pub struct OrderSetlineitemmetadataCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersSetLineItemMetadataRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11003,9 +10976,9 @@ pub struct OrderSetlineitemmetadataCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderSetlineitemmetadataCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderSetlineitemmetadataCall<'a> {}
 
-impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderSetlineitemmetadataCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11078,8 +11051,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11093,7 +11065,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11104,7 +11076,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11163,7 +11135,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a> {
         self._request = new_value;
         self
     }
@@ -11173,7 +11145,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11183,7 +11155,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11193,7 +11165,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderSetlineitemmetadataCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderSetlineitemmetadataCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11214,7 +11186,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11234,7 +11206,7 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11284,10 +11256,10 @@ impl<'a, C> OrderSetlineitemmetadataCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderShiplineitemCall<'a, C>
-    where C: 'a {
+pub struct OrderShiplineitemCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersShipLineItemsRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11296,9 +11268,9 @@ pub struct OrderShiplineitemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderShiplineitemCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderShiplineitemCall<'a> {}
 
-impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderShiplineitemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11371,8 +11343,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11386,7 +11357,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11397,7 +11368,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11456,7 +11427,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a> {
         self._request = new_value;
         self
     }
@@ -11466,7 +11437,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11476,7 +11447,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11486,7 +11457,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderShiplineitemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderShiplineitemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11507,7 +11478,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11527,7 +11498,7 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderShiplineitemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderShiplineitemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11577,10 +11548,10 @@ impl<'a, C> OrderShiplineitemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdatelineitemshippingdetailCall<'a, C>
-    where C: 'a {
+pub struct OrderUpdatelineitemshippingdetailCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersUpdateLineItemShippingDetailsRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11589,9 +11560,9 @@ pub struct OrderUpdatelineitemshippingdetailCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderUpdatelineitemshippingdetailCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderUpdatelineitemshippingdetailCall<'a> {}
 
-impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderUpdatelineitemshippingdetailCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11664,8 +11635,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11679,7 +11649,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11690,7 +11660,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11749,7 +11719,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a> {
         self._request = new_value;
         self
     }
@@ -11759,7 +11729,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -11769,7 +11739,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -11779,7 +11749,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatelineitemshippingdetailCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatelineitemshippingdetailCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11800,7 +11770,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11820,7 +11790,7 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11870,10 +11840,10 @@ impl<'a, C> OrderUpdatelineitemshippingdetailCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdatemerchantorderidCall<'a, C>
-    where C: 'a {
+pub struct OrderUpdatemerchantorderidCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersUpdateMerchantOrderIdRequest,
     _merchant_id: String,
     _order_id: String,
@@ -11882,9 +11852,9 @@ pub struct OrderUpdatemerchantorderidCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderUpdatemerchantorderidCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderUpdatemerchantorderidCall<'a> {}
 
-impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderUpdatemerchantorderidCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11957,8 +11927,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11972,7 +11941,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11983,7 +11952,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12042,7 +12011,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateMerchantOrderIdRequest) -> OrderUpdatemerchantorderidCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersUpdateMerchantOrderIdRequest) -> OrderUpdatemerchantorderidCall<'a> {
         self._request = new_value;
         self
     }
@@ -12052,7 +12021,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -12062,7 +12031,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatemerchantorderidCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -12072,7 +12041,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatemerchantorderidCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdatemerchantorderidCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12093,7 +12062,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatemerchantorderidCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatemerchantorderidCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12113,7 +12082,7 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatemerchantorderidCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatemerchantorderidCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12163,10 +12132,10 @@ impl<'a, C> OrderUpdatemerchantorderidCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrderUpdateshipmentCall<'a, C>
-    where C: 'a {
+pub struct OrderUpdateshipmentCall<'a>
+    where  {
 
-    hub: &'a ShoppingContent<C>,
+    hub: &'a ShoppingContent<>,
     _request: OrdersUpdateShipmentRequest,
     _merchant_id: String,
     _order_id: String,
@@ -12175,9 +12144,9 @@ pub struct OrderUpdateshipmentCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrderUpdateshipmentCall<'a, C> {}
+impl<'a> client::CallBuilder for OrderUpdateshipmentCall<'a> {}
 
-impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrderUpdateshipmentCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12250,8 +12219,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12265,7 +12233,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12276,7 +12244,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12335,7 +12303,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersUpdateShipmentRequest) -> OrderUpdateshipmentCall<'a, C> {
+    pub fn request(mut self, new_value: OrdersUpdateShipmentRequest) -> OrderUpdateshipmentCall<'a> {
         self._request = new_value;
         self
     }
@@ -12345,7 +12313,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a, C> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -12355,7 +12323,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a, C> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdateshipmentCall<'a> {
         self._order_id = new_value.to_string();
         self
     }
@@ -12365,7 +12333,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdateshipmentCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrderUpdateshipmentCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12386,7 +12354,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdateshipmentCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdateshipmentCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12406,7 +12374,7 @@ impl<'a, C> OrderUpdateshipmentCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdateshipmentCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdateshipmentCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

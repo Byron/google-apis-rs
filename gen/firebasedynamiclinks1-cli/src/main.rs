@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::FirebaseDynamicLinks<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::FirebaseDynamicLinks,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -759,7 +758,7 @@ async fn main() {
     
     let mut app = App::new("firebasedynamiclinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210329")
+           .version("2.0.3+20210329")
            .about("Programmatically creates and manages Firebase Dynamic Links.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli")
            .arg(Arg::with_name("url")

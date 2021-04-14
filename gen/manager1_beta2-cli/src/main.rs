@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Manager<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Manager,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -875,7 +874,7 @@ async fn main() {
     
     let mut app = App::new("manager1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20140915")
+           .version("2.0.3+20140915")
            .about("The Deployment Manager API allows users to declaratively configure, deploy and run complex solutions on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_manager1_beta2_cli")
            .arg(Arg::with_name("url")

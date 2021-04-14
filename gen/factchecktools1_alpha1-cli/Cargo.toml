@@ -4,10 +4,10 @@
 [package]
 
 name = "google-factchecktools1_alpha1-cli"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Fact Check Tools (protocol v1alpha1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/factchecktools1_alpha1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/factchecktools1_alpha1-cli"
 homepage = "https://developers.google.com/fact-check/tools/api/"
 documentation = "http://byron.github.io/google-apis-rs/google_factchecktools1_alpha1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-factchecktools1_alpha1]
 path = "../factchecktools1_alpha1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"

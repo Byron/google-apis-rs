@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-retail2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/retail2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud Retail* API at revision *20210319*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud Retail* API at revision *20210319*. The CLI is at version *2.0.3*.
 
 ```bash
 retail2 [options]

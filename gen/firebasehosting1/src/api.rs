@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -80,35 +79,34 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct FirebaseHosting<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct FirebaseHosting<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for FirebaseHosting<C> {}
+impl<'a, > client::Hub for FirebaseHosting<> {}
 
-impl<'a, C> FirebaseHosting<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > FirebaseHosting<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseHosting<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseHosting<> {
         FirebaseHosting {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
     }
 
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -268,15 +266,15 @@ impl client::Part for Status {}
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -286,7 +284,7 @@ impl<'a, C> OperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a, C> {
+    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a> {
         OperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -303,7 +301,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a> {
         OperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -319,7 +317,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn list(&self, name: &str) -> OperationListCall<'a, C> {
+    pub fn list(&self, name: &str) -> OperationListCall<'a> {
         OperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -378,19 +376,19 @@ impl<'a, C> OperationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationCancelCall<'a, C>
-    where C: 'a {
+pub struct OperationCancelCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationCancelCall<'a> {}
 
-impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -474,7 +472,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -485,7 +483,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -544,7 +542,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a, C> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -554,7 +552,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -564,7 +562,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -589,7 +587,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -630,18 +628,18 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationDeleteCall<'a, C>
-    where C: 'a {
+pub struct OperationDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationDeleteCall<'a> {}
 
-impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -713,7 +711,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -722,7 +720,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -782,7 +780,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -792,7 +790,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -817,7 +815,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -861,10 +859,10 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a, C>
-    where C: 'a {
+pub struct OperationListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -873,9 +871,9 @@ pub struct OperationListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationListCall<'a> {}
 
-impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -956,7 +954,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -965,7 +963,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1025,28 +1023,28 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1056,7 +1054,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1081,7 +1079,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

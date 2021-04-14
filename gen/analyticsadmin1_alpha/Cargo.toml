@@ -4,12 +4,12 @@
 [package]
 
 name = "google-analyticsadmin1_alpha"
-version = "2.0.0+20210331"
+version = "2.0.3+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Google Analytics Admin (protocol v1alpha)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analyticsadmin1_alpha"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsadmin1_alpha"
 homepage = "http://code.google.com/apis/analytics/docs/mgmt/home.html"
-documentation = "https://docs.rs/google-analyticsadmin1_alpha/2.0.0+20210331"
+documentation = "https://docs.rs/google-analyticsadmin1_alpha/2.0.3+20210331"
 license = "MIT"
 keywords = ["analyticsadmin", "google", "protocol", "web", "api"]
 autobins = false

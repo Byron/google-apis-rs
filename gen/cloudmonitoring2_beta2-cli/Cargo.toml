@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudmonitoring2_beta2-cli"
-version = "2.0.0+20170501"
+version = "2.0.3+20170501"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudmonitoring2_beta2-cli"
 homepage = "https://cloud.google.com/monitoring/v2beta2/"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudmonitoring2_beta2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudmonitoring2_beta2]
 path = "../cloudmonitoring2_beta2"
-version = "2.0.0+20170501"
+version = "2.0.3+20170501"

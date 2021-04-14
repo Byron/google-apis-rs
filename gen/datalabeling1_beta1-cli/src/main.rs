@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::DataLabeling<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::DataLabeling,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -4574,7 +4573,7 @@ async fn main() {
     
     let mut app = App::new("datalabeling1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210317")
+           .version("2.0.3+20210317")
            .about("Public API for Google Cloud AI Data Labeling Service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datalabeling1_beta1_cli")
            .arg(Arg::with_name("url")

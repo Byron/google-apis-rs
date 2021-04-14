@@ -4,10 +4,10 @@
 [package]
 
 name = "google-acceleratedmobilepageurl1-cli"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Acceleratedmobilepageurl (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/acceleratedmobilepageurl1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/acceleratedmobilepageurl1-cli"
 homepage = "https://developers.google.com/amp/cache/"
 documentation = "http://byron.github.io/google-apis-rs/google_acceleratedmobilepageurl1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-acceleratedmobilepageurl1]
 path = "../acceleratedmobilepageurl1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"

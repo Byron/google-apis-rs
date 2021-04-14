@@ -1,8 +1,8 @@
-site_name: Firebase ML v2.0.0+20210329
+site_name: Firebase ML v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-firebaseml1-cli
 site_description: A complete library to interact with Firebase ML (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/firebaseml1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebaseml1-cli
 
 docs_dir: docs
 site_dir: build_html

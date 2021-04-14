@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-photoslibrary1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/photoslibrary1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/photoslibrary1-cli).
 
 # Usage
 
-This documentation was generated from the *Photos Library* API at revision *20210331*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Photos Library* API at revision *20210331*. The CLI is at version *2.0.3*.
 
 ```bash
 photoslibrary1 [options]

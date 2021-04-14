@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Acceleratedmobilepageurl<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Acceleratedmobilepageurl,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -241,7 +240,7 @@ async fn main() {
     
     let mut app = App::new("acceleratedmobilepageurl1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210330")
+           .version("2.0.3+20210330")
            .about("Retrieves the list of AMP URLs (and equivalent AMP Cache URLs) for a given list of public URL(s). ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_acceleratedmobilepageurl1_cli")
            .arg(Arg::with_name("folder")

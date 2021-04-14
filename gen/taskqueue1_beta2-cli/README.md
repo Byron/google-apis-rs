@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-taskqueue1_beta2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/taskqueue1_beta2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/taskqueue1_beta2-cli).
 
 # Usage
 
-This documentation was generated from the *taskqueue* API at revision *20160428*. The CLI is at version *2.0.0*.
+This documentation was generated from the *taskqueue* API at revision *20160428*. The CLI is at version *2.0.3*.
 
 ```bash
 taskqueue1-beta2 [options]

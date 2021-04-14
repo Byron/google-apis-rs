@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-deploymentmanager2_beta2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/deploymentmanager2_beta2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/deploymentmanager2_beta2-cli).
 
 # Usage
 
-This documentation was generated from the *Deployment Manager* API at revision *20160201*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Deployment Manager* API at revision *20160201*. The CLI is at version *2.0.3*.
 
 ```bash
 deploymentmanager2-beta2 [options]

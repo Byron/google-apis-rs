@@ -1,8 +1,8 @@
-site_name: Cloud Monitoring v2.0.0+20170501
+site_name: Cloud Monitoring v2.0.3+20170501
 site_url: http://byron.github.io/google-apis-rs/google-cloudmonitoring2_beta2-cli
 site_description: A complete library to interact with Cloud Monitoring (protocol v2beta2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudmonitoring2_beta2-cli
 
 docs_dir: docs
 site_dir: build_html

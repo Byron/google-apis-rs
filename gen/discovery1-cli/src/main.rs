@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Discovery<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Discovery,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -285,7 +284,7 @@ async fn main() {
     
     let mut app = App::new("discovery1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20200806")
+           .version("2.0.3+20200806")
            .about("Provides information about other Google APIs, such as what APIs are available, the resource, and method details for each API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_discovery1_cli")
            .arg(Arg::with_name("folder")

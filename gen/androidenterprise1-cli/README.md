@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-androidenterprise1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidenterprise1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/androidenterprise1-cli).
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20210324*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Android Enterprise* API at revision *20210324*. The CLI is at version *2.0.3*.
 
 ```bash
 androidenterprise1 [options]

@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dfareporting* crate version *2.0.0+20210210*, where *20210210* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Dfareporting* crate version *2.0.3+20210210*, where *20210210* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Dfareporting* *v3d3* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting3d3).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d3).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Dfareporting) ... 

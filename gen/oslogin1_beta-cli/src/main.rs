@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudOSLogin<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::CloudOSLogin,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -694,7 +693,7 @@ async fn main() {
     
     let mut app = App::new("oslogin1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210316")
+           .version("2.0.3+20210316")
            .about("You can use OS Login to manage access to your VM instances using IAM roles.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli")
            .arg(Arg::with_name("url")

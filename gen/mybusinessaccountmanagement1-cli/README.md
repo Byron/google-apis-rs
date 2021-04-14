@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-mybusinessaccountmanagement1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/mybusinessaccountmanagement1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessaccountmanagement1-cli).
 
 # Usage
 
-This documentation was generated from the *My Business Account Management* API at revision *20210330*. The CLI is at version *2.0.0*.
+This documentation was generated from the *My Business Account Management* API at revision *20210330*. The CLI is at version *2.0.3*.
 
 ```bash
 mybusinessaccountmanagement1 [options]

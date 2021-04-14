@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-ondemandscanning1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/ondemandscanning1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/ondemandscanning1-cli).
 
 # Usage
 
-This documentation was generated from the *On-Demand Scanning* API at revision *20210329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *On-Demand Scanning* API at revision *20210329*. The CLI is at version *2.0.3*.
 
 ```bash
 ondemandscanning1 [options]

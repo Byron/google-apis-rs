@@ -4,10 +4,10 @@
 [package]
 
 name = "google-remotebuildexecution2-cli"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Remote Build Execution (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/remotebuildexecution2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/remotebuildexecution2-cli"
 homepage = "https://cloud.google.com/remote-build-execution/docs/"
 documentation = "http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-remotebuildexecution2]
 path = "../remotebuildexecution2"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"

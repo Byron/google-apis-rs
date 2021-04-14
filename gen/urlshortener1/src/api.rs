@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -100,35 +99,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Urlshortener<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Urlshortener<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Urlshortener<C> {}
+impl<'a, > client::Hub for Urlshortener<> {}
 
-impl<'a, C> Urlshortener<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Urlshortener<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Urlshortener<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Urlshortener<> {
         Urlshortener {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/urlshortener/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn url(&'a self) -> UrlMethods<'a, C> {
+    pub fn url(&'a self) -> UrlMethods<'a> {
         UrlMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -314,15 +312,15 @@ impl client::ResponseResult for UrlHistory {}
 /// let rb = hub.url();
 /// # }
 /// ```
-pub struct UrlMethods<'a, C>
-    where C: 'a {
+pub struct UrlMethods<'a>
+    where  {
 
-    hub: &'a Urlshortener<C>,
+    hub: &'a Urlshortener<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UrlMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UrlMethods<'a> {}
 
-impl<'a, C> UrlMethods<'a, C> {
+impl<'a> UrlMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -331,7 +329,7 @@ impl<'a, C> UrlMethods<'a, C> {
     /// # Arguments
     ///
     /// * `shortUrl` - The short URL, including the protocol.
-    pub fn get(&self, short_url: &str) -> UrlGetCall<'a, C> {
+    pub fn get(&self, short_url: &str) -> UrlGetCall<'a> {
         UrlGetCall {
             hub: self.hub,
             _short_url: short_url.to_string(),
@@ -349,7 +347,7 @@ impl<'a, C> UrlMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Url) -> UrlInsertCall<'a, C> {
+    pub fn insert(&self, request: Url) -> UrlInsertCall<'a> {
         UrlInsertCall {
             hub: self.hub,
             _request: request,
@@ -362,7 +360,7 @@ impl<'a, C> UrlMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of URLs shortened by a user.
-    pub fn list(&self) -> UrlListCall<'a, C> {
+    pub fn list(&self) -> UrlListCall<'a> {
         UrlListCall {
             hub: self.hub,
             _start_token: Default::default(),
@@ -415,10 +413,10 @@ impl<'a, C> UrlMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlGetCall<'a, C>
-    where C: 'a {
+pub struct UrlGetCall<'a>
+    where  {
 
-    hub: &'a Urlshortener<C>,
+    hub: &'a Urlshortener<>,
     _short_url: String,
     _projection: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -426,9 +424,9 @@ pub struct UrlGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UrlGetCall<'a, C> {}
+impl<'a> client::CallBuilder for UrlGetCall<'a> {}
 
-impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UrlGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -471,8 +469,7 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -485,7 +482,7 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -494,7 +491,7 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -554,14 +551,14 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn short_url(mut self, new_value: &str) -> UrlGetCall<'a, C> {
+    pub fn short_url(mut self, new_value: &str) -> UrlGetCall<'a> {
         self._short_url = new_value.to_string();
         self
     }
     /// Additional information to return.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> UrlGetCall<'a, C> {
+    pub fn projection(mut self, new_value: &str) -> UrlGetCall<'a> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -571,7 +568,7 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -592,7 +589,7 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -612,7 +609,7 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UrlGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -662,19 +659,19 @@ impl<'a, C> UrlGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlInsertCall<'a, C>
-    where C: 'a {
+pub struct UrlInsertCall<'a>
+    where  {
 
-    hub: &'a Urlshortener<C>,
+    hub: &'a Urlshortener<>,
     _request: Url,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UrlInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for UrlInsertCall<'a> {}
 
-impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UrlInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -724,8 +721,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -739,7 +735,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -750,7 +746,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -809,7 +805,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Url) -> UrlInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Url) -> UrlInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -819,7 +815,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -840,7 +836,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -860,7 +856,7 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UrlInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -906,10 +902,10 @@ impl<'a, C> UrlInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlListCall<'a, C>
-    where C: 'a {
+pub struct UrlListCall<'a>
+    where  {
 
-    hub: &'a Urlshortener<C>,
+    hub: &'a Urlshortener<>,
     _start_token: Option<String>,
     _projection: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -917,9 +913,9 @@ pub struct UrlListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UrlListCall<'a, C> {}
+impl<'a> client::CallBuilder for UrlListCall<'a> {}
 
-impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UrlListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -964,8 +960,7 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -978,7 +973,7 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -987,7 +982,7 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1044,14 +1039,14 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Token for requesting successive pages of results.
     ///
     /// Sets the *start-token* query property to the given value.
-    pub fn start_token(mut self, new_value: &str) -> UrlListCall<'a, C> {
+    pub fn start_token(mut self, new_value: &str) -> UrlListCall<'a> {
         self._start_token = Some(new_value.to_string());
         self
     }
     /// Additional information to return.
     ///
     /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> UrlListCall<'a, C> {
+    pub fn projection(mut self, new_value: &str) -> UrlListCall<'a> {
         self._projection = Some(new_value.to_string());
         self
     }
@@ -1061,7 +1056,7 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1082,7 +1077,7 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> UrlListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1102,7 +1097,7 @@ impl<'a, C> UrlListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UrlListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-eventarc1"
-version = "2.0.0+20210325"
+version = "2.0.3+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Eventarc (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/eventarc1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/eventarc1"
 homepage = "https://cloud.google.com/eventarc"
-documentation = "https://docs.rs/google-eventarc1/2.0.0+20210325"
+documentation = "https://docs.rs/google-eventarc1/2.0.3+20210325"
 license = "MIT"
 keywords = ["eventarc", "google", "protocol", "web", "api"]
 autobins = false

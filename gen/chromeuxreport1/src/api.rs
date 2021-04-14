@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -83,35 +82,34 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct ChromeUXReport<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct ChromeUXReport<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for ChromeUXReport<C> {}
+impl<'a, > client::Hub for ChromeUXReport<> {}
 
-impl<'a, C> ChromeUXReport<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > ChromeUXReport<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ChromeUXReport<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ChromeUXReport<> {
         ChromeUXReport {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://chromeuxreport.googleapis.com/".to_string(),
             _root_url: "https://chromeuxreport.googleapis.com/".to_string(),
         }
     }
 
-    pub fn records(&'a self) -> RecordMethods<'a, C> {
+    pub fn records(&'a self) -> RecordMethods<'a> {
         RecordMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -326,15 +324,15 @@ impl client::Part for UrlNormalization {}
 /// let rb = hub.records();
 /// # }
 /// ```
-pub struct RecordMethods<'a, C>
-    where C: 'a {
+pub struct RecordMethods<'a>
+    where  {
 
-    hub: &'a ChromeUXReport<C>,
+    hub: &'a ChromeUXReport<>,
 }
 
-impl<'a, C> client::MethodsBuilder for RecordMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for RecordMethods<'a> {}
 
-impl<'a, C> RecordMethods<'a, C> {
+impl<'a> RecordMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -343,7 +341,7 @@ impl<'a, C> RecordMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn query_record(&self, request: QueryRequest) -> RecordQueryRecordCall<'a, C> {
+    pub fn query_record(&self, request: QueryRequest) -> RecordQueryRecordCall<'a> {
         RecordQueryRecordCall {
             hub: self.hub,
             _request: request,
@@ -399,18 +397,18 @@ impl<'a, C> RecordMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RecordQueryRecordCall<'a, C>
-    where C: 'a {
+pub struct RecordQueryRecordCall<'a>
+    where  {
 
-    hub: &'a ChromeUXReport<C>,
+    hub: &'a ChromeUXReport<>,
     _request: QueryRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for RecordQueryRecordCall<'a, C> {}
+impl<'a> client::CallBuilder for RecordQueryRecordCall<'a> {}
 
-impl<'a, C> RecordQueryRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RecordQueryRecordCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -468,7 +466,7 @@ impl<'a, C> RecordQueryRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -479,7 +477,7 @@ impl<'a, C> RecordQueryRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -538,7 +536,7 @@ impl<'a, C> RecordQueryRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: QueryRequest) -> RecordQueryRecordCall<'a, C> {
+    pub fn request(mut self, new_value: QueryRequest) -> RecordQueryRecordCall<'a> {
         self._request = new_value;
         self
     }
@@ -548,7 +546,7 @@ impl<'a, C> RecordQueryRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecordQueryRecordCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RecordQueryRecordCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -573,7 +571,7 @@ impl<'a, C> RecordQueryRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RecordQueryRecordCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RecordQueryRecordCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -103,38 +102,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudRun<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudRun<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudRun<C> {}
+impl<'a, > client::Hub for CloudRun<> {}
 
-impl<'a, C> CloudRun<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudRun<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudRun<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudRun<> {
         CloudRun {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://run.googleapis.com/".to_string(),
             _root_url: "https://run.googleapis.com/".to_string(),
         }
     }
 
-    pub fn namespaces(&'a self) -> NamespaceMethods<'a, C> {
+    pub fn namespaces(&'a self) -> NamespaceMethods<'a> {
         NamespaceMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1627,15 +1625,15 @@ impl client::Part for VolumeMount {}
 /// let rb = hub.namespaces();
 /// # }
 /// ```
-pub struct NamespaceMethods<'a, C>
-    where C: 'a {
+pub struct NamespaceMethods<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
 }
 
-impl<'a, C> client::MethodsBuilder for NamespaceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for NamespaceMethods<'a> {}
 
-impl<'a, C> NamespaceMethods<'a, C> {
+impl<'a> NamespaceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1644,7 +1642,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Name of the parent Project resource. Example: `projects/myproject`.
-    pub fn authorizeddomains_list(&self, parent: &str) -> NamespaceAuthorizeddomainListCall<'a, C> {
+    pub fn authorizeddomains_list(&self, parent: &str) -> NamespaceAuthorizeddomainListCall<'a> {
         NamespaceAuthorizeddomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1663,7 +1661,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the configuration to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn configurations_get(&self, name: &str) -> NamespaceConfigurationGetCall<'a, C> {
+    pub fn configurations_get(&self, name: &str) -> NamespaceConfigurationGetCall<'a> {
         NamespaceConfigurationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1680,7 +1678,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the configurations should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn configurations_list(&self, parent: &str) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn configurations_list(&self, parent: &str) -> NamespaceConfigurationListCall<'a> {
         NamespaceConfigurationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1705,7 +1703,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The namespace in which the domain mapping should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn domainmappings_create(&self, request: DomainMapping, parent: &str) -> NamespaceDomainmappingCreateCall<'a, C> {
+    pub fn domainmappings_create(&self, request: DomainMapping, parent: &str) -> NamespaceDomainmappingCreateCall<'a> {
         NamespaceDomainmappingCreateCall {
             hub: self.hub,
             _request: request,
@@ -1724,7 +1722,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the domain mapping to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn domainmappings_delete(&self, name: &str) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn domainmappings_delete(&self, name: &str) -> NamespaceDomainmappingDeleteCall<'a> {
         NamespaceDomainmappingDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1745,7 +1743,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the domain mapping to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn domainmappings_get(&self, name: &str) -> NamespaceDomainmappingGetCall<'a, C> {
+    pub fn domainmappings_get(&self, name: &str) -> NamespaceDomainmappingGetCall<'a> {
         NamespaceDomainmappingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1762,7 +1760,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the domain mappings should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn domainmappings_list(&self, parent: &str) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn domainmappings_list(&self, parent: &str) -> NamespaceDomainmappingListCall<'a> {
         NamespaceDomainmappingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1786,7 +1784,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the revision to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn revisions_delete(&self, name: &str) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn revisions_delete(&self, name: &str) -> NamespaceRevisionDeleteCall<'a> {
         NamespaceRevisionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1807,7 +1805,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the revision to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn revisions_get(&self, name: &str) -> NamespaceRevisionGetCall<'a, C> {
+    pub fn revisions_get(&self, name: &str) -> NamespaceRevisionGetCall<'a> {
         NamespaceRevisionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1824,7 +1822,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the revisions should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn revisions_list(&self, parent: &str) -> NamespaceRevisionListCall<'a, C> {
+    pub fn revisions_list(&self, parent: &str) -> NamespaceRevisionListCall<'a> {
         NamespaceRevisionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1848,7 +1846,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the route to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn routes_get(&self, name: &str) -> NamespaceRouteGetCall<'a, C> {
+    pub fn routes_get(&self, name: &str) -> NamespaceRouteGetCall<'a> {
         NamespaceRouteGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1865,7 +1863,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the routes should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn routes_list(&self, parent: &str) -> NamespaceRouteListCall<'a, C> {
+    pub fn routes_list(&self, parent: &str) -> NamespaceRouteListCall<'a> {
         NamespaceRouteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1890,7 +1888,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The namespace in which the service should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn services_create(&self, request: Service, parent: &str) -> NamespaceServiceCreateCall<'a, C> {
+    pub fn services_create(&self, request: Service, parent: &str) -> NamespaceServiceCreateCall<'a> {
         NamespaceServiceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1909,7 +1907,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the service to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn services_delete(&self, name: &str) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn services_delete(&self, name: &str) -> NamespaceServiceDeleteCall<'a> {
         NamespaceServiceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1930,7 +1928,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the service to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn services_get(&self, name: &str) -> NamespaceServiceGetCall<'a, C> {
+    pub fn services_get(&self, name: &str) -> NamespaceServiceGetCall<'a> {
         NamespaceServiceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1947,7 +1945,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the services should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn services_list(&self, parent: &str) -> NamespaceServiceListCall<'a, C> {
+    pub fn services_list(&self, parent: &str) -> NamespaceServiceListCall<'a> {
         NamespaceServiceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1972,7 +1970,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the service being replaced. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn services_replace_service(&self, request: Service, name: &str) -> NamespaceServiceReplaceServiceCall<'a, C> {
+    pub fn services_replace_service(&self, request: Service, name: &str) -> NamespaceServiceReplaceServiceCall<'a> {
         NamespaceServiceReplaceServiceCall {
             hub: self.hub,
             _request: request,
@@ -2017,15 +2015,15 @@ impl<'a, C> NamespaceMethods<'a, C> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2034,7 +2032,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Name of the parent Project resource. Example: `projects/myproject`.
-    pub fn authorizeddomains_list(&self, parent: &str) -> ProjectAuthorizeddomainListCall<'a, C> {
+    pub fn authorizeddomains_list(&self, parent: &str) -> ProjectAuthorizeddomainListCall<'a> {
         ProjectAuthorizeddomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2053,7 +2051,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Name of the parent Project resource. Example: `projects/myproject`.
-    pub fn locations_authorizeddomains_list(&self, parent: &str) -> ProjectLocationAuthorizeddomainListCall<'a, C> {
+    pub fn locations_authorizeddomains_list(&self, parent: &str) -> ProjectLocationAuthorizeddomainListCall<'a> {
         ProjectLocationAuthorizeddomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2072,7 +2070,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the configuration to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_configurations_get(&self, name: &str) -> ProjectLocationConfigurationGetCall<'a, C> {
+    pub fn locations_configurations_get(&self, name: &str) -> ProjectLocationConfigurationGetCall<'a> {
         ProjectLocationConfigurationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2089,7 +2087,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the configurations should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_configurations_list(&self, parent: &str) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn locations_configurations_list(&self, parent: &str) -> ProjectLocationConfigurationListCall<'a> {
         ProjectLocationConfigurationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2114,7 +2112,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The namespace in which the domain mapping should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_domainmappings_create(&self, request: DomainMapping, parent: &str) -> ProjectLocationDomainmappingCreateCall<'a, C> {
+    pub fn locations_domainmappings_create(&self, request: DomainMapping, parent: &str) -> ProjectLocationDomainmappingCreateCall<'a> {
         ProjectLocationDomainmappingCreateCall {
             hub: self.hub,
             _request: request,
@@ -2133,7 +2131,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the domain mapping to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_domainmappings_delete(&self, name: &str) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn locations_domainmappings_delete(&self, name: &str) -> ProjectLocationDomainmappingDeleteCall<'a> {
         ProjectLocationDomainmappingDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2154,7 +2152,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the domain mapping to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_domainmappings_get(&self, name: &str) -> ProjectLocationDomainmappingGetCall<'a, C> {
+    pub fn locations_domainmappings_get(&self, name: &str) -> ProjectLocationDomainmappingGetCall<'a> {
         ProjectLocationDomainmappingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2171,7 +2169,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the domain mappings should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_domainmappings_list(&self, parent: &str) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn locations_domainmappings_list(&self, parent: &str) -> ProjectLocationDomainmappingListCall<'a> {
         ProjectLocationDomainmappingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2195,7 +2193,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the revision to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_revisions_delete(&self, name: &str) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn locations_revisions_delete(&self, name: &str) -> ProjectLocationRevisionDeleteCall<'a> {
         ProjectLocationRevisionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2216,7 +2214,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the revision to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_revisions_get(&self, name: &str) -> ProjectLocationRevisionGetCall<'a, C> {
+    pub fn locations_revisions_get(&self, name: &str) -> ProjectLocationRevisionGetCall<'a> {
         ProjectLocationRevisionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2233,7 +2231,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the revisions should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_revisions_list(&self, parent: &str) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn locations_revisions_list(&self, parent: &str) -> ProjectLocationRevisionListCall<'a> {
         ProjectLocationRevisionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2257,7 +2255,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the route to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_routes_get(&self, name: &str) -> ProjectLocationRouteGetCall<'a, C> {
+    pub fn locations_routes_get(&self, name: &str) -> ProjectLocationRouteGetCall<'a> {
         ProjectLocationRouteGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2274,7 +2272,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the routes should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_routes_list(&self, parent: &str) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn locations_routes_list(&self, parent: &str) -> ProjectLocationRouteListCall<'a> {
         ProjectLocationRouteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2299,7 +2297,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The namespace in which the service should be created. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_services_create(&self, request: Service, parent: &str) -> ProjectLocationServiceCreateCall<'a, C> {
+    pub fn locations_services_create(&self, request: Service, parent: &str) -> ProjectLocationServiceCreateCall<'a> {
         ProjectLocationServiceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2318,7 +2316,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the service to delete. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_services_delete(&self, name: &str) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn locations_services_delete(&self, name: &str) -> ProjectLocationServiceDeleteCall<'a> {
         ProjectLocationServiceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2339,7 +2337,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the service to retrieve. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_services_get(&self, name: &str) -> ProjectLocationServiceGetCall<'a, C> {
+    pub fn locations_services_get(&self, name: &str) -> ProjectLocationServiceGetCall<'a> {
         ProjectLocationServiceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2356,7 +2354,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_services_get_iam_policy(&self, resource: &str) -> ProjectLocationServiceGetIamPolicyCall<'a, C> {
+    pub fn locations_services_get_iam_policy(&self, resource: &str) -> ProjectLocationServiceGetIamPolicyCall<'a> {
         ProjectLocationServiceGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -2374,7 +2372,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The namespace from which the services should be listed. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_services_list(&self, parent: &str) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn locations_services_list(&self, parent: &str) -> ProjectLocationServiceListCall<'a> {
         ProjectLocationServiceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2399,7 +2397,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the service being replaced. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.
-    pub fn locations_services_replace_service(&self, request: Service, name: &str) -> ProjectLocationServiceReplaceServiceCall<'a, C> {
+    pub fn locations_services_replace_service(&self, request: Service, name: &str) -> ProjectLocationServiceReplaceServiceCall<'a> {
         ProjectLocationServiceReplaceServiceCall {
             hub: self.hub,
             _request: request,
@@ -2419,7 +2417,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field.
-    pub fn locations_services_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationServiceSetIamPolicyCall<'a, C> {
+    pub fn locations_services_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationServiceSetIamPolicyCall<'a> {
         ProjectLocationServiceSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2438,7 +2436,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field.
-    pub fn locations_services_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationServiceTestIamPermissionCall<'a, C> {
+    pub fn locations_services_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationServiceTestIamPermissionCall<'a> {
         ProjectLocationServiceTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -2456,7 +2454,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2512,10 +2510,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceAuthorizeddomainListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceAuthorizeddomainListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2524,9 +2522,9 @@ pub struct NamespaceAuthorizeddomainListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceAuthorizeddomainListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceAuthorizeddomainListCall<'a> {}
 
-impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceAuthorizeddomainListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2597,8 +2595,7 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2611,7 +2608,7 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2620,7 +2617,7 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2680,21 +2677,21 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceAuthorizeddomainListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceAuthorizeddomainListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NamespaceAuthorizeddomainListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NamespaceAuthorizeddomainListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NamespaceAuthorizeddomainListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NamespaceAuthorizeddomainListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2704,7 +2701,7 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceAuthorizeddomainListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceAuthorizeddomainListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2729,7 +2726,7 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceAuthorizeddomainListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceAuthorizeddomainListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2749,7 +2746,7 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceAuthorizeddomainListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceAuthorizeddomainListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2793,19 +2790,19 @@ impl<'a, C> NamespaceAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceConfigurationGetCall<'a, C>
-    where C: 'a {
+pub struct NamespaceConfigurationGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceConfigurationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceConfigurationGetCall<'a> {}
 
-impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceConfigurationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2870,8 +2867,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2884,7 +2880,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2893,7 +2889,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2953,7 +2949,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceConfigurationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceConfigurationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2963,7 +2959,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceConfigurationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceConfigurationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2988,7 +2984,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceConfigurationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceConfigurationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3008,7 +3004,7 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceConfigurationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceConfigurationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3059,10 +3055,10 @@ impl<'a, C> NamespaceConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceConfigurationListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceConfigurationListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -3076,9 +3072,9 @@ pub struct NamespaceConfigurationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceConfigurationListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceConfigurationListCall<'a> {}
 
-impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceConfigurationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3164,8 +3160,7 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3178,7 +3173,7 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3187,7 +3182,7 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3247,56 +3242,56 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> NamespaceConfigurationListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> NamespaceConfigurationListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceConfigurationListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> NamespaceConfigurationListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -3306,7 +3301,7 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceConfigurationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceConfigurationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3331,7 +3326,7 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceConfigurationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceConfigurationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3351,7 +3346,7 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceConfigurationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceConfigurationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3402,10 +3397,10 @@ impl<'a, C> NamespaceConfigurationListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceDomainmappingCreateCall<'a, C>
-    where C: 'a {
+pub struct NamespaceDomainmappingCreateCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: DomainMapping,
     _parent: String,
     _dry_run: Option<String>,
@@ -3414,9 +3409,9 @@ pub struct NamespaceDomainmappingCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceDomainmappingCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceDomainmappingCreateCall<'a> {}
 
-impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceDomainmappingCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3495,8 +3490,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3510,7 +3504,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3521,7 +3515,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3580,7 +3574,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DomainMapping) -> NamespaceDomainmappingCreateCall<'a, C> {
+    pub fn request(mut self, new_value: DomainMapping) -> NamespaceDomainmappingCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3590,14 +3584,14 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceDomainmappingCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceDomainmappingCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> NamespaceDomainmappingCreateCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> NamespaceDomainmappingCreateCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
@@ -3607,7 +3601,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3632,7 +3626,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3652,7 +3646,7 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3700,10 +3694,10 @@ impl<'a, C> NamespaceDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceDomainmappingDeleteCall<'a, C>
-    where C: 'a {
+pub struct NamespaceDomainmappingDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _propagation_policy: Option<String>,
     _kind: Option<String>,
@@ -3714,9 +3708,9 @@ pub struct NamespaceDomainmappingDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceDomainmappingDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceDomainmappingDeleteCall<'a> {}
 
-impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceDomainmappingDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3793,8 +3787,7 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3807,7 +3800,7 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3816,7 +3809,7 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3876,35 +3869,35 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies the propagation policy of delete. Cloud Run currently ignores this setting, and deletes in the background. Please see kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for more information.
     ///
     /// Sets the *propagation policy* query property to the given value.
-    pub fn propagation_policy(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn propagation_policy(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a> {
         self._propagation_policy = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *kind* query property to the given value.
-    pub fn kind(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn kind(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a> {
         self._kind = Some(new_value.to_string());
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *api version* query property to the given value.
-    pub fn api_version(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn api_version(mut self, new_value: &str) -> NamespaceDomainmappingDeleteCall<'a> {
         self._api_version = Some(new_value.to_string());
         self
     }
@@ -3914,7 +3907,7 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3939,7 +3932,7 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3959,7 +3952,7 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4003,19 +3996,19 @@ impl<'a, C> NamespaceDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceDomainmappingGetCall<'a, C>
-    where C: 'a {
+pub struct NamespaceDomainmappingGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceDomainmappingGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceDomainmappingGetCall<'a> {}
 
-impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceDomainmappingGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4080,8 +4073,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4094,7 +4086,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4103,7 +4095,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4163,7 +4155,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceDomainmappingGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceDomainmappingGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4173,7 +4165,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4198,7 +4190,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4218,7 +4210,7 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4269,10 +4261,10 @@ impl<'a, C> NamespaceDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceDomainmappingListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceDomainmappingListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -4286,9 +4278,9 @@ pub struct NamespaceDomainmappingListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceDomainmappingListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceDomainmappingListCall<'a> {}
 
-impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceDomainmappingListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4374,8 +4366,7 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4388,7 +4379,7 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4397,7 +4388,7 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4457,56 +4448,56 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> NamespaceDomainmappingListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> NamespaceDomainmappingListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceDomainmappingListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> NamespaceDomainmappingListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -4516,7 +4507,7 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceDomainmappingListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4541,7 +4532,7 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceDomainmappingListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4561,7 +4552,7 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceDomainmappingListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4609,10 +4600,10 @@ impl<'a, C> NamespaceDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceRevisionDeleteCall<'a, C>
-    where C: 'a {
+pub struct NamespaceRevisionDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _propagation_policy: Option<String>,
     _kind: Option<String>,
@@ -4623,9 +4614,9 @@ pub struct NamespaceRevisionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceRevisionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceRevisionDeleteCall<'a> {}
 
-impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceRevisionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4702,8 +4693,7 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4716,7 +4706,7 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4725,7 +4715,7 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4785,35 +4775,35 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies the propagation policy of delete. Cloud Run currently ignores this setting, and deletes in the background. Please see kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for more information.
     ///
     /// Sets the *propagation policy* query property to the given value.
-    pub fn propagation_policy(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn propagation_policy(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a> {
         self._propagation_policy = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *kind* query property to the given value.
-    pub fn kind(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn kind(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a> {
         self._kind = Some(new_value.to_string());
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *api version* query property to the given value.
-    pub fn api_version(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn api_version(mut self, new_value: &str) -> NamespaceRevisionDeleteCall<'a> {
         self._api_version = Some(new_value.to_string());
         self
     }
@@ -4823,7 +4813,7 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRevisionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRevisionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4848,7 +4838,7 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRevisionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRevisionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4868,7 +4858,7 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRevisionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRevisionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4912,19 +4902,19 @@ impl<'a, C> NamespaceRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceRevisionGetCall<'a, C>
-    where C: 'a {
+pub struct NamespaceRevisionGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceRevisionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceRevisionGetCall<'a> {}
 
-impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceRevisionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4989,8 +4979,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5003,7 +4992,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5012,7 +5001,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5072,7 +5061,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceRevisionGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceRevisionGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5082,7 +5071,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRevisionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRevisionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5107,7 +5096,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRevisionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRevisionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5127,7 +5116,7 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRevisionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRevisionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5178,10 +5167,10 @@ impl<'a, C> NamespaceRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceRevisionListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceRevisionListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -5195,9 +5184,9 @@ pub struct NamespaceRevisionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceRevisionListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceRevisionListCall<'a> {}
 
-impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceRevisionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5283,8 +5272,7 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5297,7 +5285,7 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5306,7 +5294,7 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5366,56 +5354,56 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceRevisionListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceRevisionListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> NamespaceRevisionListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> NamespaceRevisionListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> NamespaceRevisionListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> NamespaceRevisionListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> NamespaceRevisionListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> NamespaceRevisionListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> NamespaceRevisionListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> NamespaceRevisionListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceRevisionListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceRevisionListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> NamespaceRevisionListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> NamespaceRevisionListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> NamespaceRevisionListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> NamespaceRevisionListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -5425,7 +5413,7 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRevisionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRevisionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5450,7 +5438,7 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRevisionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRevisionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5470,7 +5458,7 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRevisionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRevisionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5514,19 +5502,19 @@ impl<'a, C> NamespaceRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceRouteGetCall<'a, C>
-    where C: 'a {
+pub struct NamespaceRouteGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceRouteGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceRouteGetCall<'a> {}
 
-impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceRouteGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5591,8 +5579,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5605,7 +5592,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5614,7 +5601,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5674,7 +5661,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceRouteGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceRouteGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5684,7 +5671,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRouteGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRouteGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5709,7 +5696,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRouteGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRouteGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5729,7 +5716,7 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRouteGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRouteGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5780,10 +5767,10 @@ impl<'a, C> NamespaceRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceRouteListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceRouteListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -5797,9 +5784,9 @@ pub struct NamespaceRouteListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceRouteListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceRouteListCall<'a> {}
 
-impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceRouteListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5885,8 +5872,7 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5899,7 +5885,7 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5908,7 +5894,7 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5968,56 +5954,56 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceRouteListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceRouteListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> NamespaceRouteListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> NamespaceRouteListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> NamespaceRouteListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> NamespaceRouteListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> NamespaceRouteListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> NamespaceRouteListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> NamespaceRouteListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> NamespaceRouteListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceRouteListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceRouteListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> NamespaceRouteListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> NamespaceRouteListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> NamespaceRouteListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> NamespaceRouteListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -6027,7 +6013,7 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRouteListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceRouteListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6052,7 +6038,7 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRouteListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceRouteListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6072,7 +6058,7 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRouteListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceRouteListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6123,10 +6109,10 @@ impl<'a, C> NamespaceRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceServiceCreateCall<'a, C>
-    where C: 'a {
+pub struct NamespaceServiceCreateCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: Service,
     _parent: String,
     _dry_run: Option<String>,
@@ -6135,9 +6121,9 @@ pub struct NamespaceServiceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceServiceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceServiceCreateCall<'a> {}
 
-impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceServiceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6216,8 +6202,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6231,7 +6216,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6242,7 +6227,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6301,7 +6286,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Service) -> NamespaceServiceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Service) -> NamespaceServiceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6311,14 +6296,14 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceServiceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceServiceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> NamespaceServiceCreateCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> NamespaceServiceCreateCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
@@ -6328,7 +6313,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6353,7 +6338,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6373,7 +6358,7 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6421,10 +6406,10 @@ impl<'a, C> NamespaceServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceServiceDeleteCall<'a, C>
-    where C: 'a {
+pub struct NamespaceServiceDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _propagation_policy: Option<String>,
     _kind: Option<String>,
@@ -6435,9 +6420,9 @@ pub struct NamespaceServiceDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceServiceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceServiceDeleteCall<'a> {}
 
-impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceServiceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6514,8 +6499,7 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6528,7 +6512,7 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6537,7 +6521,7 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6597,35 +6581,35 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies the propagation policy of delete. Cloud Run currently ignores this setting, and deletes in the background. Please see kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for more information.
     ///
     /// Sets the *propagation policy* query property to the given value.
-    pub fn propagation_policy(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn propagation_policy(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a> {
         self._propagation_policy = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *kind* query property to the given value.
-    pub fn kind(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn kind(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a> {
         self._kind = Some(new_value.to_string());
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *api version* query property to the given value.
-    pub fn api_version(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn api_version(mut self, new_value: &str) -> NamespaceServiceDeleteCall<'a> {
         self._api_version = Some(new_value.to_string());
         self
     }
@@ -6635,7 +6619,7 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6660,7 +6644,7 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6680,7 +6664,7 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6724,19 +6708,19 @@ impl<'a, C> NamespaceServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceServiceGetCall<'a, C>
-    where C: 'a {
+pub struct NamespaceServiceGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceServiceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceServiceGetCall<'a> {}
 
-impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceServiceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6801,8 +6785,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6815,7 +6798,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6824,7 +6807,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6884,7 +6867,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceServiceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceServiceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6894,7 +6877,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6919,7 +6902,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6939,7 +6922,7 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6990,10 +6973,10 @@ impl<'a, C> NamespaceServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceServiceListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceServiceListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -7007,9 +6990,9 @@ pub struct NamespaceServiceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceServiceListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceServiceListCall<'a> {}
 
-impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceServiceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7095,8 +7078,7 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7109,7 +7091,7 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7118,7 +7100,7 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7178,56 +7160,56 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NamespaceServiceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NamespaceServiceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> NamespaceServiceListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> NamespaceServiceListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> NamespaceServiceListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> NamespaceServiceListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> NamespaceServiceListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> NamespaceServiceListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> NamespaceServiceListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> NamespaceServiceListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceServiceListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> NamespaceServiceListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> NamespaceServiceListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> NamespaceServiceListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> NamespaceServiceListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> NamespaceServiceListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -7237,7 +7219,7 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7262,7 +7244,7 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7282,7 +7264,7 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7333,10 +7315,10 @@ impl<'a, C> NamespaceServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceServiceReplaceServiceCall<'a, C>
-    where C: 'a {
+pub struct NamespaceServiceReplaceServiceCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: Service,
     _name: String,
     _dry_run: Option<String>,
@@ -7345,9 +7327,9 @@ pub struct NamespaceServiceReplaceServiceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceServiceReplaceServiceCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceServiceReplaceServiceCall<'a> {}
 
-impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceServiceReplaceServiceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7426,8 +7408,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7441,7 +7422,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7452,7 +7433,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7511,7 +7492,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Service) -> NamespaceServiceReplaceServiceCall<'a, C> {
+    pub fn request(mut self, new_value: Service) -> NamespaceServiceReplaceServiceCall<'a> {
         self._request = new_value;
         self
     }
@@ -7521,14 +7502,14 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NamespaceServiceReplaceServiceCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NamespaceServiceReplaceServiceCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> NamespaceServiceReplaceServiceCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> NamespaceServiceReplaceServiceCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
@@ -7538,7 +7519,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceReplaceServiceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceServiceReplaceServiceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7563,7 +7544,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceReplaceServiceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceServiceReplaceServiceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7583,7 +7564,7 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceReplaceServiceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceServiceReplaceServiceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7629,10 +7610,10 @@ impl<'a, C> NamespaceServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectAuthorizeddomainListCall<'a, C>
-    where C: 'a {
+pub struct ProjectAuthorizeddomainListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7641,9 +7622,9 @@ pub struct ProjectAuthorizeddomainListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectAuthorizeddomainListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectAuthorizeddomainListCall<'a> {}
 
-impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectAuthorizeddomainListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7714,8 +7695,7 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7728,7 +7708,7 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7737,7 +7717,7 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7797,21 +7777,21 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectAuthorizeddomainListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectAuthorizeddomainListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectAuthorizeddomainListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectAuthorizeddomainListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectAuthorizeddomainListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectAuthorizeddomainListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7821,7 +7801,7 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAuthorizeddomainListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectAuthorizeddomainListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7846,7 +7826,7 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectAuthorizeddomainListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectAuthorizeddomainListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7866,7 +7846,7 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAuthorizeddomainListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectAuthorizeddomainListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7912,10 +7892,10 @@ impl<'a, C> ProjectAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationAuthorizeddomainListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationAuthorizeddomainListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7924,9 +7904,9 @@ pub struct ProjectLocationAuthorizeddomainListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationAuthorizeddomainListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationAuthorizeddomainListCall<'a> {}
 
-impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationAuthorizeddomainListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7997,8 +7977,7 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8011,7 +7990,7 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8020,7 +7999,7 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8080,21 +8059,21 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationAuthorizeddomainListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAuthorizeddomainListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Continuation token for fetching the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAuthorizeddomainListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAuthorizeddomainListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum results to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAuthorizeddomainListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAuthorizeddomainListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8104,7 +8083,7 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAuthorizeddomainListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAuthorizeddomainListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8129,7 +8108,7 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthorizeddomainListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAuthorizeddomainListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8149,7 +8128,7 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAuthorizeddomainListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationAuthorizeddomainListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8193,19 +8172,19 @@ impl<'a, C> ProjectLocationAuthorizeddomainListCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationConfigurationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationConfigurationGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationConfigurationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationConfigurationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationConfigurationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8270,8 +8249,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8284,7 +8262,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8293,7 +8271,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8353,7 +8331,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationConfigurationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationConfigurationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8363,7 +8341,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConfigurationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConfigurationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8388,7 +8366,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConfigurationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConfigurationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8408,7 +8386,7 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationConfigurationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationConfigurationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8459,10 +8437,10 @@ impl<'a, C> ProjectLocationConfigurationGetCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationConfigurationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationConfigurationListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -8476,9 +8454,9 @@ pub struct ProjectLocationConfigurationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationConfigurationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationConfigurationListCall<'a> {}
 
-impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationConfigurationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8564,8 +8542,7 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8578,7 +8555,7 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8587,7 +8564,7 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8647,56 +8624,56 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> ProjectLocationConfigurationListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> ProjectLocationConfigurationListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationConfigurationListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> ProjectLocationConfigurationListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -8706,7 +8683,7 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConfigurationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationConfigurationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8731,7 +8708,7 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConfigurationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationConfigurationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8751,7 +8728,7 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationConfigurationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationConfigurationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8802,10 +8779,10 @@ impl<'a, C> ProjectLocationConfigurationListCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDomainmappingCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationDomainmappingCreateCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: DomainMapping,
     _parent: String,
     _dry_run: Option<String>,
@@ -8814,9 +8791,9 @@ pub struct ProjectLocationDomainmappingCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationDomainmappingCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationDomainmappingCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationDomainmappingCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8895,8 +8872,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8910,7 +8886,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8921,7 +8897,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8980,7 +8956,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DomainMapping) -> ProjectLocationDomainmappingCreateCall<'a, C> {
+    pub fn request(mut self, new_value: DomainMapping) -> ProjectLocationDomainmappingCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8990,14 +8966,14 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDomainmappingCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDomainmappingCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationDomainmappingCreateCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationDomainmappingCreateCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
@@ -9007,7 +8983,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9032,7 +9008,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9052,7 +9028,7 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9100,10 +9076,10 @@ impl<'a, C> ProjectLocationDomainmappingCreateCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDomainmappingDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationDomainmappingDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _propagation_policy: Option<String>,
     _kind: Option<String>,
@@ -9114,9 +9090,9 @@ pub struct ProjectLocationDomainmappingDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationDomainmappingDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationDomainmappingDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationDomainmappingDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9193,8 +9169,7 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9207,7 +9182,7 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9216,7 +9191,7 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9276,35 +9251,35 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies the propagation policy of delete. Cloud Run currently ignores this setting, and deletes in the background. Please see kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for more information.
     ///
     /// Sets the *propagation policy* query property to the given value.
-    pub fn propagation_policy(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn propagation_policy(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a> {
         self._propagation_policy = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *kind* query property to the given value.
-    pub fn kind(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn kind(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a> {
         self._kind = Some(new_value.to_string());
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *api version* query property to the given value.
-    pub fn api_version(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn api_version(mut self, new_value: &str) -> ProjectLocationDomainmappingDeleteCall<'a> {
         self._api_version = Some(new_value.to_string());
         self
     }
@@ -9314,7 +9289,7 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9339,7 +9314,7 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9359,7 +9334,7 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9403,19 +9378,19 @@ impl<'a, C> ProjectLocationDomainmappingDeleteCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDomainmappingGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationDomainmappingGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationDomainmappingGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationDomainmappingGetCall<'a> {}
 
-impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationDomainmappingGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9480,8 +9455,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9494,7 +9468,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9503,7 +9477,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9563,7 +9537,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationDomainmappingGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationDomainmappingGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9573,7 +9547,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9598,7 +9572,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9618,7 +9592,7 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9669,10 +9643,10 @@ impl<'a, C> ProjectLocationDomainmappingGetCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationDomainmappingListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationDomainmappingListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -9686,9 +9660,9 @@ pub struct ProjectLocationDomainmappingListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationDomainmappingListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationDomainmappingListCall<'a> {}
 
-impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationDomainmappingListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9774,8 +9748,7 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9788,7 +9761,7 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9797,7 +9770,7 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9857,56 +9830,56 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> ProjectLocationDomainmappingListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> ProjectLocationDomainmappingListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationDomainmappingListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> ProjectLocationDomainmappingListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -9916,7 +9889,7 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationDomainmappingListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9941,7 +9914,7 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDomainmappingListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9961,7 +9934,7 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationDomainmappingListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10009,10 +9982,10 @@ impl<'a, C> ProjectLocationDomainmappingListCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRevisionDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRevisionDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _propagation_policy: Option<String>,
     _kind: Option<String>,
@@ -10023,9 +9996,9 @@ pub struct ProjectLocationRevisionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRevisionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRevisionDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRevisionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10102,8 +10075,7 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10116,7 +10088,7 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10125,7 +10097,7 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10185,35 +10157,35 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies the propagation policy of delete. Cloud Run currently ignores this setting, and deletes in the background. Please see kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for more information.
     ///
     /// Sets the *propagation policy* query property to the given value.
-    pub fn propagation_policy(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn propagation_policy(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a> {
         self._propagation_policy = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *kind* query property to the given value.
-    pub fn kind(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn kind(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a> {
         self._kind = Some(new_value.to_string());
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *api version* query property to the given value.
-    pub fn api_version(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn api_version(mut self, new_value: &str) -> ProjectLocationRevisionDeleteCall<'a> {
         self._api_version = Some(new_value.to_string());
         self
     }
@@ -10223,7 +10195,7 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRevisionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRevisionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10248,7 +10220,7 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRevisionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRevisionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10268,7 +10240,7 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRevisionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRevisionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10312,19 +10284,19 @@ impl<'a, C> ProjectLocationRevisionDeleteCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRevisionGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRevisionGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRevisionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRevisionGetCall<'a> {}
 
-impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRevisionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10389,8 +10361,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10403,7 +10374,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10412,7 +10383,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10472,7 +10443,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRevisionGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRevisionGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10482,7 +10453,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRevisionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRevisionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10507,7 +10478,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRevisionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRevisionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10527,7 +10498,7 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRevisionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRevisionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10578,10 +10549,10 @@ impl<'a, C> ProjectLocationRevisionGetCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRevisionListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRevisionListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -10595,9 +10566,9 @@ pub struct ProjectLocationRevisionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRevisionListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRevisionListCall<'a> {}
 
-impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRevisionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10683,8 +10654,7 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10697,7 +10667,7 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10706,7 +10676,7 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10766,56 +10736,56 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> ProjectLocationRevisionListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> ProjectLocationRevisionListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationRevisionListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> ProjectLocationRevisionListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -10825,7 +10795,7 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRevisionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRevisionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10850,7 +10820,7 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRevisionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRevisionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10870,7 +10840,7 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRevisionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRevisionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10914,19 +10884,19 @@ impl<'a, C> ProjectLocationRevisionListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRouteGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRouteGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRouteGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRouteGetCall<'a> {}
 
-impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRouteGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10991,8 +10961,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11005,7 +10974,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11014,7 +10983,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11074,7 +11043,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRouteGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRouteGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11084,7 +11053,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRouteGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRouteGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11109,7 +11078,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRouteGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRouteGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11129,7 +11098,7 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRouteGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRouteGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11180,10 +11149,10 @@ impl<'a, C> ProjectLocationRouteGetCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRouteListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRouteListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -11197,9 +11166,9 @@ pub struct ProjectLocationRouteListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRouteListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRouteListCall<'a> {}
 
-impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRouteListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11285,8 +11254,7 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11299,7 +11267,7 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11308,7 +11276,7 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11368,56 +11336,56 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> ProjectLocationRouteListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> ProjectLocationRouteListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationRouteListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> ProjectLocationRouteListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -11427,7 +11395,7 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRouteListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRouteListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11452,7 +11420,7 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRouteListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRouteListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11472,7 +11440,7 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRouteListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRouteListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11523,10 +11491,10 @@ impl<'a, C> ProjectLocationRouteListCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceCreateCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: Service,
     _parent: String,
     _dry_run: Option<String>,
@@ -11535,9 +11503,9 @@ pub struct ProjectLocationServiceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11616,8 +11584,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11631,7 +11598,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11642,7 +11609,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11701,7 +11668,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Service) -> ProjectLocationServiceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Service) -> ProjectLocationServiceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -11711,14 +11678,14 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationServiceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationServiceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationServiceCreateCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationServiceCreateCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
@@ -11728,7 +11695,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11753,7 +11720,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11773,7 +11740,7 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11821,10 +11788,10 @@ impl<'a, C> ProjectLocationServiceCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _propagation_policy: Option<String>,
     _kind: Option<String>,
@@ -11835,9 +11802,9 @@ pub struct ProjectLocationServiceDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11914,8 +11881,7 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11928,7 +11894,7 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11937,7 +11903,7 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11997,35 +11963,35 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Specifies the propagation policy of delete. Cloud Run currently ignores this setting, and deletes in the background. Please see kubernetes.io/docs/concepts/workloads/controllers/garbage-collection/ for more information.
     ///
     /// Sets the *propagation policy* query property to the given value.
-    pub fn propagation_policy(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn propagation_policy(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a> {
         self._propagation_policy = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *kind* query property to the given value.
-    pub fn kind(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn kind(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a> {
         self._kind = Some(new_value.to_string());
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
     /// Cloud Run currently ignores this parameter.
     ///
     /// Sets the *api version* query property to the given value.
-    pub fn api_version(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn api_version(mut self, new_value: &str) -> ProjectLocationServiceDeleteCall<'a> {
         self._api_version = Some(new_value.to_string());
         self
     }
@@ -12035,7 +12001,7 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12060,7 +12026,7 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12080,7 +12046,7 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12124,19 +12090,19 @@ impl<'a, C> ProjectLocationServiceDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceGetCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceGetCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12201,8 +12167,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12215,7 +12180,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12224,7 +12189,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12284,7 +12249,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -12294,7 +12259,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12319,7 +12284,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12339,7 +12304,7 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12384,10 +12349,10 @@ impl<'a, C> ProjectLocationServiceGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12395,9 +12360,9 @@ pub struct ProjectLocationServiceGetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceGetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12465,8 +12430,7 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12479,7 +12443,7 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12488,7 +12452,7 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12548,14 +12512,14 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationServiceGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationServiceGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
     /// Optional. The policy format version to be returned. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional bindings must specify version 3. Policies without any conditional bindings may specify any valid value or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationServiceGetIamPolicyCall<'a, C> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> ProjectLocationServiceGetIamPolicyCall<'a> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -12565,7 +12529,7 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12590,7 +12554,7 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12610,7 +12574,7 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12661,10 +12625,10 @@ impl<'a, C> ProjectLocationServiceGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _parent: String,
     _watch: Option<bool>,
     _resource_version: Option<String>,
@@ -12678,9 +12642,9 @@ pub struct ProjectLocationServiceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceListCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12766,8 +12730,7 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12780,7 +12743,7 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12789,7 +12752,7 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12849,56 +12812,56 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Flag that indicates that the client expects to watch this resource as well. Not currently used by Cloud Run.
     ///
     /// Sets the *watch* query property to the given value.
-    pub fn watch(mut self, new_value: bool) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn watch(mut self, new_value: bool) -> ProjectLocationServiceListCall<'a> {
         self._watch = Some(new_value);
         self
     }
     /// The baseline resource version from which the list or watch operation should start. Not currently used by Cloud Run.
     ///
     /// Sets the *resource version* query property to the given value.
-    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn resource_version(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a> {
         self._resource_version = Some(new_value.to_string());
         self
     }
     /// The maximum number of records that should be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> ProjectLocationServiceListCall<'a> {
         self._limit = Some(new_value);
         self
     }
     /// Allows to filter resources based on a label. Supported operations are =, !=, exists, in, and notIn.
     ///
     /// Sets the *label selector* query property to the given value.
-    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn label_selector(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a> {
         self._label_selector = Some(new_value.to_string());
         self
     }
     /// Not currently used by Cloud Run.
     ///
     /// Sets the *include uninitialized* query property to the given value.
-    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn include_uninitialized(mut self, new_value: bool) -> ProjectLocationServiceListCall<'a> {
         self._include_uninitialized = Some(new_value);
         self
     }
     /// Allows to filter resources based on a specific value for a field name. Send this in a query string format. i.e. 'metadata.name%3Dlorem'. Not currently used by Cloud Run.
     ///
     /// Sets the *field selector* query property to the given value.
-    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn field_selector(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a> {
         self._field_selector = Some(new_value.to_string());
         self
     }
     /// Optional encoded string to continue paging.
     ///
     /// Sets the *continue* query property to the given value.
-    pub fn continue_(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn continue_(mut self, new_value: &str) -> ProjectLocationServiceListCall<'a> {
         self._continue_ = Some(new_value.to_string());
         self
     }
@@ -12908,7 +12871,7 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12933,7 +12896,7 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12953,7 +12916,7 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13004,10 +12967,10 @@ impl<'a, C> ProjectLocationServiceListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceReplaceServiceCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceReplaceServiceCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: Service,
     _name: String,
     _dry_run: Option<String>,
@@ -13016,9 +12979,9 @@ pub struct ProjectLocationServiceReplaceServiceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceReplaceServiceCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceReplaceServiceCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceReplaceServiceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13097,8 +13060,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13112,7 +13074,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13123,7 +13085,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13182,7 +13144,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Service) -> ProjectLocationServiceReplaceServiceCall<'a, C> {
+    pub fn request(mut self, new_value: Service) -> ProjectLocationServiceReplaceServiceCall<'a> {
         self._request = new_value;
         self
     }
@@ -13192,14 +13154,14 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceReplaceServiceCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationServiceReplaceServiceCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Indicates that the server should validate the request and populate default values without persisting the request. Supported values: `all`
     ///
     /// Sets the *dry run* query property to the given value.
-    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationServiceReplaceServiceCall<'a, C> {
+    pub fn dry_run(mut self, new_value: &str) -> ProjectLocationServiceReplaceServiceCall<'a> {
         self._dry_run = Some(new_value.to_string());
         self
     }
@@ -13209,7 +13171,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceReplaceServiceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceReplaceServiceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13234,7 +13196,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceReplaceServiceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceReplaceServiceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13254,7 +13216,7 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceReplaceServiceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceReplaceServiceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13304,10 +13266,10 @@ impl<'a, C> ProjectLocationServiceReplaceServiceCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13315,9 +13277,9 @@ pub struct ProjectLocationServiceSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceSetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13393,8 +13355,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13408,7 +13369,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13419,7 +13380,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13478,7 +13439,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationServiceSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationServiceSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -13488,7 +13449,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationServiceSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationServiceSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -13498,7 +13459,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13523,7 +13484,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13543,7 +13504,7 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13593,10 +13554,10 @@ impl<'a, C> ProjectLocationServiceSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationServiceTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationServiceTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13604,9 +13565,9 @@ pub struct ProjectLocationServiceTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationServiceTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationServiceTestIamPermissionCall<'a> {}
 
-impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationServiceTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13682,8 +13643,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13697,7 +13657,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13708,7 +13668,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13767,7 +13727,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationServiceTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationServiceTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -13777,7 +13737,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationServiceTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationServiceTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -13787,7 +13747,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationServiceTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13812,7 +13772,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationServiceTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13832,7 +13792,7 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationServiceTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13879,10 +13839,10 @@ impl<'a, C> ProjectLocationServiceTestIamPermissionCall<'a, C> where C: BorrowMu
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationListCall<'a>
+    where  {
 
-    hub: &'a CloudRun<C>,
+    hub: &'a CloudRun<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13892,9 +13852,9 @@ pub struct ProjectLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
 
-impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13968,8 +13928,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13982,7 +13941,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13991,7 +13950,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14051,28 +14010,28 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service will select a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -14082,7 +14041,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14107,7 +14066,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14127,7 +14086,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

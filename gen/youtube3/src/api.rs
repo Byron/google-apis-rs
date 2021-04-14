@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -135,119 +134,118 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct YouTube<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct YouTube<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for YouTube<C> {}
+impl<'a, > client::Hub for YouTube<> {}
 
-impl<'a, C> YouTube<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > YouTube<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> YouTube<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> YouTube<> {
         YouTube {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.2".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://youtube.googleapis.com/".to_string(),
             _root_url: "https://youtube.googleapis.com/".to_string(),
         }
     }
 
-    pub fn abuse_reports(&'a self) -> AbuseReportMethods<'a, C> {
+    pub fn abuse_reports(&'a self) -> AbuseReportMethods<'a> {
         AbuseReportMethods { hub: &self }
     }
-    pub fn activities(&'a self) -> ActivityMethods<'a, C> {
+    pub fn activities(&'a self) -> ActivityMethods<'a> {
         ActivityMethods { hub: &self }
     }
-    pub fn captions(&'a self) -> CaptionMethods<'a, C> {
+    pub fn captions(&'a self) -> CaptionMethods<'a> {
         CaptionMethods { hub: &self }
     }
-    pub fn channel_banners(&'a self) -> ChannelBannerMethods<'a, C> {
+    pub fn channel_banners(&'a self) -> ChannelBannerMethods<'a> {
         ChannelBannerMethods { hub: &self }
     }
-    pub fn channel_sections(&'a self) -> ChannelSectionMethods<'a, C> {
+    pub fn channel_sections(&'a self) -> ChannelSectionMethods<'a> {
         ChannelSectionMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C> {
+    pub fn channels(&'a self) -> ChannelMethods<'a> {
         ChannelMethods { hub: &self }
     }
-    pub fn comment_threads(&'a self) -> CommentThreadMethods<'a, C> {
+    pub fn comment_threads(&'a self) -> CommentThreadMethods<'a> {
         CommentThreadMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a, C> {
+    pub fn comments(&'a self) -> CommentMethods<'a> {
         CommentMethods { hub: &self }
     }
-    pub fn i18n_languages(&'a self) -> I18nLanguageMethods<'a, C> {
+    pub fn i18n_languages(&'a self) -> I18nLanguageMethods<'a> {
         I18nLanguageMethods { hub: &self }
     }
-    pub fn i18n_regions(&'a self) -> I18nRegionMethods<'a, C> {
+    pub fn i18n_regions(&'a self) -> I18nRegionMethods<'a> {
         I18nRegionMethods { hub: &self }
     }
-    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethods<'a, C> {
+    pub fn live_broadcasts(&'a self) -> LiveBroadcastMethods<'a> {
         LiveBroadcastMethods { hub: &self }
     }
-    pub fn live_chat_bans(&'a self) -> LiveChatBanMethods<'a, C> {
+    pub fn live_chat_bans(&'a self) -> LiveChatBanMethods<'a> {
         LiveChatBanMethods { hub: &self }
     }
-    pub fn live_chat_messages(&'a self) -> LiveChatMessageMethods<'a, C> {
+    pub fn live_chat_messages(&'a self) -> LiveChatMessageMethods<'a> {
         LiveChatMessageMethods { hub: &self }
     }
-    pub fn live_chat_moderators(&'a self) -> LiveChatModeratorMethods<'a, C> {
+    pub fn live_chat_moderators(&'a self) -> LiveChatModeratorMethods<'a> {
         LiveChatModeratorMethods { hub: &self }
     }
-    pub fn live_streams(&'a self) -> LiveStreamMethods<'a, C> {
+    pub fn live_streams(&'a self) -> LiveStreamMethods<'a> {
         LiveStreamMethods { hub: &self }
     }
-    pub fn members(&'a self) -> MemberMethods<'a, C> {
+    pub fn members(&'a self) -> MemberMethods<'a> {
         MemberMethods { hub: &self }
     }
-    pub fn memberships_levels(&'a self) -> MembershipsLevelMethods<'a, C> {
+    pub fn memberships_levels(&'a self) -> MembershipsLevelMethods<'a> {
         MembershipsLevelMethods { hub: &self }
     }
-    pub fn playlist_items(&'a self) -> PlaylistItemMethods<'a, C> {
+    pub fn playlist_items(&'a self) -> PlaylistItemMethods<'a> {
         PlaylistItemMethods { hub: &self }
     }
-    pub fn playlists(&'a self) -> PlaylistMethods<'a, C> {
+    pub fn playlists(&'a self) -> PlaylistMethods<'a> {
         PlaylistMethods { hub: &self }
     }
-    pub fn search(&'a self) -> SearchMethods<'a, C> {
+    pub fn search(&'a self) -> SearchMethods<'a> {
         SearchMethods { hub: &self }
     }
-    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a, C> {
+    pub fn subscriptions(&'a self) -> SubscriptionMethods<'a> {
         SubscriptionMethods { hub: &self }
     }
-    pub fn super_chat_events(&'a self) -> SuperChatEventMethods<'a, C> {
+    pub fn super_chat_events(&'a self) -> SuperChatEventMethods<'a> {
         SuperChatEventMethods { hub: &self }
     }
-    pub fn tests(&'a self) -> TestMethods<'a, C> {
+    pub fn tests(&'a self) -> TestMethods<'a> {
         TestMethods { hub: &self }
     }
-    pub fn third_party_links(&'a self) -> ThirdPartyLinkMethods<'a, C> {
+    pub fn third_party_links(&'a self) -> ThirdPartyLinkMethods<'a> {
         ThirdPartyLinkMethods { hub: &self }
     }
-    pub fn thumbnails(&'a self) -> ThumbnailMethods<'a, C> {
+    pub fn thumbnails(&'a self) -> ThumbnailMethods<'a> {
         ThumbnailMethods { hub: &self }
     }
-    pub fn video_abuse_report_reasons(&'a self) -> VideoAbuseReportReasonMethods<'a, C> {
+    pub fn video_abuse_report_reasons(&'a self) -> VideoAbuseReportReasonMethods<'a> {
         VideoAbuseReportReasonMethods { hub: &self }
     }
-    pub fn video_categories(&'a self) -> VideoCategoryMethods<'a, C> {
+    pub fn video_categories(&'a self) -> VideoCategoryMethods<'a> {
         VideoCategoryMethods { hub: &self }
     }
-    pub fn videos(&'a self) -> VideoMethods<'a, C> {
+    pub fn videos(&'a self) -> VideoMethods<'a> {
         VideoMethods { hub: &self }
     }
-    pub fn watermarks(&'a self) -> WatermarkMethods<'a, C> {
+    pub fn watermarks(&'a self) -> WatermarkMethods<'a> {
         WatermarkMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.2`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5854,15 +5852,15 @@ impl client::Part for ChannelContentDetailsRelatedPlaylists {}
 /// let rb = hub.abuse_reports();
 /// # }
 /// ```
-pub struct AbuseReportMethods<'a, C>
-    where C: 'a {
+pub struct AbuseReportMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AbuseReportMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AbuseReportMethods<'a> {}
 
-impl<'a, C> AbuseReportMethods<'a, C> {
+impl<'a> AbuseReportMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5871,7 +5869,7 @@ impl<'a, C> AbuseReportMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: AbuseReport) -> AbuseReportInsertCall<'a, C> {
+    pub fn insert(&self, request: AbuseReport) -> AbuseReportInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         AbuseReportInsertCall {
@@ -5917,15 +5915,15 @@ impl<'a, C> AbuseReportMethods<'a, C> {
 /// let rb = hub.activities();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C>
-    where C: 'a {
+pub struct ActivityMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ActivityMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ActivityMethods<'a> {}
 
-impl<'a, C> ActivityMethods<'a, C> {
+impl<'a> ActivityMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5934,7 +5932,7 @@ impl<'a, C> ActivityMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more activity resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in an activity resource, the snippet property contains other properties that identify the type of activity, a display title for the activity, and so forth. If you set *part=snippet*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> ActivityListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> ActivityListCall<'a> {
         ActivityListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -5985,15 +5983,15 @@ impl<'a, C> ActivityMethods<'a, C> {
 /// let rb = hub.captions();
 /// # }
 /// ```
-pub struct CaptionMethods<'a, C>
-    where C: 'a {
+pub struct CaptionMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CaptionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CaptionMethods<'a> {}
 
-impl<'a, C> CaptionMethods<'a, C> {
+impl<'a> CaptionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6002,7 +6000,7 @@ impl<'a, C> CaptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> CaptionDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> CaptionDeleteCall<'a> {
         CaptionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6021,7 +6019,7 @@ impl<'a, C> CaptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - The ID of the caption track to download, required for One Platform.
-    pub fn download(&self, id: &str) -> CaptionDownloadCall<'a, C> {
+    pub fn download(&self, id: &str) -> CaptionDownloadCall<'a> {
         CaptionDownloadCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6042,7 +6040,7 @@ impl<'a, C> CaptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Caption) -> CaptionInsertCall<'a, C> {
+    pub fn insert(&self, request: Caption) -> CaptionInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CaptionInsertCall {
@@ -6066,7 +6064,7 @@ impl<'a, C> CaptionMethods<'a, C> {
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more caption resource parts that the API response will include. The part names that you can include in the parameter value are id and snippet.
     /// * `videoId` - Returns the captions for the specified video.
-    pub fn list(&self, part: &Vec<String>, video_id: &str) -> CaptionListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>, video_id: &str) -> CaptionListCall<'a> {
         CaptionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6087,7 +6085,7 @@ impl<'a, C> CaptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Caption) -> CaptionUpdateCall<'a, C> {
+    pub fn update(&self, request: Caption) -> CaptionUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CaptionUpdateCall {
@@ -6136,15 +6134,15 @@ impl<'a, C> CaptionMethods<'a, C> {
 /// let rb = hub.channel_banners();
 /// # }
 /// ```
-pub struct ChannelBannerMethods<'a, C>
-    where C: 'a {
+pub struct ChannelBannerMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ChannelBannerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ChannelBannerMethods<'a> {}
 
-impl<'a, C> ChannelBannerMethods<'a, C> {
+impl<'a> ChannelBannerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6153,7 +6151,7 @@ impl<'a, C> ChannelBannerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: ChannelBannerResource) -> ChannelBannerInsertCall<'a, C> {
+    pub fn insert(&self, request: ChannelBannerResource) -> ChannelBannerInsertCall<'a> {
         ChannelBannerInsertCall {
             hub: self.hub,
             _request: request,
@@ -6199,15 +6197,15 @@ impl<'a, C> ChannelBannerMethods<'a, C> {
 /// let rb = hub.channel_sections();
 /// # }
 /// ```
-pub struct ChannelSectionMethods<'a, C>
-    where C: 'a {
+pub struct ChannelSectionMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ChannelSectionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ChannelSectionMethods<'a> {}
 
-impl<'a, C> ChannelSectionMethods<'a, C> {
+impl<'a> ChannelSectionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6216,7 +6214,7 @@ impl<'a, C> ChannelSectionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> ChannelSectionDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> ChannelSectionDeleteCall<'a> {
         ChannelSectionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6234,7 +6232,7 @@ impl<'a, C> ChannelSectionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: ChannelSection) -> ChannelSectionInsertCall<'a, C> {
+    pub fn insert(&self, request: ChannelSection) -> ChannelSectionInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ChannelSectionInsertCall {
@@ -6256,7 +6254,7 @@ impl<'a, C> ChannelSectionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more channelSection resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, and contentDetails. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channelSection resource, the snippet property contains other properties, such as a display title for the channelSection. If you set *part=snippet*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> ChannelSectionListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> ChannelSectionListCall<'a> {
         ChannelSectionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6278,7 +6276,7 @@ impl<'a, C> ChannelSectionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: ChannelSection) -> ChannelSectionUpdateCall<'a, C> {
+    pub fn update(&self, request: ChannelSection) -> ChannelSectionUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ChannelSectionUpdateCall {
@@ -6325,15 +6323,15 @@ impl<'a, C> ChannelSectionMethods<'a, C> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C>
-    where C: 'a {
+pub struct ChannelMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ChannelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
 
-impl<'a, C> ChannelMethods<'a, C> {
+impl<'a> ChannelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6342,7 +6340,7 @@ impl<'a, C> ChannelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more channel resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a channel resource, the contentDetails property contains other properties, such as the uploads properties. As such, if you set *part=contentDetails*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> ChannelListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> ChannelListCall<'a> {
         ChannelListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6369,7 +6367,7 @@ impl<'a, C> ChannelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Channel) -> ChannelUpdateCall<'a, C> {
+    pub fn update(&self, request: Channel) -> ChannelUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ChannelUpdateCall {
@@ -6416,15 +6414,15 @@ impl<'a, C> ChannelMethods<'a, C> {
 /// let rb = hub.comment_threads();
 /// # }
 /// ```
-pub struct CommentThreadMethods<'a, C>
-    where C: 'a {
+pub struct CommentThreadMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CommentThreadMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CommentThreadMethods<'a> {}
 
-impl<'a, C> CommentThreadMethods<'a, C> {
+impl<'a> CommentThreadMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6433,7 +6431,7 @@ impl<'a, C> CommentThreadMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: CommentThread) -> CommentThreadInsertCall<'a, C> {
+    pub fn insert(&self, request: CommentThread) -> CommentThreadInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentThreadInsertCall {
@@ -6453,7 +6451,7 @@ impl<'a, C> CommentThreadMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more commentThread resource properties that the API response will include.
-    pub fn list(&self, part: &Vec<String>) -> CommentThreadListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> CommentThreadListCall<'a> {
         CommentThreadListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6480,7 +6478,7 @@ impl<'a, C> CommentThreadMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: CommentThread) -> CommentThreadUpdateCall<'a, C> {
+    pub fn update(&self, request: CommentThread) -> CommentThreadUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentThreadUpdateCall {
@@ -6526,15 +6524,15 @@ impl<'a, C> CommentThreadMethods<'a, C> {
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a, C>
-    where C: 'a {
+pub struct CommentMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CommentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CommentMethods<'a> {}
 
-impl<'a, C> CommentMethods<'a, C> {
+impl<'a> CommentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6543,7 +6541,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> CommentDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> CommentDeleteCall<'a> {
         CommentDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6560,7 +6558,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Comment) -> CommentInsertCall<'a, C> {
+    pub fn insert(&self, request: Comment) -> CommentInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentInsertCall {
@@ -6580,7 +6578,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more comment resource properties that the API response will include.
-    pub fn list(&self, part: &Vec<String>) -> CommentListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> CommentListCall<'a> {
         CommentListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6602,7 +6600,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - Flags the comments with the given IDs as spam in the caller's opinion.
-    pub fn mark_as_spam(&self, id: &Vec<String>) -> CommentMarkAsSpamCall<'a, C> {
+    pub fn mark_as_spam(&self, id: &Vec<String>) -> CommentMarkAsSpamCall<'a> {
         CommentMarkAsSpamCall {
             hub: self.hub,
             _id: id.clone(),
@@ -6620,7 +6618,7 @@ impl<'a, C> CommentMethods<'a, C> {
     ///
     /// * `id` - Modifies the moderation status of the comments with the given IDs
     /// * `moderationStatus` - Specifies the requested moderation status. Note, comments can be in statuses, which are not available through this call. For example, this call does not allow to mark a comment as 'likely spam'. Valid values: MODERATION_STATUS_PUBLISHED, MODERATION_STATUS_HELD_FOR_REVIEW, MODERATION_STATUS_REJECTED.
-    pub fn set_moderation_status(&self, id: &Vec<String>, moderation_status: &str) -> CommentSetModerationStatuCall<'a, C> {
+    pub fn set_moderation_status(&self, id: &Vec<String>, moderation_status: &str) -> CommentSetModerationStatuCall<'a> {
         CommentSetModerationStatuCall {
             hub: self.hub,
             _id: id.clone(),
@@ -6639,7 +6637,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Comment) -> CommentUpdateCall<'a, C> {
+    pub fn update(&self, request: Comment) -> CommentUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         CommentUpdateCall {
@@ -6685,15 +6683,15 @@ impl<'a, C> CommentMethods<'a, C> {
 /// let rb = hub.i18n_languages();
 /// # }
 /// ```
-pub struct I18nLanguageMethods<'a, C>
-    where C: 'a {
+pub struct I18nLanguageMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for I18nLanguageMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for I18nLanguageMethods<'a> {}
 
-impl<'a, C> I18nLanguageMethods<'a, C> {
+impl<'a> I18nLanguageMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6702,7 +6700,7 @@ impl<'a, C> I18nLanguageMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the i18nLanguage resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> I18nLanguageListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> I18nLanguageListCall<'a> {
         I18nLanguageListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6746,15 +6744,15 @@ impl<'a, C> I18nLanguageMethods<'a, C> {
 /// let rb = hub.i18n_regions();
 /// # }
 /// ```
-pub struct I18nRegionMethods<'a, C>
-    where C: 'a {
+pub struct I18nRegionMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for I18nRegionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for I18nRegionMethods<'a> {}
 
-impl<'a, C> I18nRegionMethods<'a, C> {
+impl<'a> I18nRegionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6763,7 +6761,7 @@ impl<'a, C> I18nRegionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the i18nRegion resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> I18nRegionListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> I18nRegionListCall<'a> {
         I18nRegionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6807,15 +6805,15 @@ impl<'a, C> I18nRegionMethods<'a, C> {
 /// let rb = hub.live_broadcasts();
 /// # }
 /// ```
-pub struct LiveBroadcastMethods<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LiveBroadcastMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LiveBroadcastMethods<'a> {}
 
-impl<'a, C> LiveBroadcastMethods<'a, C> {
+impl<'a> LiveBroadcastMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -6825,7 +6823,7 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
     ///
     /// * `id` - Broadcast to bind to the stream
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn bind(&self, id: &str, part: &Vec<String>) -> LiveBroadcastBindCall<'a, C> {
+    pub fn bind(&self, id: &str, part: &Vec<String>) -> LiveBroadcastBindCall<'a> {
         LiveBroadcastBindCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6846,7 +6844,7 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - Broadcast to delete.
-    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> LiveBroadcastDeleteCall<'a> {
         LiveBroadcastDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -6865,7 +6863,7 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveBroadcast) -> LiveBroadcastInsertCall<'a, C> {
+    pub fn insert(&self, request: LiveBroadcast) -> LiveBroadcastInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveBroadcastInsertCall {
@@ -6887,7 +6885,7 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, status and statistics.
-    pub fn list(&self, part: &Vec<String>) -> LiveBroadcastListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> LiveBroadcastListCall<'a> {
         LiveBroadcastListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -6914,7 +6912,7 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
     /// * `broadcastStatus` - The status to which the broadcast is going to transition.
     /// * `id` - Broadcast to transition.
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveBroadcast resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, contentDetails, and status.
-    pub fn transition(&self, broadcast_status: &str, id: &str, part: &Vec<String>) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn transition(&self, broadcast_status: &str, id: &str, part: &Vec<String>) -> LiveBroadcastTransitionCall<'a> {
         LiveBroadcastTransitionCall {
             hub: self.hub,
             _broadcast_status: broadcast_status.to_string(),
@@ -6935,7 +6933,7 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: LiveBroadcast) -> LiveBroadcastUpdateCall<'a, C> {
+    pub fn update(&self, request: LiveBroadcast) -> LiveBroadcastUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveBroadcastUpdateCall {
@@ -6983,15 +6981,15 @@ impl<'a, C> LiveBroadcastMethods<'a, C> {
 /// let rb = hub.live_chat_bans();
 /// # }
 /// ```
-pub struct LiveChatBanMethods<'a, C>
-    where C: 'a {
+pub struct LiveChatBanMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LiveChatBanMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LiveChatBanMethods<'a> {}
 
-impl<'a, C> LiveChatBanMethods<'a, C> {
+impl<'a> LiveChatBanMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7000,7 +6998,7 @@ impl<'a, C> LiveChatBanMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveChatBanDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> LiveChatBanDeleteCall<'a> {
         LiveChatBanDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7017,7 +7015,7 @@ impl<'a, C> LiveChatBanMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveChatBan) -> LiveChatBanInsertCall<'a, C> {
+    pub fn insert(&self, request: LiveChatBan) -> LiveChatBanInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveChatBanInsertCall {
@@ -7063,15 +7061,15 @@ impl<'a, C> LiveChatBanMethods<'a, C> {
 /// let rb = hub.live_chat_messages();
 /// # }
 /// ```
-pub struct LiveChatMessageMethods<'a, C>
-    where C: 'a {
+pub struct LiveChatMessageMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LiveChatMessageMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LiveChatMessageMethods<'a> {}
 
-impl<'a, C> LiveChatMessageMethods<'a, C> {
+impl<'a> LiveChatMessageMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7080,7 +7078,7 @@ impl<'a, C> LiveChatMessageMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveChatMessageDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> LiveChatMessageDeleteCall<'a> {
         LiveChatMessageDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7097,7 +7095,7 @@ impl<'a, C> LiveChatMessageMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveChatMessage) -> LiveChatMessageInsertCall<'a, C> {
+    pub fn insert(&self, request: LiveChatMessage) -> LiveChatMessageInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveChatMessageInsertCall {
@@ -7118,7 +7116,7 @@ impl<'a, C> LiveChatMessageMethods<'a, C> {
     ///
     /// * `liveChatId` - The id of the live chat for which comments should be returned.
     /// * `part` - The *part* parameter specifies the liveChatComment resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatMessageListCall<'a, C> {
+    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatMessageListCall<'a> {
         LiveChatMessageListCall {
             hub: self.hub,
             _live_chat_id: live_chat_id.to_string(),
@@ -7166,15 +7164,15 @@ impl<'a, C> LiveChatMessageMethods<'a, C> {
 /// let rb = hub.live_chat_moderators();
 /// # }
 /// ```
-pub struct LiveChatModeratorMethods<'a, C>
-    where C: 'a {
+pub struct LiveChatModeratorMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LiveChatModeratorMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LiveChatModeratorMethods<'a> {}
 
-impl<'a, C> LiveChatModeratorMethods<'a, C> {
+impl<'a> LiveChatModeratorMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7183,7 +7181,7 @@ impl<'a, C> LiveChatModeratorMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveChatModeratorDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> LiveChatModeratorDeleteCall<'a> {
         LiveChatModeratorDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7200,7 +7198,7 @@ impl<'a, C> LiveChatModeratorMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveChatModerator) -> LiveChatModeratorInsertCall<'a, C> {
+    pub fn insert(&self, request: LiveChatModerator) -> LiveChatModeratorInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveChatModeratorInsertCall {
@@ -7221,7 +7219,7 @@ impl<'a, C> LiveChatModeratorMethods<'a, C> {
     ///
     /// * `liveChatId` - The id of the live chat for which moderators should be returned.
     /// * `part` - The *part* parameter specifies the liveChatModerator resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatModeratorListCall<'a, C> {
+    pub fn list(&self, live_chat_id: &str, part: &Vec<String>) -> LiveChatModeratorListCall<'a> {
         LiveChatModeratorListCall {
             hub: self.hub,
             _live_chat_id: live_chat_id.to_string(),
@@ -7267,15 +7265,15 @@ impl<'a, C> LiveChatModeratorMethods<'a, C> {
 /// let rb = hub.live_streams();
 /// # }
 /// ```
-pub struct LiveStreamMethods<'a, C>
-    where C: 'a {
+pub struct LiveStreamMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LiveStreamMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LiveStreamMethods<'a> {}
 
-impl<'a, C> LiveStreamMethods<'a, C> {
+impl<'a> LiveStreamMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7284,7 +7282,7 @@ impl<'a, C> LiveStreamMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> LiveStreamDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> LiveStreamDeleteCall<'a> {
         LiveStreamDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7303,7 +7301,7 @@ impl<'a, C> LiveStreamMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: LiveStream) -> LiveStreamInsertCall<'a, C> {
+    pub fn insert(&self, request: LiveStream) -> LiveStreamInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveStreamInsertCall {
@@ -7325,7 +7323,7 @@ impl<'a, C> LiveStreamMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more liveStream resource properties that the API response will include. The part names that you can include in the parameter value are id, snippet, cdn, and status.
-    pub fn list(&self, part: &Vec<String>) -> LiveStreamListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> LiveStreamListCall<'a> {
         LiveStreamListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7348,7 +7346,7 @@ impl<'a, C> LiveStreamMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: LiveStream) -> LiveStreamUpdateCall<'a, C> {
+    pub fn update(&self, request: LiveStream) -> LiveStreamUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         LiveStreamUpdateCall {
@@ -7396,15 +7394,15 @@ impl<'a, C> LiveStreamMethods<'a, C> {
 /// let rb = hub.members();
 /// # }
 /// ```
-pub struct MemberMethods<'a, C>
-    where C: 'a {
+pub struct MemberMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MemberMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MemberMethods<'a> {}
 
-impl<'a, C> MemberMethods<'a, C> {
+impl<'a> MemberMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7413,7 +7411,7 @@ impl<'a, C> MemberMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the member resource parts that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> MemberListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> MemberListCall<'a> {
         MemberListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7461,15 +7459,15 @@ impl<'a, C> MemberMethods<'a, C> {
 /// let rb = hub.memberships_levels();
 /// # }
 /// ```
-pub struct MembershipsLevelMethods<'a, C>
-    where C: 'a {
+pub struct MembershipsLevelMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MembershipsLevelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MembershipsLevelMethods<'a> {}
 
-impl<'a, C> MembershipsLevelMethods<'a, C> {
+impl<'a> MembershipsLevelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7478,7 +7476,7 @@ impl<'a, C> MembershipsLevelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the membershipsLevel resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, part: &Vec<String>) -> MembershipsLevelListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> MembershipsLevelListCall<'a> {
         MembershipsLevelListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7521,15 +7519,15 @@ impl<'a, C> MembershipsLevelMethods<'a, C> {
 /// let rb = hub.playlist_items();
 /// # }
 /// ```
-pub struct PlaylistItemMethods<'a, C>
-    where C: 'a {
+pub struct PlaylistItemMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PlaylistItemMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PlaylistItemMethods<'a> {}
 
-impl<'a, C> PlaylistItemMethods<'a, C> {
+impl<'a> PlaylistItemMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7538,7 +7536,7 @@ impl<'a, C> PlaylistItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> PlaylistItemDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> PlaylistItemDeleteCall<'a> {
         PlaylistItemDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7556,7 +7554,7 @@ impl<'a, C> PlaylistItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: PlaylistItem) -> PlaylistItemInsertCall<'a, C> {
+    pub fn insert(&self, request: PlaylistItem) -> PlaylistItemInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistItemInsertCall {
@@ -7577,7 +7575,7 @@ impl<'a, C> PlaylistItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more playlistItem resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlistItem resource, the snippet property contains numerous fields, including the title, description, position, and resourceId properties. As such, if you set *part=snippet*, the API response will contain all of those properties.
-    pub fn list(&self, part: &Vec<String>) -> PlaylistItemListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> PlaylistItemListCall<'a> {
         PlaylistItemListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7600,7 +7598,7 @@ impl<'a, C> PlaylistItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: PlaylistItem) -> PlaylistItemUpdateCall<'a, C> {
+    pub fn update(&self, request: PlaylistItem) -> PlaylistItemUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistItemUpdateCall {
@@ -7647,15 +7645,15 @@ impl<'a, C> PlaylistItemMethods<'a, C> {
 /// let rb = hub.playlists();
 /// # }
 /// ```
-pub struct PlaylistMethods<'a, C>
-    where C: 'a {
+pub struct PlaylistMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PlaylistMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PlaylistMethods<'a> {}
 
-impl<'a, C> PlaylistMethods<'a, C> {
+impl<'a> PlaylistMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7664,7 +7662,7 @@ impl<'a, C> PlaylistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> PlaylistDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> PlaylistDeleteCall<'a> {
         PlaylistDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7682,7 +7680,7 @@ impl<'a, C> PlaylistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Playlist) -> PlaylistInsertCall<'a, C> {
+    pub fn insert(&self, request: Playlist) -> PlaylistInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistInsertCall {
@@ -7704,7 +7702,7 @@ impl<'a, C> PlaylistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more playlist resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a playlist resource, the snippet property contains properties like author, title, description, tags, and timeCreated. As such, if you set *part=snippet*, the API response will contain all of those properties.
-    pub fn list(&self, part: &Vec<String>) -> PlaylistListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> PlaylistListCall<'a> {
         PlaylistListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7729,7 +7727,7 @@ impl<'a, C> PlaylistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Playlist) -> PlaylistUpdateCall<'a, C> {
+    pub fn update(&self, request: Playlist) -> PlaylistUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         PlaylistUpdateCall {
@@ -7776,15 +7774,15 @@ impl<'a, C> PlaylistMethods<'a, C> {
 /// let rb = hub.search();
 /// # }
 /// ```
-pub struct SearchMethods<'a, C>
-    where C: 'a {
+pub struct SearchMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SearchMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SearchMethods<'a> {}
 
-impl<'a, C> SearchMethods<'a, C> {
+impl<'a> SearchMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7793,7 +7791,7 @@ impl<'a, C> SearchMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more search resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> SearchListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> SearchListCall<'a> {
         SearchListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7866,15 +7864,15 @@ impl<'a, C> SearchMethods<'a, C> {
 /// let rb = hub.subscriptions();
 /// # }
 /// ```
-pub struct SubscriptionMethods<'a, C>
-    where C: 'a {
+pub struct SubscriptionMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SubscriptionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SubscriptionMethods<'a> {}
 
-impl<'a, C> SubscriptionMethods<'a, C> {
+impl<'a> SubscriptionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7883,7 +7881,7 @@ impl<'a, C> SubscriptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> SubscriptionDeleteCall<'a> {
         SubscriptionDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -7900,7 +7898,7 @@ impl<'a, C> SubscriptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Subscription) -> SubscriptionInsertCall<'a, C> {
+    pub fn insert(&self, request: Subscription) -> SubscriptionInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         SubscriptionInsertCall {
@@ -7920,7 +7918,7 @@ impl<'a, C> SubscriptionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more subscription resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a subscription resource, the snippet property contains other properties, such as a display title for the subscription. If you set *part=snippet*, the API response will also contain all of those nested properties.
-    pub fn list(&self, part: &Vec<String>) -> SubscriptionListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> SubscriptionListCall<'a> {
         SubscriptionListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -7974,15 +7972,15 @@ impl<'a, C> SubscriptionMethods<'a, C> {
 /// let rb = hub.super_chat_events();
 /// # }
 /// ```
-pub struct SuperChatEventMethods<'a, C>
-    where C: 'a {
+pub struct SuperChatEventMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SuperChatEventMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SuperChatEventMethods<'a> {}
 
-impl<'a, C> SuperChatEventMethods<'a, C> {
+impl<'a> SuperChatEventMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7991,7 +7989,7 @@ impl<'a, C> SuperChatEventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the superChatEvent resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, part: &Vec<String>) -> SuperChatEventListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> SuperChatEventListCall<'a> {
         SuperChatEventListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8037,15 +8035,15 @@ impl<'a, C> SuperChatEventMethods<'a, C> {
 /// let rb = hub.tests();
 /// # }
 /// ```
-pub struct TestMethods<'a, C>
-    where C: 'a {
+pub struct TestMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TestMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TestMethods<'a> {}
 
-impl<'a, C> TestMethods<'a, C> {
+impl<'a> TestMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8054,7 +8052,7 @@ impl<'a, C> TestMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: TestItem) -> TestInsertCall<'a, C> {
+    pub fn insert(&self, request: TestItem) -> TestInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         TestInsertCall {
@@ -8100,15 +8098,15 @@ impl<'a, C> TestMethods<'a, C> {
 /// let rb = hub.third_party_links();
 /// # }
 /// ```
-pub struct ThirdPartyLinkMethods<'a, C>
-    where C: 'a {
+pub struct ThirdPartyLinkMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ThirdPartyLinkMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ThirdPartyLinkMethods<'a> {}
 
-impl<'a, C> ThirdPartyLinkMethods<'a, C> {
+impl<'a> ThirdPartyLinkMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8118,7 +8116,7 @@ impl<'a, C> ThirdPartyLinkMethods<'a, C> {
     ///
     /// * `linkingToken` - Delete the partner links with the given linking token.
     /// * `type` - Type of the link to be deleted.
-    pub fn delete(&self, linking_token: &str, type_: &str) -> ThirdPartyLinkDeleteCall<'a, C> {
+    pub fn delete(&self, linking_token: &str, type_: &str) -> ThirdPartyLinkDeleteCall<'a> {
         ThirdPartyLinkDeleteCall {
             hub: self.hub,
             _linking_token: linking_token.to_string(),
@@ -8136,7 +8134,7 @@ impl<'a, C> ThirdPartyLinkMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a, C> {
+    pub fn insert(&self, request: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ThirdPartyLinkInsertCall {
@@ -8155,7 +8153,7 @@ impl<'a, C> ThirdPartyLinkMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the thirdPartyLink resource parts that the API response will include. Supported values are linkingToken, status, and snippet.
-    pub fn list(&self, part: &Vec<String>) -> ThirdPartyLinkListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> ThirdPartyLinkListCall<'a> {
         ThirdPartyLinkListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8173,7 +8171,7 @@ impl<'a, C> ThirdPartyLinkMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a, C> {
+    pub fn update(&self, request: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         ThirdPartyLinkUpdateCall {
@@ -8218,15 +8216,15 @@ impl<'a, C> ThirdPartyLinkMethods<'a, C> {
 /// let rb = hub.thumbnails();
 /// # }
 /// ```
-pub struct ThumbnailMethods<'a, C>
-    where C: 'a {
+pub struct ThumbnailMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ThumbnailMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ThumbnailMethods<'a> {}
 
-impl<'a, C> ThumbnailMethods<'a, C> {
+impl<'a> ThumbnailMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8235,7 +8233,7 @@ impl<'a, C> ThumbnailMethods<'a, C> {
     /// # Arguments
     ///
     /// * `videoId` - Returns the Thumbnail with the given video IDs for Stubby or Apiary.
-    pub fn set(&self, video_id: &str) -> ThumbnailSetCall<'a, C> {
+    pub fn set(&self, video_id: &str) -> ThumbnailSetCall<'a> {
         ThumbnailSetCall {
             hub: self.hub,
             _video_id: video_id.to_string(),
@@ -8279,15 +8277,15 @@ impl<'a, C> ThumbnailMethods<'a, C> {
 /// let rb = hub.video_abuse_report_reasons();
 /// # }
 /// ```
-pub struct VideoAbuseReportReasonMethods<'a, C>
-    where C: 'a {
+pub struct VideoAbuseReportReasonMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for VideoAbuseReportReasonMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for VideoAbuseReportReasonMethods<'a> {}
 
-impl<'a, C> VideoAbuseReportReasonMethods<'a, C> {
+impl<'a> VideoAbuseReportReasonMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8296,7 +8294,7 @@ impl<'a, C> VideoAbuseReportReasonMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the videoCategory resource parts that the API response will include. Supported values are id and snippet.
-    pub fn list(&self, part: &Vec<String>) -> VideoAbuseReportReasonListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> VideoAbuseReportReasonListCall<'a> {
         VideoAbuseReportReasonListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8340,15 +8338,15 @@ impl<'a, C> VideoAbuseReportReasonMethods<'a, C> {
 /// let rb = hub.video_categories();
 /// # }
 /// ```
-pub struct VideoCategoryMethods<'a, C>
-    where C: 'a {
+pub struct VideoCategoryMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for VideoCategoryMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for VideoCategoryMethods<'a> {}
 
-impl<'a, C> VideoCategoryMethods<'a, C> {
+impl<'a> VideoCategoryMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8357,7 +8355,7 @@ impl<'a, C> VideoCategoryMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies the videoCategory resource properties that the API response will include. Set the parameter value to snippet.
-    pub fn list(&self, part: &Vec<String>) -> VideoCategoryListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> VideoCategoryListCall<'a> {
         VideoCategoryListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8403,15 +8401,15 @@ impl<'a, C> VideoCategoryMethods<'a, C> {
 /// let rb = hub.videos();
 /// # }
 /// ```
-pub struct VideoMethods<'a, C>
-    where C: 'a {
+pub struct VideoMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for VideoMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for VideoMethods<'a> {}
 
-impl<'a, C> VideoMethods<'a, C> {
+impl<'a> VideoMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8420,7 +8418,7 @@ impl<'a, C> VideoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn delete(&self, id: &str) -> VideoDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> VideoDeleteCall<'a> {
         VideoDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -8438,7 +8436,7 @@ impl<'a, C> VideoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - No description provided.
-    pub fn get_rating(&self, id: &Vec<String>) -> VideoGetRatingCall<'a, C> {
+    pub fn get_rating(&self, id: &Vec<String>) -> VideoGetRatingCall<'a> {
         VideoGetRatingCall {
             hub: self.hub,
             _id: id.clone(),
@@ -8456,7 +8454,7 @@ impl<'a, C> VideoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Video) -> VideoInsertCall<'a, C> {
+    pub fn insert(&self, request: Video) -> VideoInsertCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         VideoInsertCall {
@@ -8481,7 +8479,7 @@ impl<'a, C> VideoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `part` - The *part* parameter specifies a comma-separated list of one or more video resource properties that the API response will include. If the parameter identifies a property that contains child properties, the child properties will be included in the response. For example, in a video resource, the snippet property contains the channelId, title, description, tags, and categoryId properties. As such, if you set *part=snippet*, the API response will contain all of those properties.
-    pub fn list(&self, part: &Vec<String>) -> VideoListCall<'a, C> {
+    pub fn list(&self, part: &Vec<String>) -> VideoListCall<'a> {
         VideoListCall {
             hub: self.hub,
             _part: part.clone(),
@@ -8511,7 +8509,7 @@ impl<'a, C> VideoMethods<'a, C> {
     ///
     /// * `id` - No description provided.
     /// * `rating` - No description provided.
-    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a, C> {
+    pub fn rate(&self, id: &str, rating: &str) -> VideoRateCall<'a> {
         VideoRateCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -8529,7 +8527,7 @@ impl<'a, C> VideoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn report_abuse(&self, request: VideoAbuseReport) -> VideoReportAbuseCall<'a, C> {
+    pub fn report_abuse(&self, request: VideoAbuseReport) -> VideoReportAbuseCall<'a> {
         VideoReportAbuseCall {
             hub: self.hub,
             _request: request,
@@ -8547,7 +8545,7 @@ impl<'a, C> VideoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update(&self, request: Video) -> VideoUpdateCall<'a, C> {
+    pub fn update(&self, request: Video) -> VideoUpdateCall<'a> {
         use client::ToParts;
             let parts = vec![request.to_parts()];
         VideoUpdateCall {
@@ -8594,15 +8592,15 @@ impl<'a, C> VideoMethods<'a, C> {
 /// let rb = hub.watermarks();
 /// # }
 /// ```
-pub struct WatermarkMethods<'a, C>
-    where C: 'a {
+pub struct WatermarkMethods<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
 }
 
-impl<'a, C> client::MethodsBuilder for WatermarkMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for WatermarkMethods<'a> {}
 
-impl<'a, C> WatermarkMethods<'a, C> {
+impl<'a> WatermarkMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8612,7 +8610,7 @@ impl<'a, C> WatermarkMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `channelId` - No description provided.
-    pub fn set(&self, request: InvideoBranding, channel_id: &str) -> WatermarkSetCall<'a, C> {
+    pub fn set(&self, request: InvideoBranding, channel_id: &str) -> WatermarkSetCall<'a> {
         WatermarkSetCall {
             hub: self.hub,
             _request: request,
@@ -8631,7 +8629,7 @@ impl<'a, C> WatermarkMethods<'a, C> {
     /// # Arguments
     ///
     /// * `channelId` - No description provided.
-    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCall<'a, C> {
+    pub fn unset(&self, channel_id: &str) -> WatermarkUnsetCall<'a> {
         WatermarkUnsetCall {
             hub: self.hub,
             _channel_id: channel_id.to_string(),
@@ -8689,10 +8687,10 @@ impl<'a, C> WatermarkMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AbuseReportInsertCall<'a, C>
-    where C: 'a {
+pub struct AbuseReportInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: AbuseReport,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8700,9 +8698,9 @@ pub struct AbuseReportInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AbuseReportInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for AbuseReportInsertCall<'a> {}
 
-impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AbuseReportInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8760,8 +8758,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8775,7 +8772,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8786,7 +8783,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8845,7 +8842,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AbuseReport) -> AbuseReportInsertCall<'a, C> {
+    pub fn request(mut self, new_value: AbuseReport) -> AbuseReportInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -8859,7 +8856,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> AbuseReportInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> AbuseReportInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -8869,7 +8866,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AbuseReportInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AbuseReportInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8894,7 +8891,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AbuseReportInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AbuseReportInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8914,7 +8911,7 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AbuseReportInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AbuseReportInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8966,10 +8963,10 @@ impl<'a, C> AbuseReportInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityListCall<'a, C>
-    where C: 'a {
+pub struct ActivityListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _region_code: Option<String>,
     _published_before: Option<String>,
@@ -8984,9 +8981,9 @@ pub struct ActivityListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActivityListCall<'a, C> {}
+impl<'a> client::CallBuilder for ActivityListCall<'a> {}
 
-impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActivityListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9054,8 +9051,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9068,7 +9064,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9077,7 +9073,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9138,57 +9134,57 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn region_code(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._region_code = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *published before* query property to the given value.
-    pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn published_before(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._published_before = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *published after* query property to the given value.
-    pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn published_after(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._published_after = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> ActivityListCall<'a> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> ActivityListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *home* query property to the given value.
-    pub fn home(mut self, new_value: bool) -> ActivityListCall<'a, C> {
+    pub fn home(mut self, new_value: bool) -> ActivityListCall<'a> {
         self._home = Some(new_value);
         self
     }
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> ActivityListCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -9198,7 +9194,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9223,7 +9219,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9243,7 +9239,7 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9289,10 +9285,10 @@ impl<'a, C> ActivityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaptionDeleteCall<'a, C>
-    where C: 'a {
+pub struct CaptionDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _on_behalf_of: Option<String>,
@@ -9301,9 +9297,9 @@ pub struct CaptionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CaptionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CaptionDeleteCall<'a> {}
 
-impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CaptionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9348,8 +9344,7 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9362,7 +9357,7 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9371,7 +9366,7 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9420,21 +9415,21 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CaptionDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> CaptionDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is be on behalf of
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDeleteCall<'a, C> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDeleteCall<'a> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -9444,7 +9439,7 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9469,7 +9464,7 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9489,7 +9484,7 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9540,10 +9535,10 @@ impl<'a, C> CaptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaptionDownloadCall<'a, C>
-    where C: 'a {
+pub struct CaptionDownloadCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _tlang: Option<String>,
     _tfmt: Option<String>,
@@ -9554,9 +9549,9 @@ pub struct CaptionDownloadCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CaptionDownloadCall<'a, C> {}
+impl<'a> client::CallBuilder for CaptionDownloadCall<'a> {}
 
-impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CaptionDownloadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9628,8 +9623,7 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9642,7 +9636,7 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9651,7 +9645,7 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9701,35 +9695,35 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CaptionDownloadCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// tlang is the language code; machine translate the captions into this language.
     ///
     /// Sets the *tlang* query property to the given value.
-    pub fn tlang(mut self, new_value: &str) -> CaptionDownloadCall<'a, C> {
+    pub fn tlang(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
         self._tlang = Some(new_value.to_string());
         self
     }
     /// Convert the captions into this format. Supported options are sbv, srt, and vtt.
     ///
     /// Sets the *tfmt* query property to the given value.
-    pub fn tfmt(mut self, new_value: &str) -> CaptionDownloadCall<'a, C> {
+    pub fn tfmt(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
         self._tfmt = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDownloadCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is be on behalf of
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDownloadCall<'a, C> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionDownloadCall<'a> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -9739,7 +9733,7 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDownloadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionDownloadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9764,7 +9758,7 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionDownloadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionDownloadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9784,7 +9778,7 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionDownloadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionDownloadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9838,10 +9832,10 @@ impl<'a, C> CaptionDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct CaptionInsertCall<'a, C>
-    where C: 'a {
+pub struct CaptionInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Caption,
     _part: Vec<String>,
     _sync: Option<bool>,
@@ -9852,9 +9846,9 @@ pub struct CaptionInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CaptionInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for CaptionInsertCall<'a> {}
 
-impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CaptionInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9933,8 +9927,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9974,7 +9967,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9990,7 +9983,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -10031,7 +10024,6 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         if size > 104857600 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 104857600))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -10039,10 +10031,10 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -10121,7 +10113,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Caption) -> CaptionInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Caption) -> CaptionInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -10135,28 +10127,28 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CaptionInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CaptionInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Extra parameter to allow automatically syncing the uploaded caption/transcript with the audio.
     ///
     /// Sets the *sync* query property to the given value.
-    pub fn sync(mut self, new_value: bool) -> CaptionInsertCall<'a, C> {
+    pub fn sync(mut self, new_value: bool) -> CaptionInsertCall<'a> {
         self._sync = Some(new_value);
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is be on behalf of
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionInsertCall<'a, C> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionInsertCall<'a> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -10166,7 +10158,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10191,7 +10183,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10211,7 +10203,7 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10272,10 +10264,10 @@ impl<'a, C> CaptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CaptionListCall<'a, C>
-    where C: 'a {
+pub struct CaptionListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
@@ -10286,9 +10278,9 @@ pub struct CaptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CaptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for CaptionListCall<'a> {}
 
-impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CaptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10344,8 +10336,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10358,7 +10349,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10367,7 +10358,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10433,7 +10424,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> CaptionListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CaptionListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -10443,21 +10434,21 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn video_id(mut self, new_value: &str) -> CaptionListCall<'a, C> {
+    pub fn video_id(mut self, new_value: &str) -> CaptionListCall<'a> {
         self._video_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is on behalf of.
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionListCall<'a, C> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionListCall<'a> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -10465,7 +10456,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> CaptionListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> CaptionListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
@@ -10475,7 +10466,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10500,7 +10491,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10520,7 +10511,7 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10590,10 +10581,10 @@ impl<'a, C> CaptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct CaptionUpdateCall<'a, C>
-    where C: 'a {
+pub struct CaptionUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Caption,
     _part: Vec<String>,
     _sync: Option<bool>,
@@ -10604,9 +10595,9 @@ pub struct CaptionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CaptionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for CaptionUpdateCall<'a> {}
 
-impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CaptionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10685,8 +10676,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10726,7 +10716,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10742,7 +10732,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -10783,7 +10773,6 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         if size > 104857600 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 104857600))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -10791,10 +10780,10 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -10878,7 +10867,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn request(mut self, new_value: Caption) -> CaptionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Caption) -> CaptionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10897,28 +10886,28 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> CaptionUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CaptionUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Extra parameter to allow automatically syncing the uploaded caption/transcript with the audio.
     ///
     /// Sets the *sync* query property to the given value.
-    pub fn sync(mut self, new_value: bool) -> CaptionUpdateCall<'a, C> {
+    pub fn sync(mut self, new_value: bool) -> CaptionUpdateCall<'a> {
         self._sync = Some(new_value);
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> CaptionUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// ID of the Google+ Page for the channel that the request is on behalf of.
     ///
     /// Sets the *on behalf of* query property to the given value.
-    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionUpdateCall<'a, C> {
+    pub fn on_behalf_of(mut self, new_value: &str) -> CaptionUpdateCall<'a> {
         self._on_behalf_of = Some(new_value.to_string());
         self
     }
@@ -10928,7 +10917,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CaptionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10953,7 +10942,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CaptionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CaptionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10973,7 +10962,7 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CaptionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11027,10 +11016,10 @@ impl<'a, C> CaptionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ChannelBannerInsertCall<'a, C>
-    where C: 'a {
+pub struct ChannelBannerInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: ChannelBannerResource,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -11040,9 +11029,9 @@ pub struct ChannelBannerInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelBannerInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelBannerInsertCall<'a> {}
 
-impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelBannerInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11113,8 +11102,7 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11154,7 +11142,7 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11170,7 +11158,7 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -11211,7 +11199,6 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         if size > 6291456 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 6291456))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -11219,10 +11206,10 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -11301,28 +11288,28 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ChannelBannerResource) -> ChannelBannerInsertCall<'a, C> {
+    pub fn request(mut self, new_value: ChannelBannerResource) -> ChannelBannerInsertCall<'a> {
         self._request = new_value;
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelBannerInsertCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelBannerInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Unused, channel_id is currently derived from the security context of the requestor.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ChannelBannerInsertCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> ChannelBannerInsertCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -11332,7 +11319,7 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelBannerInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelBannerInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11357,7 +11344,7 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelBannerInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11377,7 +11364,7 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelBannerInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelBannerInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11422,10 +11409,10 @@ impl<'a, C> ChannelBannerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionDeleteCall<'a, C>
-    where C: 'a {
+pub struct ChannelSectionDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11433,9 +11420,9 @@ pub struct ChannelSectionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelSectionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelSectionDeleteCall<'a> {}
 
-impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelSectionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11477,8 +11464,7 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11491,7 +11477,7 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11500,7 +11486,7 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11549,14 +11535,14 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -11566,7 +11552,7 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11591,7 +11577,7 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11611,7 +11597,7 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11680,10 +11666,10 @@ impl<'a, C> ChannelSectionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionInsertCall<'a, C>
-    where C: 'a {
+pub struct ChannelSectionInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: ChannelSection,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -11693,9 +11679,9 @@ pub struct ChannelSectionInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelSectionInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelSectionInsertCall<'a> {}
 
-impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelSectionInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11759,8 +11745,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11774,7 +11759,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11785,7 +11770,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11849,7 +11834,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionInsertCall<'a, C> {
+    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -11868,21 +11853,21 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn add_part(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelSectionInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> ChannelSectionInsertCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -11892,7 +11877,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11917,7 +11902,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11937,7 +11922,7 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12003,10 +11988,10 @@ impl<'a, C> ChannelSectionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionListCall<'a, C>
-    where C: 'a {
+pub struct ChannelSectionListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
     _mine: Option<bool>,
@@ -12018,9 +12003,9 @@ pub struct ChannelSectionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelSectionListCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelSectionListCall<'a> {}
 
-impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelSectionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12081,8 +12066,7 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12095,7 +12079,7 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12104,7 +12088,7 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12171,21 +12155,21 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *id*
     /// * *snippet*
     /// * *contentDetails*
-    pub fn add_part(mut self, new_value: &str) -> ChannelSectionListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the ChannelSections owned by the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> ChannelSectionListCall<'a> {
         self._mine = Some(new_value);
         self
     }
@@ -12193,21 +12177,21 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Return content in specified language
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> ChannelSectionListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the ChannelSections owned by the specified channel ID.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> ChannelSectionListCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -12217,7 +12201,7 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12242,7 +12226,7 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12262,7 +12246,7 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12330,10 +12314,10 @@ impl<'a, C> ChannelSectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelSectionUpdateCall<'a, C>
-    where C: 'a {
+pub struct ChannelSectionUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: ChannelSection,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -12342,9 +12326,9 @@ pub struct ChannelSectionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelSectionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelSectionUpdateCall<'a> {}
 
-impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelSectionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12405,8 +12389,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12420,7 +12403,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12431,7 +12414,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12495,7 +12478,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: ChannelSection) -> ChannelSectionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12514,14 +12497,14 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// 
     /// * *snippet*
     /// * *contentDetails*
-    pub fn add_part(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelSectionUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -12531,7 +12514,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelSectionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12556,7 +12539,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelSectionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12576,7 +12559,7 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelSectionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12630,10 +12613,10 @@ impl<'a, C> ChannelSectionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelListCall<'a, C>
-    where C: 'a {
+pub struct ChannelListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -12650,9 +12633,9 @@ pub struct ChannelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelListCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelListCall<'a> {}
 
-impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12728,8 +12711,7 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12742,7 +12724,7 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12751,7 +12733,7 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12812,49 +12794,49 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the channels subscribed to the authenticated user
     ///
     /// Sets the *my subscribers* query property to the given value.
-    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a, C> {
+    pub fn my_subscribers(mut self, new_value: bool) -> ChannelListCall<'a> {
         self._my_subscribers = Some(new_value);
         self
     }
     /// Return the ids of channels owned by the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> ChannelListCall<'a> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> ChannelListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Return the channels managed by the authenticated user.
     ///
     /// Sets the *managed by me* query property to the given value.
-    pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a, C> {
+    pub fn managed_by_me(mut self, new_value: bool) -> ChannelListCall<'a> {
         self._managed_by_me = Some(new_value);
         self
     }
@@ -12862,28 +12844,28 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Stands for "host language". Specifies the localization language of the metadata to be filled into snippet.localized. The field is filled with the default metadata if there is no localization in the specified language. The parameter value must be a language code included in the list returned by the i18nLanguages.list method (e.g. en_US, es_MX).
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the channel associated with a YouTube username.
     ///
     /// Sets the *for username* query property to the given value.
-    pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn for_username(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._for_username = Some(new_value.to_string());
         self
     }
     /// Return the channels within the specified guide category ID.
     ///
     /// Sets the *category id* query property to the given value.
-    pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a, C> {
+    pub fn category_id(mut self, new_value: &str) -> ChannelListCall<'a> {
         self._category_id = Some(new_value.to_string());
         self
     }
@@ -12893,7 +12875,7 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12918,7 +12900,7 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12938,7 +12920,7 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12989,10 +12971,10 @@ impl<'a, C> ChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelUpdateCall<'a, C>
-    where C: 'a {
+pub struct ChannelUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Channel,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -13001,9 +12983,9 @@ pub struct ChannelUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelUpdateCall<'a> {}
 
-impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13064,8 +13046,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13079,7 +13060,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13090,7 +13071,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13149,7 +13130,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> ChannelUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13163,14 +13144,14 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> ChannelUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ChannelUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *onBehalfOfContentOwner* parameter indicates that the authenticated user is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with needs to be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ChannelUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -13180,7 +13161,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13205,7 +13186,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13225,7 +13206,7 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13275,10 +13256,10 @@ impl<'a, C> ChannelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentThreadInsertCall<'a, C>
-    where C: 'a {
+pub struct CommentThreadInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: CommentThread,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13286,9 +13267,9 @@ pub struct CommentThreadInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentThreadInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentThreadInsertCall<'a> {}
 
-impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentThreadInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13346,8 +13327,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13361,7 +13341,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13372,7 +13352,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13431,7 +13411,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommentThread) -> CommentThreadInsertCall<'a, C> {
+    pub fn request(mut self, new_value: CommentThread) -> CommentThreadInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -13445,7 +13425,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentThreadInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CommentThreadInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -13455,7 +13435,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13480,7 +13460,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13500,7 +13480,7 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13554,10 +13534,10 @@ impl<'a, C> CommentThreadInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentThreadListCall<'a, C>
-    where C: 'a {
+pub struct CommentThreadListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _video_id: Option<String>,
     _text_format: Option<String>,
@@ -13574,9 +13554,9 @@ pub struct CommentThreadListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentThreadListCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentThreadListCall<'a> {}
 
-impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentThreadListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13652,8 +13632,7 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13666,7 +13645,7 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13675,7 +13654,7 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13736,55 +13715,55 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Returns the comment threads of the specified video.
     ///
     /// Sets the *video id* query property to the given value.
-    pub fn video_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn video_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._video_id = Some(new_value.to_string());
         self
     }
     /// The requested text format for the returned comments.
     ///
     /// Sets the *text format* query property to the given value.
-    pub fn text_format(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn text_format(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._text_format = Some(new_value.to_string());
         self
     }
     /// Limits the returned comment threads to those matching the specified key words. Not compatible with the 'id' filter.
     ///
     /// Sets the *search terms* query property to the given value.
-    pub fn search_terms(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn search_terms(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._search_terms = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn order(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._order = Some(new_value.to_string());
         self
     }
     /// Limits the returned comment threads to those with the specified moderation status. Not compatible with the 'id' filter. Valid values: published, heldForReview, likelySpam.
     ///
     /// Sets the *moderation status* query property to the given value.
-    pub fn moderation_status(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn moderation_status(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._moderation_status = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentThreadListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> CommentThreadListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -13792,21 +13771,21 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Returns the comment threads for all the channel comments (ie does not include comments left on videos).
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
     /// Returns the comment threads of all videos of the channel and the channel comments as well.
     ///
     /// Sets the *all threads related to channel id* query property to the given value.
-    pub fn all_threads_related_to_channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a, C> {
+    pub fn all_threads_related_to_channel_id(mut self, new_value: &str) -> CommentThreadListCall<'a> {
         self._all_threads_related_to_channel_id = Some(new_value.to_string());
         self
     }
@@ -13816,7 +13795,7 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13841,7 +13820,7 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13861,7 +13840,7 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13911,10 +13890,10 @@ impl<'a, C> CommentThreadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentThreadUpdateCall<'a, C>
-    where C: 'a {
+pub struct CommentThreadUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: CommentThread,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13922,9 +13901,9 @@ pub struct CommentThreadUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentThreadUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentThreadUpdateCall<'a> {}
 
-impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentThreadUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13982,8 +13961,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13997,7 +13975,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14008,7 +13986,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14067,7 +14045,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CommentThread) -> CommentThreadUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: CommentThread) -> CommentThreadUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -14081,7 +14059,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentThreadUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CommentThreadUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -14091,7 +14069,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentThreadUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14116,7 +14094,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentThreadUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14136,7 +14114,7 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentThreadUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14180,19 +14158,19 @@ impl<'a, C> CommentThreadUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a, C>
-    where C: 'a {
+pub struct CommentDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentDeleteCall<'a> {}
 
-impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14231,8 +14209,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14245,7 +14222,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14254,7 +14231,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14303,7 +14280,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> CommentDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -14313,7 +14290,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14338,7 +14315,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14358,7 +14335,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14408,10 +14385,10 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentInsertCall<'a, C>
-    where C: 'a {
+pub struct CommentInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Comment,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14419,9 +14396,9 @@ pub struct CommentInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentInsertCall<'a> {}
 
-impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14479,8 +14456,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14494,7 +14470,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14505,7 +14481,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14564,7 +14540,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Comment) -> CommentInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -14578,7 +14554,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CommentInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -14588,7 +14564,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14613,7 +14589,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14633,7 +14609,7 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14682,10 +14658,10 @@ impl<'a, C> CommentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListCall<'a, C>
-    where C: 'a {
+pub struct CommentListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _text_format: Option<String>,
     _parent_id: Option<String>,
@@ -14697,9 +14673,9 @@ pub struct CommentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentListCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentListCall<'a> {}
 
-impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14760,8 +14736,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14774,7 +14749,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14783,7 +14758,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14844,35 +14819,35 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CommentListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The requested text format for the returned comments.
     ///
     /// Sets the *text format* query property to the given value.
-    pub fn text_format(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn text_format(mut self, new_value: &str) -> CommentListCall<'a> {
         self._text_format = Some(new_value.to_string());
         self
     }
     /// Returns replies to the specified comment. Note, currently YouTube features only one level of replies (ie replies to top level comments). However replies to replies may be supported in the future.
     ///
     /// Sets the *parent id* query property to the given value.
-    pub fn parent_id(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn parent_id(mut self, new_value: &str) -> CommentListCall<'a> {
         self._parent_id = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> CommentListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -14880,7 +14855,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> CommentListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
@@ -14890,7 +14865,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14915,7 +14890,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14935,7 +14910,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14979,19 +14954,19 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentMarkAsSpamCall<'a, C>
-    where C: 'a {
+pub struct CommentMarkAsSpamCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentMarkAsSpamCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentMarkAsSpamCall<'a> {}
 
-impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentMarkAsSpamCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15034,8 +15009,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15048,7 +15022,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15057,7 +15031,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15108,7 +15082,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> CommentMarkAsSpamCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
@@ -15118,7 +15092,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentMarkAsSpamCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentMarkAsSpamCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15143,7 +15117,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentMarkAsSpamCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15163,7 +15137,7 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentMarkAsSpamCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentMarkAsSpamCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15208,10 +15182,10 @@ impl<'a, C> CommentMarkAsSpamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentSetModerationStatuCall<'a, C>
-    where C: 'a {
+pub struct CommentSetModerationStatuCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: Vec<String>,
     _moderation_status: String,
     _ban_author: Option<bool>,
@@ -15220,9 +15194,9 @@ pub struct CommentSetModerationStatuCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentSetModerationStatuCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentSetModerationStatuCall<'a> {}
 
-impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentSetModerationStatuCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15269,8 +15243,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15283,7 +15256,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15292,7 +15265,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15343,7 +15316,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_id(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
@@ -15353,14 +15326,14 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn moderation_status(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a, C> {
+    pub fn moderation_status(mut self, new_value: &str) -> CommentSetModerationStatuCall<'a> {
         self._moderation_status = new_value.to_string();
         self
     }
     /// If set to true the author of the comment gets added to the ban list. This means all future comments of the author will autmomatically be rejected. Only valid in combination with STATUS_REJECTED.
     ///
     /// Sets the *ban author* query property to the given value.
-    pub fn ban_author(mut self, new_value: bool) -> CommentSetModerationStatuCall<'a, C> {
+    pub fn ban_author(mut self, new_value: bool) -> CommentSetModerationStatuCall<'a> {
         self._ban_author = Some(new_value);
         self
     }
@@ -15370,7 +15343,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentSetModerationStatuCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentSetModerationStatuCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15395,7 +15368,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentSetModerationStatuCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentSetModerationStatuCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15415,7 +15388,7 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentSetModerationStatuCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentSetModerationStatuCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15465,10 +15438,10 @@ impl<'a, C> CommentSetModerationStatuCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentUpdateCall<'a, C>
-    where C: 'a {
+pub struct CommentUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Comment,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15476,9 +15449,9 @@ pub struct CommentUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentUpdateCall<'a> {}
 
-impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15536,8 +15509,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15551,7 +15523,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15562,7 +15534,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15621,7 +15593,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15635,7 +15607,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> CommentUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> CommentUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -15645,7 +15617,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15670,7 +15642,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15690,7 +15662,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15735,10 +15707,10 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct I18nLanguageListCall<'a, C>
-    where C: 'a {
+pub struct I18nLanguageListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15746,9 +15718,9 @@ pub struct I18nLanguageListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for I18nLanguageListCall<'a, C> {}
+impl<'a> client::CallBuilder for I18nLanguageListCall<'a> {}
 
-impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> I18nLanguageListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15795,8 +15767,7 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15809,7 +15780,7 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15818,7 +15789,7 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15879,13 +15850,13 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> I18nLanguageListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> I18nLanguageListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> I18nLanguageListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -15895,7 +15866,7 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nLanguageListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nLanguageListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15920,7 +15891,7 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> I18nLanguageListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15940,7 +15911,7 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> I18nLanguageListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> I18nLanguageListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15985,10 +15956,10 @@ impl<'a, C> I18nLanguageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct I18nRegionListCall<'a, C>
-    where C: 'a {
+pub struct I18nRegionListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15996,9 +15967,9 @@ pub struct I18nRegionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for I18nRegionListCall<'a, C> {}
+impl<'a> client::CallBuilder for I18nRegionListCall<'a> {}
 
-impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> I18nRegionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16045,8 +16016,7 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16059,7 +16029,7 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16068,7 +16038,7 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16129,13 +16099,13 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> I18nRegionListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> I18nRegionListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> I18nRegionListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -16145,7 +16115,7 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nRegionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> I18nRegionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16170,7 +16140,7 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> I18nRegionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16190,7 +16160,7 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> I18nRegionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> I18nRegionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16253,10 +16223,10 @@ impl<'a, C> I18nRegionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastBindCall<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastBindCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _part: Vec<String>,
     _stream_id: Option<String>,
@@ -16267,9 +16237,9 @@ pub struct LiveBroadcastBindCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveBroadcastBindCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveBroadcastBindCall<'a> {}
 
-impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveBroadcastBindCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16323,8 +16293,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16337,7 +16306,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16346,7 +16315,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16406,7 +16375,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -16424,28 +16393,28 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Stream to bind, if not set unbind the current one.
     ///
     /// Sets the *stream id* query property to the given value.
-    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C> {
+    pub fn stream_id(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
         self._stream_id = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastBindCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16455,7 +16424,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastBindCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastBindCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16480,7 +16449,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastBindCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16500,7 +16469,7 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastBindCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastBindCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16546,10 +16515,10 @@ impl<'a, C> LiveBroadcastBindCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastDeleteCall<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -16558,9 +16527,9 @@ pub struct LiveBroadcastDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveBroadcastDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveBroadcastDeleteCall<'a> {}
 
-impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveBroadcastDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16605,8 +16574,7 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16619,7 +16587,7 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16628,7 +16596,7 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16678,21 +16646,21 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -16702,7 +16670,7 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16727,7 +16695,7 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16747,7 +16715,7 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16819,10 +16787,10 @@ impl<'a, C> LiveBroadcastDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastInsertCall<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveBroadcast,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -16832,9 +16800,9 @@ pub struct LiveBroadcastInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveBroadcastInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveBroadcastInsertCall<'a> {}
 
-impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveBroadcastInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16898,8 +16866,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16913,7 +16880,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16924,7 +16891,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16990,7 +16957,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastInsertCall<'a, C> {
+    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -17011,21 +16978,21 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17035,7 +17002,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17060,7 +17027,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17080,7 +17047,7 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17150,10 +17117,10 @@ impl<'a, C> LiveBroadcastInsertCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastListCall<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -17168,9 +17135,9 @@ pub struct LiveBroadcastListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveBroadcastListCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveBroadcastListCall<'a> {}
 
-impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveBroadcastListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17240,8 +17207,7 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17254,7 +17220,7 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17263,7 +17229,7 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17332,41 +17298,41 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *contentDetails*
     /// * *status*
     /// * *statistics*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> LiveBroadcastListCall<'a> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> LiveBroadcastListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -17374,21 +17340,21 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Return only broadcasts with the selected type.
     ///
     /// Sets the *broadcast type* query property to the given value.
-    pub fn broadcast_type(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn broadcast_type(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._broadcast_type = Some(new_value.to_string());
         self
     }
     /// Return broadcasts with a certain status, e.g. active broadcasts.
     ///
     /// Sets the *broadcast status* query property to the given value.
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a, C> {
+    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastListCall<'a> {
         self._broadcast_status = Some(new_value.to_string());
         self
     }
@@ -17398,7 +17364,7 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17423,7 +17389,7 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17443,7 +17409,7 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17505,10 +17471,10 @@ impl<'a, C> LiveBroadcastListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastTransitionCall<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastTransitionCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _broadcast_status: String,
     _id: String,
     _part: Vec<String>,
@@ -17519,9 +17485,9 @@ pub struct LiveBroadcastTransitionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveBroadcastTransitionCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveBroadcastTransitionCall<'a> {}
 
-impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveBroadcastTransitionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17573,8 +17539,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17587,7 +17552,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17596,7 +17561,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17656,7 +17621,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn broadcast_status(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
         self._broadcast_status = new_value.to_string();
         self
     }
@@ -17666,7 +17631,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -17684,21 +17649,21 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastTransitionCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -17708,7 +17673,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastTransitionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastTransitionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17733,7 +17698,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastTransitionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17753,7 +17718,7 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastTransitionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastTransitionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17825,10 +17790,10 @@ impl<'a, C> LiveBroadcastTransitionCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveBroadcastUpdateCall<'a, C>
-    where C: 'a {
+pub struct LiveBroadcastUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveBroadcast,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -17838,9 +17803,9 @@ pub struct LiveBroadcastUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveBroadcastUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveBroadcastUpdateCall<'a> {}
 
-impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveBroadcastUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17904,8 +17869,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17919,7 +17883,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17930,7 +17894,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17996,7 +17960,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: LiveBroadcast) -> LiveBroadcastUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -18017,21 +17981,21 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *snippet*
     /// * *contentDetails*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveBroadcastUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -18041,7 +18005,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveBroadcastUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18066,7 +18030,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveBroadcastUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18086,7 +18050,7 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveBroadcastUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18130,19 +18094,19 @@ impl<'a, C> LiveBroadcastUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatBanDeleteCall<'a, C>
-    where C: 'a {
+pub struct LiveChatBanDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatBanDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatBanDeleteCall<'a> {}
 
-impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatBanDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18181,8 +18145,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18195,7 +18158,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18204,7 +18167,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18253,7 +18216,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveChatBanDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveChatBanDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -18263,7 +18226,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18288,7 +18251,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18308,7 +18271,7 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatBanDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatBanDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18358,10 +18321,10 @@ impl<'a, C> LiveChatBanDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatBanInsertCall<'a, C>
-    where C: 'a {
+pub struct LiveChatBanInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveChatBan,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18369,9 +18332,9 @@ pub struct LiveChatBanInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatBanInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatBanInsertCall<'a> {}
 
-impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatBanInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18429,8 +18392,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18444,7 +18406,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18455,7 +18417,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18514,7 +18476,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiveChatBan) -> LiveChatBanInsertCall<'a, C> {
+    pub fn request(mut self, new_value: LiveChatBan) -> LiveChatBanInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -18528,7 +18490,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> LiveChatBanInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatBanInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -18538,7 +18500,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatBanInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18563,7 +18525,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatBanInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18583,7 +18545,7 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatBanInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatBanInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18627,19 +18589,19 @@ impl<'a, C> LiveChatBanInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatMessageDeleteCall<'a, C>
-    where C: 'a {
+pub struct LiveChatMessageDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatMessageDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatMessageDeleteCall<'a> {}
 
-impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatMessageDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18678,8 +18640,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18692,7 +18653,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18701,7 +18662,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18750,7 +18711,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveChatMessageDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveChatMessageDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -18760,7 +18721,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18785,7 +18746,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18805,7 +18766,7 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18855,10 +18816,10 @@ impl<'a, C> LiveChatMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatMessageInsertCall<'a, C>
-    where C: 'a {
+pub struct LiveChatMessageInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveChatMessage,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18866,9 +18827,9 @@ pub struct LiveChatMessageInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatMessageInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatMessageInsertCall<'a> {}
 
-impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatMessageInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18926,8 +18887,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18941,7 +18901,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18952,7 +18912,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19011,7 +18971,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiveChatMessage) -> LiveChatMessageInsertCall<'a, C> {
+    pub fn request(mut self, new_value: LiveChatMessage) -> LiveChatMessageInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -19025,7 +18985,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -19035,7 +18995,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19060,7 +19020,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19080,7 +19040,7 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19143,10 +19103,10 @@ impl<'a, C> LiveChatMessageInsertCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatMessageListCall<'a, C>
-    where C: 'a {
+pub struct LiveChatMessageListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _live_chat_id: String,
     _part: Vec<String>,
     _profile_image_size: Option<u32>,
@@ -19158,9 +19118,9 @@ pub struct LiveChatMessageListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatMessageListCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatMessageListCall<'a> {}
 
-impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatMessageListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19217,8 +19177,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19231,7 +19190,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19240,7 +19199,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19300,7 +19259,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatMessageListCall<'a, C> {
+    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
         self._live_chat_id = new_value.to_string();
         self
     }
@@ -19316,35 +19275,35 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Specifies the size of the profile image that should be returned for each user.
     ///
     /// Sets the *profile image size* query property to the given value.
-    pub fn profile_image_size(mut self, new_value: u32) -> LiveChatMessageListCall<'a, C> {
+    pub fn profile_image_size(mut self, new_value: u32) -> LiveChatMessageListCall<'a> {
         self._profile_image_size = Some(new_value);
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken property identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveChatMessageListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveChatMessageListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> LiveChatMessageListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Specifies the localization language in which the system messages should be returned.
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> LiveChatMessageListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> LiveChatMessageListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -19354,7 +19313,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatMessageListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19379,7 +19338,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatMessageListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19399,7 +19358,7 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatMessageListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19443,19 +19402,19 @@ impl<'a, C> LiveChatMessageListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatModeratorDeleteCall<'a, C>
-    where C: 'a {
+pub struct LiveChatModeratorDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatModeratorDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatModeratorDeleteCall<'a> {}
 
-impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatModeratorDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19494,8 +19453,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19508,7 +19466,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19517,7 +19475,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19566,7 +19524,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveChatModeratorDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveChatModeratorDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -19576,7 +19534,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19601,7 +19559,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19621,7 +19579,7 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19671,10 +19629,10 @@ impl<'a, C> LiveChatModeratorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatModeratorInsertCall<'a, C>
-    where C: 'a {
+pub struct LiveChatModeratorInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveChatModerator,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19682,9 +19640,9 @@ pub struct LiveChatModeratorInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatModeratorInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatModeratorInsertCall<'a> {}
 
-impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatModeratorInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19742,8 +19700,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19757,7 +19714,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19768,7 +19725,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19827,7 +19784,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LiveChatModerator) -> LiveChatModeratorInsertCall<'a, C> {
+    pub fn request(mut self, new_value: LiveChatModerator) -> LiveChatModeratorInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -19841,7 +19798,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -19851,7 +19808,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19876,7 +19833,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19896,7 +19853,7 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19957,10 +19914,10 @@ impl<'a, C> LiveChatModeratorInsertCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveChatModeratorListCall<'a, C>
-    where C: 'a {
+pub struct LiveChatModeratorListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _live_chat_id: String,
     _part: Vec<String>,
     _page_token: Option<String>,
@@ -19970,9 +19927,9 @@ pub struct LiveChatModeratorListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveChatModeratorListCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveChatModeratorListCall<'a> {}
 
-impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveChatModeratorListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20023,8 +19980,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20037,7 +19993,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20046,7 +20002,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20106,7 +20062,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatModeratorListCall<'a, C> {
+    pub fn live_chat_id(mut self, new_value: &str) -> LiveChatModeratorListCall<'a> {
         self._live_chat_id = new_value.to_string();
         self
     }
@@ -20122,21 +20078,21 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveChatModeratorListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveChatModeratorListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LiveChatModeratorListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveChatModeratorListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> LiveChatModeratorListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -20146,7 +20102,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveChatModeratorListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20171,7 +20127,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveChatModeratorListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20191,7 +20147,7 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveChatModeratorListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20237,10 +20193,10 @@ impl<'a, C> LiveChatModeratorListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamDeleteCall<'a, C>
-    where C: 'a {
+pub struct LiveStreamDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner_channel: Option<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -20249,9 +20205,9 @@ pub struct LiveStreamDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveStreamDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveStreamDeleteCall<'a> {}
 
-impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveStreamDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20296,8 +20252,7 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20310,7 +20265,7 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20319,7 +20274,7 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20368,21 +20323,21 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> LiveStreamDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamDeleteCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -20392,7 +20347,7 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20417,7 +20372,7 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20437,7 +20392,7 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20510,10 +20465,10 @@ impl<'a, C> LiveStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamInsertCall<'a, C>
-    where C: 'a {
+pub struct LiveStreamInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveStream,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -20523,9 +20478,9 @@ pub struct LiveStreamInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveStreamInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveStreamInsertCall<'a> {}
 
-impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveStreamInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20589,8 +20544,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20604,7 +20558,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20615,7 +20569,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20682,7 +20636,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *cdn*
     /// * *content_details*
     /// * *status*
-    pub fn request(mut self, new_value: LiveStream) -> LiveStreamInsertCall<'a, C> {
+    pub fn request(mut self, new_value: LiveStream) -> LiveStreamInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -20704,21 +20658,21 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *cdn*
     /// * *content_details*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveStreamInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamInsertCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -20728,7 +20682,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20753,7 +20707,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20773,7 +20727,7 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20840,10 +20794,10 @@ impl<'a, C> LiveStreamInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamListCall<'a, C>
-    where C: 'a {
+pub struct LiveStreamListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -20856,9 +20810,9 @@ pub struct LiveStreamListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveStreamListCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveStreamListCall<'a> {}
 
-impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveStreamListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20922,8 +20876,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20936,7 +20889,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20945,7 +20898,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21013,41 +20966,41 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveStreamListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveStreamListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LiveStreamListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamListCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> LiveStreamListCall<'a> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> LiveStreamListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -21055,7 +21008,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> LiveStreamListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> LiveStreamListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
@@ -21065,7 +21018,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21090,7 +21043,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21110,7 +21063,7 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21182,10 +21135,10 @@ impl<'a, C> LiveStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LiveStreamUpdateCall<'a, C>
-    where C: 'a {
+pub struct LiveStreamUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: LiveStream,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -21195,9 +21148,9 @@ pub struct LiveStreamUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LiveStreamUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for LiveStreamUpdateCall<'a> {}
 
-impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LiveStreamUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21261,8 +21214,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21276,7 +21228,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21287,7 +21239,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21353,7 +21305,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    pub fn request(mut self, new_value: LiveStream) -> LiveStreamUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: LiveStream) -> LiveStreamUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -21374,21 +21326,21 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *snippet*
     /// * *cdn*
     /// * *status*
-    pub fn add_part(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> LiveStreamUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> LiveStreamUpdateCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> LiveStreamUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -21398,7 +21350,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LiveStreamUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21423,7 +21375,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LiveStreamUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21443,7 +21395,7 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LiveStreamUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21492,10 +21444,10 @@ impl<'a, C> LiveStreamUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MemberListCall<'a, C>
-    where C: 'a {
+pub struct MemberListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _mode: Option<String>,
@@ -21507,9 +21459,9 @@ pub struct MemberListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MemberListCall<'a, C> {}
+impl<'a> client::CallBuilder for MemberListCall<'a> {}
 
-impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MemberListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21568,8 +21520,7 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21582,7 +21533,7 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21591,7 +21542,7 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21652,42 +21603,42 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> MemberListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> MemberListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Parameter that specifies which channel members to return.
     ///
     /// Sets the *mode* query property to the given value.
-    pub fn mode(mut self, new_value: &str) -> MemberListCall<'a, C> {
+    pub fn mode(mut self, new_value: &str) -> MemberListCall<'a> {
         self._mode = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MemberListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> MemberListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Filter members in the results set to the ones that have access to a level.
     ///
     /// Sets the *has access to level* query property to the given value.
-    pub fn has_access_to_level(mut self, new_value: &str) -> MemberListCall<'a, C> {
+    pub fn has_access_to_level(mut self, new_value: &str) -> MemberListCall<'a> {
         self._has_access_to_level = Some(new_value.to_string());
         self
     }
     /// Comma separated list of channel IDs. Only data about members that are part of this list will be included in the response.
     ///
     /// Sets the *filter by member channel id* query property to the given value.
-    pub fn filter_by_member_channel_id(mut self, new_value: &str) -> MemberListCall<'a, C> {
+    pub fn filter_by_member_channel_id(mut self, new_value: &str) -> MemberListCall<'a> {
         self._filter_by_member_channel_id = Some(new_value.to_string());
         self
     }
@@ -21697,7 +21648,7 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MemberListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MemberListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21722,7 +21673,7 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21742,7 +21693,7 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21797,19 +21748,19 @@ impl<'a, C> MemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MembershipsLevelListCall<'a, C>
-    where C: 'a {
+pub struct MembershipsLevelListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MembershipsLevelListCall<'a, C> {}
+impl<'a> client::CallBuilder for MembershipsLevelListCall<'a> {}
 
-impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MembershipsLevelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21853,8 +21804,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21867,7 +21817,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21876,7 +21826,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21942,7 +21892,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> MembershipsLevelListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> MembershipsLevelListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -21952,7 +21902,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MembershipsLevelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MembershipsLevelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21977,7 +21927,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MembershipsLevelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MembershipsLevelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21997,7 +21947,7 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MembershipsLevelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MembershipsLevelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22042,10 +21992,10 @@ impl<'a, C> MembershipsLevelListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemDeleteCall<'a, C>
-    where C: 'a {
+pub struct PlaylistItemDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22053,9 +22003,9 @@ pub struct PlaylistItemDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistItemDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistItemDeleteCall<'a> {}
 
-impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistItemDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22097,8 +22047,7 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22111,7 +22060,7 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22120,7 +22069,7 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22169,14 +22118,14 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -22186,7 +22135,7 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22211,7 +22160,7 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22231,7 +22180,7 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22282,10 +22231,10 @@ impl<'a, C> PlaylistItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemInsertCall<'a, C>
-    where C: 'a {
+pub struct PlaylistItemInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: PlaylistItem,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -22294,9 +22243,9 @@ pub struct PlaylistItemInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistItemInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistItemInsertCall<'a> {}
 
-impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistItemInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22357,8 +22306,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22372,7 +22320,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22383,7 +22331,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22442,7 +22390,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemInsertCall<'a, C> {
+    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -22456,14 +22404,14 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistItemInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -22473,7 +22421,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22498,7 +22446,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22518,7 +22466,7 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22568,10 +22516,10 @@ impl<'a, C> PlaylistItemInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemListCall<'a, C>
-    where C: 'a {
+pub struct PlaylistItemListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _video_id: Option<String>,
     _playlist_id: Option<String>,
@@ -22584,9 +22532,9 @@ pub struct PlaylistItemListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistItemListCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistItemListCall<'a> {}
 
-impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistItemListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22650,8 +22598,7 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22664,7 +22611,7 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22673,7 +22620,7 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22734,49 +22681,49 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistItemListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Return the playlist items associated with the given video ID.
     ///
     /// Sets the *video id* query property to the given value.
-    pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C> {
+    pub fn video_id(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
         self._video_id = Some(new_value.to_string());
         self
     }
     /// Return the playlist items within the given playlist.
     ///
     /// Sets the *playlist id* query property to the given value.
-    pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C> {
+    pub fn playlist_id(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
         self._playlist_id = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> PlaylistItemListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> PlaylistItemListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> PlaylistItemListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
@@ -22786,7 +22733,7 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22811,7 +22758,7 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22831,7 +22778,7 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22882,10 +22829,10 @@ impl<'a, C> PlaylistItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistItemUpdateCall<'a, C>
-    where C: 'a {
+pub struct PlaylistItemUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: PlaylistItem,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -22894,9 +22841,9 @@ pub struct PlaylistItemUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistItemUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistItemUpdateCall<'a> {}
 
-impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistItemUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22957,8 +22904,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22972,7 +22918,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22983,7 +22929,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23042,7 +22988,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: PlaylistItem) -> PlaylistItemUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -23056,14 +23002,14 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistItemUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -23073,7 +23019,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistItemUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23098,7 +23044,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistItemUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23118,7 +23064,7 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistItemUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23163,10 +23109,10 @@ impl<'a, C> PlaylistItemUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistDeleteCall<'a, C>
-    where C: 'a {
+pub struct PlaylistDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23174,9 +23120,9 @@ pub struct PlaylistDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistDeleteCall<'a> {}
 
-impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23218,8 +23164,7 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23232,7 +23177,7 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23241,7 +23186,7 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23290,14 +23235,14 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> PlaylistDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -23307,7 +23252,7 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23332,7 +23277,7 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23352,7 +23297,7 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23404,10 +23349,10 @@ impl<'a, C> PlaylistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistInsertCall<'a, C>
-    where C: 'a {
+pub struct PlaylistInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Playlist,
     _part: Vec<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -23417,9 +23362,9 @@ pub struct PlaylistInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistInsertCall<'a> {}
 
-impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23483,8 +23428,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23498,7 +23442,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23509,7 +23453,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23568,7 +23512,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Playlist) -> PlaylistInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Playlist) -> PlaylistInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -23582,21 +23526,21 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistInsertCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -23606,7 +23550,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23631,7 +23575,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23651,7 +23595,7 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23703,10 +23647,10 @@ impl<'a, C> PlaylistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistListCall<'a, C>
-    where C: 'a {
+pub struct PlaylistListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _on_behalf_of_content_owner_channel: Option<String>,
@@ -23721,9 +23665,9 @@ pub struct PlaylistListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistListCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistListCall<'a> {}
 
-impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23793,8 +23737,7 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23807,7 +23750,7 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23816,7 +23759,7 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23877,42 +23820,42 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the playlists owned by the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> PlaylistListCall<'a> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> PlaylistListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -23920,21 +23863,21 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Returen content in specified language
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the playlists owned by the specified channel ID.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PlaylistListCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -23944,7 +23887,7 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23969,7 +23912,7 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23989,7 +23932,7 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24040,10 +23983,10 @@ impl<'a, C> PlaylistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlaylistUpdateCall<'a, C>
-    where C: 'a {
+pub struct PlaylistUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Playlist,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -24052,9 +23995,9 @@ pub struct PlaylistUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlaylistUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for PlaylistUpdateCall<'a> {}
 
-impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlaylistUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24115,8 +24058,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24130,7 +24072,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24141,7 +24083,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24200,7 +24142,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Playlist) -> PlaylistUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Playlist) -> PlaylistUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -24214,14 +24156,14 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> PlaylistUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> PlaylistUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> PlaylistUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -24231,7 +24173,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlaylistUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24256,7 +24198,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlaylistUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24276,7 +24218,7 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlaylistUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24350,10 +24292,10 @@ impl<'a, C> PlaylistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SearchListCall<'a, C>
-    where C: 'a {
+pub struct SearchListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _video_type: Option<String>,
     _video_syndicated: Option<String>,
@@ -24390,9 +24332,9 @@ pub struct SearchListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SearchListCall<'a, C> {}
+impl<'a> client::CallBuilder for SearchListCall<'a> {}
 
-impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SearchListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24528,8 +24470,7 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24542,7 +24483,7 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24551,7 +24492,7 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24612,70 +24553,70 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> SearchListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Filter on videos of a specific type.
     ///
     /// Sets the *video type* query property to the given value.
-    pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_type(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_type = Some(new_value.to_string());
         self
     }
     /// Filter on syndicated videos.
     ///
     /// Sets the *video syndicated* query property to the given value.
-    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_syndicated(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_syndicated = Some(new_value.to_string());
         self
     }
     /// Filter on the license of the videos.
     ///
     /// Sets the *video license* query property to the given value.
-    pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_license(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_license = Some(new_value.to_string());
         self
     }
     /// Filter on embeddable videos.
     ///
     /// Sets the *video embeddable* query property to the given value.
-    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_embeddable(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_embeddable = Some(new_value.to_string());
         self
     }
     /// Filter on the duration of the videos.
     ///
     /// Sets the *video duration* query property to the given value.
-    pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_duration(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_duration = Some(new_value.to_string());
         self
     }
     /// Filter on 3d videos.
     ///
     /// Sets the *video dimension* query property to the given value.
-    pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_dimension(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_dimension = Some(new_value.to_string());
         self
     }
     /// Filter on the definition of the videos.
     ///
     /// Sets the *video definition* query property to the given value.
-    pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_definition(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_definition = Some(new_value.to_string());
         self
     }
     /// Filter on videos in a specific category.
     ///
     /// Sets the *video category id* query property to the given value.
-    pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_category_id(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
     /// Filter on the presence of captions on the videos.
     ///
     /// Sets the *video caption* query property to the given value.
-    pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn video_caption(mut self, new_value: &str) -> SearchListCall<'a> {
         self._video_caption = Some(new_value.to_string());
         self
     }
@@ -24683,147 +24624,147 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Append the given value to the *type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_type(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn add_type(mut self, new_value: &str) -> SearchListCall<'a> {
         self._type_.push(new_value.to_string());
         self
     }
     /// Restrict results to a particular topic.
     ///
     /// Sets the *topic id* query property to the given value.
-    pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn topic_id(mut self, new_value: &str) -> SearchListCall<'a> {
         self._topic_id = Some(new_value.to_string());
         self
     }
     /// Indicates whether the search results should include restricted content as well as standard content.
     ///
     /// Sets the *safe search* query property to the given value.
-    pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn safe_search(mut self, new_value: &str) -> SearchListCall<'a> {
         self._safe_search = Some(new_value.to_string());
         self
     }
     /// Return results relevant to this language.
     ///
     /// Sets the *relevance language* query property to the given value.
-    pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn relevance_language(mut self, new_value: &str) -> SearchListCall<'a> {
         self._relevance_language = Some(new_value.to_string());
         self
     }
     /// Search related to a resource.
     ///
     /// Sets the *related to video id* query property to the given value.
-    pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn related_to_video_id(mut self, new_value: &str) -> SearchListCall<'a> {
         self._related_to_video_id = Some(new_value.to_string());
         self
     }
     /// Display the content as seen by viewers in this country.
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn region_code(mut self, new_value: &str) -> SearchListCall<'a> {
         self._region_code = Some(new_value.to_string());
         self
     }
     /// Textual search terms to match.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> SearchListCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Filter on resources published before this date.
     ///
     /// Sets the *published before* query property to the given value.
-    pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn published_before(mut self, new_value: &str) -> SearchListCall<'a> {
         self._published_before = Some(new_value.to_string());
         self
     }
     /// Filter on resources published after this date.
     ///
     /// Sets the *published after* query property to the given value.
-    pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn published_after(mut self, new_value: &str) -> SearchListCall<'a> {
         self._published_after = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SearchListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Sort order of the results.
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn order(mut self, new_value: &str) -> SearchListCall<'a> {
         self._order = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SearchListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> SearchListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Filter on distance from the location (specified above).
     ///
     /// Sets the *location radius* query property to the given value.
-    pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn location_radius(mut self, new_value: &str) -> SearchListCall<'a> {
         self._location_radius = Some(new_value.to_string());
         self
     }
     /// Filter on location of the video
     ///
     /// Sets the *location* query property to the given value.
-    pub fn location(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn location(mut self, new_value: &str) -> SearchListCall<'a> {
         self._location = Some(new_value.to_string());
         self
     }
     /// Search for the private videos of the authenticated user.
     ///
     /// Sets the *for mine* query property to the given value.
-    pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a, C> {
+    pub fn for_mine(mut self, new_value: bool) -> SearchListCall<'a> {
         self._for_mine = Some(new_value);
         self
     }
     /// Restrict the search to only retrieve videos uploaded using the project id of the authenticated user.
     ///
     /// Sets the *for developer* query property to the given value.
-    pub fn for_developer(mut self, new_value: bool) -> SearchListCall<'a, C> {
+    pub fn for_developer(mut self, new_value: bool) -> SearchListCall<'a> {
         self._for_developer = Some(new_value);
         self
     }
     /// Search owned by a content owner.
     ///
     /// Sets the *for content owner* query property to the given value.
-    pub fn for_content_owner(mut self, new_value: bool) -> SearchListCall<'a, C> {
+    pub fn for_content_owner(mut self, new_value: bool) -> SearchListCall<'a> {
         self._for_content_owner = Some(new_value);
         self
     }
     /// Filter on the livestream status of the videos.
     ///
     /// Sets the *event type* query property to the given value.
-    pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn event_type(mut self, new_value: &str) -> SearchListCall<'a> {
         self._event_type = Some(new_value.to_string());
         self
     }
     /// Add a filter on the channel search.
     ///
     /// Sets the *channel type* query property to the given value.
-    pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn channel_type(mut self, new_value: &str) -> SearchListCall<'a> {
         self._channel_type = Some(new_value.to_string());
         self
     }
     /// Filter on resources belonging to this channelId.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> SearchListCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -24833,7 +24774,7 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SearchListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24858,7 +24799,7 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SearchListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SearchListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24878,7 +24819,7 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SearchListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SearchListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24922,19 +24863,19 @@ impl<'a, C> SearchListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionDeleteCall<'a, C>
-    where C: 'a {
+pub struct SubscriptionDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SubscriptionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SubscriptionDeleteCall<'a> {}
 
-impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SubscriptionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24973,8 +24914,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24987,7 +24927,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24996,7 +24936,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25045,7 +24985,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> SubscriptionDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -25055,7 +24995,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25080,7 +25020,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25100,7 +25040,7 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25150,10 +25090,10 @@ impl<'a, C> SubscriptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionInsertCall<'a, C>
-    where C: 'a {
+pub struct SubscriptionInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Subscription,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25161,9 +25101,9 @@ pub struct SubscriptionInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SubscriptionInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for SubscriptionInsertCall<'a> {}
 
-impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SubscriptionInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -25221,8 +25161,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -25236,7 +25175,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -25247,7 +25186,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25306,7 +25245,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Subscription) -> SubscriptionInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -25320,7 +25259,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> SubscriptionInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> SubscriptionInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -25330,7 +25269,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25355,7 +25294,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25375,7 +25314,7 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25430,10 +25369,10 @@ impl<'a, C> SubscriptionInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SubscriptionListCall<'a, C>
-    where C: 'a {
+pub struct SubscriptionListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _order: Option<String>,
@@ -25451,9 +25390,9 @@ pub struct SubscriptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SubscriptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for SubscriptionListCall<'a> {}
 
-impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SubscriptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -25532,8 +25471,7 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -25546,7 +25484,7 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -25555,7 +25493,7 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25616,62 +25554,62 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order of the returned subscriptions
     ///
     /// Sets the *order* query property to the given value.
-    pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn order(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._order = Some(new_value.to_string());
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return the subscribers of the given channel owner.
     ///
     /// Sets the *my subscribers* query property to the given value.
-    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C> {
+    pub fn my_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a> {
         self._my_subscribers = Some(new_value);
         self
     }
     ///
     /// Sets the *my recent subscribers* query property to the given value.
-    pub fn my_recent_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a, C> {
+    pub fn my_recent_subscribers(mut self, new_value: bool) -> SubscriptionListCall<'a> {
         self._my_recent_subscribers = Some(new_value);
         self
     }
     /// Flag for returning the subscriptions of the authenticated user.
     ///
     /// Sets the *mine* query property to the given value.
-    pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a, C> {
+    pub fn mine(mut self, new_value: bool) -> SubscriptionListCall<'a> {
         self._mine = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> SubscriptionListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -25679,21 +25617,21 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Return the subscriptions to the subset of these channels that the authenticated user is subscribed to.
     ///
     /// Sets the *for channel id* query property to the given value.
-    pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn for_channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._for_channel_id = Some(new_value.to_string());
         self
     }
     /// Return the subscriptions of the given channel owner.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> SubscriptionListCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -25703,7 +25641,7 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SubscriptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25728,7 +25666,7 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SubscriptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25748,7 +25686,7 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SubscriptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25810,10 +25748,10 @@ impl<'a, C> SubscriptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SuperChatEventListCall<'a, C>
-    where C: 'a {
+pub struct SuperChatEventListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -25823,9 +25761,9 @@ pub struct SuperChatEventListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SuperChatEventListCall<'a, C> {}
+impl<'a> client::CallBuilder for SuperChatEventListCall<'a> {}
 
-impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SuperChatEventListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -25878,8 +25816,7 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -25892,7 +25829,7 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -25901,7 +25838,7 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25967,28 +25904,28 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> SuperChatEventListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> SuperChatEventListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SuperChatEventListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SuperChatEventListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SuperChatEventListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> SuperChatEventListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Return rendered funding amounts in specified language.
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> SuperChatEventListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> SuperChatEventListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -25998,7 +25935,7 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SuperChatEventListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SuperChatEventListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26023,7 +25960,7 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SuperChatEventListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SuperChatEventListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26043,7 +25980,7 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SuperChatEventListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SuperChatEventListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -26093,10 +26030,10 @@ impl<'a, C> SuperChatEventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TestInsertCall<'a, C>
-    where C: 'a {
+pub struct TestInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: TestItem,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -26104,9 +26041,9 @@ pub struct TestInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TestInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for TestInsertCall<'a> {}
 
-impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TestInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26164,8 +26101,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -26179,7 +26115,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -26190,7 +26126,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -26249,7 +26185,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestItem) -> TestInsertCall<'a, C> {
+    pub fn request(mut self, new_value: TestItem) -> TestInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -26262,7 +26198,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> TestInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> TestInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -26272,7 +26208,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26297,7 +26233,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TestInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TestInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26317,7 +26253,7 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TestInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TestInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -26362,10 +26298,10 @@ impl<'a, C> TestInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkDeleteCall<'a, C>
-    where C: 'a {
+pub struct ThirdPartyLinkDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _linking_token: String,
     _type_: String,
     _part: Vec<String>,
@@ -26373,9 +26309,9 @@ pub struct ThirdPartyLinkDeleteCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ThirdPartyLinkDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ThirdPartyLinkDeleteCall<'a> {}
 
-impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ThirdPartyLinkDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26427,7 +26363,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -26436,7 +26372,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -26486,7 +26422,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, C> {
+    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
         self._linking_token = new_value.to_string();
         self
     }
@@ -26496,7 +26432,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, C> {
+    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
         self._type_ = new_value.to_string();
         self
     }
@@ -26504,7 +26440,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Append the given value to the *part* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkDeleteCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -26514,7 +26450,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26539,7 +26475,7 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26596,19 +26532,19 @@ impl<'a, C> ThirdPartyLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkInsertCall<'a, C>
-    where C: 'a {
+pub struct ThirdPartyLinkInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: ThirdPartyLink,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ThirdPartyLinkInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for ThirdPartyLinkInsertCall<'a> {}
 
-impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ThirdPartyLinkInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26674,7 +26610,7 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -26685,7 +26621,7 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -26750,7 +26686,7 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a, C> {
+    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -26770,7 +26706,7 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -26780,7 +26716,7 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26805,7 +26741,7 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26855,10 +26791,10 @@ impl<'a, C> ThirdPartyLinkInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkListCall<'a, C>
-    where C: 'a {
+pub struct ThirdPartyLinkListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _type_: Option<String>,
     _linking_token: Option<String>,
@@ -26866,9 +26802,9 @@ pub struct ThirdPartyLinkListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ThirdPartyLinkListCall<'a, C> {}
+impl<'a> client::CallBuilder for ThirdPartyLinkListCall<'a> {}
 
-impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ThirdPartyLinkListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26925,7 +26861,7 @@ impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -26934,7 +26870,7 @@ impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27001,21 +26937,21 @@ impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Get a third party link of the given type.
     ///
     /// Sets the *type* query property to the given value.
-    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, C> {
+    pub fn type_(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
         self._type_ = Some(new_value.to_string());
         self
     }
     /// Get a third party link with the given linking token.
     ///
     /// Sets the *linking token* query property to the given value.
-    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a, C> {
+    pub fn linking_token(mut self, new_value: &str) -> ThirdPartyLinkListCall<'a> {
         self._linking_token = Some(new_value.to_string());
         self
     }
@@ -27025,7 +26961,7 @@ impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27050,7 +26986,7 @@ impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27107,19 +27043,19 @@ impl<'a, C> ThirdPartyLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ThirdPartyLinkUpdateCall<'a, C>
-    where C: 'a {
+pub struct ThirdPartyLinkUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: ThirdPartyLink,
     _part: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ThirdPartyLinkUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ThirdPartyLinkUpdateCall<'a> {}
 
-impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ThirdPartyLinkUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -27185,7 +27121,7 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -27196,7 +27132,7 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27261,7 +27197,7 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: ThirdPartyLink) -> ThirdPartyLinkUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -27281,7 +27217,7 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *linkingToken*
     /// * *status*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> ThirdPartyLinkUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
@@ -27291,7 +27227,7 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThirdPartyLinkUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27316,7 +27252,7 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ThirdPartyLinkUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27359,10 +27295,10 @@ impl<'a, C> ThirdPartyLinkUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct ThumbnailSetCall<'a, C>
-    where C: 'a {
+pub struct ThumbnailSetCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _video_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27370,9 +27306,9 @@ pub struct ThumbnailSetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ThumbnailSetCall<'a, C> {}
+impl<'a> client::CallBuilder for ThumbnailSetCall<'a> {}
 
-impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ThumbnailSetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -27427,8 +27363,7 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -27451,7 +27386,7 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -27476,7 +27411,7 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                                 req_builder.body(hyper::body::Body::from(Vec::new()))
                             };
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -27517,7 +27452,6 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         if size > 2097152 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 2097152))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -27525,10 +27459,10 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -27608,14 +27542,14 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a, C> {
+    pub fn video_id(mut self, new_value: &str) -> ThumbnailSetCall<'a> {
         self._video_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ThumbnailSetCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -27625,7 +27559,7 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThumbnailSetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ThumbnailSetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27650,7 +27584,7 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ThumbnailSetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27670,7 +27604,7 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ThumbnailSetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ThumbnailSetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -27730,10 +27664,10 @@ impl<'a, C> ThumbnailSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoAbuseReportReasonListCall<'a, C>
-    where C: 'a {
+pub struct VideoAbuseReportReasonListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _hl: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27741,9 +27675,9 @@ pub struct VideoAbuseReportReasonListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoAbuseReportReasonListCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoAbuseReportReasonListCall<'a> {}
 
-impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoAbuseReportReasonListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -27790,8 +27724,7 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -27804,7 +27737,7 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -27813,7 +27746,7 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27879,13 +27812,13 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// 
     /// * *id*
     /// * *snippet*
-    pub fn add_part(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> VideoAbuseReportReasonListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -27895,7 +27828,7 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAbuseReportReasonListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoAbuseReportReasonListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27920,7 +27853,7 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoAbuseReportReasonListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoAbuseReportReasonListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27940,7 +27873,7 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoAbuseReportReasonListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoAbuseReportReasonListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -27987,10 +27920,10 @@ impl<'a, C> VideoAbuseReportReasonListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoCategoryListCall<'a, C>
-    where C: 'a {
+pub struct VideoCategoryListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _region_code: Option<String>,
     _id: Vec<String>,
@@ -28000,9 +27933,9 @@ pub struct VideoCategoryListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoCategoryListCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoCategoryListCall<'a> {}
 
-impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoCategoryListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28057,8 +27990,7 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28071,7 +28003,7 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28080,7 +28012,7 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -28141,13 +28073,13 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> VideoCategoryListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a, C> {
+    pub fn region_code(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
         self._region_code = Some(new_value.to_string());
         self
     }
@@ -28155,13 +28087,13 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> VideoCategoryListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> VideoCategoryListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
@@ -28171,7 +28103,7 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoCategoryListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoCategoryListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -28196,7 +28128,7 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoCategoryListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28216,7 +28148,7 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoCategoryListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoCategoryListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28261,10 +28193,10 @@ impl<'a, C> VideoCategoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoDeleteCall<'a, C>
-    where C: 'a {
+pub struct VideoDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28272,9 +28204,9 @@ pub struct VideoDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoDeleteCall<'a> {}
 
-impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28316,8 +28248,7 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28330,7 +28261,7 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28339,7 +28270,7 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -28388,14 +28319,14 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> VideoDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -28405,7 +28336,7 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -28430,7 +28361,7 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28450,7 +28381,7 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28495,10 +28426,10 @@ impl<'a, C> VideoDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoGetRatingCall<'a, C>
-    where C: 'a {
+pub struct VideoGetRatingCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28506,9 +28437,9 @@ pub struct VideoGetRatingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoGetRatingCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoGetRatingCall<'a> {}
 
-impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoGetRatingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28555,8 +28486,7 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28569,7 +28499,7 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28578,7 +28508,7 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -28638,14 +28568,14 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_id(mut self, new_value: &str) -> VideoGetRatingCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> VideoGetRatingCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoGetRatingCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -28655,7 +28585,7 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoGetRatingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoGetRatingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -28680,7 +28610,7 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoGetRatingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28700,7 +28630,7 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoGetRatingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoGetRatingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28756,10 +28686,10 @@ impl<'a, C> VideoGetRatingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct VideoInsertCall<'a, C>
-    where C: 'a {
+pub struct VideoInsertCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Video,
     _part: Vec<String>,
     _stabilize: Option<bool>,
@@ -28772,9 +28702,9 @@ pub struct VideoInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoInsertCall<'a> {}
 
-impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28859,8 +28789,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28900,7 +28829,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28916,7 +28845,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -28957,7 +28886,6 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         if size > 137438953472 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 137438953472))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -28965,10 +28893,10 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -29047,7 +28975,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Video) -> VideoInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Video) -> VideoInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -29061,42 +28989,42 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> VideoInsertCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> VideoInsertCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Should stabilize be applied to the upload.
     ///
     /// Sets the *stabilize* query property to the given value.
-    pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a, C> {
+    pub fn stabilize(mut self, new_value: bool) -> VideoInsertCall<'a> {
         self._stabilize = Some(new_value);
         self
     }
     /// This parameter can only be used in a properly authorized request. *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwnerChannel* parameter specifies the YouTube channel ID of the channel to which a video is being added. This parameter is required when a request specifies a value for the onBehalfOfContentOwner parameter, and it can only be used in conjunction with that parameter. In addition, the request must be authorized using a CMS account that is linked to the content owner that the onBehalfOfContentOwner parameter specifies. Finally, the channel that the onBehalfOfContentOwnerChannel parameter value specifies must be linked to the content owner that the onBehalfOfContentOwner parameter specifies. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and perform actions on behalf of the channel specified in the parameter value, without having to provide authentication credentials for each separate channel.
     ///
     /// Sets the *on behalf of content owner channel* query property to the given value.
-    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner_channel(mut self, new_value: &str) -> VideoInsertCall<'a> {
         self._on_behalf_of_content_owner_channel = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoInsertCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Notify the channel subscribers about the new video. As default, the notification is enabled.
     ///
     /// Sets the *notify subscribers* query property to the given value.
-    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a, C> {
+    pub fn notify_subscribers(mut self, new_value: bool) -> VideoInsertCall<'a> {
         self._notify_subscribers = Some(new_value);
         self
     }
     /// Should auto-levels be applied to the upload.
     ///
     /// Sets the *auto levels* query property to the given value.
-    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a, C> {
+    pub fn auto_levels(mut self, new_value: bool) -> VideoInsertCall<'a> {
         self._auto_levels = Some(new_value);
         self
     }
@@ -29106,7 +29034,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -29131,7 +29059,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29151,7 +29079,7 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29207,10 +29135,10 @@ impl<'a, C> VideoInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoListCall<'a, C>
-    where C: 'a {
+pub struct VideoListCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _part: Vec<String>,
     _video_category_id: Option<String>,
     _region_code: Option<String>,
@@ -29229,9 +29157,9 @@ pub struct VideoListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoListCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoListCall<'a> {}
 
-impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -29313,8 +29241,7 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29327,7 +29254,7 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29336,7 +29263,7 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29397,68 +29324,68 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn add_part(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> VideoListCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// Use chart that is specific to the specified video category
     ///
     /// Sets the *video category id* query property to the given value.
-    pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn video_category_id(mut self, new_value: &str) -> VideoListCall<'a> {
         self._video_category_id = Some(new_value.to_string());
         self
     }
     /// Use a chart that is specific to the specified region
     ///
     /// Sets the *region code* query property to the given value.
-    pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn region_code(mut self, new_value: &str) -> VideoListCall<'a> {
         self._region_code = Some(new_value.to_string());
         self
     }
     /// The *pageToken* parameter identifies a specific page in the result set that should be returned. In an API response, the nextPageToken and prevPageToken properties identify other pages that could be retrieved. *Note:* This parameter is supported for use in conjunction with the myRating and chart parameters, but it is not supported for use in conjunction with the id parameter.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> VideoListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// Return videos liked/disliked by the authenticated user. Does not support RateType.RATED_TYPE_NONE.
     ///
     /// Sets the *my rating* query property to the given value.
-    pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn my_rating(mut self, new_value: &str) -> VideoListCall<'a> {
         self._my_rating = Some(new_value.to_string());
         self
     }
     /// Return the player with maximum height specified in
     ///
     /// Sets the *max width* query property to the given value.
-    pub fn max_width(mut self, new_value: i32) -> VideoListCall<'a, C> {
+    pub fn max_width(mut self, new_value: i32) -> VideoListCall<'a> {
         self._max_width = Some(new_value);
         self
     }
     /// The *maxResults* parameter specifies the maximum number of items that should be returned in the result set. *Note:* This parameter is supported for use in conjunction with the myRating and chart parameters, but it is not supported for use in conjunction with the id parameter.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> VideoListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *max height* query property to the given value.
-    pub fn max_height(mut self, new_value: i32) -> VideoListCall<'a, C> {
+    pub fn max_height(mut self, new_value: i32) -> VideoListCall<'a> {
         self._max_height = Some(new_value);
         self
     }
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn locale(mut self, new_value: &str) -> VideoListCall<'a> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -29466,21 +29393,21 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_id(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn add_id(mut self, new_value: &str) -> VideoListCall<'a> {
         self._id.push(new_value.to_string());
         self
     }
     /// Stands for "host language". Specifies the localization language of the metadata to be filled into snippet.localized. The field is filled with the default metadata if there is no localization in the specified language. The parameter value must be a language code included in the list returned by the i18nLanguages.list method (e.g. en_US, es_MX).
     ///
     /// Sets the *hl* query property to the given value.
-    pub fn hl(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn hl(mut self, new_value: &str) -> VideoListCall<'a> {
         self._hl = Some(new_value.to_string());
         self
     }
     /// Return the videos that are in the specified chart.
     ///
     /// Sets the *chart* query property to the given value.
-    pub fn chart(mut self, new_value: &str) -> VideoListCall<'a, C> {
+    pub fn chart(mut self, new_value: &str) -> VideoListCall<'a> {
         self._chart = Some(new_value.to_string());
         self
     }
@@ -29490,7 +29417,7 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -29515,7 +29442,7 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29535,7 +29462,7 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29579,10 +29506,10 @@ impl<'a, C> VideoListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoRateCall<'a, C>
-    where C: 'a {
+pub struct VideoRateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _id: String,
     _rating: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29590,9 +29517,9 @@ pub struct VideoRateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoRateCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoRateCall<'a> {}
 
-impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoRateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -29632,8 +29559,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29646,7 +29572,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29655,7 +29581,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29704,7 +29630,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> VideoRateCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> VideoRateCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -29713,7 +29639,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a, C> {
+    pub fn rating(mut self, new_value: &str) -> VideoRateCall<'a> {
         self._rating = new_value.to_string();
         self
     }
@@ -29723,7 +29649,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoRateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoRateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -29748,7 +29674,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoRateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoRateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29768,7 +29694,7 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoRateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoRateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29819,10 +29745,10 @@ impl<'a, C> VideoRateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoReportAbuseCall<'a, C>
-    where C: 'a {
+pub struct VideoReportAbuseCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: VideoAbuseReport,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -29830,9 +29756,9 @@ pub struct VideoReportAbuseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoReportAbuseCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoReportAbuseCall<'a> {}
 
-impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoReportAbuseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -29884,8 +29810,7 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29899,7 +29824,7 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29910,7 +29835,7 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29959,14 +29884,14 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: VideoAbuseReport) -> VideoReportAbuseCall<'a, C> {
+    pub fn request(mut self, new_value: VideoAbuseReport) -> VideoReportAbuseCall<'a> {
         self._request = new_value;
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoReportAbuseCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoReportAbuseCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -29976,7 +29901,7 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoReportAbuseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoReportAbuseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30001,7 +29926,7 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoReportAbuseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoReportAbuseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30021,7 +29946,7 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoReportAbuseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoReportAbuseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30072,10 +29997,10 @@ impl<'a, C> VideoReportAbuseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct VideoUpdateCall<'a, C>
-    where C: 'a {
+pub struct VideoUpdateCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: Video,
     _part: Vec<String>,
     _on_behalf_of_content_owner: Option<String>,
@@ -30084,9 +30009,9 @@ pub struct VideoUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for VideoUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for VideoUpdateCall<'a> {}
 
-impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> VideoUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -30147,8 +30072,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -30162,7 +30086,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -30173,7 +30097,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -30232,7 +30156,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Video) -> VideoUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Video) -> VideoUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -30246,14 +30170,14 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// This may not always be desirable, as you can obtain (newly generated) parts you cannot pass in,
     /// like statistics that are generated server side. Therefore you should use this method to specify
     /// the parts you provide in addition to the ones you want in the response.
-    pub fn add_part(mut self, new_value: &str) -> VideoUpdateCall<'a, C> {
+    pub fn add_part(mut self, new_value: &str) -> VideoUpdateCall<'a> {
         self._part.push(new_value.to_string());
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The actual CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> VideoUpdateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -30263,7 +30187,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VideoUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30288,7 +30212,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> VideoUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30308,7 +30232,7 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VideoUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VideoUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30360,10 +30284,10 @@ impl<'a, C> VideoUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct WatermarkSetCall<'a, C>
-    where C: 'a {
+pub struct WatermarkSetCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _request: InvideoBranding,
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
@@ -30372,9 +30296,9 @@ pub struct WatermarkSetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WatermarkSetCall<'a, C> {}
+impl<'a> client::CallBuilder for WatermarkSetCall<'a> {}
 
-impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WatermarkSetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -30439,8 +30363,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -30480,7 +30403,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -30496,7 +30419,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -30537,7 +30460,6 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         if size > 10485760 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 10485760))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -30545,10 +30467,10 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -30617,7 +30539,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InvideoBranding) -> WatermarkSetCall<'a, C> {
+    pub fn request(mut self, new_value: InvideoBranding) -> WatermarkSetCall<'a> {
         self._request = new_value;
         self
     }
@@ -30626,14 +30548,14 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> WatermarkSetCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkSetCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -30643,7 +30565,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkSetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkSetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30668,7 +30590,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkSetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30688,7 +30610,7 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WatermarkSetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WatermarkSetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30733,10 +30655,10 @@ impl<'a, C> WatermarkSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WatermarkUnsetCall<'a, C>
-    where C: 'a {
+pub struct WatermarkUnsetCall<'a>
+    where  {
 
-    hub: &'a YouTube<C>,
+    hub: &'a YouTube<>,
     _channel_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -30744,9 +30666,9 @@ pub struct WatermarkUnsetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WatermarkUnsetCall<'a, C> {}
+impl<'a> client::CallBuilder for WatermarkUnsetCall<'a> {}
 
-impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WatermarkUnsetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -30788,8 +30710,7 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -30802,7 +30723,7 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -30811,7 +30732,7 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -30860,14 +30781,14 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> WatermarkUnsetCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// *Note:* This parameter is intended exclusively for YouTube content partners. The *onBehalfOfContentOwner* parameter indicates that the request's authorization credentials identify a YouTube CMS user who is acting on behalf of the content owner specified in the parameter value. This parameter is intended for YouTube content partners that own and manage many different YouTube channels. It allows content owners to authenticate once and get access to all their video and channel data, without having to provide authentication credentials for each individual channel. The CMS account that the user authenticates with must be linked to the specified YouTube content owner.
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> WatermarkUnsetCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -30877,7 +30798,7 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkUnsetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WatermarkUnsetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30902,7 +30823,7 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WatermarkUnsetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30922,7 +30843,7 @@ impl<'a, C> WatermarkUnsetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WatermarkUnsetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WatermarkUnsetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

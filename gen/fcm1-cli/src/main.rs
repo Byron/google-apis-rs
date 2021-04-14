@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::FirebaseCloudMessaging<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::FirebaseCloudMessaging,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -302,7 +301,7 @@ async fn main() {
     
     let mut app = App::new("fcm1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210329")
+           .version("2.0.3+20210329")
            .about("FCM send API that provides a cross-platform messaging solution to reliably deliver messages at no cost.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fcm1_cli")
            .arg(Arg::with_name("url")

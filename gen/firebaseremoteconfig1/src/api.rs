@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -84,35 +83,34 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct FirebaseRemoteConfig<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct FirebaseRemoteConfig<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for FirebaseRemoteConfig<C> {}
+impl<'a, > client::Hub for FirebaseRemoteConfig<> {}
 
-impl<'a, C> FirebaseRemoteConfig<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > FirebaseRemoteConfig<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseRemoteConfig<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseRemoteConfig<> {
         FirebaseRemoteConfig {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://firebaseremoteconfig.googleapis.com/".to_string(),
             _root_url: "https://firebaseremoteconfig.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -305,15 +303,15 @@ impl client::ResponseResult for RemoteConfig {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a FirebaseRemoteConfig<C>,
+    hub: &'a FirebaseRemoteConfig<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -325,7 +323,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `project` - The GMP project identifier. Required.
     ///               See note at the beginning of this file regarding project ids.
-    pub fn get_remote_config(&self, project: &str) -> ProjectGetRemoteConfigCall<'a, C> {
+    pub fn get_remote_config(&self, project: &str) -> ProjectGetRemoteConfigCall<'a> {
         ProjectGetRemoteConfigCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -360,7 +358,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `project` - The GMP project identifier. Required.
     ///               See note at the beginning of this file regarding project ids.
-    pub fn update_remote_config(&self, request: RemoteConfig, project: &str) -> ProjectUpdateRemoteConfigCall<'a, C> {
+    pub fn update_remote_config(&self, request: RemoteConfig, project: &str) -> ProjectUpdateRemoteConfigCall<'a> {
         ProjectUpdateRemoteConfigCall {
             hub: self.hub,
             _request: request,
@@ -414,18 +412,18 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectGetRemoteConfigCall<'a, C>
-    where C: 'a {
+pub struct ProjectGetRemoteConfigCall<'a>
+    where  {
 
-    hub: &'a FirebaseRemoteConfig<C>,
+    hub: &'a FirebaseRemoteConfig<>,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ProjectGetRemoteConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectGetRemoteConfigCall<'a> {}
 
-impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectGetRemoteConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -497,7 +495,7 @@ impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<h
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -506,7 +504,7 @@ impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -567,7 +565,7 @@ impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectGetRemoteConfigCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> ProjectGetRemoteConfigCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -577,7 +575,7 @@ impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetRemoteConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectGetRemoteConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -604,7 +602,7 @@ impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetRemoteConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectGetRemoteConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -669,10 +667,10 @@ impl<'a, C> ProjectGetRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectUpdateRemoteConfigCall<'a, C>
-    where C: 'a {
+pub struct ProjectUpdateRemoteConfigCall<'a>
+    where  {
 
-    hub: &'a FirebaseRemoteConfig<C>,
+    hub: &'a FirebaseRemoteConfig<>,
     _request: RemoteConfig,
     _project: String,
     _validate_only: Option<bool>,
@@ -680,9 +678,9 @@ pub struct ProjectUpdateRemoteConfigCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ProjectUpdateRemoteConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectUpdateRemoteConfigCall<'a> {}
 
-impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectUpdateRemoteConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -769,7 +767,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -780,7 +778,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -839,7 +837,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoteConfig) -> ProjectUpdateRemoteConfigCall<'a, C> {
+    pub fn request(mut self, new_value: RemoteConfig) -> ProjectUpdateRemoteConfigCall<'a> {
         self._request = new_value;
         self
     }
@@ -850,7 +848,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ProjectUpdateRemoteConfigCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> ProjectUpdateRemoteConfigCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -863,7 +861,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     /// "200 OK" when calling with <code>true</code>.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> ProjectUpdateRemoteConfigCall<'a, C> {
+    pub fn validate_only(mut self, new_value: bool) -> ProjectUpdateRemoteConfigCall<'a> {
         self._validate_only = Some(new_value);
         self
     }
@@ -873,7 +871,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateRemoteConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUpdateRemoteConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -900,7 +898,7 @@ impl<'a, C> ProjectUpdateRemoteConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateRemoteConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectUpdateRemoteConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

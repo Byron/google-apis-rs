@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reseller* crate version *2.0.0+20160329*, where *20160329* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *reseller* crate version *2.0.3+20160329*, where *20160329* is the exact revision of the *reseller:v1sandbox* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *reseller* *v1_sandbox* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/reseller/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/reseller1_sandbox).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/reseller1_sandbox).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Reseller) ... 

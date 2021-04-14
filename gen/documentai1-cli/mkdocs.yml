@@ -1,8 +1,8 @@
-site_name: Document v2.0.0+20210329
+site_name: Document v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-documentai1-cli
 site_description: A complete library to interact with Document (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/documentai1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/documentai1-cli
 
 docs_dir: docs
 site_dir: build_html

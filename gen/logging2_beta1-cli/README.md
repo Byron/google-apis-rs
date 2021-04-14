@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-logging2_beta1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/logging2_beta1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/logging2_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20190325*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Logging* API at revision *20190325*. The CLI is at version *2.0.3*.
 
 ```bash
 logging2-beta1 [options]

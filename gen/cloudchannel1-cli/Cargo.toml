@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudchannel1-cli"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloudchannel (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudchannel1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudchannel1-cli"
 homepage = "https://cloud.google.com/channel"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudchannel1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudchannel1]
 path = "../cloudchannel1"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"

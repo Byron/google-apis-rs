@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-clouduseraccountsvm_beta-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/clouduseraccountsvm_beta-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/clouduseraccountsvm_beta-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud User Accounts* API at revision *20160316*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud User Accounts* API at revision *20160316*. The CLI is at version *2.0.3*.
 
 ```bash
 clouduseraccountsvm-beta [options]

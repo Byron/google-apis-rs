@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -110,41 +109,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct ConsumerSurveys<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct ConsumerSurveys<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for ConsumerSurveys<C> {}
+impl<'a, > client::Hub for ConsumerSurveys<> {}
 
-impl<'a, C> ConsumerSurveys<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > ConsumerSurveys<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ConsumerSurveys<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ConsumerSurveys<> {
         ConsumerSurveys {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/consumersurveys/v2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn mobileapppanels(&'a self) -> MobileapppanelMethods<'a, C> {
+    pub fn mobileapppanels(&'a self) -> MobileapppanelMethods<'a> {
         MobileapppanelMethods { hub: &self }
     }
-    pub fn results(&'a self) -> ResultMethods<'a, C> {
+    pub fn results(&'a self) -> ResultMethods<'a> {
         ResultMethods { hub: &self }
     }
-    pub fn surveys(&'a self) -> SurveyMethods<'a, C> {
+    pub fn surveys(&'a self) -> SurveyMethods<'a> {
         SurveyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -673,15 +671,15 @@ impl client::Part for TokenPagination {}
 /// let rb = hub.mobileapppanels();
 /// # }
 /// ```
-pub struct MobileapppanelMethods<'a, C>
-    where C: 'a {
+pub struct MobileapppanelMethods<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MobileapppanelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MobileapppanelMethods<'a> {}
 
-impl<'a, C> MobileapppanelMethods<'a, C> {
+impl<'a> MobileapppanelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -690,7 +688,7 @@ impl<'a, C> MobileapppanelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `panelId` - External URL ID for the panel.
-    pub fn get(&self, panel_id: &str) -> MobileapppanelGetCall<'a, C> {
+    pub fn get(&self, panel_id: &str) -> MobileapppanelGetCall<'a> {
         MobileapppanelGetCall {
             hub: self.hub,
             _panel_id: panel_id.to_string(),
@@ -703,7 +701,7 @@ impl<'a, C> MobileapppanelMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the MobileAppPanels available to the authenticated user.
-    pub fn list(&self) -> MobileapppanelListCall<'a, C> {
+    pub fn list(&self) -> MobileapppanelListCall<'a> {
         MobileapppanelListCall {
             hub: self.hub,
             _token: Default::default(),
@@ -723,7 +721,7 @@ impl<'a, C> MobileapppanelMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `panelId` - External URL ID for the panel.
-    pub fn update(&self, request: MobileAppPanel, panel_id: &str) -> MobileapppanelUpdateCall<'a, C> {
+    pub fn update(&self, request: MobileAppPanel, panel_id: &str) -> MobileapppanelUpdateCall<'a> {
         MobileapppanelUpdateCall {
             hub: self.hub,
             _request: request,
@@ -767,15 +765,15 @@ impl<'a, C> MobileapppanelMethods<'a, C> {
 /// let rb = hub.results();
 /// # }
 /// ```
-pub struct ResultMethods<'a, C>
-    where C: 'a {
+pub struct ResultMethods<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ResultMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ResultMethods<'a> {}
 
-impl<'a, C> ResultMethods<'a, C> {
+impl<'a> ResultMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -785,7 +783,7 @@ impl<'a, C> ResultMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn get(&self, request: ResultsGetRequest, survey_url_id: &str) -> ResultGetCall<'a, C> {
+    pub fn get(&self, request: ResultsGetRequest, survey_url_id: &str) -> ResultGetCall<'a> {
         ResultGetCall {
             hub: self.hub,
             _request: request,
@@ -829,15 +827,15 @@ impl<'a, C> ResultMethods<'a, C> {
 /// let rb = hub.surveys();
 /// # }
 /// ```
-pub struct SurveyMethods<'a, C>
-    where C: 'a {
+pub struct SurveyMethods<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SurveyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SurveyMethods<'a> {}
 
-impl<'a, C> SurveyMethods<'a, C> {
+impl<'a> SurveyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -846,7 +844,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn delete(&self, survey_url_id: &str) -> SurveyDeleteCall<'a, C> {
+    pub fn delete(&self, survey_url_id: &str) -> SurveyDeleteCall<'a> {
         SurveyDeleteCall {
             hub: self.hub,
             _survey_url_id: survey_url_id.to_string(),
@@ -863,7 +861,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn get(&self, survey_url_id: &str) -> SurveyGetCall<'a, C> {
+    pub fn get(&self, survey_url_id: &str) -> SurveyGetCall<'a> {
         SurveyGetCall {
             hub: self.hub,
             _survey_url_id: survey_url_id.to_string(),
@@ -880,7 +878,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Survey) -> SurveyInsertCall<'a, C> {
+    pub fn insert(&self, request: Survey) -> SurveyInsertCall<'a> {
         SurveyInsertCall {
             hub: self.hub,
             _request: request,
@@ -893,7 +891,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the surveys owned by the authenticated user.
-    pub fn list(&self) -> SurveyListCall<'a, C> {
+    pub fn list(&self) -> SurveyListCall<'a> {
         SurveyListCall {
             hub: self.hub,
             _token: Default::default(),
@@ -913,7 +911,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resourceId` - No description provided.
-    pub fn start(&self, request: SurveysStartRequest, resource_id: &str) -> SurveyStartCall<'a, C> {
+    pub fn start(&self, request: SurveysStartRequest, resource_id: &str) -> SurveyStartCall<'a> {
         SurveyStartCall {
             hub: self.hub,
             _request: request,
@@ -931,7 +929,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceId` - No description provided.
-    pub fn stop(&self, resource_id: &str) -> SurveyStopCall<'a, C> {
+    pub fn stop(&self, resource_id: &str) -> SurveyStopCall<'a> {
         SurveyStopCall {
             hub: self.hub,
             _resource_id: resource_id.to_string(),
@@ -949,7 +947,7 @@ impl<'a, C> SurveyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `surveyUrlId` - External URL ID for the survey.
-    pub fn update(&self, request: Survey, survey_url_id: &str) -> SurveyUpdateCall<'a, C> {
+    pub fn update(&self, request: Survey, survey_url_id: &str) -> SurveyUpdateCall<'a> {
         SurveyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1001,19 +999,19 @@ impl<'a, C> SurveyMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MobileapppanelGetCall<'a, C>
-    where C: 'a {
+pub struct MobileapppanelGetCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _panel_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MobileapppanelGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MobileapppanelGetCall<'a> {}
 
-impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MobileapppanelGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1074,8 +1072,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1088,7 +1085,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1097,7 +1094,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1157,7 +1154,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn panel_id(mut self, new_value: &str) -> MobileapppanelGetCall<'a, C> {
+    pub fn panel_id(mut self, new_value: &str) -> MobileapppanelGetCall<'a> {
         self._panel_id = new_value.to_string();
         self
     }
@@ -1167,7 +1164,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MobileapppanelGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MobileapppanelGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1188,7 +1185,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MobileapppanelGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MobileapppanelGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1208,7 +1205,7 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MobileapppanelGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MobileapppanelGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1255,10 +1252,10 @@ impl<'a, C> MobileapppanelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MobileapppanelListCall<'a, C>
-    where C: 'a {
+pub struct MobileapppanelListCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _token: Option<String>,
     _start_index: Option<u32>,
     _max_results: Option<u32>,
@@ -1267,9 +1264,9 @@ pub struct MobileapppanelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MobileapppanelListCall<'a, C> {}
+impl<'a> client::CallBuilder for MobileapppanelListCall<'a> {}
 
-impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MobileapppanelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1317,8 +1314,7 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1331,7 +1327,7 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1340,7 +1336,7 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1396,19 +1392,19 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
     ///
     /// Sets the *token* query property to the given value.
-    pub fn token(mut self, new_value: &str) -> MobileapppanelListCall<'a, C> {
+    pub fn token(mut self, new_value: &str) -> MobileapppanelListCall<'a> {
         self._token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> MobileapppanelListCall<'a, C> {
+    pub fn start_index(mut self, new_value: u32) -> MobileapppanelListCall<'a> {
         self._start_index = Some(new_value);
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> MobileapppanelListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> MobileapppanelListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -1418,7 +1414,7 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MobileapppanelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MobileapppanelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1439,7 +1435,7 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MobileapppanelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MobileapppanelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1459,7 +1455,7 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MobileapppanelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MobileapppanelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1509,10 +1505,10 @@ impl<'a, C> MobileapppanelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MobileapppanelUpdateCall<'a, C>
-    where C: 'a {
+pub struct MobileapppanelUpdateCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _request: MobileAppPanel,
     _panel_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1520,9 +1516,9 @@ pub struct MobileapppanelUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MobileapppanelUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for MobileapppanelUpdateCall<'a> {}
 
-impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MobileapppanelUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1594,8 +1590,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1609,7 +1604,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1620,7 +1615,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1679,7 +1674,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MobileAppPanel) -> MobileapppanelUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: MobileAppPanel) -> MobileapppanelUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1689,7 +1684,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn panel_id(mut self, new_value: &str) -> MobileapppanelUpdateCall<'a, C> {
+    pub fn panel_id(mut self, new_value: &str) -> MobileapppanelUpdateCall<'a> {
         self._panel_id = new_value.to_string();
         self
     }
@@ -1699,7 +1694,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MobileapppanelUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MobileapppanelUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1720,7 +1715,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MobileapppanelUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MobileapppanelUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1740,7 +1735,7 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MobileapppanelUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MobileapppanelUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1795,10 +1790,10 @@ impl<'a, C> MobileapppanelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ResultGetCall<'a, C>
-    where C: 'a {
+pub struct ResultGetCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _request: ResultsGetRequest,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1806,9 +1801,9 @@ pub struct ResultGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ResultGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ResultGetCall<'a> {}
 
-impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ResultGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1896,8 +1891,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1911,7 +1905,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1922,7 +1916,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1981,7 +1975,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResultsGetRequest) -> ResultGetCall<'a, C> {
+    pub fn request(mut self, new_value: ResultsGetRequest) -> ResultGetCall<'a> {
         self._request = new_value;
         self
     }
@@ -1991,7 +1985,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> ResultGetCall<'a, C> {
+    pub fn survey_url_id(mut self, new_value: &str) -> ResultGetCall<'a> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -2001,7 +1995,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResultGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ResultGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2022,7 +2016,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ResultGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ResultGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2042,7 +2036,7 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ResultGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ResultGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2086,19 +2080,19 @@ impl<'a, C> ResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyDeleteCall<'a, C>
-    where C: 'a {
+pub struct SurveyDeleteCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyDeleteCall<'a> {}
 
-impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2159,8 +2153,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2173,7 +2166,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2182,7 +2175,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2242,7 +2235,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> SurveyDeleteCall<'a, C> {
+    pub fn survey_url_id(mut self, new_value: &str) -> SurveyDeleteCall<'a> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -2252,7 +2245,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2273,7 +2266,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2293,7 +2286,7 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2337,19 +2330,19 @@ impl<'a, C> SurveyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyGetCall<'a, C>
-    where C: 'a {
+pub struct SurveyGetCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyGetCall<'a> {}
 
-impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2410,8 +2403,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2424,7 +2416,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2433,7 +2425,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2493,7 +2485,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> SurveyGetCall<'a, C> {
+    pub fn survey_url_id(mut self, new_value: &str) -> SurveyGetCall<'a> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -2503,7 +2495,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2524,7 +2516,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2544,7 +2536,7 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2594,19 +2586,19 @@ impl<'a, C> SurveyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyInsertCall<'a, C>
-    where C: 'a {
+pub struct SurveyInsertCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _request: Survey,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyInsertCall<'a> {}
 
-impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2656,8 +2648,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2671,7 +2662,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2682,7 +2673,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2741,7 +2732,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Survey) -> SurveyInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Survey) -> SurveyInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -2751,7 +2742,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2772,7 +2763,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2792,7 +2783,7 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2839,10 +2830,10 @@ impl<'a, C> SurveyInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyListCall<'a, C>
-    where C: 'a {
+pub struct SurveyListCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _token: Option<String>,
     _start_index: Option<u32>,
     _max_results: Option<u32>,
@@ -2851,9 +2842,9 @@ pub struct SurveyListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyListCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyListCall<'a> {}
 
-impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2901,8 +2892,7 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2915,7 +2905,7 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2924,7 +2914,7 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2980,19 +2970,19 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
     ///
     /// Sets the *token* query property to the given value.
-    pub fn token(mut self, new_value: &str) -> SurveyListCall<'a, C> {
+    pub fn token(mut self, new_value: &str) -> SurveyListCall<'a> {
         self._token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> SurveyListCall<'a, C> {
+    pub fn start_index(mut self, new_value: u32) -> SurveyListCall<'a> {
         self._start_index = Some(new_value);
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> SurveyListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> SurveyListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -3002,7 +2992,7 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3023,7 +3013,7 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3043,7 +3033,7 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3093,10 +3083,10 @@ impl<'a, C> SurveyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyStartCall<'a, C>
-    where C: 'a {
+pub struct SurveyStartCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _request: SurveysStartRequest,
     _resource_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3104,9 +3094,9 @@ pub struct SurveyStartCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyStartCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyStartCall<'a> {}
 
-impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyStartCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3178,8 +3168,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3193,7 +3182,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3204,7 +3193,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3263,7 +3252,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SurveysStartRequest) -> SurveyStartCall<'a, C> {
+    pub fn request(mut self, new_value: SurveysStartRequest) -> SurveyStartCall<'a> {
         self._request = new_value;
         self
     }
@@ -3272,7 +3261,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_id(mut self, new_value: &str) -> SurveyStartCall<'a, C> {
+    pub fn resource_id(mut self, new_value: &str) -> SurveyStartCall<'a> {
         self._resource_id = new_value.to_string();
         self
     }
@@ -3282,7 +3271,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStartCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStartCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3303,7 +3292,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyStartCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyStartCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3323,7 +3312,7 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyStartCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyStartCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3367,19 +3356,19 @@ impl<'a, C> SurveyStartCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyStopCall<'a, C>
-    where C: 'a {
+pub struct SurveyStopCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _resource_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyStopCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyStopCall<'a> {}
 
-impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyStopCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3440,8 +3429,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3454,7 +3442,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3463,7 +3451,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3522,7 +3510,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_id(mut self, new_value: &str) -> SurveyStopCall<'a, C> {
+    pub fn resource_id(mut self, new_value: &str) -> SurveyStopCall<'a> {
         self._resource_id = new_value.to_string();
         self
     }
@@ -3532,7 +3520,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStopCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyStopCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3553,7 +3541,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyStopCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyStopCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3573,7 +3561,7 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyStopCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyStopCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3623,10 +3611,10 @@ impl<'a, C> SurveyStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SurveyUpdateCall<'a, C>
-    where C: 'a {
+pub struct SurveyUpdateCall<'a>
+    where  {
 
-    hub: &'a ConsumerSurveys<C>,
+    hub: &'a ConsumerSurveys<>,
     _request: Survey,
     _survey_url_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3634,9 +3622,9 @@ pub struct SurveyUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SurveyUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for SurveyUpdateCall<'a> {}
 
-impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SurveyUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3708,8 +3696,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3723,7 +3710,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3734,7 +3721,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3793,7 +3780,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Survey) -> SurveyUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Survey) -> SurveyUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3803,7 +3790,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn survey_url_id(mut self, new_value: &str) -> SurveyUpdateCall<'a, C> {
+    pub fn survey_url_id(mut self, new_value: &str) -> SurveyUpdateCall<'a> {
         self._survey_url_id = new_value.to_string();
         self
     }
@@ -3813,7 +3800,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SurveyUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3834,7 +3821,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> SurveyUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SurveyUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3854,7 +3841,7 @@ impl<'a, C> SurveyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SurveyUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

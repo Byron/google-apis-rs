@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,41 +104,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct FirebaseDynamicLinks<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct FirebaseDynamicLinks<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for FirebaseDynamicLinks<C> {}
+impl<'a, > client::Hub for FirebaseDynamicLinks<> {}
 
-impl<'a, C> FirebaseDynamicLinks<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > FirebaseDynamicLinks<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseDynamicLinks<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseDynamicLinks<> {
         FirebaseDynamicLinks {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
             _root_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
         }
     }
 
-    pub fn managed_short_links(&'a self) -> ManagedShortLinkMethods<'a, C> {
+    pub fn managed_short_links(&'a self) -> ManagedShortLinkMethods<'a> {
         ManagedShortLinkMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
-    pub fn short_links(&'a self) -> ShortLinkMethods<'a, C> {
+    pub fn short_links(&'a self) -> ShortLinkMethods<'a> {
         ShortLinkMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -815,15 +813,15 @@ impl client::Part for Suffix {}
 /// let rb = hub.managed_short_links();
 /// # }
 /// ```
-pub struct ManagedShortLinkMethods<'a, C>
-    where C: 'a {
+pub struct ManagedShortLinkMethods<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ManagedShortLinkMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ManagedShortLinkMethods<'a> {}
 
-impl<'a, C> ManagedShortLinkMethods<'a, C> {
+impl<'a> ManagedShortLinkMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -832,7 +830,7 @@ impl<'a, C> ManagedShortLinkMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a, C> {
+    pub fn create(&self, request: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a> {
         ManagedShortLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -875,15 +873,15 @@ impl<'a, C> ManagedShortLinkMethods<'a, C> {
 /// let rb = hub.short_links();
 /// # }
 /// ```
-pub struct ShortLinkMethods<'a, C>
-    where C: 'a {
+pub struct ShortLinkMethods<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ShortLinkMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ShortLinkMethods<'a> {}
 
-impl<'a, C> ShortLinkMethods<'a, C> {
+impl<'a> ShortLinkMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -892,7 +890,7 @@ impl<'a, C> ShortLinkMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a, C> {
+    pub fn create(&self, request: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a> {
         ShortLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -935,15 +933,15 @@ impl<'a, C> ShortLinkMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -952,7 +950,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `dynamicLink` - Dynamic Link URL. e.g. https://abcd.app.goo.gl/wxyz
-    pub fn get_link_stats(&self, dynamic_link: &str) -> MethodGetLinkStatCall<'a, C> {
+    pub fn get_link_stats(&self, dynamic_link: &str) -> MethodGetLinkStatCall<'a> {
         MethodGetLinkStatCall {
             hub: self.hub,
             _dynamic_link: dynamic_link.to_string(),
@@ -971,7 +969,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn install_attribution(&self, request: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a, C> {
+    pub fn install_attribution(&self, request: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a> {
         MethodInstallAttributionCall {
             hub: self.hub,
             _request: request,
@@ -988,7 +986,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reopen_attribution(&self, request: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a, C> {
+    pub fn reopen_attribution(&self, request: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a> {
         MethodReopenAttributionCall {
             hub: self.hub,
             _request: request,
@@ -1045,19 +1043,19 @@ impl<'a, C> MethodMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ManagedShortLinkCreateCall<'a, C>
-    where C: 'a {
+pub struct ManagedShortLinkCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
     _request: CreateManagedShortLinkRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ManagedShortLinkCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ManagedShortLinkCreateCall<'a> {}
 
-impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ManagedShortLinkCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1107,8 +1105,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1122,7 +1119,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1133,7 +1130,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1192,7 +1189,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1202,7 +1199,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedShortLinkCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ManagedShortLinkCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1227,7 +1224,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ManagedShortLinkCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedShortLinkCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1247,7 +1244,7 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedShortLinkCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedShortLinkCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1297,19 +1294,19 @@ impl<'a, C> ManagedShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShortLinkCreateCall<'a, C>
-    where C: 'a {
+pub struct ShortLinkCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
     _request: CreateShortDynamicLinkRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShortLinkCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ShortLinkCreateCall<'a> {}
 
-impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShortLinkCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1359,8 +1356,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1374,7 +1370,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1385,7 +1381,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1444,7 +1440,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateShortDynamicLinkRequest) -> ShortLinkCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1454,7 +1450,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShortLinkCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShortLinkCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1479,7 +1475,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShortLinkCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShortLinkCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1499,7 +1495,7 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShortLinkCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShortLinkCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1545,10 +1541,10 @@ impl<'a, C> ShortLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetLinkStatCall<'a, C>
-    where C: 'a {
+pub struct MethodGetLinkStatCall<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
     _dynamic_link: String,
     _sdk_version: Option<String>,
     _duration_days: Option<String>,
@@ -1557,9 +1553,9 @@ pub struct MethodGetLinkStatCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodGetLinkStatCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetLinkStatCall<'a> {}
 
-impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetLinkStatCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1626,8 +1622,7 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1640,7 +1635,7 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1649,7 +1644,7 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1709,21 +1704,21 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dynamic_link(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, C> {
+    pub fn dynamic_link(mut self, new_value: &str) -> MethodGetLinkStatCall<'a> {
         self._dynamic_link = new_value.to_string();
         self
     }
     /// Google SDK version. Version takes the form "$major.$minor.$patch"
     ///
     /// Sets the *sdk version* query property to the given value.
-    pub fn sdk_version(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, C> {
+    pub fn sdk_version(mut self, new_value: &str) -> MethodGetLinkStatCall<'a> {
         self._sdk_version = Some(new_value.to_string());
         self
     }
     /// The span of time requested in days.
     ///
     /// Sets the *duration days* query property to the given value.
-    pub fn duration_days(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, C> {
+    pub fn duration_days(mut self, new_value: &str) -> MethodGetLinkStatCall<'a> {
         self._duration_days = Some(new_value.to_string());
         self
     }
@@ -1733,7 +1728,7 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetLinkStatCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetLinkStatCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1758,7 +1753,7 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetLinkStatCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetLinkStatCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1778,7 +1773,7 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetLinkStatCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetLinkStatCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1828,19 +1823,19 @@ impl<'a, C> MethodGetLinkStatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodInstallAttributionCall<'a, C>
-    where C: 'a {
+pub struct MethodInstallAttributionCall<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
     _request: GetIosPostInstallAttributionRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodInstallAttributionCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodInstallAttributionCall<'a> {}
 
-impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodInstallAttributionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1890,8 +1885,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1905,7 +1899,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1916,7 +1910,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1975,7 +1969,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a, C> {
+    pub fn request(mut self, new_value: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a> {
         self._request = new_value;
         self
     }
@@ -1985,7 +1979,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodInstallAttributionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodInstallAttributionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2010,7 +2004,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodInstallAttributionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodInstallAttributionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2030,7 +2024,7 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodInstallAttributionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodInstallAttributionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2080,19 +2074,19 @@ impl<'a, C> MethodInstallAttributionCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodReopenAttributionCall<'a, C>
-    where C: 'a {
+pub struct MethodReopenAttributionCall<'a>
+    where  {
 
-    hub: &'a FirebaseDynamicLinks<C>,
+    hub: &'a FirebaseDynamicLinks<>,
     _request: GetIosReopenAttributionRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodReopenAttributionCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodReopenAttributionCall<'a> {}
 
-impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodReopenAttributionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2142,8 +2136,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2157,7 +2150,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2168,7 +2161,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2227,7 +2220,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a, C> {
+    pub fn request(mut self, new_value: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a> {
         self._request = new_value;
         self
     }
@@ -2237,7 +2230,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodReopenAttributionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodReopenAttributionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2262,7 +2255,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodReopenAttributionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodReopenAttributionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2282,7 +2275,7 @@ impl<'a, C> MethodReopenAttributionCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodReopenAttributionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodReopenAttributionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

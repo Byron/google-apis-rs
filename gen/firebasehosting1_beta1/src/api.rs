@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -114,38 +113,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct FirebaseHosting<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct FirebaseHosting<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for FirebaseHosting<C> {}
+impl<'a, > client::Hub for FirebaseHosting<> {}
 
-impl<'a, C> FirebaseHosting<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > FirebaseHosting<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseHosting<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseHosting<> {
         FirebaseHosting {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://firebasehosting.googleapis.com/".to_string(),
             _root_url: "https://firebasehosting.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
-    pub fn sites(&'a self) -> SiteMethods<'a, C> {
+    pub fn sites(&'a self) -> SiteMethods<'a> {
         SiteMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -990,15 +988,15 @@ impl client::Part for VersionFile {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1007,7 +1005,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a, C> {
+    pub fn operations_get(&self, name: &str) -> ProjectOperationGetCall<'a> {
         ProjectOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1025,7 +1023,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_releases_create(&self, request: Release, parent: &str) -> ProjectSiteChannelReleaseCreateCall<'a, C> {
+    pub fn sites_channels_releases_create(&self, request: Release, parent: &str) -> ProjectSiteChannelReleaseCreateCall<'a> {
         ProjectSiteChannelReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1044,7 +1042,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn sites_channels_releases_list(&self, parent: &str) -> ProjectSiteChannelReleaseListCall<'a, C> {
+    pub fn sites_channels_releases_list(&self, parent: &str) -> ProjectSiteChannelReleaseListCall<'a> {
         ProjectSiteChannelReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1064,7 +1062,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create this channel, in the format: sites/ SITE_ID
-    pub fn sites_channels_create(&self, request: Channel, parent: &str) -> ProjectSiteChannelCreateCall<'a, C> {
+    pub fn sites_channels_create(&self, request: Channel, parent: &str) -> ProjectSiteChannelCreateCall<'a> {
         ProjectSiteChannelCreateCall {
             hub: self.hub,
             _request: request,
@@ -1083,7 +1081,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_delete(&self, name: &str) -> ProjectSiteChannelDeleteCall<'a, C> {
+    pub fn sites_channels_delete(&self, name: &str) -> ProjectSiteChannelDeleteCall<'a> {
         ProjectSiteChannelDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1100,7 +1098,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_get(&self, name: &str) -> ProjectSiteChannelGetCall<'a, C> {
+    pub fn sites_channels_get(&self, name: &str) -> ProjectSiteChannelGetCall<'a> {
         ProjectSiteChannelGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1117,7 +1115,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site for which to list channels, in the format: sites/SITE_ID
-    pub fn sites_channels_list(&self, parent: &str) -> ProjectSiteChannelListCall<'a, C> {
+    pub fn sites_channels_list(&self, parent: &str) -> ProjectSiteChannelListCall<'a> {
         ProjectSiteChannelListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1137,7 +1135,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the channel, in the format: sites/ SITE_ID/channels/CHANNEL_ID
-    pub fn sites_channels_patch(&self, request: Channel, name: &str) -> ProjectSiteChannelPatchCall<'a, C> {
+    pub fn sites_channels_patch(&self, request: Channel, name: &str) -> ProjectSiteChannelPatchCall<'a> {
         ProjectSiteChannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -1157,7 +1155,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent to create the domain association for, in the format: sites/site-name
-    pub fn sites_domains_create(&self, request: Domain, parent: &str) -> ProjectSiteDomainCreateCall<'a, C> {
+    pub fn sites_domains_create(&self, request: Domain, parent: &str) -> ProjectSiteDomainCreateCall<'a> {
         ProjectSiteDomainCreateCall {
             hub: self.hub,
             _request: request,
@@ -1175,7 +1173,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain association to delete.
-    pub fn sites_domains_delete(&self, name: &str) -> ProjectSiteDomainDeleteCall<'a, C> {
+    pub fn sites_domains_delete(&self, name: &str) -> ProjectSiteDomainDeleteCall<'a> {
         ProjectSiteDomainDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1192,7 +1190,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain configuration to get.
-    pub fn sites_domains_get(&self, name: &str) -> ProjectSiteDomainGetCall<'a, C> {
+    pub fn sites_domains_get(&self, name: &str) -> ProjectSiteDomainGetCall<'a> {
         ProjectSiteDomainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1209,7 +1207,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent for which to list domains, in the format: sites/ site-name
-    pub fn sites_domains_list(&self, parent: &str) -> ProjectSiteDomainListCall<'a, C> {
+    pub fn sites_domains_list(&self, parent: &str) -> ProjectSiteDomainListCall<'a> {
         ProjectSiteDomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1229,7 +1227,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the domain association to update or create, if an association doesn't already exist.
-    pub fn sites_domains_update(&self, request: Domain, name: &str) -> ProjectSiteDomainUpdateCall<'a, C> {
+    pub fn sites_domains_update(&self, request: Domain, name: &str) -> ProjectSiteDomainUpdateCall<'a> {
         ProjectSiteDomainUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1248,7 +1246,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn sites_releases_create(&self, request: Release, parent: &str) -> ProjectSiteReleaseCreateCall<'a, C> {
+    pub fn sites_releases_create(&self, request: Release, parent: &str) -> ProjectSiteReleaseCreateCall<'a> {
         ProjectSiteReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1267,7 +1265,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn sites_releases_list(&self, parent: &str) -> ProjectSiteReleaseListCall<'a, C> {
+    pub fn sites_releases_list(&self, parent: &str) -> ProjectSiteReleaseListCall<'a> {
         ProjectSiteReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1286,7 +1284,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The version for which to list files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn sites_versions_files_list(&self, parent: &str) -> ProjectSiteVersionFileListCall<'a, C> {
+    pub fn sites_versions_files_list(&self, parent: &str) -> ProjectSiteVersionFileListCall<'a> {
         ProjectSiteVersionFileListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1307,7 +1305,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The target site for the cloned version, in the format: sites/ SITE_ID
-    pub fn sites_versions_clone(&self, request: CloneVersionRequest, parent: &str) -> ProjectSiteVersionCloneCall<'a, C> {
+    pub fn sites_versions_clone(&self, request: CloneVersionRequest, parent: &str) -> ProjectSiteVersionCloneCall<'a> {
         ProjectSiteVersionCloneCall {
             hub: self.hub,
             _request: request,
@@ -1326,7 +1324,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create the version, in the format: sites/ SITE_ID
-    pub fn sites_versions_create(&self, request: Version, parent: &str) -> ProjectSiteVersionCreateCall<'a, C> {
+    pub fn sites_versions_create(&self, request: Version, parent: &str) -> ProjectSiteVersionCreateCall<'a> {
         ProjectSiteVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1346,7 +1344,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the version, in the format: sites/SITE_ID/versions/VERSION_ID
-    pub fn sites_versions_delete(&self, name: &str) -> ProjectSiteVersionDeleteCall<'a, C> {
+    pub fn sites_versions_delete(&self, name: &str) -> ProjectSiteVersionDeleteCall<'a> {
         ProjectSiteVersionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1363,7 +1361,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list versions, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn sites_versions_list(&self, parent: &str) -> ProjectSiteVersionListCall<'a, C> {
+    pub fn sites_versions_list(&self, parent: &str) -> ProjectSiteVersionListCall<'a> {
         ProjectSiteVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1384,7 +1382,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the version, in the format: sites/ SITE_ID/versions/VERSION_ID This name is provided in the response body when you call [`CreateVersion`](sites.versions/create).
-    pub fn sites_versions_patch(&self, request: Version, name: &str) -> ProjectSiteVersionPatchCall<'a, C> {
+    pub fn sites_versions_patch(&self, request: Version, name: &str) -> ProjectSiteVersionPatchCall<'a> {
         ProjectSiteVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1404,7 +1402,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The version to which to add files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn sites_versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> ProjectSiteVersionPopulateFileCall<'a, C> {
+    pub fn sites_versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> ProjectSiteVersionPopulateFileCall<'a> {
         ProjectSiteVersionPopulateFileCall {
             hub: self.hub,
             _request: request,
@@ -1423,7 +1421,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The Firebase project in which to create a Hosting site, in the format: projects/PROJECT_IDENTIFIER Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn sites_create(&self, request: Site, parent: &str) -> ProjectSiteCreateCall<'a, C> {
+    pub fn sites_create(&self, request: Site, parent: &str) -> ProjectSiteCreateCall<'a> {
         ProjectSiteCreateCall {
             hub: self.hub,
             _request: request,
@@ -1442,7 +1440,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the Hosting site, in the format: projects/PROJECT_IDENTIFIER/sites/SITE_ID Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn sites_delete(&self, name: &str) -> ProjectSiteDeleteCall<'a, C> {
+    pub fn sites_delete(&self, name: &str) -> ProjectSiteDeleteCall<'a> {
         ProjectSiteDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1459,7 +1457,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the Hosting site, in the format: projects/PROJECT_IDENTIFIER/sites/SITE_ID Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values. Since a SITE_ID is a globally unique identifier, you can also use the unique sub-collection resource access pattern, in the format: projects/-/sites/SITE_ID
-    pub fn sites_get(&self, name: &str) -> ProjectSiteGetCall<'a, C> {
+    pub fn sites_get(&self, name: &str) -> ProjectSiteGetCall<'a> {
         ProjectSiteGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1476,7 +1474,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The site for which to get the SiteConfig, in the format: sites/ site-name/config
-    pub fn sites_get_config(&self, name: &str) -> ProjectSiteGetConfigCall<'a, C> {
+    pub fn sites_get_config(&self, name: &str) -> ProjectSiteGetConfigCall<'a> {
         ProjectSiteGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1493,7 +1491,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The Firebase project for which to list sites, in the format: projects/PROJECT_IDENTIFIER Refer to the `Site` [`name`](../projects#Site.FIELDS.name) field for details about PROJECT_IDENTIFIER values.
-    pub fn sites_list(&self, parent: &str) -> ProjectSiteListCall<'a, C> {
+    pub fn sites_list(&self, parent: &str) -> ProjectSiteListCall<'a> {
         ProjectSiteListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1513,7 +1511,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The fully-qualified resource name of the Hosting site, in the format: projects/PROJECT_IDENTIFIER/sites/SITE_ID PROJECT_IDENTIFIER: the Firebase project's [`ProjectNumber`](https://firebase.google.com/docs/projects/api/reference/rest/v1beta1/projects#FirebaseProject.FIELDS.project_number) ***(recommended)*** or its [`ProjectId`](https://firebase.google.com/docs/projects/api/reference/rest/v1beta1/projects#FirebaseProject.FIELDS.project_id). Learn more about using project identifiers in Google's [AIP 2510 standard](https://google.aip.dev/cloud/2510).
-    pub fn sites_patch(&self, request: Site, name: &str) -> ProjectSitePatchCall<'a, C> {
+    pub fn sites_patch(&self, request: Site, name: &str) -> ProjectSitePatchCall<'a> {
         ProjectSitePatchCall {
             hub: self.hub,
             _request: request,
@@ -1533,7 +1531,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The site for which to update the SiteConfig, in the format: sites/ site-name/config
-    pub fn sites_update_config(&self, request: SiteConfig, name: &str) -> ProjectSiteUpdateConfigCall<'a, C> {
+    pub fn sites_update_config(&self, request: SiteConfig, name: &str) -> ProjectSiteUpdateConfigCall<'a> {
         ProjectSiteUpdateConfigCall {
             hub: self.hub,
             _request: request,
@@ -1578,15 +1576,15 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// let rb = hub.sites();
 /// # }
 /// ```
-pub struct SiteMethods<'a, C>
-    where C: 'a {
+pub struct SiteMethods<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SiteMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SiteMethods<'a> {}
 
-impl<'a, C> SiteMethods<'a, C> {
+impl<'a> SiteMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1596,7 +1594,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn channels_releases_create(&self, request: Release, parent: &str) -> SiteChannelReleaseCreateCall<'a, C> {
+    pub fn channels_releases_create(&self, request: Release, parent: &str) -> SiteChannelReleaseCreateCall<'a> {
         SiteChannelReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1615,7 +1613,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn channels_releases_list(&self, parent: &str) -> SiteChannelReleaseListCall<'a, C> {
+    pub fn channels_releases_list(&self, parent: &str) -> SiteChannelReleaseListCall<'a> {
         SiteChannelReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1635,7 +1633,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create this channel, in the format: sites/ SITE_ID
-    pub fn channels_create(&self, request: Channel, parent: &str) -> SiteChannelCreateCall<'a, C> {
+    pub fn channels_create(&self, request: Channel, parent: &str) -> SiteChannelCreateCall<'a> {
         SiteChannelCreateCall {
             hub: self.hub,
             _request: request,
@@ -1654,7 +1652,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn channels_delete(&self, name: &str) -> SiteChannelDeleteCall<'a, C> {
+    pub fn channels_delete(&self, name: &str) -> SiteChannelDeleteCall<'a> {
         SiteChannelDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1671,7 +1669,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the channel, in the format: sites/SITE_ID/channels/CHANNEL_ID
-    pub fn channels_get(&self, name: &str) -> SiteChannelGetCall<'a, C> {
+    pub fn channels_get(&self, name: &str) -> SiteChannelGetCall<'a> {
         SiteChannelGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1688,7 +1686,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site for which to list channels, in the format: sites/SITE_ID
-    pub fn channels_list(&self, parent: &str) -> SiteChannelListCall<'a, C> {
+    pub fn channels_list(&self, parent: &str) -> SiteChannelListCall<'a> {
         SiteChannelListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1708,7 +1706,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the channel, in the format: sites/ SITE_ID/channels/CHANNEL_ID
-    pub fn channels_patch(&self, request: Channel, name: &str) -> SiteChannelPatchCall<'a, C> {
+    pub fn channels_patch(&self, request: Channel, name: &str) -> SiteChannelPatchCall<'a> {
         SiteChannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -1728,7 +1726,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent to create the domain association for, in the format: sites/site-name
-    pub fn domains_create(&self, request: Domain, parent: &str) -> SiteDomainCreateCall<'a, C> {
+    pub fn domains_create(&self, request: Domain, parent: &str) -> SiteDomainCreateCall<'a> {
         SiteDomainCreateCall {
             hub: self.hub,
             _request: request,
@@ -1746,7 +1744,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain association to delete.
-    pub fn domains_delete(&self, name: &str) -> SiteDomainDeleteCall<'a, C> {
+    pub fn domains_delete(&self, name: &str) -> SiteDomainDeleteCall<'a> {
         SiteDomainDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1763,7 +1761,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the domain configuration to get.
-    pub fn domains_get(&self, name: &str) -> SiteDomainGetCall<'a, C> {
+    pub fn domains_get(&self, name: &str) -> SiteDomainGetCall<'a> {
         SiteDomainGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1780,7 +1778,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent for which to list domains, in the format: sites/ site-name
-    pub fn domains_list(&self, parent: &str) -> SiteDomainListCall<'a, C> {
+    pub fn domains_list(&self, parent: &str) -> SiteDomainListCall<'a> {
         SiteDomainListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1800,7 +1798,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the domain association to update or create, if an association doesn't already exist.
-    pub fn domains_update(&self, request: Domain, name: &str) -> SiteDomainUpdateCall<'a, C> {
+    pub fn domains_update(&self, request: Domain, name: &str) -> SiteDomainUpdateCall<'a> {
         SiteDomainUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1819,7 +1817,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site or channel to which the release belongs, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID
-    pub fn releases_create(&self, request: Release, parent: &str) -> SiteReleaseCreateCall<'a, C> {
+    pub fn releases_create(&self, request: Release, parent: &str) -> SiteReleaseCreateCall<'a> {
         SiteReleaseCreateCall {
             hub: self.hub,
             _request: request,
@@ -1838,7 +1836,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list releases, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn releases_list(&self, parent: &str) -> SiteReleaseListCall<'a, C> {
+    pub fn releases_list(&self, parent: &str) -> SiteReleaseListCall<'a> {
         SiteReleaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1857,7 +1855,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The version for which to list files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn versions_files_list(&self, parent: &str) -> SiteVersionFileListCall<'a, C> {
+    pub fn versions_files_list(&self, parent: &str) -> SiteVersionFileListCall<'a> {
         SiteVersionFileListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1878,7 +1876,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The target site for the cloned version, in the format: sites/ SITE_ID
-    pub fn versions_clone(&self, request: CloneVersionRequest, parent: &str) -> SiteVersionCloneCall<'a, C> {
+    pub fn versions_clone(&self, request: CloneVersionRequest, parent: &str) -> SiteVersionCloneCall<'a> {
         SiteVersionCloneCall {
             hub: self.hub,
             _request: request,
@@ -1897,7 +1895,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The site in which to create the version, in the format: sites/ SITE_ID
-    pub fn versions_create(&self, request: Version, parent: &str) -> SiteVersionCreateCall<'a, C> {
+    pub fn versions_create(&self, request: Version, parent: &str) -> SiteVersionCreateCall<'a> {
         SiteVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1917,7 +1915,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fully-qualified resource name for the version, in the format: sites/SITE_ID/versions/VERSION_ID
-    pub fn versions_delete(&self, name: &str) -> SiteVersionDeleteCall<'a, C> {
+    pub fn versions_delete(&self, name: &str) -> SiteVersionDeleteCall<'a> {
         SiteVersionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1934,7 +1932,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The site or channel for which to list versions, in either of the following formats: - sites/SITE_ID - sites/SITE_ID/channels/CHANNEL_ID 
-    pub fn versions_list(&self, parent: &str) -> SiteVersionListCall<'a, C> {
+    pub fn versions_list(&self, parent: &str) -> SiteVersionListCall<'a> {
         SiteVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1955,7 +1953,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully-qualified resource name for the version, in the format: sites/ SITE_ID/versions/VERSION_ID This name is provided in the response body when you call [`CreateVersion`](sites.versions/create).
-    pub fn versions_patch(&self, request: Version, name: &str) -> SiteVersionPatchCall<'a, C> {
+    pub fn versions_patch(&self, request: Version, name: &str) -> SiteVersionPatchCall<'a> {
         SiteVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1975,7 +1973,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The version to which to add files, in the format: sites/SITE_ID /versions/VERSION_ID
-    pub fn versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> SiteVersionPopulateFileCall<'a, C> {
+    pub fn versions_populate_files(&self, request: PopulateVersionFilesRequest, parent: &str) -> SiteVersionPopulateFileCall<'a> {
         SiteVersionPopulateFileCall {
             hub: self.hub,
             _request: request,
@@ -1993,7 +1991,7 @@ impl<'a, C> SiteMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The site for which to get the SiteConfig, in the format: sites/ site-name/config
-    pub fn get_config(&self, name: &str) -> SiteGetConfigCall<'a, C> {
+    pub fn get_config(&self, name: &str) -> SiteGetConfigCall<'a> {
         SiteGetConfigCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2011,7 +2009,7 @@ impl<'a, C> SiteMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The site for which to update the SiteConfig, in the format: sites/ site-name/config
-    pub fn update_config(&self, request: SiteConfig, name: &str) -> SiteUpdateConfigCall<'a, C> {
+    pub fn update_config(&self, request: SiteConfig, name: &str) -> SiteUpdateConfigCall<'a> {
         SiteUpdateConfigCall {
             hub: self.hub,
             _request: request,
@@ -2064,19 +2062,19 @@ impl<'a, C> SiteMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectOperationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectOperationGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectOperationGetCall<'a> {}
 
-impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2141,8 +2139,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2155,7 +2152,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2164,7 +2161,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2224,7 +2221,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectOperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2234,7 +2231,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2259,7 +2256,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2279,7 +2276,7 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2330,10 +2327,10 @@ impl<'a, C> ProjectOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelReleaseCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelReleaseCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -2342,9 +2339,9 @@ pub struct ProjectSiteChannelReleaseCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelReleaseCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelReleaseCreateCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelReleaseCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2423,8 +2420,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2438,7 +2434,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2449,7 +2445,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2508,7 +2504,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> ProjectSiteChannelReleaseCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Release) -> ProjectSiteChannelReleaseCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2518,14 +2514,14 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a, C> {
+    pub fn version_name(mut self, new_value: &str) -> ProjectSiteChannelReleaseCreateCall<'a> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -2535,7 +2531,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2560,7 +2556,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2580,7 +2576,7 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelReleaseCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelReleaseCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2626,10 +2622,10 @@ impl<'a, C> ProjectSiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelReleaseListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelReleaseListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2638,9 +2634,9 @@ pub struct ProjectSiteChannelReleaseListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelReleaseListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelReleaseListCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelReleaseListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2711,8 +2707,7 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2725,7 +2720,7 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2734,7 +2729,7 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2794,21 +2789,21 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelReleaseListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelReleaseListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelReleaseListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2818,7 +2813,7 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelReleaseListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2843,7 +2838,7 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelReleaseListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2863,7 +2858,7 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelReleaseListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelReleaseListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2914,10 +2909,10 @@ impl<'a, C> ProjectSiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Channel,
     _parent: String,
     _channel_id: Option<String>,
@@ -2926,9 +2921,9 @@ pub struct ProjectSiteChannelCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelCreateCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3007,8 +3002,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3022,7 +3016,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3033,7 +3027,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3092,7 +3086,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3102,14 +3096,14 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Immutable. A unique ID within the site that identifies the channel.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> ProjectSiteChannelCreateCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -3119,7 +3113,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3144,7 +3138,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3164,7 +3158,7 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3208,19 +3202,19 @@ impl<'a, C> ProjectSiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelDeleteCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3285,8 +3279,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3299,7 +3292,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3308,7 +3301,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3368,7 +3361,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3378,7 +3371,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3403,7 +3396,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3423,7 +3416,7 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3467,19 +3460,19 @@ impl<'a, C> ProjectSiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelGetCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3544,8 +3537,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3558,7 +3550,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3567,7 +3559,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3627,7 +3619,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3637,7 +3629,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3662,7 +3654,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3682,7 +3674,7 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3728,10 +3720,10 @@ impl<'a, C> ProjectSiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3740,9 +3732,9 @@ pub struct ProjectSiteChannelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelListCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3813,8 +3805,7 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3827,7 +3818,7 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3836,7 +3827,7 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3896,21 +3887,21 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListChannels` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteChannelListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of channels to return. The service may return a lower number if fewer channels exist than this maximum number. If unspecified, defaults to 10. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteChannelListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3920,7 +3911,7 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3945,7 +3936,7 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3965,7 +3956,7 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4016,10 +4007,10 @@ impl<'a, C> ProjectSiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteChannelPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteChannelPatchCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Channel,
     _name: String,
     _update_mask: Option<String>,
@@ -4028,9 +4019,9 @@ pub struct ProjectSiteChannelPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteChannelPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteChannelPatchCall<'a> {}
 
-impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteChannelPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4109,8 +4100,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4124,7 +4114,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4135,7 +4125,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4194,7 +4184,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> ProjectSiteChannelPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4204,14 +4194,14 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A comma-separated list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteChannelPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4221,7 +4211,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteChannelPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4246,7 +4236,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteChannelPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4266,7 +4256,7 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteChannelPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4316,10 +4306,10 @@ impl<'a, C> ProjectSiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteDomainCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Domain,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4327,9 +4317,9 @@ pub struct ProjectSiteDomainCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteDomainCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteDomainCreateCall<'a> {}
 
-impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteDomainCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4405,8 +4395,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4420,7 +4409,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4431,7 +4420,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4490,7 +4479,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4500,7 +4489,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4510,7 +4499,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4535,7 +4524,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4555,7 +4544,7 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4599,19 +4588,19 @@ impl<'a, C> ProjectSiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteDomainDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteDomainDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteDomainDeleteCall<'a> {}
 
-impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteDomainDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4676,8 +4665,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4690,7 +4678,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4699,7 +4687,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4759,7 +4747,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4769,7 +4757,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4794,7 +4782,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4814,7 +4802,7 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4858,19 +4846,19 @@ impl<'a, C> ProjectSiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteDomainGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteDomainGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteDomainGetCall<'a> {}
 
-impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteDomainGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4935,8 +4923,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4949,7 +4936,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4958,7 +4945,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5018,7 +5005,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5028,7 +5015,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5053,7 +5040,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5073,7 +5060,7 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5119,10 +5106,10 @@ impl<'a, C> ProjectSiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteDomainListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5131,9 +5118,9 @@ pub struct ProjectSiteDomainListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteDomainListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteDomainListCall<'a> {}
 
-impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteDomainListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5204,8 +5191,7 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5218,7 +5204,7 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5227,7 +5213,7 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5287,21 +5273,21 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token from a previous request, if provided.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteDomainListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The page size to return. Defaults to 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteDomainListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteDomainListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5311,7 +5297,7 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5336,7 +5322,7 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5356,7 +5342,7 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5406,10 +5392,10 @@ impl<'a, C> ProjectSiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDomainUpdateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteDomainUpdateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Domain,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5417,9 +5403,9 @@ pub struct ProjectSiteDomainUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteDomainUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteDomainUpdateCall<'a> {}
 
-impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteDomainUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5495,8 +5481,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5510,7 +5495,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5521,7 +5506,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5580,7 +5565,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Domain) -> ProjectSiteDomainUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5590,7 +5575,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainUpdateCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDomainUpdateCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5600,7 +5585,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDomainUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5625,7 +5610,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDomainUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5645,7 +5630,7 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDomainUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5696,10 +5681,10 @@ impl<'a, C> ProjectSiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteReleaseCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteReleaseCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -5708,9 +5693,9 @@ pub struct ProjectSiteReleaseCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteReleaseCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteReleaseCreateCall<'a> {}
 
-impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteReleaseCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5789,8 +5774,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5804,7 +5788,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5815,7 +5799,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5874,7 +5858,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> ProjectSiteReleaseCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Release) -> ProjectSiteReleaseCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5884,14 +5868,14 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a, C> {
+    pub fn version_name(mut self, new_value: &str) -> ProjectSiteReleaseCreateCall<'a> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -5901,7 +5885,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5926,7 +5910,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5946,7 +5930,7 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5992,10 +5976,10 @@ impl<'a, C> ProjectSiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteReleaseListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteReleaseListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6004,9 +5988,9 @@ pub struct ProjectSiteReleaseListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteReleaseListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteReleaseListCall<'a> {}
 
-impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteReleaseListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6077,8 +6061,7 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6091,7 +6074,7 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6100,7 +6083,7 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6160,21 +6143,21 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteReleaseListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteReleaseListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteReleaseListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -6184,7 +6167,7 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteReleaseListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6209,7 +6192,7 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteReleaseListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6229,7 +6212,7 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteReleaseListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6276,10 +6259,10 @@ impl<'a, C> ProjectSiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionFileListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionFileListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _status: Option<String>,
     _page_token: Option<String>,
@@ -6289,9 +6272,9 @@ pub struct ProjectSiteVersionFileListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionFileListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionFileListCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionFileListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6365,8 +6348,7 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6379,7 +6361,7 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6388,7 +6370,7 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6448,28 +6430,28 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     ///  The type of files that should be listed for the specified version.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, C> {
+    pub fn status(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a> {
         self._status = Some(new_value.to_string());
         self
     }
     /// A token from a previous call to `ListVersionFiles` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionFileListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of version files to return. The service may return a lower number if fewer version files exist than this maximum number. If unspecified, defaults to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionFileListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionFileListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -6479,7 +6461,7 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionFileListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionFileListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6504,7 +6486,7 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionFileListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionFileListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6524,7 +6506,7 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionFileListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionFileListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6574,10 +6556,10 @@ impl<'a, C> ProjectSiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionCloneCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionCloneCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: CloneVersionRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6585,9 +6567,9 @@ pub struct ProjectSiteVersionCloneCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionCloneCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionCloneCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionCloneCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6663,8 +6645,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6678,7 +6659,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6689,7 +6670,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6748,7 +6729,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloneVersionRequest) -> ProjectSiteVersionCloneCall<'a, C> {
+    pub fn request(mut self, new_value: CloneVersionRequest) -> ProjectSiteVersionCloneCall<'a> {
         self._request = new_value;
         self
     }
@@ -6758,7 +6739,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCloneCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCloneCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -6768,7 +6749,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCloneCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCloneCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6793,7 +6774,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCloneCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCloneCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6813,7 +6794,7 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCloneCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCloneCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6865,10 +6846,10 @@ impl<'a, C> ProjectSiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Version,
     _parent: String,
     _version_id: Option<String>,
@@ -6878,9 +6859,9 @@ pub struct ProjectSiteVersionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionCreateCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6962,8 +6943,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6977,7 +6957,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6988,7 +6968,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7047,7 +7027,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -7057,21 +7037,21 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A unique id for the new version. This is was only specified for legacy version creations, and should be blank.
     ///
     /// Sets the *version id* query property to the given value.
-    pub fn version_id(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, C> {
+    pub fn version_id(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a> {
         self._version_id = Some(new_value.to_string());
         self
     }
     /// The self-reported size of the version. This value is used for a pre-emptive quota check for legacy version uploads.
     ///
     /// Sets the *size bytes* query property to the given value.
-    pub fn size_bytes(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a, C> {
+    pub fn size_bytes(mut self, new_value: &str) -> ProjectSiteVersionCreateCall<'a> {
         self._size_bytes = Some(new_value.to_string());
         self
     }
@@ -7081,7 +7061,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7106,7 +7086,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7126,7 +7106,7 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7170,19 +7150,19 @@ impl<'a, C> ProjectSiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionDeleteCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7247,8 +7227,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7261,7 +7240,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7270,7 +7249,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7330,7 +7309,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7340,7 +7319,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7365,7 +7344,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7385,7 +7364,7 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7432,10 +7411,10 @@ impl<'a, C> ProjectSiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7445,9 +7424,9 @@ pub struct ProjectSiteVersionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionListCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7521,8 +7500,7 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7535,7 +7513,7 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7544,7 +7522,7 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7604,28 +7582,28 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListVersions` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of versions to return. The service may return a lower number if fewer versions exist than this maximum number. If unspecified, defaults to 25. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteVersionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter string used to return a subset of versions in the response. The currently supported fields for filtering are: `name`, `status`, and `create_time`. Learn more about filtering in Google's [AIP 160 standard](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectSiteVersionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7635,7 +7613,7 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7660,7 +7638,7 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7680,7 +7658,7 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7731,10 +7709,10 @@ impl<'a, C> ProjectSiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionPatchCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Version,
     _name: String,
     _update_mask: Option<String>,
@@ -7743,9 +7721,9 @@ pub struct ProjectSiteVersionPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionPatchCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7824,8 +7802,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7839,7 +7816,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7850,7 +7827,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7909,7 +7886,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Version) -> ProjectSiteVersionPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -7919,14 +7896,14 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [version](../sites.versions) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`status`](../sites.versions#Version.FIELDS.status) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteVersionPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7936,7 +7913,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7961,7 +7938,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7981,7 +7958,7 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8031,10 +8008,10 @@ impl<'a, C> ProjectSiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteVersionPopulateFileCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteVersionPopulateFileCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: PopulateVersionFilesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8042,9 +8019,9 @@ pub struct ProjectSiteVersionPopulateFileCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteVersionPopulateFileCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteVersionPopulateFileCall<'a> {}
 
-impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteVersionPopulateFileCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8120,8 +8097,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8135,7 +8111,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8146,7 +8122,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8205,7 +8181,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> ProjectSiteVersionPopulateFileCall<'a, C> {
+    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> ProjectSiteVersionPopulateFileCall<'a> {
         self._request = new_value;
         self
     }
@@ -8215,7 +8191,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionPopulateFileCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteVersionPopulateFileCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -8225,7 +8201,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPopulateFileCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteVersionPopulateFileCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8250,7 +8226,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPopulateFileCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteVersionPopulateFileCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8270,7 +8246,7 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPopulateFileCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteVersionPopulateFileCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8321,10 +8297,10 @@ impl<'a, C> ProjectSiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Site,
     _parent: String,
     _site_id: Option<String>,
@@ -8333,9 +8309,9 @@ pub struct ProjectSiteCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteCreateCall<'a> {}
 
-impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8414,8 +8390,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8429,7 +8404,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8440,7 +8415,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8499,7 +8474,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Site) -> ProjectSiteCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Site) -> ProjectSiteCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8509,14 +8484,14 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Immutable. A globally unique identifier for the Hosting site. This identifier is used to construct the Firebase-provisioned subdomains for the site, so it must also be a valid domain name label.
     ///
     /// Sets the *site id* query property to the given value.
-    pub fn site_id(mut self, new_value: &str) -> ProjectSiteCreateCall<'a, C> {
+    pub fn site_id(mut self, new_value: &str) -> ProjectSiteCreateCall<'a> {
         self._site_id = Some(new_value.to_string());
         self
     }
@@ -8526,7 +8501,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8551,7 +8526,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8571,7 +8546,7 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8615,19 +8590,19 @@ impl<'a, C> ProjectSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteDeleteCall<'a> {}
 
-impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8692,8 +8667,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8706,7 +8680,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8715,7 +8689,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8775,7 +8749,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8785,7 +8759,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8810,7 +8784,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8830,7 +8804,7 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8874,19 +8848,19 @@ impl<'a, C> ProjectSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteGetCall<'a> {}
 
-impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8951,8 +8925,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8965,7 +8938,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8974,7 +8947,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9034,7 +9007,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9044,7 +9017,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9069,7 +9042,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9089,7 +9062,7 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9133,19 +9106,19 @@ impl<'a, C> ProjectSiteGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteGetConfigCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteGetConfigCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteGetConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteGetConfigCall<'a> {}
 
-impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteGetConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9210,8 +9183,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9224,7 +9196,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9233,7 +9205,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9293,7 +9265,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteGetConfigCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteGetConfigCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9303,7 +9275,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteGetConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9328,7 +9300,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteGetConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9348,7 +9320,7 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetConfigCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteGetConfigCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9394,10 +9366,10 @@ impl<'a, C> ProjectSiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteListCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9406,9 +9378,9 @@ pub struct ProjectSiteListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteListCall<'a> {}
 
-impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9479,8 +9451,7 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9493,7 +9464,7 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9502,7 +9473,7 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9562,21 +9533,21 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectSiteListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectSiteListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A token from a previous call to `ListSites` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectSiteListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectSiteListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of sites to return. The service may return a lower number if fewer sites exist than this maximum number. If unspecified, defaults to 40.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectSiteListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectSiteListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -9586,7 +9557,7 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9611,7 +9582,7 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9631,7 +9602,7 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9682,10 +9653,10 @@ impl<'a, C> ProjectSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSitePatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectSitePatchCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Site,
     _name: String,
     _update_mask: Option<String>,
@@ -9694,9 +9665,9 @@ pub struct ProjectSitePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSitePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSitePatchCall<'a> {}
 
-impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSitePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9775,8 +9746,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9790,7 +9760,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9801,7 +9771,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9860,7 +9830,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Site) -> ProjectSitePatchCall<'a, C> {
+    pub fn request(mut self, new_value: Site) -> ProjectSitePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -9870,14 +9840,14 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSitePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSitePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your Site that you want to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSitePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSitePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9887,7 +9857,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSitePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSitePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9912,7 +9882,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSitePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSitePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9932,7 +9902,7 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSitePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSitePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9983,10 +9953,10 @@ impl<'a, C> ProjectSitePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectSiteUpdateConfigCall<'a, C>
-    where C: 'a {
+pub struct ProjectSiteUpdateConfigCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: SiteConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -9995,9 +9965,9 @@ pub struct ProjectSiteUpdateConfigCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectSiteUpdateConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectSiteUpdateConfigCall<'a> {}
 
-impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectSiteUpdateConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10076,8 +10046,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10091,7 +10060,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10102,7 +10071,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10161,7 +10130,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteConfig) -> ProjectSiteUpdateConfigCall<'a, C> {
+    pub fn request(mut self, new_value: SiteConfig) -> ProjectSiteUpdateConfigCall<'a> {
         self._request = new_value;
         self
     }
@@ -10171,14 +10140,14 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [site configuration](../sites.SiteConfig) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`max_versions`](../sites.SiteConfig.max_versions) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectSiteUpdateConfigCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10188,7 +10157,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteUpdateConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectSiteUpdateConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10213,7 +10182,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteUpdateConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSiteUpdateConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10233,7 +10202,7 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteUpdateConfigCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSiteUpdateConfigCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10284,10 +10253,10 @@ impl<'a, C> ProjectSiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelReleaseCreateCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelReleaseCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -10296,9 +10265,9 @@ pub struct SiteChannelReleaseCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelReleaseCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelReleaseCreateCall<'a> {}
 
-impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelReleaseCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10377,8 +10346,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10392,7 +10360,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10403,7 +10371,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10462,7 +10430,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> SiteChannelReleaseCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Release) -> SiteChannelReleaseCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10472,14 +10440,14 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a, C> {
+    pub fn version_name(mut self, new_value: &str) -> SiteChannelReleaseCreateCall<'a> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -10489,7 +10457,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10514,7 +10482,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10534,7 +10502,7 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelReleaseCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelReleaseCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10580,10 +10548,10 @@ impl<'a, C> SiteChannelReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelReleaseListCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelReleaseListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10592,9 +10560,9 @@ pub struct SiteChannelReleaseListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelReleaseListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelReleaseListCall<'a> {}
 
-impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelReleaseListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10665,8 +10633,7 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10679,7 +10646,7 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10688,7 +10655,7 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10748,21 +10715,21 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SiteChannelReleaseListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteChannelReleaseListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SiteChannelReleaseListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -10772,7 +10739,7 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelReleaseListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10797,7 +10764,7 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelReleaseListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10817,7 +10784,7 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelReleaseListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelReleaseListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10868,10 +10835,10 @@ impl<'a, C> SiteChannelReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelCreateCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Channel,
     _parent: String,
     _channel_id: Option<String>,
@@ -10880,9 +10847,9 @@ pub struct SiteChannelCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelCreateCall<'a> {}
 
-impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10961,8 +10928,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10976,7 +10942,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10987,7 +10953,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11046,7 +11012,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> SiteChannelCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> SiteChannelCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -11056,14 +11022,14 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. Immutable. A unique ID within the site that identifies the channel.
     ///
     /// Sets the *channel id* query property to the given value.
-    pub fn channel_id(mut self, new_value: &str) -> SiteChannelCreateCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> SiteChannelCreateCall<'a> {
         self._channel_id = Some(new_value.to_string());
         self
     }
@@ -11073,7 +11039,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11098,7 +11064,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11118,7 +11084,7 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11162,19 +11128,19 @@ impl<'a, C> SiteChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelDeleteCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelDeleteCall<'a> {}
 
-impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11239,8 +11205,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11253,7 +11218,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11262,7 +11227,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11322,7 +11287,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteChannelDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteChannelDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11332,7 +11297,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11357,7 +11322,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11377,7 +11342,7 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11421,19 +11386,19 @@ impl<'a, C> SiteChannelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelGetCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelGetCall<'a> {}
 
-impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11498,8 +11463,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11512,7 +11476,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11521,7 +11485,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11581,7 +11545,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteChannelGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteChannelGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11591,7 +11555,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11616,7 +11580,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11636,7 +11600,7 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11682,10 +11646,10 @@ impl<'a, C> SiteChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelListCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11694,9 +11658,9 @@ pub struct SiteChannelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelListCall<'a> {}
 
-impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11767,8 +11731,7 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11781,7 +11744,7 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11790,7 +11753,7 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11850,21 +11813,21 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteChannelListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteChannelListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListChannels` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteChannelListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SiteChannelListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of channels to return. The service may return a lower number if fewer channels exist than this maximum number. If unspecified, defaults to 10. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteChannelListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SiteChannelListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -11874,7 +11837,7 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11899,7 +11862,7 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11919,7 +11882,7 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11970,10 +11933,10 @@ impl<'a, C> SiteChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteChannelPatchCall<'a, C>
-    where C: 'a {
+pub struct SiteChannelPatchCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Channel,
     _name: String,
     _update_mask: Option<String>,
@@ -11982,9 +11945,9 @@ pub struct SiteChannelPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteChannelPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteChannelPatchCall<'a> {}
 
-impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteChannelPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12063,8 +12026,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12078,7 +12040,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12089,7 +12051,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12148,7 +12110,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> SiteChannelPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> SiteChannelPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -12158,14 +12120,14 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteChannelPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteChannelPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A comma-separated list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SiteChannelPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> SiteChannelPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12175,7 +12137,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteChannelPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12200,7 +12162,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteChannelPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12220,7 +12182,7 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteChannelPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12270,10 +12232,10 @@ impl<'a, C> SiteChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainCreateCall<'a, C>
-    where C: 'a {
+pub struct SiteDomainCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Domain,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12281,9 +12243,9 @@ pub struct SiteDomainCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteDomainCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteDomainCreateCall<'a> {}
 
-impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteDomainCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12359,8 +12321,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12374,7 +12335,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12385,7 +12346,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12444,7 +12405,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> SiteDomainCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Domain) -> SiteDomainCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12454,7 +12415,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteDomainCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteDomainCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -12464,7 +12425,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12489,7 +12450,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12509,7 +12470,7 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12553,19 +12514,19 @@ impl<'a, C> SiteDomainCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainDeleteCall<'a, C>
-    where C: 'a {
+pub struct SiteDomainDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteDomainDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteDomainDeleteCall<'a> {}
 
-impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteDomainDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12630,8 +12591,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12644,7 +12604,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12653,7 +12613,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12713,7 +12673,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteDomainDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteDomainDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -12723,7 +12683,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12748,7 +12708,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12768,7 +12728,7 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12812,19 +12772,19 @@ impl<'a, C> SiteDomainDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainGetCall<'a, C>
-    where C: 'a {
+pub struct SiteDomainGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteDomainGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteDomainGetCall<'a> {}
 
-impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteDomainGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12889,8 +12849,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12903,7 +12862,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12912,7 +12871,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12972,7 +12931,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteDomainGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteDomainGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -12982,7 +12941,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13007,7 +12966,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13027,7 +12986,7 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13073,10 +13032,10 @@ impl<'a, C> SiteDomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainListCall<'a, C>
-    where C: 'a {
+pub struct SiteDomainListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13085,9 +13044,9 @@ pub struct SiteDomainListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteDomainListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteDomainListCall<'a> {}
 
-impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteDomainListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13158,8 +13117,7 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13172,7 +13130,7 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13181,7 +13139,7 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13241,21 +13199,21 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteDomainListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteDomainListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token from a previous request, if provided.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteDomainListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SiteDomainListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The page size to return. Defaults to 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteDomainListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SiteDomainListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -13265,7 +13223,7 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13290,7 +13248,7 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13310,7 +13268,7 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13360,10 +13318,10 @@ impl<'a, C> SiteDomainListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteDomainUpdateCall<'a, C>
-    where C: 'a {
+pub struct SiteDomainUpdateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Domain,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13371,9 +13329,9 @@ pub struct SiteDomainUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteDomainUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteDomainUpdateCall<'a> {}
 
-impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteDomainUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13449,8 +13407,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13464,7 +13421,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13475,7 +13432,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13534,7 +13491,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Domain) -> SiteDomainUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Domain) -> SiteDomainUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13544,7 +13501,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteDomainUpdateCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteDomainUpdateCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -13554,7 +13511,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteDomainUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13579,7 +13536,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteDomainUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13599,7 +13556,7 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteDomainUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13650,10 +13607,10 @@ impl<'a, C> SiteDomainUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteReleaseCreateCall<'a, C>
-    where C: 'a {
+pub struct SiteReleaseCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Release,
     _parent: String,
     _version_name: Option<String>,
@@ -13662,9 +13619,9 @@ pub struct SiteReleaseCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteReleaseCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteReleaseCreateCall<'a> {}
 
-impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteReleaseCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13743,8 +13700,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13758,7 +13714,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13769,7 +13725,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13828,7 +13784,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Release) -> SiteReleaseCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Release) -> SiteReleaseCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13838,14 +13794,14 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteReleaseCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteReleaseCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     ///  The unique identifier for a version, in the format: sites/SITE_ID/versions/ VERSION_ID The SITE_ID in this version identifier must match the SITE_ID in the `parent` parameter. This query parameter must be empty if the `type` field in the request body is `SITE_DISABLE`.
     ///
     /// Sets the *version name* query property to the given value.
-    pub fn version_name(mut self, new_value: &str) -> SiteReleaseCreateCall<'a, C> {
+    pub fn version_name(mut self, new_value: &str) -> SiteReleaseCreateCall<'a> {
         self._version_name = Some(new_value.to_string());
         self
     }
@@ -13855,7 +13811,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13880,7 +13836,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13900,7 +13856,7 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteReleaseCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteReleaseCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13946,10 +13902,10 @@ impl<'a, C> SiteReleaseCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteReleaseListCall<'a, C>
-    where C: 'a {
+pub struct SiteReleaseListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -13958,9 +13914,9 @@ pub struct SiteReleaseListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteReleaseListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteReleaseListCall<'a> {}
 
-impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteReleaseListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14031,8 +13987,7 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14045,7 +14000,7 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14054,7 +14009,7 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14114,21 +14069,21 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteReleaseListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteReleaseListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `releases.list` or `channels.releases.list` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteReleaseListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SiteReleaseListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of releases to return. The service may return a lower number if fewer releases exist than this maximum number. If unspecified, defaults to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteReleaseListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SiteReleaseListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -14138,7 +14093,7 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteReleaseListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14163,7 +14118,7 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteReleaseListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14183,7 +14138,7 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteReleaseListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteReleaseListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14230,10 +14185,10 @@ impl<'a, C> SiteReleaseListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionFileListCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionFileListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _status: Option<String>,
     _page_token: Option<String>,
@@ -14243,9 +14198,9 @@ pub struct SiteVersionFileListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionFileListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionFileListCall<'a> {}
 
-impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionFileListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14319,8 +14274,7 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14333,7 +14287,7 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14342,7 +14296,7 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14402,28 +14356,28 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionFileListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionFileListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     ///  The type of files that should be listed for the specified version.
     ///
     /// Sets the *status* query property to the given value.
-    pub fn status(mut self, new_value: &str) -> SiteVersionFileListCall<'a, C> {
+    pub fn status(mut self, new_value: &str) -> SiteVersionFileListCall<'a> {
         self._status = Some(new_value.to_string());
         self
     }
     /// A token from a previous call to `ListVersionFiles` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteVersionFileListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SiteVersionFileListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of version files to return. The service may return a lower number if fewer version files exist than this maximum number. If unspecified, defaults to 1000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteVersionFileListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SiteVersionFileListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -14433,7 +14387,7 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionFileListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionFileListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14458,7 +14412,7 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionFileListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionFileListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14478,7 +14432,7 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionFileListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionFileListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14528,10 +14482,10 @@ impl<'a, C> SiteVersionFileListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionCloneCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionCloneCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: CloneVersionRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14539,9 +14493,9 @@ pub struct SiteVersionCloneCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionCloneCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionCloneCall<'a> {}
 
-impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionCloneCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14617,8 +14571,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14632,7 +14585,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14643,7 +14596,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14702,7 +14655,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloneVersionRequest) -> SiteVersionCloneCall<'a, C> {
+    pub fn request(mut self, new_value: CloneVersionRequest) -> SiteVersionCloneCall<'a> {
         self._request = new_value;
         self
     }
@@ -14712,7 +14665,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionCloneCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionCloneCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -14722,7 +14675,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCloneCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCloneCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14747,7 +14700,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCloneCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCloneCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14767,7 +14720,7 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionCloneCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionCloneCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14819,10 +14772,10 @@ impl<'a, C> SiteVersionCloneCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionCreateCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Version,
     _parent: String,
     _version_id: Option<String>,
@@ -14832,9 +14785,9 @@ pub struct SiteVersionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionCreateCall<'a> {}
 
-impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14916,8 +14869,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14931,7 +14883,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14942,7 +14894,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15001,7 +14953,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> SiteVersionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Version) -> SiteVersionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15011,21 +14963,21 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A unique id for the new version. This is was only specified for legacy version creations, and should be blank.
     ///
     /// Sets the *version id* query property to the given value.
-    pub fn version_id(mut self, new_value: &str) -> SiteVersionCreateCall<'a, C> {
+    pub fn version_id(mut self, new_value: &str) -> SiteVersionCreateCall<'a> {
         self._version_id = Some(new_value.to_string());
         self
     }
     /// The self-reported size of the version. This value is used for a pre-emptive quota check for legacy version uploads.
     ///
     /// Sets the *size bytes* query property to the given value.
-    pub fn size_bytes(mut self, new_value: &str) -> SiteVersionCreateCall<'a, C> {
+    pub fn size_bytes(mut self, new_value: &str) -> SiteVersionCreateCall<'a> {
         self._size_bytes = Some(new_value.to_string());
         self
     }
@@ -15035,7 +14987,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15060,7 +15012,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15080,7 +15032,7 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15124,19 +15076,19 @@ impl<'a, C> SiteVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionDeleteCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionDeleteCall<'a> {}
 
-impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15201,8 +15153,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15215,7 +15166,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15224,7 +15175,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15284,7 +15235,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteVersionDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteVersionDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -15294,7 +15245,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15319,7 +15270,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15339,7 +15290,7 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15386,10 +15337,10 @@ impl<'a, C> SiteVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionListCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionListCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15399,9 +15350,9 @@ pub struct SiteVersionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionListCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionListCall<'a> {}
 
-impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15475,8 +15426,7 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15489,7 +15439,7 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15498,7 +15448,7 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15558,28 +15508,28 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token from a previous call to `ListVersions` that tells the server where to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SiteVersionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SiteVersionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of versions to return. The service may return a lower number if fewer versions exist than this maximum number. If unspecified, defaults to 25. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SiteVersionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SiteVersionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter string used to return a subset of versions in the response. The currently supported fields for filtering are: `name`, `status`, and `create_time`. Learn more about filtering in Google's [AIP 160 standard](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> SiteVersionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> SiteVersionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -15589,7 +15539,7 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15614,7 +15564,7 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15634,7 +15584,7 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15685,10 +15635,10 @@ impl<'a, C> SiteVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionPatchCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionPatchCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: Version,
     _name: String,
     _update_mask: Option<String>,
@@ -15697,9 +15647,9 @@ pub struct SiteVersionPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionPatchCall<'a> {}
 
-impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15778,8 +15728,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15793,7 +15742,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15804,7 +15753,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15863,7 +15812,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Version) -> SiteVersionPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Version) -> SiteVersionPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -15873,14 +15822,14 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteVersionPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteVersionPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [version](../sites.versions) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`status`](../sites.versions#Version.FIELDS.status) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SiteVersionPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> SiteVersionPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15890,7 +15839,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15915,7 +15864,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15935,7 +15884,7 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15985,10 +15934,10 @@ impl<'a, C> SiteVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteVersionPopulateFileCall<'a, C>
-    where C: 'a {
+pub struct SiteVersionPopulateFileCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: PopulateVersionFilesRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15996,9 +15945,9 @@ pub struct SiteVersionPopulateFileCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteVersionPopulateFileCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteVersionPopulateFileCall<'a> {}
 
-impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteVersionPopulateFileCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16074,8 +16023,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16089,7 +16037,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16100,7 +16048,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16159,7 +16107,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> SiteVersionPopulateFileCall<'a, C> {
+    pub fn request(mut self, new_value: PopulateVersionFilesRequest) -> SiteVersionPopulateFileCall<'a> {
         self._request = new_value;
         self
     }
@@ -16169,7 +16117,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SiteVersionPopulateFileCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SiteVersionPopulateFileCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -16179,7 +16127,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPopulateFileCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteVersionPopulateFileCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16204,7 +16152,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPopulateFileCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteVersionPopulateFileCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16224,7 +16172,7 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPopulateFileCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteVersionPopulateFileCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16268,19 +16216,19 @@ impl<'a, C> SiteVersionPopulateFileCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteGetConfigCall<'a, C>
-    where C: 'a {
+pub struct SiteGetConfigCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteGetConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteGetConfigCall<'a> {}
 
-impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteGetConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16345,8 +16293,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16359,7 +16306,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16368,7 +16315,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16428,7 +16375,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteGetConfigCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteGetConfigCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -16438,7 +16385,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteGetConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16463,7 +16410,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteGetConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteGetConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16483,7 +16430,7 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetConfigCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteGetConfigCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16534,10 +16481,10 @@ impl<'a, C> SiteGetConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SiteUpdateConfigCall<'a, C>
-    where C: 'a {
+pub struct SiteUpdateConfigCall<'a>
+    where  {
 
-    hub: &'a FirebaseHosting<C>,
+    hub: &'a FirebaseHosting<>,
     _request: SiteConfig,
     _name: String,
     _update_mask: Option<String>,
@@ -16546,9 +16493,9 @@ pub struct SiteUpdateConfigCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SiteUpdateConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for SiteUpdateConfigCall<'a> {}
 
-impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SiteUpdateConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16627,8 +16574,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16642,7 +16588,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16653,7 +16599,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16712,7 +16658,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteConfig) -> SiteUpdateConfigCall<'a, C> {
+    pub fn request(mut self, new_value: SiteConfig) -> SiteUpdateConfigCall<'a> {
         self._request = new_value;
         self
     }
@@ -16722,14 +16668,14 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SiteUpdateConfigCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SiteUpdateConfigCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A set of field names from your [site configuration](../sites.SiteConfig) that you want to update. A field will be overwritten if, and only if, it's in the mask. If a mask is not provided then a default mask of only [`max_versions`](../sites.SiteConfig.max_versions) will be used.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SiteUpdateConfigCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> SiteUpdateConfigCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -16739,7 +16685,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteUpdateConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SiteUpdateConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16764,7 +16710,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SiteUpdateConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SiteUpdateConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16784,7 +16730,7 @@ impl<'a, C> SiteUpdateConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SiteUpdateConfigCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SiteUpdateConfigCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

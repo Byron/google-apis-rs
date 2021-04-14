@@ -1,8 +1,8 @@
-site_name: BigQuery Data Transfer v2.0.0+20210324
+site_name: BigQuery Data Transfer v2.0.3+20210324
 site_url: http://byron.github.io/google-apis-rs/google-bigquerydatatransfer1-cli
 site_description: A complete library to interact with BigQuery Data Transfer (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/bigquerydatatransfer1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigquerydatatransfer1-cli
 
 docs_dir: docs
 site_dir: build_html

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -114,38 +113,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudIdentity<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudIdentity<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudIdentity<C> {}
+impl<'a, > client::Hub for CloudIdentity<> {}
 
-impl<'a, C> CloudIdentity<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudIdentity<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudIdentity<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudIdentity<> {
         CloudIdentity {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudidentity.googleapis.com/".to_string(),
             _root_url: "https://cloudidentity.googleapis.com/".to_string(),
         }
     }
 
-    pub fn devices(&'a self) -> DeviceMethods<'a, C> {
+    pub fn devices(&'a self) -> DeviceMethods<'a> {
         DeviceMethods { hub: &self }
     }
-    pub fn groups(&'a self) -> GroupMethods<'a, C> {
+    pub fn groups(&'a self) -> GroupMethods<'a> {
         GroupMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1160,15 +1158,15 @@ impl client::Part for UpdateMembershipRolesParams {}
 /// let rb = hub.devices();
 /// # }
 /// ```
-pub struct DeviceMethods<'a, C>
-    where C: 'a {
+pub struct DeviceMethods<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DeviceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DeviceMethods<'a> {}
 
-impl<'a, C> DeviceMethods<'a, C> {
+impl<'a> DeviceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1177,7 +1175,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the ClientState in format: `devices/{device_id}/deviceUsers/{device_user_id}/clientStates/{partner_id}`, where `device_id` is the unique ID assigned to the Device, `device_user_id` is the unique ID assigned to the User and `partner_id` identifies the partner storing the data. To get the client state for devices belonging to your own organization, the `partnerId` is in the format: `customerId-*anystring*`. Where the `customerId` is your organization's customer ID and `anystring` is any suffix. This suffix is used in setting up Custom Access Levels in Context-Aware Access. You may use `my_customer` instead of the customer ID for devices managed by your own organization. You may specify `-` in place of the `{device_id}`, so the ClientState resource name can be: `devices/-/deviceUsers/{device_user_resource_id}/clientStates/{partner_id}`.
-    pub fn device_users_client_states_get(&self, name: &str) -> DeviceDeviceUserClientStateGetCall<'a, C> {
+    pub fn device_users_client_states_get(&self, name: &str) -> DeviceDeviceUserClientStateGetCall<'a> {
         DeviceDeviceUserClientStateGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1194,7 +1192,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. To list all ClientStates, set this to "devices/-/deviceUsers/-". To list all ClientStates owned by a DeviceUser, set this to the resource name of the DeviceUser. Format: devices/{device}/deviceUsers/{deviceUser}
-    pub fn device_users_client_states_list(&self, parent: &str) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn device_users_client_states_list(&self, parent: &str) -> DeviceDeviceUserClientStateListCall<'a> {
         DeviceDeviceUserClientStateListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1215,7 +1213,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. [Resource name](https://cloud.google.com/apis/design/resource_names) of the ClientState in format: `devices/{device_id}/deviceUsers/{device_user_id}/clientState/{partner_id}`, where partner_id corresponds to the partner storing the data. For partners belonging to the "BeyondCorp Alliance", this is the partner ID specified to you by Google. For all other callers, this is a string of the form: `{customer_id}-suffix`, where `customer_id` is your customer ID. The *suffix* is any string the caller specifies. This string will be displayed verbatim in the administration console. This suffix is used in setting up Custom Access Levels in Context-Aware Access. Your organization's customer ID can be obtained from the URL: `GET https://www.googleapis.com/admin/directory/v1/customers/my_customer` The `id` field in the response contains the customer ID starting with the letter 'C'. The customer ID to be used in this API is the string after the letter 'C' (not including 'C')
-    pub fn device_users_client_states_patch(&self, request: GoogleAppsCloudidentityDevicesV1ClientState, name: &str) -> DeviceDeviceUserClientStatePatchCall<'a, C> {
+    pub fn device_users_client_states_patch(&self, request: GoogleAppsCloudidentityDevicesV1ClientState, name: &str) -> DeviceDeviceUserClientStatePatchCall<'a> {
         DeviceDeviceUserClientStatePatchCall {
             hub: self.hub,
             _request: request,
@@ -1235,7 +1233,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn device_users_approve(&self, request: GoogleAppsCloudidentityDevicesV1ApproveDeviceUserRequest, name: &str) -> DeviceDeviceUserApproveCall<'a, C> {
+    pub fn device_users_approve(&self, request: GoogleAppsCloudidentityDevicesV1ApproveDeviceUserRequest, name: &str) -> DeviceDeviceUserApproveCall<'a> {
         DeviceDeviceUserApproveCall {
             hub: self.hub,
             _request: request,
@@ -1253,7 +1251,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn device_users_block(&self, request: GoogleAppsCloudidentityDevicesV1BlockDeviceUserRequest, name: &str) -> DeviceDeviceUserBlockCall<'a, C> {
+    pub fn device_users_block(&self, request: GoogleAppsCloudidentityDevicesV1BlockDeviceUserRequest, name: &str) -> DeviceDeviceUserBlockCall<'a> {
         DeviceDeviceUserBlockCall {
             hub: self.hub,
             _request: request,
@@ -1271,7 +1269,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn device_users_cancel_wipe(&self, request: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceUserRequest, name: &str) -> DeviceDeviceUserCancelWipeCall<'a, C> {
+    pub fn device_users_cancel_wipe(&self, request: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceUserRequest, name: &str) -> DeviceDeviceUserCancelWipeCall<'a> {
         DeviceDeviceUserCancelWipeCall {
             hub: self.hub,
             _request: request,
@@ -1288,7 +1286,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn device_users_delete(&self, name: &str) -> DeviceDeviceUserDeleteCall<'a, C> {
+    pub fn device_users_delete(&self, name: &str) -> DeviceDeviceUserDeleteCall<'a> {
         DeviceDeviceUserDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1305,7 +1303,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn device_users_get(&self, name: &str) -> DeviceDeviceUserGetCall<'a, C> {
+    pub fn device_users_get(&self, name: &str) -> DeviceDeviceUserGetCall<'a> {
         DeviceDeviceUserGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1322,7 +1320,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. To list all DeviceUsers, set this to "devices/-". To list all DeviceUsers owned by a device, set this to the resource name of the device. Format: devices/{device}
-    pub fn device_users_list(&self, parent: &str) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn device_users_list(&self, parent: &str) -> DeviceDeviceUserListCall<'a> {
         DeviceDeviceUserListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1343,7 +1341,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Must be set to "devices/-/deviceUsers" to search across all DeviceUser belonging to the user.
-    pub fn device_users_lookup(&self, parent: &str) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn device_users_lookup(&self, parent: &str) -> DeviceDeviceUserLookupCall<'a> {
         DeviceDeviceUserLookupCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1366,7 +1364,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn device_users_wipe(&self, request: GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequest, name: &str) -> DeviceDeviceUserWipeCall<'a, C> {
+    pub fn device_users_wipe(&self, request: GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequest, name: &str) -> DeviceDeviceUserWipeCall<'a> {
         DeviceDeviceUserWipeCall {
             hub: self.hub,
             _request: request,
@@ -1384,7 +1382,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}`, where device_id is the unique ID assigned to the Device.
-    pub fn cancel_wipe(&self, request: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceRequest, name: &str) -> DeviceCancelWipeCall<'a, C> {
+    pub fn cancel_wipe(&self, request: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceRequest, name: &str) -> DeviceCancelWipeCall<'a> {
         DeviceCancelWipeCall {
             hub: self.hub,
             _request: request,
@@ -1401,7 +1399,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: GoogleAppsCloudidentityDevicesV1Device) -> DeviceCreateCall<'a, C> {
+    pub fn create(&self, request: GoogleAppsCloudidentityDevicesV1Device) -> DeviceCreateCall<'a> {
         DeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1418,7 +1416,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}`, where device_id is the unique ID assigned to the Device.
-    pub fn delete(&self, name: &str) -> DeviceDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> DeviceDeleteCall<'a> {
         DeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1435,7 +1433,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in the format: `devices/{device_id}`, where device_id is the unique ID assigned to the Device.
-    pub fn get(&self, name: &str) -> DeviceGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> DeviceGetCall<'a> {
         DeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1448,7 +1446,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists/Searches devices.
-    pub fn list(&self) -> DeviceListCall<'a, C> {
+    pub fn list(&self) -> DeviceListCall<'a> {
         DeviceListCall {
             hub: self.hub,
             _view: Default::default(),
@@ -1470,7 +1468,7 @@ impl<'a, C> DeviceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Device in format: `devices/{device_id}/deviceUsers/{device_user_id}`, where device_id is the unique ID assigned to the Device, and device_user_id is the unique ID assigned to the User.
-    pub fn wipe(&self, request: GoogleAppsCloudidentityDevicesV1WipeDeviceRequest, name: &str) -> DeviceWipeCall<'a, C> {
+    pub fn wipe(&self, request: GoogleAppsCloudidentityDevicesV1WipeDeviceRequest, name: &str) -> DeviceWipeCall<'a> {
         DeviceWipeCall {
             hub: self.hub,
             _request: request,
@@ -1513,15 +1511,15 @@ impl<'a, C> DeviceMethods<'a, C> {
 /// let rb = hub.groups();
 /// # }
 /// ```
-pub struct GroupMethods<'a, C>
-    where C: 'a {
+pub struct GroupMethods<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
 }
 
-impl<'a, C> client::MethodsBuilder for GroupMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for GroupMethods<'a> {}
 
-impl<'a, C> GroupMethods<'a, C> {
+impl<'a> GroupMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1530,7 +1528,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the group to check the transitive membership in. Format: `groups/{group_id}`, where `group_id` is the unique id assigned to the Group to which the Membership belongs to.
-    pub fn memberships_check_transitive_membership(&self, parent: &str) -> GroupMembershipCheckTransitiveMembershipCall<'a, C> {
+    pub fn memberships_check_transitive_membership(&self, parent: &str) -> GroupMembershipCheckTransitiveMembershipCall<'a> {
         GroupMembershipCheckTransitiveMembershipCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1549,7 +1547,7 @@ impl<'a, C> GroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent `Group` resource under which to create the `Membership`. Must be of the form `groups/{group_id}`.
-    pub fn memberships_create(&self, request: Membership, parent: &str) -> GroupMembershipCreateCall<'a, C> {
+    pub fn memberships_create(&self, request: Membership, parent: &str) -> GroupMembershipCreateCall<'a> {
         GroupMembershipCreateCall {
             hub: self.hub,
             _request: request,
@@ -1567,7 +1565,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership` to delete. Must be of the form `groups/{group_id}/memberships/{membership_id}`
-    pub fn memberships_delete(&self, name: &str) -> GroupMembershipDeleteCall<'a, C> {
+    pub fn memberships_delete(&self, name: &str) -> GroupMembershipDeleteCall<'a> {
         GroupMembershipDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1584,7 +1582,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership` to retrieve. Must be of the form `groups/{group_id}/memberships/{membership_id}`.
-    pub fn memberships_get(&self, name: &str) -> GroupMembershipGetCall<'a, C> {
+    pub fn memberships_get(&self, name: &str) -> GroupMembershipGetCall<'a> {
         GroupMembershipGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1601,7 +1599,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. [Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to the Group to which the Membership belongs to. group_id can be a wildcard collection id "-". When a group_id is specified, the membership graph will be constrained to paths between the member (defined in the query) and the parent. If a wildcard collection is provided, all membership paths connected to the member will be returned.
-    pub fn memberships_get_membership_graph(&self, parent: &str) -> GroupMembershipGetMembershipGraphCall<'a, C> {
+    pub fn memberships_get_membership_graph(&self, parent: &str) -> GroupMembershipGetMembershipGraphCall<'a> {
         GroupMembershipGetMembershipGraphCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1619,7 +1617,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent `Group` resource under which to lookup the `Membership` name. Must be of the form `groups/{group_id}`.
-    pub fn memberships_list(&self, parent: &str) -> GroupMembershipListCall<'a, C> {
+    pub fn memberships_list(&self, parent: &str) -> GroupMembershipListCall<'a> {
         GroupMembershipListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1639,7 +1637,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent `Group` resource under which to lookup the `Membership` name. Must be of the form `groups/{group_id}`.
-    pub fn memberships_lookup(&self, parent: &str) -> GroupMembershipLookupCall<'a, C> {
+    pub fn memberships_lookup(&self, parent: &str) -> GroupMembershipLookupCall<'a> {
         GroupMembershipLookupCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1659,7 +1657,7 @@ impl<'a, C> GroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership` whose roles are to be modified. Must be of the form `groups/{group_id}/memberships/{membership_id}`.
-    pub fn memberships_modify_membership_roles(&self, request: ModifyMembershipRolesRequest, name: &str) -> GroupMembershipModifyMembershipRoleCall<'a, C> {
+    pub fn memberships_modify_membership_roles(&self, request: ModifyMembershipRolesRequest, name: &str) -> GroupMembershipModifyMembershipRoleCall<'a> {
         GroupMembershipModifyMembershipRoleCall {
             hub: self.hub,
             _request: request,
@@ -1677,7 +1675,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: `groups/{group_id}`, where `group_id` is always '-' as this API will search across all groups for a given member.
-    pub fn memberships_search_transitive_groups(&self, parent: &str) -> GroupMembershipSearchTransitiveGroupCall<'a, C> {
+    pub fn memberships_search_transitive_groups(&self, parent: &str) -> GroupMembershipSearchTransitiveGroupCall<'a> {
         GroupMembershipSearchTransitiveGroupCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1697,7 +1695,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: `groups/{group_id}`, where `group_id` is the unique ID assigned to the Group.
-    pub fn memberships_search_transitive_memberships(&self, parent: &str) -> GroupMembershipSearchTransitiveMembershipCall<'a, C> {
+    pub fn memberships_search_transitive_memberships(&self, parent: &str) -> GroupMembershipSearchTransitiveMembershipCall<'a> {
         GroupMembershipSearchTransitiveMembershipCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1716,7 +1714,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Group) -> GroupCreateCall<'a, C> {
+    pub fn create(&self, request: Group) -> GroupCreateCall<'a> {
         GroupCreateCall {
             hub: self.hub,
             _request: request,
@@ -1734,7 +1732,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Group` to retrieve. Must be of the form `groups/{group_id}`.
-    pub fn delete(&self, name: &str) -> GroupDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> GroupDeleteCall<'a> {
         GroupDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1751,7 +1749,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Group` to retrieve. Must be of the form `groups/{group_id}`.
-    pub fn get(&self, name: &str) -> GroupGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> GroupGetCall<'a> {
         GroupGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1764,7 +1762,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the `Group`s under a customer or namespace.
-    pub fn list(&self) -> GroupListCall<'a, C> {
+    pub fn list(&self) -> GroupListCall<'a> {
         GroupListCall {
             hub: self.hub,
             _view: Default::default(),
@@ -1780,7 +1778,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Looks up the [resource name](https://cloud.google.com/apis/design/resource_names) of a `Group` by its `EntityKey`.
-    pub fn lookup(&self) -> GroupLookupCall<'a, C> {
+    pub fn lookup(&self) -> GroupLookupCall<'a> {
         GroupLookupCall {
             hub: self.hub,
             _group_key_namespace: Default::default(),
@@ -1799,7 +1797,7 @@ impl<'a, C> GroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Group`. Shall be of the form `groups/{group_id}`.
-    pub fn patch(&self, request: Group, name: &str) -> GroupPatchCall<'a, C> {
+    pub fn patch(&self, request: Group, name: &str) -> GroupPatchCall<'a> {
         GroupPatchCall {
             hub: self.hub,
             _request: request,
@@ -1814,7 +1812,7 @@ impl<'a, C> GroupMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Searches for `Group`s matching a specified query.
-    pub fn search(&self) -> GroupSearchCall<'a, C> {
+    pub fn search(&self) -> GroupSearchCall<'a> {
         GroupSearchCall {
             hub: self.hub,
             _view: Default::default(),
@@ -1869,19 +1867,19 @@ impl<'a, C> GroupMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserClientStateGetCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserClientStateGetCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _customer: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserClientStateGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserClientStateGetCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserClientStateGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1956,7 +1954,7 @@ impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1965,7 +1963,7 @@ impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2025,14 +2023,14 @@ impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserClientStateGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserClientStateGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserClientStateGetCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserClientStateGetCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -2042,7 +2040,7 @@ impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserClientStateGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserClientStateGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2067,7 +2065,7 @@ impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserClientStateGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserClientStateGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2112,10 +2110,10 @@ impl<'a, C> DeviceDeviceUserClientStateGetCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserClientStateListCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserClientStateListCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _page_token: Option<String>,
     _order_by: Option<String>,
@@ -2125,9 +2123,9 @@ pub struct DeviceDeviceUserClientStateListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserClientStateListCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserClientStateListCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserClientStateListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2211,7 +2209,7 @@ impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper:
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2220,7 +2218,7 @@ impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2280,35 +2278,35 @@ impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListClientStates` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListClientStates` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. Order specification for client states in the response.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Additional restrictions when fetching list of client states.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserClientStateListCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -2318,7 +2316,7 @@ impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserClientStateListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserClientStateListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2343,7 +2341,7 @@ impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserClientStateListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserClientStateListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2392,10 +2390,10 @@ impl<'a, C> DeviceDeviceUserClientStateListCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserClientStatePatchCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserClientStatePatchCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1ClientState,
     _name: String,
     _update_mask: Option<String>,
@@ -2404,9 +2402,9 @@ pub struct DeviceDeviceUserClientStatePatchCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserClientStatePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserClientStatePatchCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserClientStatePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2496,7 +2494,7 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2507,7 +2505,7 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2566,7 +2564,7 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1ClientState) -> DeviceDeviceUserClientStatePatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1ClientState) -> DeviceDeviceUserClientStatePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2576,21 +2574,21 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserClientStatePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserClientStatePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Comma-separated list of fully qualified names of fields to be updated. If not specified, all updatable fields in ClientState are updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> DeviceDeviceUserClientStatePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> DeviceDeviceUserClientStatePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserClientStatePatchCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserClientStatePatchCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -2600,7 +2598,7 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserClientStatePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserClientStatePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2625,7 +2623,7 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserClientStatePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserClientStatePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2672,19 +2670,19 @@ impl<'a, C> DeviceDeviceUserClientStatePatchCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserApproveCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserApproveCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1ApproveDeviceUserRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserApproveCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserApproveCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserApproveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2768,7 +2766,7 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2779,7 +2777,7 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2838,7 +2836,7 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1ApproveDeviceUserRequest) -> DeviceDeviceUserApproveCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1ApproveDeviceUserRequest) -> DeviceDeviceUserApproveCall<'a> {
         self._request = new_value;
         self
     }
@@ -2848,7 +2846,7 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserApproveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserApproveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2858,7 +2856,7 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserApproveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserApproveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2883,7 +2881,7 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserApproveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserApproveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2930,19 +2928,19 @@ impl<'a, C> DeviceDeviceUserApproveCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserBlockCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserBlockCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1BlockDeviceUserRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserBlockCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserBlockCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserBlockCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3026,7 +3024,7 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3037,7 +3035,7 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3096,7 +3094,7 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1BlockDeviceUserRequest) -> DeviceDeviceUserBlockCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1BlockDeviceUserRequest) -> DeviceDeviceUserBlockCall<'a> {
         self._request = new_value;
         self
     }
@@ -3106,7 +3104,7 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserBlockCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserBlockCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3116,7 +3114,7 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserBlockCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserBlockCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3141,7 +3139,7 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserBlockCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserBlockCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3188,19 +3186,19 @@ impl<'a, C> DeviceDeviceUserBlockCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserCancelWipeCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserCancelWipeCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceUserRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserCancelWipeCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserCancelWipeCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserCancelWipeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3284,7 +3282,7 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3295,7 +3293,7 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3354,7 +3352,7 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceUserRequest) -> DeviceDeviceUserCancelWipeCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceUserRequest) -> DeviceDeviceUserCancelWipeCall<'a> {
         self._request = new_value;
         self
     }
@@ -3364,7 +3362,7 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserCancelWipeCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserCancelWipeCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3374,7 +3372,7 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserCancelWipeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserCancelWipeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3399,7 +3397,7 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserCancelWipeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserCancelWipeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3441,19 +3439,19 @@ impl<'a, C> DeviceDeviceUserCancelWipeCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserDeleteCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _customer: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserDeleteCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3528,7 +3526,7 @@ impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3537,7 +3535,7 @@ impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3597,14 +3595,14 @@ impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserDeleteCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserDeleteCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -3614,7 +3612,7 @@ impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3639,7 +3637,7 @@ impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3681,19 +3679,19 @@ impl<'a, C> DeviceDeviceUserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserGetCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserGetCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _customer: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserGetCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3768,7 +3766,7 @@ impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3777,7 +3775,7 @@ impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3837,14 +3835,14 @@ impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserGetCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserGetCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -3854,7 +3852,7 @@ impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3879,7 +3877,7 @@ impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3925,10 +3923,10 @@ impl<'a, C> DeviceDeviceUserGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserListCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserListCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3939,9 +3937,9 @@ pub struct DeviceDeviceUserListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserListCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserListCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4028,7 +4026,7 @@ impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4037,7 +4035,7 @@ impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4097,42 +4095,42 @@ impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. A page token, received from a previous `ListDeviceUsers` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListBooks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of DeviceUsers to return. If unspecified, at most 5 DeviceUsers will be returned. The maximum value is 20; values above 20 will be coerced to 20.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> DeviceDeviceUserListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Order specification for devices in the response.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Additional restrictions when fetching list of devices. For a list of search fields, refer to [Mobile device search fields](https://developers.google.com/admin-sdk/directory/v1/search-operators). Multiple search fields are separated by the space character.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeviceUserListCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -4142,7 +4140,7 @@ impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4167,7 +4165,7 @@ impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4213,10 +4211,10 @@ impl<'a, C> DeviceDeviceUserListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserLookupCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserLookupCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _user_id: Option<String>,
     _raw_resource_id: Option<String>,
@@ -4228,9 +4226,9 @@ pub struct DeviceDeviceUserLookupCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserLookupCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserLookupCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserLookupCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4310,8 +4308,7 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4324,7 +4321,7 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4333,7 +4330,7 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4393,42 +4390,42 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The user whose DeviceUser's resource name will be fetched. Must be set to 'me' to fetch the DeviceUser's resource name for the calling user.
     ///
     /// Sets the *user id* query property to the given value.
-    pub fn user_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a> {
         self._user_id = Some(new_value.to_string());
         self
     }
     /// Raw Resource Id used by Google Endpoint Verification. If the user is enrolled into Google Endpoint Verification, this id will be saved as the 'device_resource_id' field in the following platform dependent files. Mac: ~/.secureConnect/context_aware_config.json Windows: C:\Users\%USERPROFILE%\.secureConnect\context_aware_config.json Linux: ~/.secureConnect/context_aware_config.json
     ///
     /// Sets the *raw resource id* query property to the given value.
-    pub fn raw_resource_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn raw_resource_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a> {
         self._raw_resource_id = Some(new_value.to_string());
         self
     }
     /// A page token, received from a previous `LookupDeviceUsers` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `LookupDeviceUsers` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of DeviceUsers to return. If unspecified, at most 20 DeviceUsers will be returned. The maximum value is 20; values above 20 will be coerced to 20.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> DeviceDeviceUserLookupCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Android Id returned by [Settings.Secure#ANDROID_ID](https://developer.android.com/reference/android/provider/Settings.Secure.html#ANDROID_ID).
     ///
     /// Sets the *android id* query property to the given value.
-    pub fn android_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn android_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a> {
         self._android_id = Some(new_value.to_string());
         self
     }
@@ -4438,7 +4435,7 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserLookupCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserLookupCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4463,7 +4460,7 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserLookupCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserLookupCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4483,7 +4480,7 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeviceDeviceUserLookupCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeviceDeviceUserLookupCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4533,19 +4530,19 @@ impl<'a, C> DeviceDeviceUserLookupCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeviceUserWipeCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeviceUserWipeCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeviceUserWipeCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeviceUserWipeCall<'a> {}
 
-impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeviceUserWipeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4629,7 +4626,7 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4640,7 +4637,7 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4699,7 +4696,7 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequest) -> DeviceDeviceUserWipeCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequest) -> DeviceDeviceUserWipeCall<'a> {
         self._request = new_value;
         self
     }
@@ -4709,7 +4706,7 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserWipeCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeviceUserWipeCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4719,7 +4716,7 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserWipeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeviceUserWipeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4744,7 +4741,7 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserWipeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeviceUserWipeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4791,19 +4788,19 @@ impl<'a, C> DeviceDeviceUserWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceCancelWipeCall<'a, C>
-    where C: 'a {
+pub struct DeviceCancelWipeCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceCancelWipeCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceCancelWipeCall<'a> {}
 
-impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceCancelWipeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4887,7 +4884,7 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4898,7 +4895,7 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4957,7 +4954,7 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceRequest) -> DeviceCancelWipeCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1CancelWipeDeviceRequest) -> DeviceCancelWipeCall<'a> {
         self._request = new_value;
         self
     }
@@ -4967,7 +4964,7 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceCancelWipeCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceCancelWipeCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4977,7 +4974,7 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceCancelWipeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceCancelWipeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5002,7 +4999,7 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceCancelWipeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceCancelWipeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5050,19 +5047,19 @@ impl<'a, C> DeviceCancelWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct DeviceCreateCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1Device,
     _customer: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceCreateCall<'a> {}
 
-impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5123,7 +5120,7 @@ impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5134,7 +5131,7 @@ impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5193,14 +5190,14 @@ impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1Device) -> DeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1Device) -> DeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceCreateCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceCreateCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -5210,7 +5207,7 @@ impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5235,7 +5232,7 @@ impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5277,19 +5274,19 @@ impl<'a, C> DeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceDeleteCall<'a, C>
-    where C: 'a {
+pub struct DeviceDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _customer: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceDeleteCall<'a> {}
 
-impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5364,7 +5361,7 @@ impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5373,7 +5370,7 @@ impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5433,14 +5430,14 @@ impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer. If you're using this API for your own organization, use `customers/my_customer` If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceDeleteCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceDeleteCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -5450,7 +5447,7 @@ impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5475,7 +5472,7 @@ impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5517,19 +5514,19 @@ impl<'a, C> DeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceGetCall<'a, C>
-    where C: 'a {
+pub struct DeviceGetCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _customer: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceGetCall<'a> {}
 
-impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5604,7 +5601,7 @@ impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5613,7 +5610,7 @@ impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5673,14 +5670,14 @@ impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the Customer in the format: `customers/{customer_id}`, where customer_id is the customer to whom the device belongs. If you're using this API for your own organization, use `customers/my_customer`. If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceGetCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceGetCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -5690,7 +5687,7 @@ impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5715,7 +5712,7 @@ impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5762,10 +5759,10 @@ impl<'a, C> DeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceListCall<'a, C>
-    where C: 'a {
+pub struct DeviceListCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _view: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5776,9 +5773,9 @@ pub struct DeviceListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceListCall<'a> {}
 
-impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5842,7 +5839,7 @@ impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5851,7 +5848,7 @@ impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5908,42 +5905,42 @@ impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Optional. The view to use for the List request.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> DeviceListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> DeviceListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous `ListDevices` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDevices` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> DeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of Devices to return. If unspecified, at most 20 Devices will be returned. The maximum value is 100; values above 100 will be coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> DeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Order specification for devices in the response. Only one of the following field names may be used to specify the order: `create_time`, `last_sync_time`, `model`, `os_version`, `device_type` and `serial_number`. `desc` may be specified optionally at the end to specify results to be sorted in descending order. Default order is ascending.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> DeviceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> DeviceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. Additional restrictions when fetching list of devices. For a list of search fields, refer to [Mobile device search fields](https://developers.google.com/admin-sdk/directory/v1/search-operators). Multiple search fields are separated by the space character.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> DeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> DeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. [Resource name](https://cloud.google.com/apis/design/resource_names) of the customer in the format: `customers/{customer_id}`, where customer_id is the customer to whom the device belongs. If you're using this API for your own organization, use `customers/my_customer`. If you're using this API to manage another organization, use `customers/{customer_id}`, where customer_id is the customer to whom the device belongs.
     ///
     /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> DeviceListCall<'a, C> {
+    pub fn customer(mut self, new_value: &str) -> DeviceListCall<'a> {
         self._customer = Some(new_value.to_string());
         self
     }
@@ -5953,7 +5950,7 @@ impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5978,7 +5975,7 @@ impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6025,19 +6022,19 @@ impl<'a, C> DeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeviceWipeCall<'a, C>
-    where C: 'a {
+pub struct DeviceWipeCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: GoogleAppsCloudidentityDevicesV1WipeDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DeviceWipeCall<'a, C> {}
+impl<'a> client::CallBuilder for DeviceWipeCall<'a> {}
 
-impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeviceWipeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6121,7 +6118,7 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6132,7 +6129,7 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6191,7 +6188,7 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1WipeDeviceRequest) -> DeviceWipeCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAppsCloudidentityDevicesV1WipeDeviceRequest) -> DeviceWipeCall<'a> {
         self._request = new_value;
         self
     }
@@ -6201,7 +6198,7 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeviceWipeCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeviceWipeCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6211,7 +6208,7 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceWipeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeviceWipeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6236,7 +6233,7 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeviceWipeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeviceWipeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6278,10 +6275,10 @@ impl<'a, C> DeviceWipeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipCheckTransitiveMembershipCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipCheckTransitiveMembershipCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _query: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6289,9 +6286,9 @@ pub struct GroupMembershipCheckTransitiveMembershipCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipCheckTransitiveMembershipCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipCheckTransitiveMembershipCall<'a> {}
 
-impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipCheckTransitiveMembershipCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6359,8 +6356,7 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6373,7 +6369,7 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6382,7 +6378,7 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6442,14 +6438,14 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipCheckTransitiveMembershipCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipCheckTransitiveMembershipCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. A CEL expression that MUST include member specification. This is a `required` field. Certain groups are uniquely identified by both a 'member_key_id' and a 'member_key_namespace', which requires an additional query input: 'member_key_namespace'. Example query: `member_key_id == 'member_key_id_value'`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> GroupMembershipCheckTransitiveMembershipCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> GroupMembershipCheckTransitiveMembershipCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -6459,7 +6455,7 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipCheckTransitiveMembershipCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipCheckTransitiveMembershipCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6484,7 +6480,7 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipCheckTransitiveMembershipCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipCheckTransitiveMembershipCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6504,7 +6500,7 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipCheckTransitiveMembershipCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipCheckTransitiveMembershipCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6554,10 +6550,10 @@ impl<'a, C> GroupMembershipCheckTransitiveMembershipCall<'a, C> where C: BorrowM
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipCreateCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipCreateCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: Membership,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6565,9 +6561,9 @@ pub struct GroupMembershipCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipCreateCall<'a> {}
 
-impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6643,8 +6639,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6658,7 +6653,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6669,7 +6664,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6728,7 +6723,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Membership) -> GroupMembershipCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Membership) -> GroupMembershipCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6738,7 +6733,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -6748,7 +6743,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6773,7 +6768,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6793,7 +6788,7 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6837,19 +6832,19 @@ impl<'a, C> GroupMembershipCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipDeleteCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipDeleteCall<'a> {}
 
-impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6914,8 +6909,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6928,7 +6922,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6937,7 +6931,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6997,7 +6991,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GroupMembershipDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> GroupMembershipDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7007,7 +7001,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7032,7 +7026,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7052,7 +7046,7 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7096,19 +7090,19 @@ impl<'a, C> GroupMembershipDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipGetCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipGetCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipGetCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipGetCall<'a> {}
 
-impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7173,8 +7167,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7187,7 +7180,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7196,7 +7189,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7256,7 +7249,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GroupMembershipGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> GroupMembershipGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7266,7 +7259,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7291,7 +7284,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7311,7 +7304,7 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7356,10 +7349,10 @@ impl<'a, C> GroupMembershipGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipGetMembershipGraphCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipGetMembershipGraphCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _query: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7367,9 +7360,9 @@ pub struct GroupMembershipGetMembershipGraphCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipGetMembershipGraphCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipGetMembershipGraphCall<'a> {}
 
-impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipGetMembershipGraphCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7437,8 +7430,7 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7451,7 +7443,7 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7460,7 +7452,7 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7520,14 +7512,14 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipGetMembershipGraphCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipGetMembershipGraphCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. A CEL expression that MUST include member specification AND label(s). Certain groups are uniquely identified by both a 'member_key_id' and a 'member_key_namespace', which requires an additional query input: 'member_key_namespace'. Example query: `member_key_id == 'member_key_id_value' && in labels`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> GroupMembershipGetMembershipGraphCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> GroupMembershipGetMembershipGraphCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -7537,7 +7529,7 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipGetMembershipGraphCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipGetMembershipGraphCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7562,7 +7554,7 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipGetMembershipGraphCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipGetMembershipGraphCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7582,7 +7574,7 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipGetMembershipGraphCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipGetMembershipGraphCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7629,10 +7621,10 @@ impl<'a, C> GroupMembershipGetMembershipGraphCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipListCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipListCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -7642,9 +7634,9 @@ pub struct GroupMembershipListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipListCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipListCall<'a> {}
 
-impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7718,8 +7710,7 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7732,7 +7723,7 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7741,7 +7732,7 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7801,28 +7792,28 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The level of detail to be returned. If unspecified, defaults to `View.BASIC`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> GroupMembershipListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> GroupMembershipListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The `next_page_token` value returned from a previous search request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupMembershipListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> GroupMembershipListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. Note that the number of results returned may be less than this value even if there are more available results. To fetch all results, clients must continue calling this method repeatedly until the response no longer contains a `next_page_token`. If unspecified, defaults to 200 for `GroupView.BASIC` and to 50 for `GroupView.FULL`. Must not be greater than 1000 for `GroupView.BASIC` or 500 for `GroupView.FULL`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> GroupMembershipListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> GroupMembershipListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7832,7 +7823,7 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7857,7 +7848,7 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7877,7 +7868,7 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7923,10 +7914,10 @@ impl<'a, C> GroupMembershipListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipLookupCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipLookupCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _member_key_namespace: Option<String>,
     _member_key_id: Option<String>,
@@ -7935,9 +7926,9 @@ pub struct GroupMembershipLookupCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipLookupCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipLookupCall<'a> {}
 
-impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipLookupCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8008,8 +7999,7 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8022,7 +8012,7 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8031,7 +8021,7 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8091,21 +8081,21 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipLookupCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipLookupCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The namespace in which the entity exists. If not specified, the `EntityKey` represents a Google-managed entity such as a Google user or a Google Group. If specified, the `EntityKey` represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of `identitysources/{identity_source_id}.
     ///
     /// Sets the *member key.namespace* query property to the given value.
-    pub fn member_key_namespace(mut self, new_value: &str) -> GroupMembershipLookupCall<'a, C> {
+    pub fn member_key_namespace(mut self, new_value: &str) -> GroupMembershipLookupCall<'a> {
         self._member_key_namespace = Some(new_value.to_string());
         self
     }
     /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
     ///
     /// Sets the *member key.id* query property to the given value.
-    pub fn member_key_id(mut self, new_value: &str) -> GroupMembershipLookupCall<'a, C> {
+    pub fn member_key_id(mut self, new_value: &str) -> GroupMembershipLookupCall<'a> {
         self._member_key_id = Some(new_value.to_string());
         self
     }
@@ -8115,7 +8105,7 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipLookupCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipLookupCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8140,7 +8130,7 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipLookupCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipLookupCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8160,7 +8150,7 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipLookupCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipLookupCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8210,10 +8200,10 @@ impl<'a, C> GroupMembershipLookupCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipModifyMembershipRoleCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipModifyMembershipRoleCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: ModifyMembershipRolesRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8221,9 +8211,9 @@ pub struct GroupMembershipModifyMembershipRoleCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipModifyMembershipRoleCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipModifyMembershipRoleCall<'a> {}
 
-impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipModifyMembershipRoleCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8299,8 +8289,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8314,7 +8303,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8325,7 +8314,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8384,7 +8373,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyMembershipRolesRequest) -> GroupMembershipModifyMembershipRoleCall<'a, C> {
+    pub fn request(mut self, new_value: ModifyMembershipRolesRequest) -> GroupMembershipModifyMembershipRoleCall<'a> {
         self._request = new_value;
         self
     }
@@ -8394,7 +8383,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GroupMembershipModifyMembershipRoleCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> GroupMembershipModifyMembershipRoleCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8404,7 +8393,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipModifyMembershipRoleCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipModifyMembershipRoleCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8429,7 +8418,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipModifyMembershipRoleCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipModifyMembershipRoleCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8449,7 +8438,7 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipModifyMembershipRoleCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipModifyMembershipRoleCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8496,10 +8485,10 @@ impl<'a, C> GroupMembershipModifyMembershipRoleCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipSearchTransitiveGroupCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipSearchTransitiveGroupCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -8509,9 +8498,9 @@ pub struct GroupMembershipSearchTransitiveGroupCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipSearchTransitiveGroupCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipSearchTransitiveGroupCall<'a> {}
 
-impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipSearchTransitiveGroupCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8585,8 +8574,7 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8599,7 +8587,7 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8608,7 +8596,7 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8668,28 +8656,28 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Required. A CEL expression that MUST include member specification AND label(s). This is a `required` field. Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Certain groups are uniquely identified by both a 'member_key_id' and a 'member_key_namespace', which requires an additional query input: 'member_key_namespace'. Example query: `member_key_id == 'member_key_id_value' && in labels`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The default page size is 200 (max 1000).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> GroupMembershipSearchTransitiveGroupCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> GroupMembershipSearchTransitiveGroupCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8699,7 +8687,7 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipSearchTransitiveGroupCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipSearchTransitiveGroupCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8724,7 +8712,7 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipSearchTransitiveGroupCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipSearchTransitiveGroupCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8744,7 +8732,7 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipSearchTransitiveGroupCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipSearchTransitiveGroupCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8790,10 +8778,10 @@ impl<'a, C> GroupMembershipSearchTransitiveGroupCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupMembershipSearchTransitiveMembershipCall<'a, C>
-    where C: 'a {
+pub struct GroupMembershipSearchTransitiveMembershipCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8802,9 +8790,9 @@ pub struct GroupMembershipSearchTransitiveMembershipCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupMembershipSearchTransitiveMembershipCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupMembershipSearchTransitiveMembershipCall<'a> {}
 
-impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupMembershipSearchTransitiveMembershipCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8875,8 +8863,7 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8889,7 +8876,7 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8898,7 +8885,7 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8958,21 +8945,21 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> GroupMembershipSearchTransitiveMembershipCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipSearchTransitiveMembershipCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The next_page_token value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupMembershipSearchTransitiveMembershipCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> GroupMembershipSearchTransitiveMembershipCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The default page size is 200 (max 1000).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> GroupMembershipSearchTransitiveMembershipCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> GroupMembershipSearchTransitiveMembershipCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8982,7 +8969,7 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipSearchTransitiveMembershipCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipSearchTransitiveMembershipCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9007,7 +8994,7 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipSearchTransitiveMembershipCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipSearchTransitiveMembershipCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9027,7 +9014,7 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipSearchTransitiveMembershipCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupMembershipSearchTransitiveMembershipCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9078,10 +9065,10 @@ impl<'a, C> GroupMembershipSearchTransitiveMembershipCall<'a, C> where C: Borrow
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupCreateCall<'a, C>
-    where C: 'a {
+pub struct GroupCreateCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: Group,
     _initial_group_config: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9089,9 +9076,9 @@ pub struct GroupCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupCreateCall<'a> {}
 
-impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9144,8 +9131,7 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9159,7 +9145,7 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9170,7 +9156,7 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9229,14 +9215,14 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Group) -> GroupCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Group) -> GroupCreateCall<'a> {
         self._request = new_value;
         self
     }
     /// Optional. The initial configuration option for the `Group`.
     ///
     /// Sets the *initial group config* query property to the given value.
-    pub fn initial_group_config(mut self, new_value: &str) -> GroupCreateCall<'a, C> {
+    pub fn initial_group_config(mut self, new_value: &str) -> GroupCreateCall<'a> {
         self._initial_group_config = Some(new_value.to_string());
         self
     }
@@ -9246,7 +9232,7 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9271,7 +9257,7 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9291,7 +9277,7 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9335,19 +9321,19 @@ impl<'a, C> GroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupDeleteCall<'a, C>
-    where C: 'a {
+pub struct GroupDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupDeleteCall<'a> {}
 
-impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9412,8 +9398,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9426,7 +9411,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9435,7 +9420,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9495,7 +9480,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GroupDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> GroupDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9505,7 +9490,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9530,7 +9515,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9550,7 +9535,7 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9594,19 +9579,19 @@ impl<'a, C> GroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupGetCall<'a, C>
-    where C: 'a {
+pub struct GroupGetCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupGetCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupGetCall<'a> {}
 
-impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9671,8 +9656,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9685,7 +9669,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9694,7 +9678,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9754,7 +9738,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GroupGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> GroupGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9764,7 +9748,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9789,7 +9773,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9809,7 +9793,7 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9857,10 +9841,10 @@ impl<'a, C> GroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupListCall<'a, C>
-    where C: 'a {
+pub struct GroupListCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _view: Option<String>,
     _parent: Option<String>,
     _page_token: Option<String>,
@@ -9870,9 +9854,9 @@ pub struct GroupListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupListCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupListCall<'a> {}
 
-impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9923,8 +9907,7 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9937,7 +9920,7 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9946,7 +9929,7 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10003,28 +9986,28 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// The level of detail to be returned. If unspecified, defaults to `View.BASIC`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> GroupListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> GroupListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Required. The parent resource under which to list all `Group`s. Must be of the form `identitysources/{identity_source_id}` for external- identity-mapped groups or `customers/{customer_id}` for Google Groups.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> GroupListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> GroupListCall<'a> {
         self._parent = Some(new_value.to_string());
         self
     }
     /// The `next_page_token` value returned from a previous list request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. Note that the number of results returned may be less than this value even if there are more available results. To fetch all results, clients must continue calling this method repeatedly until the response no longer contains a `next_page_token`. If unspecified, defaults to 200 for `View.BASIC` and to 50 for `View.FULL`. Must not be greater than 1000 for `View.BASIC` or 500 for `View.FULL`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> GroupListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> GroupListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -10034,7 +10017,7 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10059,7 +10042,7 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10079,7 +10062,7 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10125,10 +10108,10 @@ impl<'a, C> GroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupLookupCall<'a, C>
-    where C: 'a {
+pub struct GroupLookupCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _group_key_namespace: Option<String>,
     _group_key_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10136,9 +10119,9 @@ pub struct GroupLookupCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupLookupCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupLookupCall<'a> {}
 
-impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupLookupCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10183,8 +10166,7 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10197,7 +10179,7 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10206,7 +10188,7 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10263,14 +10245,14 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// The namespace in which the entity exists. If not specified, the `EntityKey` represents a Google-managed entity such as a Google user or a Google Group. If specified, the `EntityKey` represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of `identitysources/{identity_source_id}.
     ///
     /// Sets the *group key.namespace* query property to the given value.
-    pub fn group_key_namespace(mut self, new_value: &str) -> GroupLookupCall<'a, C> {
+    pub fn group_key_namespace(mut self, new_value: &str) -> GroupLookupCall<'a> {
         self._group_key_namespace = Some(new_value.to_string());
         self
     }
     /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
     ///
     /// Sets the *group key.id* query property to the given value.
-    pub fn group_key_id(mut self, new_value: &str) -> GroupLookupCall<'a, C> {
+    pub fn group_key_id(mut self, new_value: &str) -> GroupLookupCall<'a> {
         self._group_key_id = Some(new_value.to_string());
         self
     }
@@ -10280,7 +10262,7 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupLookupCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupLookupCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10305,7 +10287,7 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupLookupCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupLookupCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10325,7 +10307,7 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupLookupCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupLookupCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10376,10 +10358,10 @@ impl<'a, C> GroupLookupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupPatchCall<'a, C>
-    where C: 'a {
+pub struct GroupPatchCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _request: Group,
     _name: String,
     _update_mask: Option<String>,
@@ -10388,9 +10370,9 @@ pub struct GroupPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupPatchCall<'a> {}
 
-impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10469,8 +10451,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10484,7 +10465,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10495,7 +10476,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10554,7 +10535,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Group) -> GroupPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Group) -> GroupPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -10564,14 +10545,14 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> GroupPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> GroupPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The fully-qualified names of fields to update. May only contain the following fields: `display_name`, `description`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> GroupPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> GroupPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10581,7 +10562,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10606,7 +10587,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10626,7 +10607,7 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10674,10 +10655,10 @@ impl<'a, C> GroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GroupSearchCall<'a, C>
-    where C: 'a {
+pub struct GroupSearchCall<'a>
+    where  {
 
-    hub: &'a CloudIdentity<C>,
+    hub: &'a CloudIdentity<>,
     _view: Option<String>,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -10687,9 +10668,9 @@ pub struct GroupSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GroupSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for GroupSearchCall<'a> {}
 
-impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GroupSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10740,8 +10721,7 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10754,7 +10734,7 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10763,7 +10743,7 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10820,28 +10800,28 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// The level of detail to be returned. If unspecified, defaults to `View.BASIC`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> GroupSearchCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> GroupSearchCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Required. The search query. Must be specified in [Common Expression Language](https://opensource.google/projects/cel). May only contain equality operators on the parent and inclusion operators on labels (e.g., `parent == 'customers/{customer_id}' && 'cloudidentity.googleapis.com/groups.discussion_forum' in labels`).
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> GroupSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> GroupSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The `next_page_token` value returned from a previous search request, if any.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> GroupSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. Note that the number of results returned may be less than this value even if there are more available results. To fetch all results, clients must continue calling this method repeatedly until the response no longer contains a `next_page_token`. If unspecified, defaults to 200 for `GroupView.BASIC` and 50 for `GroupView.FULL`. Must not be greater than 1000 for `GroupView.BASIC` or 500 for `GroupView.FULL`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> GroupSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> GroupSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -10851,7 +10831,7 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10876,7 +10856,7 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GroupSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10896,7 +10876,7 @@ impl<'a, C> GroupSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

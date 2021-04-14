@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-adexchangebuyer2_v2_beta1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer2_v2_beta1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer2_v2_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *AdExchangeBuyerII* API at revision *20210331*. The CLI is at version *2.0.0*.
+This documentation was generated from the *AdExchangeBuyerII* API at revision *20210331*. The CLI is at version *2.0.3*.
 
 ```bash
 adexchangebuyer2-v2-beta1 [options]

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -126,35 +125,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Sheets<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Sheets<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Sheets<C> {}
+impl<'a, > client::Hub for Sheets<> {}
 
-impl<'a, C> Sheets<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Sheets<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Sheets<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Sheets<> {
         Sheets {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://sheets.googleapis.com/".to_string(),
             _root_url: "https://sheets.googleapis.com/".to_string(),
         }
     }
 
-    pub fn spreadsheets(&'a self) -> SpreadsheetMethods<'a, C> {
+    pub fn spreadsheets(&'a self) -> SpreadsheetMethods<'a> {
         SpreadsheetMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5472,15 +5470,15 @@ impl client::Part for WaterfallChartSpec {}
 /// let rb = hub.spreadsheets();
 /// # }
 /// ```
-pub struct SpreadsheetMethods<'a, C>
-    where C: 'a {
+pub struct SpreadsheetMethods<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SpreadsheetMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SpreadsheetMethods<'a> {}
 
-impl<'a, C> SpreadsheetMethods<'a, C> {
+impl<'a> SpreadsheetMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5490,7 +5488,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve metadata from.
     /// * `metadataId` - The ID of the developer metadata to retrieve.
-    pub fn developer_metadata_get(&self, spreadsheet_id: &str, metadata_id: i32) -> SpreadsheetDeveloperMetadataGetCall<'a, C> {
+    pub fn developer_metadata_get(&self, spreadsheet_id: &str, metadata_id: i32) -> SpreadsheetDeveloperMetadataGetCall<'a> {
         SpreadsheetDeveloperMetadataGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5509,7 +5507,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve metadata from.
-    pub fn developer_metadata_search(&self, request: SearchDeveloperMetadataRequest, spreadsheet_id: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a, C> {
+    pub fn developer_metadata_search(&self, request: SearchDeveloperMetadataRequest, spreadsheet_id: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
         SpreadsheetDeveloperMetadataSearchCall {
             hub: self.hub,
             _request: request,
@@ -5529,7 +5527,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet containing the sheet to copy.
     /// * `sheetId` - The ID of the sheet to copy.
-    pub fn sheets_copy_to(&self, request: CopySheetToAnotherSpreadsheetRequest, spreadsheet_id: &str, sheet_id: i32) -> SpreadsheetSheetCopyToCall<'a, C> {
+    pub fn sheets_copy_to(&self, request: CopySheetToAnotherSpreadsheetRequest, spreadsheet_id: &str, sheet_id: i32) -> SpreadsheetSheetCopyToCall<'a> {
         SpreadsheetSheetCopyToCall {
             hub: self.hub,
             _request: request,
@@ -5550,7 +5548,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
     /// * `range` - The A1 notation of a range to search for a logical table of data. Values are appended after the last row of the table.
-    pub fn values_append(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn values_append(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueAppendCall<'a> {
         SpreadsheetValueAppendCall {
             hub: self.hub,
             _request: request,
@@ -5575,7 +5573,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_clear(&self, request: BatchClearValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearCall<'a, C> {
+    pub fn values_batch_clear(&self, request: BatchClearValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearCall<'a> {
         SpreadsheetValueBatchClearCall {
             hub: self.hub,
             _request: request,
@@ -5594,7 +5592,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_clear_by_data_filter(&self, request: BatchClearValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C> {
+    pub fn values_batch_clear_by_data_filter(&self, request: BatchClearValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
         SpreadsheetValueBatchClearByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5612,7 +5610,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// # Arguments
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
-    pub fn values_batch_get(&self, spreadsheet_id: &str) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn values_batch_get(&self, spreadsheet_id: &str) -> SpreadsheetValueBatchGetCall<'a> {
         SpreadsheetValueBatchGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5634,7 +5632,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
-    pub fn values_batch_get_by_data_filter(&self, request: BatchGetValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C> {
+    pub fn values_batch_get_by_data_filter(&self, request: BatchGetValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
         SpreadsheetValueBatchGetByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5653,7 +5651,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_update(&self, request: BatchUpdateValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateCall<'a, C> {
+    pub fn values_batch_update(&self, request: BatchUpdateValuesRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateCall<'a> {
         SpreadsheetValueBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5672,7 +5670,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
-    pub fn values_batch_update_by_data_filter(&self, request: BatchUpdateValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> {
+    pub fn values_batch_update_by_data_filter(&self, request: BatchUpdateValuesByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
         SpreadsheetValueBatchUpdateByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5692,7 +5690,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
     /// * `range` - The A1 notation or R1C1 notation of the values to clear.
-    pub fn values_clear(&self, request: ClearValuesRequest, spreadsheet_id: &str, range: &str) -> SpreadsheetValueClearCall<'a, C> {
+    pub fn values_clear(&self, request: ClearValuesRequest, spreadsheet_id: &str, range: &str) -> SpreadsheetValueClearCall<'a> {
         SpreadsheetValueClearCall {
             hub: self.hub,
             _request: request,
@@ -5712,7 +5710,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `spreadsheetId` - The ID of the spreadsheet to retrieve data from.
     /// * `range` - The A1 notation or R1C1 notation of the range to retrieve values from.
-    pub fn values_get(&self, spreadsheet_id: &str, range: &str) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn values_get(&self, spreadsheet_id: &str, range: &str) -> SpreadsheetValueGetCall<'a> {
         SpreadsheetValueGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5735,7 +5733,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The ID of the spreadsheet to update.
     /// * `range` - The A1 notation of the values to update.
-    pub fn values_update(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn values_update(&self, request: ValueRange, spreadsheet_id: &str, range: &str) -> SpreadsheetValueUpdateCall<'a> {
         SpreadsheetValueUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5759,7 +5757,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The spreadsheet to apply the updates to.
-    pub fn batch_update(&self, request: BatchUpdateSpreadsheetRequest, spreadsheet_id: &str) -> SpreadsheetBatchUpdateCall<'a, C> {
+    pub fn batch_update(&self, request: BatchUpdateSpreadsheetRequest, spreadsheet_id: &str) -> SpreadsheetBatchUpdateCall<'a> {
         SpreadsheetBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -5777,7 +5775,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Spreadsheet) -> SpreadsheetCreateCall<'a, C> {
+    pub fn create(&self, request: Spreadsheet) -> SpreadsheetCreateCall<'a> {
         SpreadsheetCreateCall {
             hub: self.hub,
             _request: request,
@@ -5794,7 +5792,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     /// # Arguments
     ///
     /// * `spreadsheetId` - The spreadsheet to request.
-    pub fn get(&self, spreadsheet_id: &str) -> SpreadsheetGetCall<'a, C> {
+    pub fn get(&self, spreadsheet_id: &str) -> SpreadsheetGetCall<'a> {
         SpreadsheetGetCall {
             hub: self.hub,
             _spreadsheet_id: spreadsheet_id.to_string(),
@@ -5814,7 +5812,7 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `spreadsheetId` - The spreadsheet to request.
-    pub fn get_by_data_filter(&self, request: GetSpreadsheetByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetGetByDataFilterCall<'a, C> {
+    pub fn get_by_data_filter(&self, request: GetSpreadsheetByDataFilterRequest, spreadsheet_id: &str) -> SpreadsheetGetByDataFilterCall<'a> {
         SpreadsheetGetByDataFilterCall {
             hub: self.hub,
             _request: request,
@@ -5866,10 +5864,10 @@ impl<'a, C> SpreadsheetMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetDeveloperMetadataGetCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetDeveloperMetadataGetCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _spreadsheet_id: String,
     _metadata_id: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5877,9 +5875,9 @@ pub struct SpreadsheetDeveloperMetadataGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetDeveloperMetadataGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetDeveloperMetadataGetCall<'a> {}
 
-impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetDeveloperMetadataGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5941,8 +5939,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5955,7 +5952,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5964,7 +5961,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6024,7 +6021,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataGetCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataGetCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6034,7 +6031,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metadata_id(mut self, new_value: i32) -> SpreadsheetDeveloperMetadataGetCall<'a, C> {
+    pub fn metadata_id(mut self, new_value: i32) -> SpreadsheetDeveloperMetadataGetCall<'a> {
         self._metadata_id = new_value;
         self
     }
@@ -6044,7 +6041,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6069,7 +6066,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6089,7 +6086,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetDeveloperMetadataGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetDeveloperMetadataGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6139,10 +6136,10 @@ impl<'a, C> SpreadsheetDeveloperMetadataGetCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetDeveloperMetadataSearchCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetDeveloperMetadataSearchCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: SearchDeveloperMetadataRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6150,9 +6147,9 @@ pub struct SpreadsheetDeveloperMetadataSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetDeveloperMetadataSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetDeveloperMetadataSearchCall<'a> {}
 
-impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetDeveloperMetadataSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6224,8 +6221,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6239,7 +6235,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6250,7 +6246,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6309,7 +6305,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchDeveloperMetadataRequest) -> SpreadsheetDeveloperMetadataSearchCall<'a, C> {
+    pub fn request(mut self, new_value: SearchDeveloperMetadataRequest) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
         self._request = new_value;
         self
     }
@@ -6319,7 +6315,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6329,7 +6325,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetDeveloperMetadataSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6354,7 +6350,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6374,7 +6370,7 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetDeveloperMetadataSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetDeveloperMetadataSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6424,10 +6420,10 @@ impl<'a, C> SpreadsheetDeveloperMetadataSearchCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetSheetCopyToCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetSheetCopyToCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: CopySheetToAnotherSpreadsheetRequest,
     _spreadsheet_id: String,
     _sheet_id: i32,
@@ -6436,9 +6432,9 @@ pub struct SpreadsheetSheetCopyToCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetSheetCopyToCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetSheetCopyToCall<'a> {}
 
-impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetSheetCopyToCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6511,8 +6507,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6526,7 +6521,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6537,7 +6532,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6596,7 +6591,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CopySheetToAnotherSpreadsheetRequest) -> SpreadsheetSheetCopyToCall<'a, C> {
+    pub fn request(mut self, new_value: CopySheetToAnotherSpreadsheetRequest) -> SpreadsheetSheetCopyToCall<'a> {
         self._request = new_value;
         self
     }
@@ -6606,7 +6601,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetSheetCopyToCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetSheetCopyToCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6616,7 +6611,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sheet_id(mut self, new_value: i32) -> SpreadsheetSheetCopyToCall<'a, C> {
+    pub fn sheet_id(mut self, new_value: i32) -> SpreadsheetSheetCopyToCall<'a> {
         self._sheet_id = new_value;
         self
     }
@@ -6626,7 +6621,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetSheetCopyToCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetSheetCopyToCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6651,7 +6646,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetSheetCopyToCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetSheetCopyToCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6671,7 +6666,7 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetSheetCopyToCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetSheetCopyToCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6726,10 +6721,10 @@ impl<'a, C> SpreadsheetSheetCopyToCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueAppendCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueAppendCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: ValueRange,
     _spreadsheet_id: String,
     _range: String,
@@ -6743,9 +6738,9 @@ pub struct SpreadsheetValueAppendCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueAppendCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueAppendCall<'a> {}
 
-impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueAppendCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6833,8 +6828,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6848,7 +6842,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6859,7 +6853,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6918,7 +6912,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueAppendCall<'a> {
         self._request = new_value;
         self
     }
@@ -6928,7 +6922,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -6938,42 +6932,42 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
         self._range = new_value.to_string();
         self
     }
     /// How the input data should be interpreted.
     ///
     /// Sets the *value input option* query property to the given value.
-    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
         self._value_input_option = Some(new_value.to_string());
         self
     }
     /// Determines how values in the response should be rendered. The default render option is ValueRenderOption.FORMATTED_VALUE.
     ///
     /// Sets the *response value render option* query property to the given value.
-    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
         self._response_value_render_option = Some(new_value.to_string());
         self
     }
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
     ///
     /// Sets the *response date time render option* query property to the given value.
-    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
         self._response_date_time_render_option = Some(new_value.to_string());
         self
     }
     /// How the input data should be inserted.
     ///
     /// Sets the *insert data option* query property to the given value.
-    pub fn insert_data_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn insert_data_option(mut self, new_value: &str) -> SpreadsheetValueAppendCall<'a> {
         self._insert_data_option = Some(new_value.to_string());
         self
     }
     /// Determines if the update response should include the values of the cells that were appended. By default, responses do not include the updated values.
     ///
     /// Sets the *include values in response* query property to the given value.
-    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueAppendCall<'a> {
         self._include_values_in_response = Some(new_value);
         self
     }
@@ -6983,7 +6977,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueAppendCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueAppendCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7008,7 +7002,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueAppendCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueAppendCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7028,7 +7022,7 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueAppendCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueAppendCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7078,10 +7072,10 @@ impl<'a, C> SpreadsheetValueAppendCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchClearCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueBatchClearCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: BatchClearValuesRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7089,9 +7083,9 @@ pub struct SpreadsheetValueBatchClearCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueBatchClearCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueBatchClearCall<'a> {}
 
-impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueBatchClearCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7163,8 +7157,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7178,7 +7171,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7189,7 +7182,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7248,7 +7241,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchClearValuesRequest) -> SpreadsheetValueBatchClearCall<'a, C> {
+    pub fn request(mut self, new_value: BatchClearValuesRequest) -> SpreadsheetValueBatchClearCall<'a> {
         self._request = new_value;
         self
     }
@@ -7258,7 +7251,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -7268,7 +7261,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7293,7 +7286,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7313,7 +7306,7 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchClearCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchClearCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7363,10 +7356,10 @@ impl<'a, C> SpreadsheetValueBatchClearCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchClearByDataFilterCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueBatchClearByDataFilterCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: BatchClearValuesByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7374,9 +7367,9 @@ pub struct SpreadsheetValueBatchClearByDataFilterCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueBatchClearByDataFilterCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueBatchClearByDataFilterCall<'a> {}
 
-impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueBatchClearByDataFilterCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7448,8 +7441,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7463,7 +7455,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7474,7 +7466,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7533,7 +7525,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchClearValuesByDataFilterRequest) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C> {
+    pub fn request(mut self, new_value: BatchClearValuesByDataFilterRequest) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
         self._request = new_value;
         self
     }
@@ -7543,7 +7535,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -7553,7 +7545,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchClearByDataFilterCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7578,7 +7570,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7598,7 +7590,7 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7646,10 +7638,10 @@ impl<'a, C> SpreadsheetValueBatchClearByDataFilterCall<'a, C> where C: BorrowMut
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchGetCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueBatchGetCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _spreadsheet_id: String,
     _value_render_option: Option<String>,
     _ranges: Vec<String>,
@@ -7660,9 +7652,9 @@ pub struct SpreadsheetValueBatchGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueBatchGetCall<'a> {}
 
-impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7737,8 +7729,7 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7751,7 +7742,7 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7760,7 +7751,7 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7820,14 +7811,14 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
     /// How values should be represented in the output. The default render option is ValueRenderOption.FORMATTED_VALUE.
     ///
     /// Sets the *value render option* query property to the given value.
-    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
         self._value_render_option = Some(new_value.to_string());
         self
     }
@@ -7835,21 +7826,21 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Append the given value to the *ranges* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
         self._ranges.push(new_value.to_string());
         self
     }
     /// The major dimension that results should use. For example, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=A1:B2,majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas requesting `range=A1:B2,majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     ///
     /// Sets the *major dimension* query property to the given value.
-    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
         self._major_dimension = Some(new_value.to_string());
         self
     }
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
     ///
     /// Sets the *date time render option* query property to the given value.
-    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueBatchGetCall<'a> {
         self._date_time_render_option = Some(new_value.to_string());
         self
     }
@@ -7859,7 +7850,7 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7884,7 +7875,7 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7904,7 +7895,7 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7954,10 +7945,10 @@ impl<'a, C> SpreadsheetValueBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchGetByDataFilterCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueBatchGetByDataFilterCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: BatchGetValuesByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7965,9 +7956,9 @@ pub struct SpreadsheetValueBatchGetByDataFilterCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueBatchGetByDataFilterCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueBatchGetByDataFilterCall<'a> {}
 
-impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueBatchGetByDataFilterCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8039,8 +8030,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8054,7 +8044,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8065,7 +8055,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8124,7 +8114,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchGetValuesByDataFilterRequest) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C> {
+    pub fn request(mut self, new_value: BatchGetValuesByDataFilterRequest) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
         self._request = new_value;
         self
     }
@@ -8134,7 +8124,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8144,7 +8134,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchGetByDataFilterCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8169,7 +8159,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8189,7 +8179,7 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8239,10 +8229,10 @@ impl<'a, C> SpreadsheetValueBatchGetByDataFilterCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: BatchUpdateValuesRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8250,9 +8240,9 @@ pub struct SpreadsheetValueBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueBatchUpdateCall<'a> {}
 
-impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8324,8 +8314,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8339,7 +8328,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8350,7 +8339,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8409,7 +8398,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateValuesRequest) -> SpreadsheetValueBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUpdateValuesRequest) -> SpreadsheetValueBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8419,7 +8408,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8429,7 +8418,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8454,7 +8443,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8474,7 +8463,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8524,10 +8513,10 @@ impl<'a, C> SpreadsheetValueBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: BatchUpdateValuesByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8535,9 +8524,9 @@ pub struct SpreadsheetValueBatchUpdateByDataFilterCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueBatchUpdateByDataFilterCall<'a> {}
 
-impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8609,8 +8598,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8624,7 +8612,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8635,7 +8623,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8694,7 +8682,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateValuesByDataFilterRequest) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUpdateValuesByDataFilterRequest) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
         self._request = new_value;
         self
     }
@@ -8704,7 +8692,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -8714,7 +8702,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8739,7 +8727,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8759,7 +8747,7 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8809,10 +8797,10 @@ impl<'a, C> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C> where C: BorrowMu
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueClearCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueClearCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: ClearValuesRequest,
     _spreadsheet_id: String,
     _range: String,
@@ -8821,9 +8809,9 @@ pub struct SpreadsheetValueClearCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueClearCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueClearCall<'a> {}
 
-impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueClearCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8896,8 +8884,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8911,7 +8898,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8922,7 +8909,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8981,7 +8968,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClearValuesRequest) -> SpreadsheetValueClearCall<'a, C> {
+    pub fn request(mut self, new_value: ClearValuesRequest) -> SpreadsheetValueClearCall<'a> {
         self._request = new_value;
         self
     }
@@ -8991,7 +8978,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9001,7 +8988,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a, C> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueClearCall<'a> {
         self._range = new_value.to_string();
         self
     }
@@ -9011,7 +8998,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueClearCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueClearCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9036,7 +9023,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueClearCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueClearCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9056,7 +9043,7 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueClearCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueClearCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9103,10 +9090,10 @@ impl<'a, C> SpreadsheetValueClearCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueGetCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueGetCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _spreadsheet_id: String,
     _range: String,
     _value_render_option: Option<String>,
@@ -9117,9 +9104,9 @@ pub struct SpreadsheetValueGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueGetCall<'a> {}
 
-impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9190,8 +9177,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9204,7 +9190,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9213,7 +9199,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9273,7 +9259,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9283,28 +9269,28 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
         self._range = new_value.to_string();
         self
     }
     /// How values should be represented in the output. The default render option is ValueRenderOption.FORMATTED_VALUE.
     ///
     /// Sets the *value render option* query property to the given value.
-    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn value_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
         self._value_render_option = Some(new_value.to_string());
         self
     }
     /// The major dimension that results should use. For example, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`, then requesting `range=A1:B2,majorDimension=ROWS` returns `[[1,2],[3,4]]`, whereas requesting `range=A1:B2,majorDimension=COLUMNS` returns `[[1,3],[2,4]]`.
     ///
     /// Sets the *major dimension* query property to the given value.
-    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn major_dimension(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
         self._major_dimension = Some(new_value.to_string());
         self
     }
     /// How dates, times, and durations should be represented in the output. This is ignored if value_render_option is FORMATTED_VALUE. The default dateTime render option is [DateTimeRenderOption.SERIAL_NUMBER].
     ///
     /// Sets the *date time render option* query property to the given value.
-    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueGetCall<'a> {
         self._date_time_render_option = Some(new_value.to_string());
         self
     }
@@ -9314,7 +9300,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9339,7 +9325,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9359,7 +9345,7 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9413,10 +9399,10 @@ impl<'a, C> SpreadsheetValueGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetValueUpdateCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetValueUpdateCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: ValueRange,
     _spreadsheet_id: String,
     _range: String,
@@ -9429,9 +9415,9 @@ pub struct SpreadsheetValueUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetValueUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetValueUpdateCall<'a> {}
 
-impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetValueUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9516,8 +9502,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9531,7 +9516,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9542,7 +9527,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9601,7 +9586,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: ValueRange) -> SpreadsheetValueUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -9611,7 +9596,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9621,35 +9606,35 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn range(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn range(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
         self._range = new_value.to_string();
         self
     }
     /// How the input data should be interpreted.
     ///
     /// Sets the *value input option* query property to the given value.
-    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn value_input_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
         self._value_input_option = Some(new_value.to_string());
         self
     }
     /// Determines how values in the response should be rendered. The default render option is ValueRenderOption.FORMATTED_VALUE.
     ///
     /// Sets the *response value render option* query property to the given value.
-    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn response_value_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
         self._response_value_render_option = Some(new_value.to_string());
         self
     }
     /// Determines how dates, times, and durations in the response should be rendered. This is ignored if response_value_render_option is FORMATTED_VALUE. The default dateTime render option is DateTimeRenderOption.SERIAL_NUMBER.
     ///
     /// Sets the *response date time render option* query property to the given value.
-    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn response_date_time_render_option(mut self, new_value: &str) -> SpreadsheetValueUpdateCall<'a> {
         self._response_date_time_render_option = Some(new_value.to_string());
         self
     }
     /// Determines if the update response should include the values of the cells that were updated. By default, responses do not include the updated values. If the range to write was larger than the range actually written, the response includes all values in the requested range (excluding trailing empty rows and columns).
     ///
     /// Sets the *include values in response* query property to the given value.
-    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn include_values_in_response(mut self, new_value: bool) -> SpreadsheetValueUpdateCall<'a> {
         self._include_values_in_response = Some(new_value);
         self
     }
@@ -9659,7 +9644,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetValueUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9684,7 +9669,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9704,7 +9689,7 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetValueUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9754,10 +9739,10 @@ impl<'a, C> SpreadsheetValueUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: BatchUpdateSpreadsheetRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9765,9 +9750,9 @@ pub struct SpreadsheetBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetBatchUpdateCall<'a> {}
 
-impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9839,8 +9824,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9854,7 +9838,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9865,7 +9849,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9924,7 +9908,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateSpreadsheetRequest) -> SpreadsheetBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUpdateSpreadsheetRequest) -> SpreadsheetBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -9934,7 +9918,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetBatchUpdateCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetBatchUpdateCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -9944,7 +9928,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9969,7 +9953,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9989,7 +9973,7 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10039,19 +10023,19 @@ impl<'a, C> SpreadsheetBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetCreateCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetCreateCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: Spreadsheet,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetCreateCall<'a> {}
 
-impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10101,8 +10085,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10116,7 +10099,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10127,7 +10110,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10186,7 +10169,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Spreadsheet) -> SpreadsheetCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Spreadsheet) -> SpreadsheetCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10196,7 +10179,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10221,7 +10204,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10241,7 +10224,7 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10287,10 +10270,10 @@ impl<'a, C> SpreadsheetCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetGetCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetGetCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _spreadsheet_id: String,
     _ranges: Vec<String>,
     _include_grid_data: Option<bool>,
@@ -10299,9 +10282,9 @@ pub struct SpreadsheetGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetGetCall<'a> {}
 
-impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10370,8 +10353,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10384,7 +10366,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10393,7 +10375,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10453,7 +10435,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -10461,14 +10443,14 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Append the given value to the *ranges* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetGetCall<'a, C> {
+    pub fn add_ranges(mut self, new_value: &str) -> SpreadsheetGetCall<'a> {
         self._ranges.push(new_value.to_string());
         self
     }
     /// True if grid data should be returned. This parameter is ignored if a field mask was set in the request.
     ///
     /// Sets the *include grid data* query property to the given value.
-    pub fn include_grid_data(mut self, new_value: bool) -> SpreadsheetGetCall<'a, C> {
+    pub fn include_grid_data(mut self, new_value: bool) -> SpreadsheetGetCall<'a> {
         self._include_grid_data = Some(new_value);
         self
     }
@@ -10478,7 +10460,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10503,7 +10485,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10523,7 +10505,7 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10573,10 +10555,10 @@ impl<'a, C> SpreadsheetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpreadsheetGetByDataFilterCall<'a, C>
-    where C: 'a {
+pub struct SpreadsheetGetByDataFilterCall<'a>
+    where  {
 
-    hub: &'a Sheets<C>,
+    hub: &'a Sheets<>,
     _request: GetSpreadsheetByDataFilterRequest,
     _spreadsheet_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10584,9 +10566,9 @@ pub struct SpreadsheetGetByDataFilterCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpreadsheetGetByDataFilterCall<'a, C> {}
+impl<'a> client::CallBuilder for SpreadsheetGetByDataFilterCall<'a> {}
 
-impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpreadsheetGetByDataFilterCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10658,8 +10640,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10673,7 +10654,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10684,7 +10665,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10743,7 +10724,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetSpreadsheetByDataFilterRequest) -> SpreadsheetGetByDataFilterCall<'a, C> {
+    pub fn request(mut self, new_value: GetSpreadsheetByDataFilterRequest) -> SpreadsheetGetByDataFilterCall<'a> {
         self._request = new_value;
         self
     }
@@ -10753,7 +10734,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetByDataFilterCall<'a, C> {
+    pub fn spreadsheet_id(mut self, new_value: &str) -> SpreadsheetGetByDataFilterCall<'a> {
         self._spreadsheet_id = new_value.to_string();
         self
     }
@@ -10763,7 +10744,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetByDataFilterCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpreadsheetGetByDataFilterCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10788,7 +10769,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetByDataFilterCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetByDataFilterCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10808,7 +10789,7 @@ impl<'a, C> SpreadsheetGetByDataFilterCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetGetByDataFilterCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpreadsheetGetByDataFilterCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

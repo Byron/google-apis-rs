@@ -4,10 +4,10 @@
 [package]
 
 name = "google-bigquery2-cli"
-version = "2.0.0+20210327"
+version = "2.0.3+20210327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with bigquery (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/bigquery2-cli"
 homepage = "https://cloud.google.com/bigquery/"
 documentation = "http://byron.github.io/google-apis-rs/google_bigquery2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-bigquery2]
 path = "../bigquery2"
-version = "2.0.0+20210327"
+version = "2.0.3+20210327"

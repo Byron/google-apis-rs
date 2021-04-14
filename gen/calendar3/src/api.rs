@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -138,56 +137,55 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CalendarHub<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CalendarHub<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CalendarHub<C> {}
+impl<'a, > client::Hub for CalendarHub<> {}
 
-impl<'a, C> CalendarHub<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CalendarHub<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CalendarHub<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CalendarHub<> {
         CalendarHub {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/calendar/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn acl(&'a self) -> AclMethods<'a, C> {
+    pub fn acl(&'a self) -> AclMethods<'a> {
         AclMethods { hub: &self }
     }
-    pub fn calendar_list(&'a self) -> CalendarListMethods<'a, C> {
+    pub fn calendar_list(&'a self) -> CalendarListMethods<'a> {
         CalendarListMethods { hub: &self }
     }
-    pub fn calendars(&'a self) -> CalendarMethods<'a, C> {
+    pub fn calendars(&'a self) -> CalendarMethods<'a> {
         CalendarMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C> {
+    pub fn channels(&'a self) -> ChannelMethods<'a> {
         ChannelMethods { hub: &self }
     }
-    pub fn colors(&'a self) -> ColorMethods<'a, C> {
+    pub fn colors(&'a self) -> ColorMethods<'a> {
         ColorMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a, C> {
+    pub fn events(&'a self) -> EventMethods<'a> {
         EventMethods { hub: &self }
     }
-    pub fn freebusy(&'a self) -> FreebusyMethods<'a, C> {
+    pub fn freebusy(&'a self) -> FreebusyMethods<'a> {
         FreebusyMethods { hub: &self }
     }
-    pub fn settings(&'a self) -> SettingMethods<'a, C> {
+    pub fn settings(&'a self) -> SettingMethods<'a> {
         SettingMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1442,15 +1440,15 @@ impl client::Part for EventSource {}
 /// let rb = hub.acl();
 /// # }
 /// ```
-pub struct AclMethods<'a, C>
-    where C: 'a {
+pub struct AclMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AclMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AclMethods<'a> {}
 
-impl<'a, C> AclMethods<'a, C> {
+impl<'a> AclMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1460,7 +1458,7 @@ impl<'a, C> AclMethods<'a, C> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a, C> {
+    pub fn delete(&self, calendar_id: &str, rule_id: &str) -> AclDeleteCall<'a> {
         AclDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1479,7 +1477,7 @@ impl<'a, C> AclMethods<'a, C> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a, C> {
+    pub fn get(&self, calendar_id: &str, rule_id: &str) -> AclGetCall<'a> {
         AclGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1498,7 +1496,7 @@ impl<'a, C> AclMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn insert(&self, request: AclRule, calendar_id: &str) -> AclInsertCall<'a, C> {
+    pub fn insert(&self, request: AclRule, calendar_id: &str) -> AclInsertCall<'a> {
         AclInsertCall {
             hub: self.hub,
             _request: request,
@@ -1517,7 +1515,7 @@ impl<'a, C> AclMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn list(&self, calendar_id: &str) -> AclListCall<'a, C> {
+    pub fn list(&self, calendar_id: &str) -> AclListCall<'a> {
         AclListCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1540,7 +1538,7 @@ impl<'a, C> AclMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn patch(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a, C> {
+    pub fn patch(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclPatchCall<'a> {
         AclPatchCall {
             hub: self.hub,
             _request: request,
@@ -1562,7 +1560,7 @@ impl<'a, C> AclMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `ruleId` - ACL rule identifier.
-    pub fn update(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a, C> {
+    pub fn update(&self, request: AclRule, calendar_id: &str, rule_id: &str) -> AclUpdateCall<'a> {
         AclUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1583,7 +1581,7 @@ impl<'a, C> AclMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn watch(&self, request: Channel, calendar_id: &str) -> AclWatchCall<'a, C> {
+    pub fn watch(&self, request: Channel, calendar_id: &str) -> AclWatchCall<'a> {
         AclWatchCall {
             hub: self.hub,
             _request: request,
@@ -1631,15 +1629,15 @@ impl<'a, C> AclMethods<'a, C> {
 /// let rb = hub.calendar_list();
 /// # }
 /// ```
-pub struct CalendarListMethods<'a, C>
-    where C: 'a {
+pub struct CalendarListMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CalendarListMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CalendarListMethods<'a> {}
 
-impl<'a, C> CalendarListMethods<'a, C> {
+impl<'a> CalendarListMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1648,7 +1646,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a, C> {
+    pub fn delete(&self, calendar_id: &str) -> CalendarListDeleteCall<'a> {
         CalendarListDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1665,7 +1663,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a, C> {
+    pub fn get(&self, calendar_id: &str) -> CalendarListGetCall<'a> {
         CalendarListGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1682,7 +1680,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: CalendarListEntry) -> CalendarListInsertCall<'a, C> {
+    pub fn insert(&self, request: CalendarListEntry) -> CalendarListInsertCall<'a> {
         CalendarListInsertCall {
             hub: self.hub,
             _request: request,
@@ -1696,7 +1694,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the calendars on the user's calendar list.
-    pub fn list(&self) -> CalendarListListCall<'a, C> {
+    pub fn list(&self) -> CalendarListListCall<'a> {
         CalendarListListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -1719,7 +1717,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn patch(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a, C> {
+    pub fn patch(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListPatchCall<'a> {
         CalendarListPatchCall {
             hub: self.hub,
             _request: request,
@@ -1739,7 +1737,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn update(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a, C> {
+    pub fn update(&self, request: CalendarListEntry, calendar_id: &str) -> CalendarListUpdateCall<'a> {
         CalendarListUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1758,7 +1756,7 @@ impl<'a, C> CalendarListMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: Channel) -> CalendarListWatchCall<'a, C> {
+    pub fn watch(&self, request: Channel) -> CalendarListWatchCall<'a> {
         CalendarListWatchCall {
             hub: self.hub,
             _request: request,
@@ -1807,15 +1805,15 @@ impl<'a, C> CalendarListMethods<'a, C> {
 /// let rb = hub.calendars();
 /// # }
 /// ```
-pub struct CalendarMethods<'a, C>
-    where C: 'a {
+pub struct CalendarMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CalendarMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CalendarMethods<'a> {}
 
-impl<'a, C> CalendarMethods<'a, C> {
+impl<'a> CalendarMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1824,7 +1822,7 @@ impl<'a, C> CalendarMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a, C> {
+    pub fn clear(&self, calendar_id: &str) -> CalendarClearCall<'a> {
         CalendarClearCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1841,7 +1839,7 @@ impl<'a, C> CalendarMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a, C> {
+    pub fn delete(&self, calendar_id: &str) -> CalendarDeleteCall<'a> {
         CalendarDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1858,7 +1856,7 @@ impl<'a, C> CalendarMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a, C> {
+    pub fn get(&self, calendar_id: &str) -> CalendarGetCall<'a> {
         CalendarGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -1875,7 +1873,7 @@ impl<'a, C> CalendarMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: Calendar) -> CalendarInsertCall<'a, C> {
+    pub fn insert(&self, request: Calendar) -> CalendarInsertCall<'a> {
         CalendarInsertCall {
             hub: self.hub,
             _request: request,
@@ -1893,7 +1891,7 @@ impl<'a, C> CalendarMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn patch(&self, request: Calendar, calendar_id: &str) -> CalendarPatchCall<'a, C> {
+    pub fn patch(&self, request: Calendar, calendar_id: &str) -> CalendarPatchCall<'a> {
         CalendarPatchCall {
             hub: self.hub,
             _request: request,
@@ -1912,7 +1910,7 @@ impl<'a, C> CalendarMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn update(&self, request: Calendar, calendar_id: &str) -> CalendarUpdateCall<'a, C> {
+    pub fn update(&self, request: Calendar, calendar_id: &str) -> CalendarUpdateCall<'a> {
         CalendarUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1956,15 +1954,15 @@ impl<'a, C> CalendarMethods<'a, C> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C>
-    where C: 'a {
+pub struct ChannelMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ChannelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
 
-impl<'a, C> ChannelMethods<'a, C> {
+impl<'a> ChannelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1973,7 +1971,7 @@ impl<'a, C> ChannelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, C> {
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a> {
         ChannelStopCall {
             hub: self.hub,
             _request: request,
@@ -2016,20 +2014,20 @@ impl<'a, C> ChannelMethods<'a, C> {
 /// let rb = hub.colors();
 /// # }
 /// ```
-pub struct ColorMethods<'a, C>
-    where C: 'a {
+pub struct ColorMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ColorMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ColorMethods<'a> {}
 
-impl<'a, C> ColorMethods<'a, C> {
+impl<'a> ColorMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the color definitions for calendars and events.
-    pub fn get(&self) -> ColorGetCall<'a, C> {
+    pub fn get(&self) -> ColorGetCall<'a> {
         ColorGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2071,15 +2069,15 @@ impl<'a, C> ColorMethods<'a, C> {
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a, C>
-    where C: 'a {
+pub struct EventMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for EventMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for EventMethods<'a> {}
 
-impl<'a, C> EventMethods<'a, C> {
+impl<'a> EventMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2089,7 +2087,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a, C> {
+    pub fn delete(&self, calendar_id: &str, event_id: &str) -> EventDeleteCall<'a> {
         EventDeleteCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2110,7 +2108,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a, C> {
+    pub fn get(&self, calendar_id: &str, event_id: &str) -> EventGetCall<'a> {
         EventGetCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2132,7 +2130,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn import(&self, request: Event, calendar_id: &str) -> EventImportCall<'a, C> {
+    pub fn import(&self, request: Event, calendar_id: &str) -> EventImportCall<'a> {
         EventImportCall {
             hub: self.hub,
             _request: request,
@@ -2153,7 +2151,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn insert(&self, request: Event, calendar_id: &str) -> EventInsertCall<'a, C> {
+    pub fn insert(&self, request: Event, calendar_id: &str) -> EventInsertCall<'a> {
         EventInsertCall {
             hub: self.hub,
             _request: request,
@@ -2177,7 +2175,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Recurring event identifier.
-    pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a, C> {
+    pub fn instances(&self, calendar_id: &str, event_id: &str) -> EventInstanceCall<'a> {
         EventInstanceCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2204,7 +2202,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn list(&self, calendar_id: &str) -> EventListCall<'a, C> {
+    pub fn list(&self, calendar_id: &str) -> EventListCall<'a> {
         EventListCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2240,7 +2238,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// * `calendarId` - Calendar identifier of the source calendar where the event currently is on.
     /// * `eventId` - Event identifier.
     /// * `destination` - Calendar identifier of the target calendar where the event is to be moved to.
-    pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a, C> {
+    pub fn move_(&self, calendar_id: &str, event_id: &str, destination: &str) -> EventMoveCall<'a> {
         EventMoveCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2263,7 +2261,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn patch(&self, request: Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a, C> {
+    pub fn patch(&self, request: Event, calendar_id: &str, event_id: &str) -> EventPatchCall<'a> {
         EventPatchCall {
             hub: self.hub,
             _request: request,
@@ -2289,7 +2287,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `text` - The text describing the event to be created.
-    pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a, C> {
+    pub fn quick_add(&self, calendar_id: &str, text: &str) -> EventQuickAddCall<'a> {
         EventQuickAddCall {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
@@ -2311,7 +2309,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
     /// * `eventId` - Event identifier.
-    pub fn update(&self, request: Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a, C> {
+    pub fn update(&self, request: Event, calendar_id: &str, event_id: &str) -> EventUpdateCall<'a> {
         EventUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2337,7 +2335,7 @@ impl<'a, C> EventMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `calendarId` - Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the "primary" keyword.
-    pub fn watch(&self, request: Channel, calendar_id: &str) -> EventWatchCall<'a, C> {
+    pub fn watch(&self, request: Channel, calendar_id: &str) -> EventWatchCall<'a> {
         EventWatchCall {
             hub: self.hub,
             _request: request,
@@ -2398,15 +2396,15 @@ impl<'a, C> EventMethods<'a, C> {
 /// let rb = hub.freebusy();
 /// # }
 /// ```
-pub struct FreebusyMethods<'a, C>
-    where C: 'a {
+pub struct FreebusyMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FreebusyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FreebusyMethods<'a> {}
 
-impl<'a, C> FreebusyMethods<'a, C> {
+impl<'a> FreebusyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2415,7 +2413,7 @@ impl<'a, C> FreebusyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn query(&self, request: FreeBusyRequest) -> FreebusyQueryCall<'a, C> {
+    pub fn query(&self, request: FreeBusyRequest) -> FreebusyQueryCall<'a> {
         FreebusyQueryCall {
             hub: self.hub,
             _request: request,
@@ -2458,15 +2456,15 @@ impl<'a, C> FreebusyMethods<'a, C> {
 /// let rb = hub.settings();
 /// # }
 /// ```
-pub struct SettingMethods<'a, C>
-    where C: 'a {
+pub struct SettingMethods<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SettingMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SettingMethods<'a> {}
 
-impl<'a, C> SettingMethods<'a, C> {
+impl<'a> SettingMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2475,7 +2473,7 @@ impl<'a, C> SettingMethods<'a, C> {
     /// # Arguments
     ///
     /// * `setting` - The id of the user setting.
-    pub fn get(&self, setting: &str) -> SettingGetCall<'a, C> {
+    pub fn get(&self, setting: &str) -> SettingGetCall<'a> {
         SettingGetCall {
             hub: self.hub,
             _setting: setting.to_string(),
@@ -2488,7 +2486,7 @@ impl<'a, C> SettingMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all user settings for the authenticated user.
-    pub fn list(&self) -> SettingListCall<'a, C> {
+    pub fn list(&self) -> SettingListCall<'a> {
         SettingListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -2507,7 +2505,7 @@ impl<'a, C> SettingMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn watch(&self, request: Channel) -> SettingWatchCall<'a, C> {
+    pub fn watch(&self, request: Channel) -> SettingWatchCall<'a> {
         SettingWatchCall {
             hub: self.hub,
             _request: request,
@@ -2561,10 +2559,10 @@ impl<'a, C> SettingMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclDeleteCall<'a, C>
-    where C: 'a {
+pub struct AclDeleteCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _rule_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2572,9 +2570,9 @@ pub struct AclDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AclDeleteCall<'a> {}
 
-impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2635,8 +2633,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2649,7 +2646,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2658,7 +2655,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2708,7 +2705,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclDeleteCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -2718,7 +2715,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a, C> {
+    pub fn rule_id(mut self, new_value: &str) -> AclDeleteCall<'a> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -2728,7 +2725,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2749,7 +2746,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2769,7 +2766,7 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2813,10 +2810,10 @@ impl<'a, C> AclDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclGetCall<'a, C>
-    where C: 'a {
+pub struct AclGetCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _rule_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2824,9 +2821,9 @@ pub struct AclGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AclGetCall<'a> {}
 
-impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2888,8 +2885,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2902,7 +2898,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2911,7 +2907,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2971,7 +2967,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclGetCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -2981,7 +2977,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a, C> {
+    pub fn rule_id(mut self, new_value: &str) -> AclGetCall<'a> {
         self._rule_id = new_value.to_string();
         self
     }
@@ -2991,7 +2987,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3012,7 +3008,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3032,7 +3028,7 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3083,10 +3079,10 @@ impl<'a, C> AclGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclInsertCall<'a, C>
-    where C: 'a {
+pub struct AclInsertCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: AclRule,
     _calendar_id: String,
     _send_notifications: Option<bool>,
@@ -3095,9 +3091,9 @@ pub struct AclInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for AclInsertCall<'a> {}
 
-impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3172,8 +3168,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3187,7 +3182,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3198,7 +3193,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3257,7 +3252,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AclRule) -> AclInsertCall<'a, C> {
+    pub fn request(mut self, new_value: AclRule) -> AclInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -3267,14 +3262,14 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclInsertCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether to send notifications about the calendar sharing change. Optional. The default is True.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> AclInsertCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> AclInsertCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -3284,7 +3279,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3305,7 +3300,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3325,7 +3320,7 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3373,10 +3368,10 @@ impl<'a, C> AclInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclListCall<'a, C>
-    where C: 'a {
+pub struct AclListCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _sync_token: Option<String>,
     _show_deleted: Option<bool>,
@@ -3387,9 +3382,9 @@ pub struct AclListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclListCall<'a, C> {}
+impl<'a> client::CallBuilder for AclListCall<'a> {}
 
-impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3462,8 +3457,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3476,7 +3470,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3485,7 +3479,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3545,7 +3539,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclListCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -3555,28 +3549,28 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> AclListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> AclListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AclListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AclListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AclListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> AclListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -3586,7 +3580,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3607,7 +3601,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3627,7 +3621,7 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3678,10 +3672,10 @@ impl<'a, C> AclListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclPatchCall<'a, C>
-    where C: 'a {
+pub struct AclPatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
@@ -3691,9 +3685,9 @@ pub struct AclPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AclPatchCall<'a> {}
 
-impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3769,8 +3763,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3784,7 +3777,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3795,7 +3788,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3854,7 +3847,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AclRule) -> AclPatchCall<'a, C> {
+    pub fn request(mut self, new_value: AclRule) -> AclPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -3864,7 +3857,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclPatchCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -3874,14 +3867,14 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a, C> {
+    pub fn rule_id(mut self, new_value: &str) -> AclPatchCall<'a> {
         self._rule_id = new_value.to_string();
         self
     }
     /// Whether to send notifications about the calendar sharing change. Note that there are no notifications on access removal. Optional. The default is True.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> AclPatchCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> AclPatchCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -3891,7 +3884,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3912,7 +3905,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3932,7 +3925,7 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3983,10 +3976,10 @@ impl<'a, C> AclPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclUpdateCall<'a, C>
-    where C: 'a {
+pub struct AclUpdateCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
@@ -3996,9 +3989,9 @@ pub struct AclUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AclUpdateCall<'a> {}
 
-impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4074,8 +4067,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4089,7 +4081,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4100,7 +4092,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4159,7 +4151,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AclRule) -> AclUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: AclRule) -> AclUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4169,7 +4161,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclUpdateCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4179,14 +4171,14 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a, C> {
+    pub fn rule_id(mut self, new_value: &str) -> AclUpdateCall<'a> {
         self._rule_id = new_value.to_string();
         self
     }
     /// Whether to send notifications about the calendar sharing change. Note that there are no notifications on access removal. Optional. The default is True.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> AclUpdateCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> AclUpdateCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -4196,7 +4188,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4217,7 +4209,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4237,7 +4229,7 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4291,10 +4283,10 @@ impl<'a, C> AclUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AclWatchCall<'a, C>
-    where C: 'a {
+pub struct AclWatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Channel,
     _calendar_id: String,
     _sync_token: Option<String>,
@@ -4306,9 +4298,9 @@ pub struct AclWatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AclWatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AclWatchCall<'a> {}
 
-impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AclWatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4392,8 +4384,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4407,7 +4398,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4418,7 +4409,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4477,7 +4468,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> AclWatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> AclWatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4487,7 +4478,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> AclWatchCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4497,28 +4488,28 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> AclWatchCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to include deleted ACLs in the result. Deleted ACLs are represented by role equal to "none". Deleted ACLs will always be included if syncToken is provided. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> AclWatchCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AclWatchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> AclWatchCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -4528,7 +4519,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclWatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AclWatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4549,7 +4540,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4569,7 +4560,7 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AclWatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AclWatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4613,19 +4604,19 @@ impl<'a, C> AclWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListDeleteCall<'a, C>
-    where C: 'a {
+pub struct CalendarListDeleteCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListDeleteCall<'a> {}
 
-impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4685,8 +4676,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4699,7 +4689,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4708,7 +4698,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4758,7 +4748,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListDeleteCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -4768,7 +4758,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4789,7 +4779,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4809,7 +4799,7 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4853,19 +4843,19 @@ impl<'a, C> CalendarListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListGetCall<'a, C>
-    where C: 'a {
+pub struct CalendarListGetCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListGetCall<'a> {}
 
-impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4926,8 +4916,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4940,7 +4929,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4949,7 +4938,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5009,7 +4998,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListGetCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -5019,7 +5008,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5040,7 +5029,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5060,7 +5049,7 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5111,10 +5100,10 @@ impl<'a, C> CalendarListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListInsertCall<'a, C>
-    where C: 'a {
+pub struct CalendarListInsertCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: CalendarListEntry,
     _color_rgb_format: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5122,9 +5111,9 @@ pub struct CalendarListInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListInsertCall<'a> {}
 
-impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5177,8 +5166,7 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5192,7 +5180,7 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5203,7 +5191,7 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5262,14 +5250,14 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListInsertCall<'a, C> {
+    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListInsertCall<'a> {
         self._request = new_value;
         self
     }
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     ///
     /// Sets the *color rgb format* query property to the given value.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a, C> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListInsertCall<'a> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -5279,7 +5267,7 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5300,7 +5288,7 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5320,7 +5308,7 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5370,10 +5358,10 @@ impl<'a, C> CalendarListInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListListCall<'a, C>
-    where C: 'a {
+pub struct CalendarListListCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _sync_token: Option<String>,
     _show_hidden: Option<bool>,
     _show_deleted: Option<bool>,
@@ -5385,9 +5373,9 @@ pub struct CalendarListListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListListCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListListCall<'a> {}
 
-impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5444,8 +5432,7 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5458,7 +5445,7 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5467,7 +5454,7 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5528,42 +5515,42 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> CalendarListListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to show hidden entries. Optional. The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
-    pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a, C> {
+    pub fn show_hidden(mut self, new_value: bool) -> CalendarListListCall<'a> {
         self._show_hidden = Some(new_value);
         self
     }
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> CalendarListListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CalendarListListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The minimum access role for the user in the returned entries. Optional. The default is no restriction.
     ///
     /// Sets the *min access role* query property to the given value.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a, C> {
+    pub fn min_access_role(mut self, new_value: &str) -> CalendarListListCall<'a> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> CalendarListListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -5573,7 +5560,7 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5594,7 +5581,7 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5614,7 +5601,7 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5665,10 +5652,10 @@ impl<'a, C> CalendarListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListPatchCall<'a, C>
-    where C: 'a {
+pub struct CalendarListPatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: CalendarListEntry,
     _calendar_id: String,
     _color_rgb_format: Option<bool>,
@@ -5677,9 +5664,9 @@ pub struct CalendarListPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListPatchCall<'a> {}
 
-impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5754,8 +5741,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5769,7 +5755,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5780,7 +5766,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5839,7 +5825,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListPatchCall<'a, C> {
+    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5849,14 +5835,14 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListPatchCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     ///
     /// Sets the *color rgb format* query property to the given value.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a, C> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListPatchCall<'a> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -5866,7 +5852,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5887,7 +5873,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5907,7 +5893,7 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5958,10 +5944,10 @@ impl<'a, C> CalendarListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListUpdateCall<'a, C>
-    where C: 'a {
+pub struct CalendarListUpdateCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: CalendarListEntry,
     _calendar_id: String,
     _color_rgb_format: Option<bool>,
@@ -5970,9 +5956,9 @@ pub struct CalendarListUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListUpdateCall<'a> {}
 
-impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6047,8 +6033,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6062,7 +6047,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6073,7 +6058,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6132,7 +6117,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: CalendarListEntry) -> CalendarListUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6142,14 +6127,14 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarListUpdateCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether to use the foregroundColor and backgroundColor fields to write the calendar colors (RGB). If this feature is used, the index-based colorId field will be set to the best matching option automatically. Optional. The default is False.
     ///
     /// Sets the *color rgb format* query property to the given value.
-    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a, C> {
+    pub fn color_rgb_format(mut self, new_value: bool) -> CalendarListUpdateCall<'a> {
         self._color_rgb_format = Some(new_value);
         self
     }
@@ -6159,7 +6144,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6180,7 +6165,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6200,7 +6185,7 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6256,10 +6241,10 @@ impl<'a, C> CalendarListUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarListWatchCall<'a, C>
-    where C: 'a {
+pub struct CalendarListWatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Channel,
     _sync_token: Option<String>,
     _show_hidden: Option<bool>,
@@ -6272,9 +6257,9 @@ pub struct CalendarListWatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarListWatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarListWatchCall<'a> {}
 
-impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarListWatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6342,8 +6327,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6357,7 +6341,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6368,7 +6352,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6427,7 +6411,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> CalendarListWatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> CalendarListWatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -6438,42 +6422,42 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> CalendarListWatchCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to show hidden entries. Optional. The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
-    pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a, C> {
+    pub fn show_hidden(mut self, new_value: bool) -> CalendarListWatchCall<'a> {
         self._show_hidden = Some(new_value);
         self
     }
     /// Whether to include deleted calendar list entries in the result. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> CalendarListWatchCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CalendarListWatchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The minimum access role for the user in the returned entries. Optional. The default is no restriction.
     ///
     /// Sets the *min access role* query property to the given value.
-    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a, C> {
+    pub fn min_access_role(mut self, new_value: &str) -> CalendarListWatchCall<'a> {
         self._min_access_role = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> CalendarListWatchCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -6483,7 +6467,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListWatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarListWatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6504,7 +6488,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6524,7 +6508,7 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListWatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarListWatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6568,19 +6552,19 @@ impl<'a, C> CalendarListWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarClearCall<'a, C>
-    where C: 'a {
+pub struct CalendarClearCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarClearCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarClearCall<'a> {}
 
-impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarClearCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6640,8 +6624,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6654,7 +6637,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6663,7 +6646,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6713,7 +6696,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarClearCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6723,7 +6706,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarClearCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarClearCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6744,7 +6727,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6764,7 +6747,7 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarClearCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarClearCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6808,19 +6791,19 @@ impl<'a, C> CalendarClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarDeleteCall<'a, C>
-    where C: 'a {
+pub struct CalendarDeleteCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarDeleteCall<'a> {}
 
-impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6880,8 +6863,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6894,7 +6876,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6903,7 +6885,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6953,7 +6935,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarDeleteCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -6963,7 +6945,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6984,7 +6966,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7004,7 +6986,7 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7048,19 +7030,19 @@ impl<'a, C> CalendarDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarGetCall<'a, C>
-    where C: 'a {
+pub struct CalendarGetCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarGetCall<'a> {}
 
-impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7121,8 +7103,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7135,7 +7116,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7144,7 +7125,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7204,7 +7185,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarGetCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7214,7 +7195,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7235,7 +7216,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7255,7 +7236,7 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7305,19 +7286,19 @@ impl<'a, C> CalendarGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarInsertCall<'a, C>
-    where C: 'a {
+pub struct CalendarInsertCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Calendar,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarInsertCall<'a> {}
 
-impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7367,8 +7348,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7382,7 +7362,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7393,7 +7373,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7452,7 +7432,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Calendar) -> CalendarInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Calendar) -> CalendarInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -7462,7 +7442,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7483,7 +7463,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7503,7 +7483,7 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7553,10 +7533,10 @@ impl<'a, C> CalendarInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarPatchCall<'a, C>
-    where C: 'a {
+pub struct CalendarPatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Calendar,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7564,9 +7544,9 @@ pub struct CalendarPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarPatchCall<'a> {}
 
-impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7638,8 +7618,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7653,7 +7632,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7664,7 +7643,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7723,7 +7702,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Calendar) -> CalendarPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Calendar) -> CalendarPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -7733,7 +7712,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarPatchCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -7743,7 +7722,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7764,7 +7743,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7784,7 +7763,7 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7834,10 +7813,10 @@ impl<'a, C> CalendarPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CalendarUpdateCall<'a, C>
-    where C: 'a {
+pub struct CalendarUpdateCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Calendar,
     _calendar_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7845,9 +7824,9 @@ pub struct CalendarUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CalendarUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for CalendarUpdateCall<'a> {}
 
-impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CalendarUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7919,8 +7898,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7934,7 +7912,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7945,7 +7923,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8004,7 +7982,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Calendar) -> CalendarUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Calendar) -> CalendarUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8014,7 +7992,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> CalendarUpdateCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -8024,7 +8002,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CalendarUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8045,7 +8023,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8065,7 +8043,7 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CalendarUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8115,19 +8093,19 @@ impl<'a, C> CalendarUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C>
-    where C: 'a {
+pub struct ChannelStopCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Channel,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelStopCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelStopCall<'a> {}
 
-impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelStopCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8176,8 +8154,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8191,7 +8168,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8202,7 +8179,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8251,7 +8228,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a> {
         self._request = new_value;
         self
     }
@@ -8261,7 +8238,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8282,7 +8259,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8302,7 +8279,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8346,18 +8323,18 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ColorGetCall<'a, C>
-    where C: 'a {
+pub struct ColorGetCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ColorGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ColorGetCall<'a> {}
 
-impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ColorGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8396,8 +8373,7 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8410,7 +8386,7 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8419,7 +8395,7 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8479,7 +8455,7 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColorGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ColorGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8500,7 +8476,7 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8520,7 +8496,7 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ColorGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ColorGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8566,10 +8542,10 @@ impl<'a, C> ColorGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventDeleteCall<'a, C>
-    where C: 'a {
+pub struct EventDeleteCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _event_id: String,
     _send_updates: Option<String>,
@@ -8579,9 +8555,9 @@ pub struct EventDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for EventDeleteCall<'a> {}
 
-impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8648,8 +8624,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8662,7 +8637,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8671,7 +8646,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8721,7 +8696,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventDeleteCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -8731,14 +8706,14 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventDeleteCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
     /// Guests who should receive notifications about the deletion of the event.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventDeleteCall<'a, C> {
+    pub fn send_updates(mut self, new_value: &str) -> EventDeleteCall<'a> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -8747,7 +8722,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Whether to send notifications about the deletion of the event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -8757,7 +8732,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8778,7 +8753,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8798,7 +8773,7 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8845,10 +8820,10 @@ impl<'a, C> EventDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventGetCall<'a, C>
-    where C: 'a {
+pub struct EventGetCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _event_id: String,
     _time_zone: Option<String>,
@@ -8859,9 +8834,9 @@ pub struct EventGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventGetCall<'a, C> {}
+impl<'a> client::CallBuilder for EventGetCall<'a> {}
 
-impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8932,8 +8907,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8946,7 +8920,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8955,7 +8929,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9015,7 +8989,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventGetCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -9025,28 +8999,28 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventGetCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a, C> {
+    pub fn time_zone(mut self, new_value: &str) -> EventGetCall<'a> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventGetCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a, C> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventGetCall<'a> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -9056,7 +9030,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9077,7 +9051,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9097,7 +9071,7 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9149,10 +9123,10 @@ impl<'a, C> EventGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventImportCall<'a, C>
-    where C: 'a {
+pub struct EventImportCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Event,
     _calendar_id: String,
     _supports_attachments: Option<bool>,
@@ -9162,9 +9136,9 @@ pub struct EventImportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventImportCall<'a, C> {}
+impl<'a> client::CallBuilder for EventImportCall<'a> {}
 
-impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventImportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9242,8 +9216,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9257,7 +9230,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9268,7 +9241,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9327,7 +9300,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventImportCall<'a, C> {
+    pub fn request(mut self, new_value: Event) -> EventImportCall<'a> {
         self._request = new_value;
         self
     }
@@ -9337,21 +9310,21 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventImportCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventImportCall<'a, C> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventImportCall<'a> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventImportCall<'a, C> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventImportCall<'a> {
         self._conference_data_version = Some(new_value);
         self
     }
@@ -9361,7 +9334,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventImportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventImportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9382,7 +9355,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9402,7 +9375,7 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventImportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventImportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9457,10 +9430,10 @@ impl<'a, C> EventImportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventInsertCall<'a, C>
-    where C: 'a {
+pub struct EventInsertCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Event,
     _calendar_id: String,
     _supports_attachments: Option<bool>,
@@ -9473,9 +9446,9 @@ pub struct EventInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for EventInsertCall<'a> {}
 
-impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9562,8 +9535,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9577,7 +9549,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9588,7 +9560,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9647,7 +9619,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Event) -> EventInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -9657,21 +9629,21 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventInsertCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventInsertCall<'a, C> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventInsertCall<'a> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent. The default is false.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventInsertCall<'a, C> {
+    pub fn send_updates(mut self, new_value: &str) -> EventInsertCall<'a> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -9680,21 +9652,21 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventInsertCall<'a, C> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventInsertCall<'a> {
         self._conference_data_version = Some(new_value);
         self
     }
@@ -9704,7 +9676,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9725,7 +9697,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9745,7 +9717,7 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9798,10 +9770,10 @@ impl<'a, C> EventInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventInstanceCall<'a, C>
-    where C: 'a {
+pub struct EventInstanceCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _event_id: String,
     _time_zone: Option<String>,
@@ -9818,9 +9790,9 @@ pub struct EventInstanceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventInstanceCall<'a, C> {}
+impl<'a> client::CallBuilder for EventInstanceCall<'a> {}
 
-impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventInstanceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9909,8 +9881,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9923,7 +9894,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9932,7 +9903,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9992,7 +9963,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -10002,70 +9973,70 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn time_zone(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// Lower bound (inclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset.
     ///
     /// Sets the *time min* query property to the given value.
-    pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn time_min(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._time_min = Some(new_value.to_string());
         self
     }
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset.
     ///
     /// Sets the *time max* query property to the given value.
-    pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn time_max(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._time_max = Some(new_value.to_string());
         self
     }
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events will still be included if singleEvents is False. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventInstanceCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The original start time of the instance in the result. Optional.
     ///
     /// Sets the *original start* query property to the given value.
-    pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a, C> {
+    pub fn original_start(mut self, new_value: &str) -> EventInstanceCall<'a> {
         self._original_start = Some(new_value.to_string());
         self
     }
     /// Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> EventInstanceCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventInstanceCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a, C> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventInstanceCall<'a> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -10075,7 +10046,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInstanceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventInstanceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10096,7 +10067,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10116,7 +10087,7 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventInstanceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventInstanceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10177,10 +10148,10 @@ impl<'a, C> EventInstanceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventListCall<'a, C>
-    where C: 'a {
+pub struct EventListCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _updated_min: Option<String>,
     _time_zone: Option<String>,
@@ -10204,9 +10175,9 @@ pub struct EventListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventListCall<'a, C> {}
+impl<'a> client::CallBuilder for EventListCall<'a> {}
 
-impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10322,8 +10293,7 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10336,7 +10306,7 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10345,7 +10315,7 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10405,35 +10375,35 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventListCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn updated_min(mut self, new_value: &str) -> EventListCall<'a> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn time_zone(mut self, new_value: &str) -> EventListCall<'a> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// Lower bound (exclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMax is set, timeMin must be smaller than timeMax.
     ///
     /// Sets the *time min* query property to the given value.
-    pub fn time_min(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn time_min(mut self, new_value: &str) -> EventListCall<'a> {
         self._time_min = Some(new_value.to_string());
         self
     }
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMin is set, timeMax must be greater than timeMin.
     ///
     /// Sets the *time max* query property to the given value.
-    pub fn time_max(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn time_max(mut self, new_value: &str) -> EventListCall<'a> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -10453,28 +10423,28 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> EventListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
     ///
     /// Sets the *single events* query property to the given value.
-    pub fn single_events(mut self, new_value: bool) -> EventListCall<'a, C> {
+    pub fn single_events(mut self, new_value: bool) -> EventListCall<'a> {
         self._single_events = Some(new_value);
         self
     }
     /// Whether to include hidden invitations in the result. Optional. The default is False.
     ///
     /// Sets the *show hidden invitations* query property to the given value.
-    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a, C> {
+    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventListCall<'a> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -10482,14 +10452,14 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *shared extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventListCall<'a> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> EventListCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -10497,49 +10467,49 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *private extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn add_private_extended_property(mut self, new_value: &str) -> EventListCall<'a> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EventListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> EventListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> EventListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventListCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
     ///
     /// Sets the *i cal uid* query property to the given value.
-    pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a, C> {
+    pub fn i_cal_uid(mut self, new_value: &str) -> EventListCall<'a> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, C> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -10549,7 +10519,7 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10570,7 +10540,7 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10590,7 +10560,7 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10636,10 +10606,10 @@ impl<'a, C> EventListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventMoveCall<'a, C>
-    where C: 'a {
+pub struct EventMoveCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _event_id: String,
     _destination: String,
@@ -10650,9 +10620,9 @@ pub struct EventMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for EventMoveCall<'a> {}
 
-impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10721,8 +10691,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10735,7 +10704,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10744,7 +10713,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10804,7 +10773,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventMoveCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -10814,7 +10783,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventMoveCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
@@ -10824,14 +10793,14 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a, C> {
+    pub fn destination(mut self, new_value: &str) -> EventMoveCall<'a> {
         self._destination = new_value.to_string();
         self
     }
     /// Guests who should receive notifications about the change of the event's organizer.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventMoveCall<'a, C> {
+    pub fn send_updates(mut self, new_value: &str) -> EventMoveCall<'a> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -10840,7 +10809,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Whether to send notifications about the change of the event's organizer. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -10850,7 +10819,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10871,7 +10840,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10891,7 +10860,7 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10947,10 +10916,10 @@ impl<'a, C> EventMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventPatchCall<'a, C>
-    where C: 'a {
+pub struct EventPatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Event,
     _calendar_id: String,
     _event_id: String,
@@ -10965,9 +10934,9 @@ pub struct EventPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for EventPatchCall<'a> {}
 
-impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11058,8 +11027,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11073,7 +11041,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11084,7 +11052,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11143,7 +11111,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Event) -> EventPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -11153,7 +11121,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventPatchCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11163,21 +11131,21 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventPatchCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventPatchCall<'a, C> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventPatchCall<'a> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Guests who should receive notifications about the event update (for example, title changes, etc.).
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventPatchCall<'a, C> {
+    pub fn send_updates(mut self, new_value: &str) -> EventPatchCall<'a> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -11186,28 +11154,28 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Whether to send notifications about the event update (for example, description changes, etc.). Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventPatchCall<'a, C> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventPatchCall<'a> {
         self._conference_data_version = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a, C> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventPatchCall<'a> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -11217,7 +11185,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11238,7 +11206,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11258,7 +11226,7 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11304,10 +11272,10 @@ impl<'a, C> EventPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventQuickAddCall<'a, C>
-    where C: 'a {
+pub struct EventQuickAddCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _calendar_id: String,
     _text: String,
     _send_updates: Option<String>,
@@ -11317,9 +11285,9 @@ pub struct EventQuickAddCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventQuickAddCall<'a, C> {}
+impl<'a> client::CallBuilder for EventQuickAddCall<'a> {}
 
-impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventQuickAddCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11387,8 +11355,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11401,7 +11368,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11410,7 +11377,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11470,7 +11437,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventQuickAddCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11480,14 +11447,14 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a, C> {
+    pub fn text(mut self, new_value: &str) -> EventQuickAddCall<'a> {
         self._text = new_value.to_string();
         self
     }
     /// Guests who should receive notifications about the creation of the new event.
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventQuickAddCall<'a, C> {
+    pub fn send_updates(mut self, new_value: &str) -> EventQuickAddCall<'a> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -11496,7 +11463,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Whether to send notifications about the creation of the event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
@@ -11506,7 +11473,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventQuickAddCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventQuickAddCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11527,7 +11494,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11547,7 +11514,7 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventQuickAddCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventQuickAddCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11603,10 +11570,10 @@ impl<'a, C> EventQuickAddCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventUpdateCall<'a, C>
-    where C: 'a {
+pub struct EventUpdateCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Event,
     _calendar_id: String,
     _event_id: String,
@@ -11621,9 +11588,9 @@ pub struct EventUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for EventUpdateCall<'a> {}
 
-impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11714,8 +11681,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11729,7 +11695,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11740,7 +11706,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11799,7 +11765,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Event) -> EventUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Event) -> EventUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -11809,7 +11775,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventUpdateCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
@@ -11819,21 +11785,21 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventUpdateCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
     /// Whether API client performing operation supports event attachments. Optional. The default is False.
     ///
     /// Sets the *supports attachments* query property to the given value.
-    pub fn supports_attachments(mut self, new_value: bool) -> EventUpdateCall<'a, C> {
+    pub fn supports_attachments(mut self, new_value: bool) -> EventUpdateCall<'a> {
         self._supports_attachments = Some(new_value);
         self
     }
     /// Guests who should receive notifications about the event update (for example, title changes, etc.).
     ///
     /// Sets the *send updates* query property to the given value.
-    pub fn send_updates(mut self, new_value: &str) -> EventUpdateCall<'a, C> {
+    pub fn send_updates(mut self, new_value: &str) -> EventUpdateCall<'a> {
         self._send_updates = Some(new_value.to_string());
         self
     }
@@ -11842,28 +11808,28 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Whether to send notifications about the event update (for example, description changes, etc.). Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
-    pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, C> {
+    pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a> {
         self._send_notifications = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
     ///
     /// Sets the *conference data version* query property to the given value.
-    pub fn conference_data_version(mut self, new_value: i32) -> EventUpdateCall<'a, C> {
+    pub fn conference_data_version(mut self, new_value: i32) -> EventUpdateCall<'a> {
         self._conference_data_version = Some(new_value);
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a, C> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventUpdateCall<'a> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -11873,7 +11839,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11894,7 +11860,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11914,7 +11880,7 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11981,10 +11947,10 @@ impl<'a, C> EventUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventWatchCall<'a, C>
-    where C: 'a {
+pub struct EventWatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Channel,
     _calendar_id: String,
     _updated_min: Option<String>,
@@ -12009,9 +11975,9 @@ pub struct EventWatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventWatchCall<'a, C> {}
+impl<'a> client::CallBuilder for EventWatchCall<'a> {}
 
-impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventWatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12138,8 +12104,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12153,7 +12118,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12164,7 +12129,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12223,7 +12188,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> EventWatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> EventWatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -12233,35 +12198,35 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn calendar_id(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._calendar_id = new_value.to_string();
         self
     }
     /// Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn updated_min(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// Time zone used in the response. Optional. The default is the time zone of the calendar.
     ///
     /// Sets the *time zone* query property to the given value.
-    pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn time_zone(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._time_zone = Some(new_value.to_string());
         self
     }
     /// Lower bound (exclusive) for an event's end time to filter by. Optional. The default is not to filter by end time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMax is set, timeMin must be smaller than timeMax.
     ///
     /// Sets the *time min* query property to the given value.
-    pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn time_min(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._time_min = Some(new_value.to_string());
         self
     }
     /// Upper bound (exclusive) for an event's start time to filter by. Optional. The default is not to filter by start time. Must be an RFC3339 timestamp with mandatory time zone offset, for example, 2011-06-03T10:00:00-07:00, 2011-06-03T10:00:00Z. Milliseconds may be provided but are ignored. If timeMin is set, timeMax must be greater than timeMin.
     ///
     /// Sets the *time max* query property to the given value.
-    pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn time_max(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._time_max = Some(new_value.to_string());
         self
     }
@@ -12281,28 +12246,28 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. Optional. The default is False.
     ///
     /// Sets the *single events* query property to the given value.
-    pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a, C> {
+    pub fn single_events(mut self, new_value: bool) -> EventWatchCall<'a> {
         self._single_events = Some(new_value);
         self
     }
     /// Whether to include hidden invitations in the result. Optional. The default is False.
     ///
     /// Sets the *show hidden invitations* query property to the given value.
-    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a, C> {
+    pub fn show_hidden_invitations(mut self, new_value: bool) -> EventWatchCall<'a> {
         self._show_hidden_invitations = Some(new_value);
         self
     }
     /// Whether to include deleted events (with status equals "cancelled") in the result. Cancelled instances of recurring events (but not the underlying recurring event) will still be included if showDeleted and singleEvents are both False. If showDeleted and singleEvents are both True, only single instances of deleted events (but not the underlying recurring events) are returned. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> EventWatchCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
@@ -12310,14 +12275,14 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Append the given value to the *shared extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn add_shared_extended_property(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._shared_extended_property.push(new_value.to_string());
         self
     }
     /// Free text search terms to find events that match these terms in any field, except for extended properties. Optional.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -12325,49 +12290,49 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Append the given value to the *private extended property* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn add_private_extended_property(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._private_extended_property.push(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The order of the events returned in the result. Optional. The default is an unspecified, stable order.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response. By default the value is 250 events. The page size can never be larger than 2500 events. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> EventWatchCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned. Optional.
     ///
     /// Sets the *max attendees* query property to the given value.
-    pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a, C> {
+    pub fn max_attendees(mut self, new_value: i32) -> EventWatchCall<'a> {
         self._max_attendees = Some(new_value);
         self
     }
     /// Specifies event ID in the iCalendar format to be included in the response. Optional.
     ///
     /// Sets the *i cal uid* query property to the given value.
-    pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a, C> {
+    pub fn i_cal_uid(mut self, new_value: &str) -> EventWatchCall<'a> {
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
     /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
     ///
     /// Sets the *always include email* query property to the given value.
-    pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, C> {
+    pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a> {
         self._always_include_email = Some(new_value);
         self
     }
@@ -12377,7 +12342,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventWatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventWatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12398,7 +12363,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12418,7 +12383,7 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventWatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventWatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12468,19 +12433,19 @@ impl<'a, C> EventWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FreebusyQueryCall<'a, C>
-    where C: 'a {
+pub struct FreebusyQueryCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: FreeBusyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FreebusyQueryCall<'a, C> {}
+impl<'a> client::CallBuilder for FreebusyQueryCall<'a> {}
 
-impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FreebusyQueryCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12530,8 +12495,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12545,7 +12509,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12556,7 +12520,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12615,7 +12579,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FreeBusyRequest) -> FreebusyQueryCall<'a, C> {
+    pub fn request(mut self, new_value: FreeBusyRequest) -> FreebusyQueryCall<'a> {
         self._request = new_value;
         self
     }
@@ -12625,7 +12589,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FreebusyQueryCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FreebusyQueryCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12646,7 +12610,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12666,7 +12630,7 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FreebusyQueryCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FreebusyQueryCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12710,19 +12674,19 @@ impl<'a, C> FreebusyQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingGetCall<'a, C>
-    where C: 'a {
+pub struct SettingGetCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _setting: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SettingGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SettingGetCall<'a> {}
 
-impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SettingGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12783,8 +12747,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12797,7 +12760,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12806,7 +12769,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12866,7 +12829,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a, C> {
+    pub fn setting(mut self, new_value: &str) -> SettingGetCall<'a> {
         self._setting = new_value.to_string();
         self
     }
@@ -12876,7 +12839,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12897,7 +12860,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12917,7 +12880,7 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SettingGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12964,10 +12927,10 @@ impl<'a, C> SettingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingListCall<'a, C>
-    where C: 'a {
+pub struct SettingListCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _sync_token: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -12976,9 +12939,9 @@ pub struct SettingListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SettingListCall<'a, C> {}
+impl<'a> client::CallBuilder for SettingListCall<'a> {}
 
-impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SettingListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13026,8 +12989,7 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13040,7 +13002,7 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13049,7 +13011,7 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13109,21 +13071,21 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> SettingListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SettingListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> SettingListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -13133,7 +13095,7 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13154,7 +13116,7 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13174,7 +13136,7 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SettingListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13227,10 +13189,10 @@ impl<'a, C> SettingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SettingWatchCall<'a, C>
-    where C: 'a {
+pub struct SettingWatchCall<'a>
+    where  {
 
-    hub: &'a CalendarHub<C>,
+    hub: &'a CalendarHub<>,
     _request: Channel,
     _sync_token: Option<String>,
     _page_token: Option<String>,
@@ -13240,9 +13202,9 @@ pub struct SettingWatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SettingWatchCall<'a, C> {}
+impl<'a> client::CallBuilder for SettingWatchCall<'a> {}
 
-impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SettingWatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13301,8 +13263,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13316,7 +13277,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13327,7 +13288,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13386,7 +13347,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> SettingWatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> SettingWatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -13396,21 +13357,21 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Optional. The default is to return all entries.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> SettingWatchCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Token specifying which result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SettingWatchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries. Optional.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> SettingWatchCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -13420,7 +13381,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingWatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SettingWatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13441,7 +13402,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13461,7 +13422,7 @@ impl<'a, C> SettingWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SettingWatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SettingWatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,38 +108,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AnalyticsReporting<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AnalyticsReporting<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AnalyticsReporting<C> {}
+impl<'a, > client::Hub for AnalyticsReporting<> {}
 
-impl<'a, C> AnalyticsReporting<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AnalyticsReporting<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AnalyticsReporting<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AnalyticsReporting<> {
         AnalyticsReporting {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://analyticsreporting.googleapis.com/".to_string(),
             _root_url: "https://analyticsreporting.googleapis.com/".to_string(),
         }
     }
 
-    pub fn reports(&'a self) -> ReportMethods<'a, C> {
+    pub fn reports(&'a self) -> ReportMethods<'a> {
         ReportMethods { hub: &self }
     }
-    pub fn user_activity(&'a self) -> UserActivityMethods<'a, C> {
+    pub fn user_activity(&'a self) -> UserActivityMethods<'a> {
         UserActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1262,15 +1260,15 @@ impl client::Part for UserActivitySession {}
 /// let rb = hub.reports();
 /// # }
 /// ```
-pub struct ReportMethods<'a, C>
-    where C: 'a {
+pub struct ReportMethods<'a>
+    where  {
 
-    hub: &'a AnalyticsReporting<C>,
+    hub: &'a AnalyticsReporting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ReportMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ReportMethods<'a> {}
 
-impl<'a, C> ReportMethods<'a, C> {
+impl<'a> ReportMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1279,7 +1277,7 @@ impl<'a, C> ReportMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_get(&self, request: GetReportsRequest) -> ReportBatchGetCall<'a, C> {
+    pub fn batch_get(&self, request: GetReportsRequest) -> ReportBatchGetCall<'a> {
         ReportBatchGetCall {
             hub: self.hub,
             _request: request,
@@ -1322,15 +1320,15 @@ impl<'a, C> ReportMethods<'a, C> {
 /// let rb = hub.user_activity();
 /// # }
 /// ```
-pub struct UserActivityMethods<'a, C>
-    where C: 'a {
+pub struct UserActivityMethods<'a>
+    where  {
 
-    hub: &'a AnalyticsReporting<C>,
+    hub: &'a AnalyticsReporting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserActivityMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserActivityMethods<'a> {}
 
-impl<'a, C> UserActivityMethods<'a, C> {
+impl<'a> UserActivityMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1339,7 +1337,7 @@ impl<'a, C> UserActivityMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: SearchUserActivityRequest) -> UserActivitySearchCall<'a, C> {
+    pub fn search(&self, request: SearchUserActivityRequest) -> UserActivitySearchCall<'a> {
         UserActivitySearchCall {
             hub: self.hub,
             _request: request,
@@ -1396,19 +1394,19 @@ impl<'a, C> UserActivityMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReportBatchGetCall<'a, C>
-    where C: 'a {
+pub struct ReportBatchGetCall<'a>
+    where  {
 
-    hub: &'a AnalyticsReporting<C>,
+    hub: &'a AnalyticsReporting<>,
     _request: GetReportsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReportBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ReportBatchGetCall<'a> {}
 
-impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReportBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1458,8 +1456,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1473,7 +1470,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1484,7 +1481,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1543,7 +1540,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetReportsRequest) -> ReportBatchGetCall<'a, C> {
+    pub fn request(mut self, new_value: GetReportsRequest) -> ReportBatchGetCall<'a> {
         self._request = new_value;
         self
     }
@@ -1553,7 +1550,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1578,7 +1575,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ReportBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1598,7 +1595,7 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReportBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReportBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1648,19 +1645,19 @@ impl<'a, C> ReportBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserActivitySearchCall<'a, C>
-    where C: 'a {
+pub struct UserActivitySearchCall<'a>
+    where  {
 
-    hub: &'a AnalyticsReporting<C>,
+    hub: &'a AnalyticsReporting<>,
     _request: SearchUserActivityRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserActivitySearchCall<'a, C> {}
+impl<'a> client::CallBuilder for UserActivitySearchCall<'a> {}
 
-impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserActivitySearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1710,8 +1707,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1725,7 +1721,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1736,7 +1732,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1795,7 +1791,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchUserActivityRequest) -> UserActivitySearchCall<'a, C> {
+    pub fn request(mut self, new_value: SearchUserActivityRequest) -> UserActivitySearchCall<'a> {
         self._request = new_value;
         self
     }
@@ -1805,7 +1801,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserActivitySearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserActivitySearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1830,7 +1826,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserActivitySearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserActivitySearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1850,7 +1846,7 @@ impl<'a, C> UserActivitySearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserActivitySearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserActivitySearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

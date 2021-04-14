@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -84,38 +83,37 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct Digitalassetlinks<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Digitalassetlinks<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Digitalassetlinks<C> {}
+impl<'a, > client::Hub for Digitalassetlinks<> {}
 
-impl<'a, C> Digitalassetlinks<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Digitalassetlinks<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Digitalassetlinks<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Digitalassetlinks<> {
         Digitalassetlinks {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://digitalassetlinks.googleapis.com/".to_string(),
             _root_url: "https://digitalassetlinks.googleapis.com/".to_string(),
         }
     }
 
-    pub fn assetlinks(&'a self) -> AssetlinkMethods<'a, C> {
+    pub fn assetlinks(&'a self) -> AssetlinkMethods<'a> {
         AssetlinkMethods { hub: &self }
     }
-    pub fn statements(&'a self) -> StatementMethods<'a, C> {
+    pub fn statements(&'a self) -> StatementMethods<'a> {
         StatementMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -313,20 +311,20 @@ impl client::Part for WebAsset {}
 /// let rb = hub.assetlinks();
 /// # }
 /// ```
-pub struct AssetlinkMethods<'a, C>
-    where C: 'a {
+pub struct AssetlinkMethods<'a>
+    where  {
 
-    hub: &'a Digitalassetlinks<C>,
+    hub: &'a Digitalassetlinks<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AssetlinkMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AssetlinkMethods<'a> {}
 
-impl<'a, C> AssetlinkMethods<'a, C> {
+impl<'a> AssetlinkMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Determines whether the specified (directional) relationship exists between the specified source and target assets. The relation describes the intent of the link between the two assets as claimed by the source asset. An example for such relationships is the delegation of privileges or permissions. This command is most often used by infrastructure systems to check preconditions for an action. For example, a client may want to know if it is OK to send a web URL to a particular mobile app instead. The client can check for the relevant asset link from the website to the mobile app to decide if the operation should be allowed. A note about security: if you specify a secure asset as the source, such as an HTTPS website or an Android app, the API will ensure that any statements used to generate the response have been made in a secure way by the owner of that asset. Conversely, if the source asset is an insecure HTTP website (that is, the URL starts with `http://` instead of `https://`), the API cannot verify its statements securely, and it is not possible to ensure that the website's statements have not been altered by a third party. For more information, see the [Digital Asset Links technical design specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md).
-    pub fn check(&self) -> AssetlinkCheckCall<'a, C> {
+    pub fn check(&self) -> AssetlinkCheckCall<'a> {
         AssetlinkCheckCall {
             hub: self.hub,
             _target_web_site: Default::default(),
@@ -374,20 +372,20 @@ impl<'a, C> AssetlinkMethods<'a, C> {
 /// let rb = hub.statements();
 /// # }
 /// ```
-pub struct StatementMethods<'a, C>
-    where C: 'a {
+pub struct StatementMethods<'a>
+    where  {
 
-    hub: &'a Digitalassetlinks<C>,
+    hub: &'a Digitalassetlinks<>,
 }
 
-impl<'a, C> client::MethodsBuilder for StatementMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for StatementMethods<'a> {}
 
-impl<'a, C> StatementMethods<'a, C> {
+impl<'a> StatementMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves a list of all statements from a given source that match the specified target and statement string. The API guarantees that all statements with secure source assets, such as HTTPS websites or Android apps, have been made in a secure way by the owner of those assets, as described in the [Digital Asset Links technical design specification](https://github.com/google/digitalassetlinks/blob/master/well-known/details.md). Specifically, you should consider that for insecure websites (that is, where the URL starts with `http://` instead of `https://`), this guarantee cannot be made. The `List` command is most useful in cases where the API client wants to know all the ways in which two assets are related, or enumerate all the relationships from a particular source asset. Example: a feature that helps users navigate to related items. When a mobile app is running on a device, the feature would make it easy to navigate to the corresponding web site or Google+ profile.
-    pub fn list(&self) -> StatementListCall<'a, C> {
+    pub fn list(&self) -> StatementListCall<'a> {
         StatementListCall {
             hub: self.hub,
             _source_web_site: Default::default(),
@@ -447,10 +445,10 @@ impl<'a, C> StatementMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AssetlinkCheckCall<'a, C>
-    where C: 'a {
+pub struct AssetlinkCheckCall<'a>
+    where  {
 
-    hub: &'a Digitalassetlinks<C>,
+    hub: &'a Digitalassetlinks<>,
     _target_web_site: Option<String>,
     _target_android_app_package_name: Option<String>,
     _target_android_app_certificate_sha256_fingerprint: Option<String>,
@@ -462,9 +460,9 @@ pub struct AssetlinkCheckCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AssetlinkCheckCall<'a, C> {}
+impl<'a> client::CallBuilder for AssetlinkCheckCall<'a> {}
 
-impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AssetlinkCheckCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -531,7 +529,7 @@ impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -540,7 +538,7 @@ impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -597,49 +595,49 @@ impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Web assets are identified by a URL that contains only the scheme, hostname and port parts. The format is http[s]://[:] Hostnames must be fully qualified: they must end in a single period ("`.`"). Only the schemes "http" and "https" are currently allowed. Port numbers are given as a decimal number, and they must be omitted if the standard port numbers are used: 80 for http and 443 for https. We call this limited URL the "site". All URLs that share the same scheme, hostname and port are considered to be a part of the site and thus belong to the web asset. Example: the asset with the site `https://www.google.com` contains all these URLs: * `https://www.google.com/` * `https://www.google.com:443/` * `https://www.google.com/foo` * `https://www.google.com/foo?bar` * `https://www.google.com/foo#bar` * `https://user@password:www.google.com/` But it does not contain these URLs: * `http://www.google.com/` (wrong scheme) * `https://google.com/` (hostname does not match) * `https://www.google.com:444/` (port does not match) REQUIRED
     ///
     /// Sets the *target.web.site* query property to the given value.
-    pub fn target_web_site(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn target_web_site(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._target_web_site = Some(new_value.to_string());
         self
     }
     /// Android App assets are naturally identified by their Java package name. For example, the Google Maps app uses the package name `com.google.android.apps.maps`. REQUIRED
     ///
     /// Sets the *target.android app.package name* query property to the given value.
-    pub fn target_android_app_package_name(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn target_android_app_package_name(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._target_android_app_package_name = Some(new_value.to_string());
         self
     }
     /// The uppercase SHA-265 fingerprint of the certificate. From the PEM certificate, it can be acquired like this: $ keytool -printcert -file $CERTFILE | grep SHA256: SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \ 42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 or like this: $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256 SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \ 16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`. If these tools are not available to you, you can convert the PEM certificate into the DER format, compute the SHA-256 hash of that string and represent the result as a hexstring (that is, uppercase hexadecimal representations of each octet, separated by colons).
     ///
     /// Sets the *target.android app.certificate.sha256 fingerprint* query property to the given value.
-    pub fn target_android_app_certificate_sha256_fingerprint(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn target_android_app_certificate_sha256_fingerprint(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._target_android_app_certificate_sha256_fingerprint = Some(new_value.to_string());
         self
     }
     /// Web assets are identified by a URL that contains only the scheme, hostname and port parts. The format is http[s]://[:] Hostnames must be fully qualified: they must end in a single period ("`.`"). Only the schemes "http" and "https" are currently allowed. Port numbers are given as a decimal number, and they must be omitted if the standard port numbers are used: 80 for http and 443 for https. We call this limited URL the "site". All URLs that share the same scheme, hostname and port are considered to be a part of the site and thus belong to the web asset. Example: the asset with the site `https://www.google.com` contains all these URLs: * `https://www.google.com/` * `https://www.google.com:443/` * `https://www.google.com/foo` * `https://www.google.com/foo?bar` * `https://www.google.com/foo#bar` * `https://user@password:www.google.com/` But it does not contain these URLs: * `http://www.google.com/` (wrong scheme) * `https://google.com/` (hostname does not match) * `https://www.google.com:444/` (port does not match) REQUIRED
     ///
     /// Sets the *source.web.site* query property to the given value.
-    pub fn source_web_site(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn source_web_site(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._source_web_site = Some(new_value.to_string());
         self
     }
     /// Android App assets are naturally identified by their Java package name. For example, the Google Maps app uses the package name `com.google.android.apps.maps`. REQUIRED
     ///
     /// Sets the *source.android app.package name* query property to the given value.
-    pub fn source_android_app_package_name(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn source_android_app_package_name(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._source_android_app_package_name = Some(new_value.to_string());
         self
     }
     /// The uppercase SHA-265 fingerprint of the certificate. From the PEM certificate, it can be acquired like this: $ keytool -printcert -file $CERTFILE | grep SHA256: SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \ 42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 or like this: $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256 SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \ 16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`. If these tools are not available to you, you can convert the PEM certificate into the DER format, compute the SHA-256 hash of that string and represent the result as a hexstring (that is, uppercase hexadecimal representations of each octet, separated by colons).
     ///
     /// Sets the *source.android app.certificate.sha256 fingerprint* query property to the given value.
-    pub fn source_android_app_certificate_sha256_fingerprint(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn source_android_app_certificate_sha256_fingerprint(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._source_android_app_certificate_sha256_fingerprint = Some(new_value.to_string());
         self
     }
     /// Query string for the relation. We identify relations with strings of the format `/`, where `` must be one of a set of pre-defined purpose categories, and `` is a free-form lowercase alphanumeric string that describes the specific use case of the statement. Refer to [our API documentation](/digital-asset-links/v1/relation-strings) for the current list of supported relations. For a query to match an asset link, both the query's and the asset link's relation strings must match exactly. Example: A query with relation `delegate_permission/common.handle_all_urls` matches an asset link with relation `delegate_permission/common.handle_all_urls`.
     ///
     /// Sets the *relation* query property to the given value.
-    pub fn relation(mut self, new_value: &str) -> AssetlinkCheckCall<'a, C> {
+    pub fn relation(mut self, new_value: &str) -> AssetlinkCheckCall<'a> {
         self._relation = Some(new_value.to_string());
         self
     }
@@ -649,7 +647,7 @@ impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssetlinkCheckCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AssetlinkCheckCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -674,7 +672,7 @@ impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AssetlinkCheckCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AssetlinkCheckCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -719,10 +717,10 @@ impl<'a, C> AssetlinkCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StatementListCall<'a, C>
-    where C: 'a {
+pub struct StatementListCall<'a>
+    where  {
 
-    hub: &'a Digitalassetlinks<C>,
+    hub: &'a Digitalassetlinks<>,
     _source_web_site: Option<String>,
     _source_android_app_package_name: Option<String>,
     _source_android_app_certificate_sha256_fingerprint: Option<String>,
@@ -731,9 +729,9 @@ pub struct StatementListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for StatementListCall<'a, C> {}
+impl<'a> client::CallBuilder for StatementListCall<'a> {}
 
-impl<'a, C> StatementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StatementListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -791,7 +789,7 @@ impl<'a, C> StatementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -800,7 +798,7 @@ impl<'a, C> StatementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -857,28 +855,28 @@ impl<'a, C> StatementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Web assets are identified by a URL that contains only the scheme, hostname and port parts. The format is http[s]://[:] Hostnames must be fully qualified: they must end in a single period ("`.`"). Only the schemes "http" and "https" are currently allowed. Port numbers are given as a decimal number, and they must be omitted if the standard port numbers are used: 80 for http and 443 for https. We call this limited URL the "site". All URLs that share the same scheme, hostname and port are considered to be a part of the site and thus belong to the web asset. Example: the asset with the site `https://www.google.com` contains all these URLs: * `https://www.google.com/` * `https://www.google.com:443/` * `https://www.google.com/foo` * `https://www.google.com/foo?bar` * `https://www.google.com/foo#bar` * `https://user@password:www.google.com/` But it does not contain these URLs: * `http://www.google.com/` (wrong scheme) * `https://google.com/` (hostname does not match) * `https://www.google.com:444/` (port does not match) REQUIRED
     ///
     /// Sets the *source.web.site* query property to the given value.
-    pub fn source_web_site(mut self, new_value: &str) -> StatementListCall<'a, C> {
+    pub fn source_web_site(mut self, new_value: &str) -> StatementListCall<'a> {
         self._source_web_site = Some(new_value.to_string());
         self
     }
     /// Android App assets are naturally identified by their Java package name. For example, the Google Maps app uses the package name `com.google.android.apps.maps`. REQUIRED
     ///
     /// Sets the *source.android app.package name* query property to the given value.
-    pub fn source_android_app_package_name(mut self, new_value: &str) -> StatementListCall<'a, C> {
+    pub fn source_android_app_package_name(mut self, new_value: &str) -> StatementListCall<'a> {
         self._source_android_app_package_name = Some(new_value.to_string());
         self
     }
     /// The uppercase SHA-265 fingerprint of the certificate. From the PEM certificate, it can be acquired like this: $ keytool -printcert -file $CERTFILE | grep SHA256: SHA256: 14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83: \ 42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 or like this: $ openssl x509 -in $CERTFILE -noout -fingerprint -sha256 SHA256 Fingerprint=14:6D:E9:83:C5:73:06:50:D8:EE:B9:95:2F:34:FC:64: \ 16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF:44:E5 In this example, the contents of this field would be `14:6D:E9:83:C5:73: 06:50:D8:EE:B9:95:2F:34:FC:64:16:A0:83:42:E6:1D:BE:A8:8A:04:96:B2:3F:CF: 44:E5`. If these tools are not available to you, you can convert the PEM certificate into the DER format, compute the SHA-256 hash of that string and represent the result as a hexstring (that is, uppercase hexadecimal representations of each octet, separated by colons).
     ///
     /// Sets the *source.android app.certificate.sha256 fingerprint* query property to the given value.
-    pub fn source_android_app_certificate_sha256_fingerprint(mut self, new_value: &str) -> StatementListCall<'a, C> {
+    pub fn source_android_app_certificate_sha256_fingerprint(mut self, new_value: &str) -> StatementListCall<'a> {
         self._source_android_app_certificate_sha256_fingerprint = Some(new_value.to_string());
         self
     }
     /// Use only associations that match the specified relation. See the [`Statement`](#Statement) message for a detailed definition of relation strings. For a query to match a statement, one of the following must be true: * both the query's and the statement's relation strings match exactly, or * the query's relation string is empty or missing. Example: A query with relation `delegate_permission/common.handle_all_urls` matches an asset link with relation `delegate_permission/common.handle_all_urls`.
     ///
     /// Sets the *relation* query property to the given value.
-    pub fn relation(mut self, new_value: &str) -> StatementListCall<'a, C> {
+    pub fn relation(mut self, new_value: &str) -> StatementListCall<'a> {
         self._relation = Some(new_value.to_string());
         self
     }
@@ -888,7 +886,7 @@ impl<'a, C> StatementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatementListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatementListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -913,7 +911,7 @@ impl<'a, C> StatementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> StatementListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StatementListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

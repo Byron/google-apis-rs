@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::PolicySimulator<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::PolicySimulator,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -1194,7 +1193,7 @@ async fn main() {
     
     let mut app = App::new("policysimulator1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210330")
+           .version("2.0.3+20210330")
            .about(" Policy Simulator is a collection of endpoints for creating, running, and viewing a Replay. A `Replay` is a type of simulation that lets you see how your members' access to resources might change if you changed your IAM policy. During a `Replay`, Policy Simulator re-evaluates, or replays, past access attempts under both the current policy and your proposed policy, and compares those results to determine how your members' access might change under the proposed policy.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_policysimulator1_cli")
            .arg(Arg::with_name("url")

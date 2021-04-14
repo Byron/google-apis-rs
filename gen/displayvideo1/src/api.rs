@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -115,74 +114,73 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct DisplayVideo<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct DisplayVideo<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for DisplayVideo<C> {}
+impl<'a, > client::Hub for DisplayVideo<> {}
 
-impl<'a, C> DisplayVideo<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > DisplayVideo<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DisplayVideo<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DisplayVideo<> {
         DisplayVideo {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://displayvideo.googleapis.com/".to_string(),
             _root_url: "https://displayvideo.googleapis.com/".to_string(),
         }
     }
 
-    pub fn advertisers(&'a self) -> AdvertiserMethods<'a, C> {
+    pub fn advertisers(&'a self) -> AdvertiserMethods<'a> {
         AdvertiserMethods { hub: &self }
     }
-    pub fn combined_audiences(&'a self) -> CombinedAudienceMethods<'a, C> {
+    pub fn combined_audiences(&'a self) -> CombinedAudienceMethods<'a> {
         CombinedAudienceMethods { hub: &self }
     }
-    pub fn custom_bidding_algorithms(&'a self) -> CustomBiddingAlgorithmMethods<'a, C> {
+    pub fn custom_bidding_algorithms(&'a self) -> CustomBiddingAlgorithmMethods<'a> {
         CustomBiddingAlgorithmMethods { hub: &self }
     }
-    pub fn custom_lists(&'a self) -> CustomListMethods<'a, C> {
+    pub fn custom_lists(&'a self) -> CustomListMethods<'a> {
         CustomListMethods { hub: &self }
     }
-    pub fn first_and_third_party_audiences(&'a self) -> FirstAndThirdPartyAudienceMethods<'a, C> {
+    pub fn first_and_third_party_audiences(&'a self) -> FirstAndThirdPartyAudienceMethods<'a> {
         FirstAndThirdPartyAudienceMethods { hub: &self }
     }
-    pub fn floodlight_groups(&'a self) -> FloodlightGroupMethods<'a, C> {
+    pub fn floodlight_groups(&'a self) -> FloodlightGroupMethods<'a> {
         FloodlightGroupMethods { hub: &self }
     }
-    pub fn google_audiences(&'a self) -> GoogleAudienceMethods<'a, C> {
+    pub fn google_audiences(&'a self) -> GoogleAudienceMethods<'a> {
         GoogleAudienceMethods { hub: &self }
     }
-    pub fn inventory_source_groups(&'a self) -> InventorySourceGroupMethods<'a, C> {
+    pub fn inventory_source_groups(&'a self) -> InventorySourceGroupMethods<'a> {
         InventorySourceGroupMethods { hub: &self }
     }
-    pub fn inventory_sources(&'a self) -> InventorySourceMethods<'a, C> {
+    pub fn inventory_sources(&'a self) -> InventorySourceMethods<'a> {
         InventorySourceMethods { hub: &self }
     }
-    pub fn media(&'a self) -> MediaMethods<'a, C> {
+    pub fn media(&'a self) -> MediaMethods<'a> {
         MediaMethods { hub: &self }
     }
-    pub fn partners(&'a self) -> PartnerMethods<'a, C> {
+    pub fn partners(&'a self) -> PartnerMethods<'a> {
         PartnerMethods { hub: &self }
     }
-    pub fn sdfdownloadtasks(&'a self) -> SdfdownloadtaskMethods<'a, C> {
+    pub fn sdfdownloadtasks(&'a self) -> SdfdownloadtaskMethods<'a> {
         SdfdownloadtaskMethods { hub: &self }
     }
-    pub fn targeting_types(&'a self) -> TargetingTypeMethods<'a, C> {
+    pub fn targeting_types(&'a self) -> TargetingTypeMethods<'a> {
         TargetingTypeMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a, C> {
+    pub fn users(&'a self) -> UserMethods<'a> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5631,15 +5629,15 @@ impl client::Part for ViewabilityTargetingOptionDetails {}
 /// let rb = hub.advertisers();
 /// # }
 /// ```
-pub struct AdvertiserMethods<'a, C>
-    where C: 'a {
+pub struct AdvertiserMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AdvertiserMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AdvertiserMethods<'a> {}
 
-impl<'a, C> AdvertiserMethods<'a, C> {
+impl<'a> AdvertiserMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -5649,7 +5647,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser this asset belongs to.
-    pub fn assets_upload(&self, request: CreateAssetRequest, advertiser_id: &str) -> AdvertiserAssetUploadCall<'a, C> {
+    pub fn assets_upload(&self, request: CreateAssetRequest, advertiser_id: &str) -> AdvertiserAssetUploadCall<'a> {
         AdvertiserAssetUploadCall {
             hub: self.hub,
             _request: request,
@@ -5670,7 +5668,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `campaignId` - Required. The ID of the campaign the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_VIEWABILITY`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this campaign that identifies the assigned targeting option being requested.
-    pub fn campaigns_targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, campaign_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn campaigns_targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, campaign_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
         AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5692,7 +5690,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the advertiser the campaign belongs to.
     /// * `campaignId` - Required. The ID of the campaign to list assigned targeting options for.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_AGE_RANGE` * `TARGETING_TYPE_AUTHORIZED_SELLER_STATUS` * `TARGETING_TYPE_CONTENT_INSTREAM_POSITION` * `TARGETING_TYPE_CONTENT_OUTSTREAM_POSITION` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_ENVIRONMENT` * `TARGETING_TYPE_EXCHANGE` * `TARGETING_TYPE_GENDER` * `TARGETING_TYPE_GEO_REGION` * `TARGETING_TYPE_HOUSEHOLD_INCOME` * `TARGETING_TYPE_INVENTORY_SOURCE` * `TARGETING_TYPE_INVENTORY_SOURCE_GROUP` * `TARGETING_TYPE_LANGUAGE` * `TARGETING_TYPE_ON_SCREEN_POSITION` * `TARGETING_TYPE_PARENTAL_STATUS` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_SUB_EXCHANGE` * `TARGETING_TYPE_THIRD_PARTY_VERIFIER` * `TARGETING_TYPE_VIEWABILITY`
-    pub fn campaigns_targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, campaign_id: &str, targeting_type: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn campaigns_targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, campaign_id: &str, targeting_type: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5716,7 +5714,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser the campaign belongs to.
     /// * `campaignId` - Required. The ID of the campaign to list assigned targeting options for.
-    pub fn campaigns_bulk_list_campaign_assigned_targeting_options(&self, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn campaigns_bulk_list_campaign_assigned_targeting_options(&self, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5739,7 +5737,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the campaign belongs to.
-    pub fn campaigns_create(&self, request: Campaign, advertiser_id: &str) -> AdvertiserCampaignCreateCall<'a, C> {
+    pub fn campaigns_create(&self, request: Campaign, advertiser_id: &str) -> AdvertiserCampaignCreateCall<'a> {
         AdvertiserCampaignCreateCall {
             hub: self.hub,
             _request: request,
@@ -5758,7 +5756,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - The ID of the advertiser this campaign belongs to.
     /// * `campaignId` - The ID of the campaign we need to delete.
-    pub fn campaigns_delete(&self, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignDeleteCall<'a, C> {
+    pub fn campaigns_delete(&self, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignDeleteCall<'a> {
         AdvertiserCampaignDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5777,7 +5775,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser this campaign belongs to.
     /// * `campaignId` - Required. The ID of the campaign to fetch.
-    pub fn campaigns_get(&self, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignGetCall<'a, C> {
+    pub fn campaigns_get(&self, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignGetCall<'a> {
         AdvertiserCampaignGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5795,7 +5793,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - The ID of the advertiser to list campaigns for.
-    pub fn campaigns_list(&self, advertiser_id: &str) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn campaigns_list(&self, advertiser_id: &str) -> AdvertiserCampaignListCall<'a> {
         AdvertiserCampaignListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5818,7 +5816,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the campaign belongs to.
     /// * `campaignId` - Output only. The unique ID of the campaign. Assigned by the system.
-    pub fn campaigns_patch(&self, request: Campaign, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignPatchCall<'a, C> {
+    pub fn campaigns_patch(&self, request: Campaign, advertiser_id: &str, campaign_id: &str) -> AdvertiserCampaignPatchCall<'a> {
         AdvertiserCampaignPatchCall {
             hub: self.hub,
             _request: request,
@@ -5840,7 +5838,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - The ID of the advertiser that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel to which the sites belong.
-    pub fn channels_sites_bulk_edit(&self, request: BulkEditSitesRequest, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteBulkEditCall<'a, C> {
+    pub fn channels_sites_bulk_edit(&self, request: BulkEditSitesRequest, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteBulkEditCall<'a> {
         AdvertiserChannelSiteBulkEditCall {
             hub: self.hub,
             _request: request,
@@ -5861,7 +5859,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - The ID of the advertiser that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel in which the site will be created.
-    pub fn channels_sites_create(&self, request: Site, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteCreateCall<'a, C> {
+    pub fn channels_sites_create(&self, request: Site, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteCreateCall<'a> {
         AdvertiserChannelSiteCreateCall {
             hub: self.hub,
             _request: request,
@@ -5883,7 +5881,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - The ID of the advertiser that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel to which the site belongs.
     /// * `urlOrAppId` - Required. The URL or app ID of the site to delete.
-    pub fn channels_sites_delete(&self, advertiser_id: &str, channel_id: &str, url_or_app_id: &str) -> AdvertiserChannelSiteDeleteCall<'a, C> {
+    pub fn channels_sites_delete(&self, advertiser_id: &str, channel_id: &str, url_or_app_id: &str) -> AdvertiserChannelSiteDeleteCall<'a> {
         AdvertiserChannelSiteDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5904,7 +5902,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - The ID of the advertiser that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel to which the requested sites belong.
-    pub fn channels_sites_list(&self, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn channels_sites_list(&self, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteListCall<'a> {
         AdvertiserChannelSiteListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5929,7 +5927,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - The ID of the advertiser that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel whose sites will be replaced.
-    pub fn channels_sites_replace(&self, request: ReplaceSitesRequest, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteReplaceCall<'a, C> {
+    pub fn channels_sites_replace(&self, request: ReplaceSitesRequest, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelSiteReplaceCall<'a> {
         AdvertiserChannelSiteReplaceCall {
             hub: self.hub,
             _request: request,
@@ -5949,7 +5947,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - The ID of the advertiser that owns the created channel.
-    pub fn channels_create(&self, request: Channel, advertiser_id: &str) -> AdvertiserChannelCreateCall<'a, C> {
+    pub fn channels_create(&self, request: Channel, advertiser_id: &str) -> AdvertiserChannelCreateCall<'a> {
         AdvertiserChannelCreateCall {
             hub: self.hub,
             _request: request,
@@ -5969,7 +5967,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - The ID of the advertiser that owns the fetched channel.
     /// * `channelId` - Required. The ID of the channel to fetch.
-    pub fn channels_get(&self, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelGetCall<'a, C> {
+    pub fn channels_get(&self, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelGetCall<'a> {
         AdvertiserChannelGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -5988,7 +5986,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - The ID of the advertiser that owns the channels.
-    pub fn channels_list(&self, advertiser_id: &str) -> AdvertiserChannelListCall<'a, C> {
+    pub fn channels_list(&self, advertiser_id: &str) -> AdvertiserChannelListCall<'a> {
         AdvertiserChannelListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6012,7 +6010,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - The ID of the advertiser that owns the created channel.
     /// * `channelId` - Output only. The unique ID of the channel. Assigned by the system.
-    pub fn channels_patch(&self, request: Channel, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn channels_patch(&self, request: Channel, advertiser_id: &str, channel_id: &str) -> AdvertiserChannelPatchCall<'a> {
         AdvertiserChannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -6034,7 +6032,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the creative belongs to.
-    pub fn creatives_create(&self, request: Creative, advertiser_id: &str) -> AdvertiserCreativeCreateCall<'a, C> {
+    pub fn creatives_create(&self, request: Creative, advertiser_id: &str) -> AdvertiserCreativeCreateCall<'a> {
         AdvertiserCreativeCreateCall {
             hub: self.hub,
             _request: request,
@@ -6053,7 +6051,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - The ID of the advertiser this creative belongs to.
     /// * `creativeId` - The ID of the creative to be deleted.
-    pub fn creatives_delete(&self, advertiser_id: &str, creative_id: &str) -> AdvertiserCreativeDeleteCall<'a, C> {
+    pub fn creatives_delete(&self, advertiser_id: &str, creative_id: &str) -> AdvertiserCreativeDeleteCall<'a> {
         AdvertiserCreativeDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6072,7 +6070,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser this creative belongs to.
     /// * `creativeId` - Required. The ID of the creative to fetch.
-    pub fn creatives_get(&self, advertiser_id: &str, creative_id: &str) -> AdvertiserCreativeGetCall<'a, C> {
+    pub fn creatives_get(&self, advertiser_id: &str, creative_id: &str) -> AdvertiserCreativeGetCall<'a> {
         AdvertiserCreativeGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6090,7 +6088,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser to list creatives for.
-    pub fn creatives_list(&self, advertiser_id: &str) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn creatives_list(&self, advertiser_id: &str) -> AdvertiserCreativeListCall<'a> {
         AdvertiserCreativeListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6113,7 +6111,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the creative belongs to.
     /// * `creativeId` - Output only. The unique ID of the creative. Assigned by the system.
-    pub fn creatives_patch(&self, request: Creative, advertiser_id: &str, creative_id: &str) -> AdvertiserCreativePatchCall<'a, C> {
+    pub fn creatives_patch(&self, request: Creative, advertiser_id: &str, creative_id: &str) -> AdvertiserCreativePatchCall<'a> {
         AdvertiserCreativePatchCall {
             hub: self.hub,
             _request: request,
@@ -6136,7 +6134,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `insertionOrderId` - Required. The ID of the insertion order the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this insertion order that identifies the assigned targeting option being requested.
-    pub fn insertion_orders_targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, insertion_order_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn insertion_orders_targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, insertion_order_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
         AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6158,7 +6156,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the advertiser the insertion order belongs to.
     /// * `insertionOrderId` - Required. The ID of the insertion order to list assigned targeting options for.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list.
-    pub fn insertion_orders_targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, insertion_order_id: &str, targeting_type: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn insertion_orders_targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, insertion_order_id: &str, targeting_type: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6182,7 +6180,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser the insertion order belongs to.
     /// * `insertionOrderId` - Required. The ID of the insertion order to list assigned targeting options for.
-    pub fn insertion_orders_bulk_list_insertion_order_assigned_targeting_options(&self, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn insertion_orders_bulk_list_insertion_order_assigned_targeting_options(&self, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6205,7 +6203,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the insertion order belongs to.
-    pub fn insertion_orders_create(&self, request: InsertionOrder, advertiser_id: &str) -> AdvertiserInsertionOrderCreateCall<'a, C> {
+    pub fn insertion_orders_create(&self, request: InsertionOrder, advertiser_id: &str) -> AdvertiserInsertionOrderCreateCall<'a> {
         AdvertiserInsertionOrderCreateCall {
             hub: self.hub,
             _request: request,
@@ -6224,7 +6222,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - The ID of the advertiser this insertion order belongs to.
     /// * `insertionOrderId` - The ID of the insertion order we need to delete.
-    pub fn insertion_orders_delete(&self, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderDeleteCall<'a, C> {
+    pub fn insertion_orders_delete(&self, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderDeleteCall<'a> {
         AdvertiserInsertionOrderDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6243,7 +6241,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser this insertion order belongs to.
     /// * `insertionOrderId` - Required. The ID of the insertion order to fetch.
-    pub fn insertion_orders_get(&self, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderGetCall<'a, C> {
+    pub fn insertion_orders_get(&self, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderGetCall<'a> {
         AdvertiserInsertionOrderGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6261,7 +6259,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser to list insertion orders for.
-    pub fn insertion_orders_list(&self, advertiser_id: &str) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn insertion_orders_list(&self, advertiser_id: &str) -> AdvertiserInsertionOrderListCall<'a> {
         AdvertiserInsertionOrderListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6284,7 +6282,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the insertion order belongs to.
     /// * `insertionOrderId` - Output only. The unique ID of the insertion order. Assigned by the system.
-    pub fn insertion_orders_patch(&self, request: InsertionOrder, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderPatchCall<'a, C> {
+    pub fn insertion_orders_patch(&self, request: InsertionOrder, advertiser_id: &str, insertion_order_id: &str) -> AdvertiserInsertionOrderPatchCall<'a> {
         AdvertiserInsertionOrderPatchCall {
             hub: self.hub,
             _request: request,
@@ -6307,7 +6305,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option will belong to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
-    pub fn line_items_targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: &str, line_item_id: &str, targeting_type: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn line_items_targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: &str, line_item_id: &str, targeting_type: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall {
             hub: self.hub,
             _request: request,
@@ -6330,7 +6328,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
-    pub fn line_items_targeting_types_assigned_targeting_options_delete(&self, advertiser_id: &str, line_item_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn line_items_targeting_types_assigned_targeting_options_delete(&self, advertiser_id: &str, line_item_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6353,7 +6351,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option belongs to.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option.
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this line item that identifies the assigned targeting option being requested.
-    pub fn line_items_targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, line_item_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn line_items_targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, line_item_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6375,7 +6373,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item to list assigned targeting options for.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list.
-    pub fn line_items_targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, line_item_id: &str, targeting_type: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn line_items_targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, line_item_id: &str, targeting_type: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6400,7 +6398,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item the assigned targeting option will belong to.
-    pub fn line_items_bulk_edit_line_item_assigned_targeting_options(&self, request: BulkEditLineItemAssignedTargetingOptionsRequest, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn line_items_bulk_edit_line_item_assigned_targeting_options(&self, request: BulkEditLineItemAssignedTargetingOptionsRequest, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {
         AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall {
             hub: self.hub,
             _request: request,
@@ -6420,7 +6418,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item to list assigned targeting options for.
-    pub fn line_items_bulk_list_line_item_assigned_targeting_options(&self, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn line_items_bulk_list_line_item_assigned_targeting_options(&self, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6443,7 +6441,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the line item belongs to.
-    pub fn line_items_create(&self, request: LineItem, advertiser_id: &str) -> AdvertiserLineItemCreateCall<'a, C> {
+    pub fn line_items_create(&self, request: LineItem, advertiser_id: &str) -> AdvertiserLineItemCreateCall<'a> {
         AdvertiserLineItemCreateCall {
             hub: self.hub,
             _request: request,
@@ -6462,7 +6460,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - The ID of the advertiser this line item belongs to.
     /// * `lineItemId` - The ID of the line item we need to fetch.
-    pub fn line_items_delete(&self, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemDeleteCall<'a, C> {
+    pub fn line_items_delete(&self, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemDeleteCall<'a> {
         AdvertiserLineItemDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6481,7 +6479,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser this line item belongs to.
-    pub fn line_items_generate_default(&self, request: GenerateDefaultLineItemRequest, advertiser_id: &str) -> AdvertiserLineItemGenerateDefaultCall<'a, C> {
+    pub fn line_items_generate_default(&self, request: GenerateDefaultLineItemRequest, advertiser_id: &str) -> AdvertiserLineItemGenerateDefaultCall<'a> {
         AdvertiserLineItemGenerateDefaultCall {
             hub: self.hub,
             _request: request,
@@ -6500,7 +6498,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser this line item belongs to.
     /// * `lineItemId` - Required. The ID of the line item to fetch.
-    pub fn line_items_get(&self, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemGetCall<'a, C> {
+    pub fn line_items_get(&self, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemGetCall<'a> {
         AdvertiserLineItemGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6518,7 +6516,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser to list line items for.
-    pub fn line_items_list(&self, advertiser_id: &str) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn line_items_list(&self, advertiser_id: &str) -> AdvertiserLineItemListCall<'a> {
         AdvertiserLineItemListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6541,7 +6539,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser the line item belongs to.
     /// * `lineItemId` - Output only. The unique ID of the line item. Assigned by the system.
-    pub fn line_items_patch(&self, request: LineItem, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemPatchCall<'a, C> {
+    pub fn line_items_patch(&self, request: LineItem, advertiser_id: &str, line_item_id: &str) -> AdvertiserLineItemPatchCall<'a> {
         AdvertiserLineItemPatchCall {
             hub: self.hub,
             _request: request,
@@ -6563,7 +6561,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the location list belongs.
     /// * `locationListId` - Required. The ID of the location list to which these assignments are assigned.
-    pub fn location_lists_assigned_locations_bulk_edit(&self, request: BulkEditAssignedLocationsRequest, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> {
+    pub fn location_lists_assigned_locations_bulk_edit(&self, request: BulkEditAssignedLocationsRequest, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a> {
         AdvertiserLocationListAssignedLocationBulkEditCall {
             hub: self.hub,
             _request: request,
@@ -6584,7 +6582,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the location list belongs.
     /// * `locationListId` - Required. The ID of the location list for which the assignment will be created.
-    pub fn location_lists_assigned_locations_create(&self, request: AssignedLocation, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C> {
+    pub fn location_lists_assigned_locations_create(&self, request: AssignedLocation, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListAssignedLocationCreateCall<'a> {
         AdvertiserLocationListAssignedLocationCreateCall {
             hub: self.hub,
             _request: request,
@@ -6605,7 +6603,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the location list belongs.
     /// * `locationListId` - Required. The ID of the location list to which this assignment is assigned.
     /// * `assignedLocationId` - Required. The ID of the assigned location to delete.
-    pub fn location_lists_assigned_locations_delete(&self, advertiser_id: &str, location_list_id: &str, assigned_location_id: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> {
+    pub fn location_lists_assigned_locations_delete(&self, advertiser_id: &str, location_list_id: &str, assigned_location_id: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a> {
         AdvertiserLocationListAssignedLocationDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6625,7 +6623,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the location list belongs.
     /// * `locationListId` - Required. The ID of the location list to which these assignments are assigned.
-    pub fn location_lists_assigned_locations_list(&self, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn location_lists_assigned_locations_list(&self, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         AdvertiserLocationListAssignedLocationListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6648,7 +6646,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the location list belongs.
-    pub fn location_lists_create(&self, request: LocationList, advertiser_id: &str) -> AdvertiserLocationListCreateCall<'a, C> {
+    pub fn location_lists_create(&self, request: LocationList, advertiser_id: &str) -> AdvertiserLocationListCreateCall<'a> {
         AdvertiserLocationListCreateCall {
             hub: self.hub,
             _request: request,
@@ -6667,7 +6665,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the fetched location list belongs.
     /// * `locationListId` - Required. The ID of the location list to fetch.
-    pub fn location_lists_get(&self, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListGetCall<'a, C> {
+    pub fn location_lists_get(&self, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListGetCall<'a> {
         AdvertiserLocationListGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6685,7 +6683,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the fetched location lists belong.
-    pub fn location_lists_list(&self, advertiser_id: &str) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn location_lists_list(&self, advertiser_id: &str) -> AdvertiserLocationListListCall<'a> {
         AdvertiserLocationListListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6708,7 +6706,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the location lists belongs.
     /// * `locationListId` - Output only. The unique ID of the location list. Assigned by the system.
-    pub fn location_lists_patch(&self, request: LocationList, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListPatchCall<'a, C> {
+    pub fn location_lists_patch(&self, request: LocationList, advertiser_id: &str, location_list_id: &str) -> AdvertiserLocationListPatchCall<'a> {
         AdvertiserLocationListPatchCall {
             hub: self.hub,
             _request: request,
@@ -6730,7 +6728,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser that the manual trigger belongs.
     /// * `triggerId` - Required. The ID of the manual trigger to activate.
-    pub fn manual_triggers_activate(&self, request: ActivateManualTriggerRequest, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerActivateCall<'a, C> {
+    pub fn manual_triggers_activate(&self, request: ActivateManualTriggerRequest, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerActivateCall<'a> {
         AdvertiserManualTriggerActivateCall {
             hub: self.hub,
             _request: request,
@@ -6750,7 +6748,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. Immutable. The unique ID of the advertiser that the manual trigger belongs to.
-    pub fn manual_triggers_create(&self, request: ManualTrigger, advertiser_id: &str) -> AdvertiserManualTriggerCreateCall<'a, C> {
+    pub fn manual_triggers_create(&self, request: ManualTrigger, advertiser_id: &str) -> AdvertiserManualTriggerCreateCall<'a> {
         AdvertiserManualTriggerCreateCall {
             hub: self.hub,
             _request: request,
@@ -6770,7 +6768,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser that the manual trigger belongs.
     /// * `triggerId` - Required. The ID of the manual trigger to deactivate.
-    pub fn manual_triggers_deactivate(&self, request: DeactivateManualTriggerRequest, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerDeactivateCall<'a, C> {
+    pub fn manual_triggers_deactivate(&self, request: DeactivateManualTriggerRequest, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerDeactivateCall<'a> {
         AdvertiserManualTriggerDeactivateCall {
             hub: self.hub,
             _request: request,
@@ -6790,7 +6788,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser this manual trigger belongs to.
     /// * `triggerId` - Required. The ID of the manual trigger to fetch.
-    pub fn manual_triggers_get(&self, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerGetCall<'a, C> {
+    pub fn manual_triggers_get(&self, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerGetCall<'a> {
         AdvertiserManualTriggerGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6808,7 +6806,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser that the fetched manual triggers belong to.
-    pub fn manual_triggers_list(&self, advertiser_id: &str) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn manual_triggers_list(&self, advertiser_id: &str) -> AdvertiserManualTriggerListCall<'a> {
         AdvertiserManualTriggerListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6831,7 +6829,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. Immutable. The unique ID of the advertiser that the manual trigger belongs to.
     /// * `triggerId` - Output only. The unique ID of the manual trigger.
-    pub fn manual_triggers_patch(&self, request: ManualTrigger, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerPatchCall<'a, C> {
+    pub fn manual_triggers_patch(&self, request: ManualTrigger, advertiser_id: &str, trigger_id: &str) -> AdvertiserManualTriggerPatchCall<'a> {
         AdvertiserManualTriggerPatchCall {
             hub: self.hub,
             _request: request,
@@ -6853,7 +6851,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the parent negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the parent negative keyword list to which the negative keywords belong.
-    pub fn negative_keyword_lists_negative_keywords_bulk_edit(&self, request: BulkEditNegativeKeywordsRequest, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> {
+    pub fn negative_keyword_lists_negative_keywords_bulk_edit(&self, request: BulkEditNegativeKeywordsRequest, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {
         AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall {
             hub: self.hub,
             _request: request,
@@ -6874,7 +6872,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the parent negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the parent negative keyword list in which the negative keyword will be created.
-    pub fn negative_keyword_lists_negative_keywords_create(&self, request: NegativeKeyword, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> {
+    pub fn negative_keyword_lists_negative_keywords_create(&self, request: NegativeKeyword, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {
         AdvertiserNegativeKeywordListNegativeKeywordCreateCall {
             hub: self.hub,
             _request: request,
@@ -6895,7 +6893,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the parent negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the parent negative keyword list to which the negative keyword belongs.
     /// * `keywordValue` - Required. The keyword value of the negative keyword to delete.
-    pub fn negative_keyword_lists_negative_keywords_delete(&self, advertiser_id: &str, negative_keyword_list_id: &str, keyword_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> {
+    pub fn negative_keyword_lists_negative_keywords_delete(&self, advertiser_id: &str, negative_keyword_list_id: &str, keyword_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {
         AdvertiserNegativeKeywordListNegativeKeywordDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6915,7 +6913,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the parent negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the parent negative keyword list to which the requested negative keywords belong.
-    pub fn negative_keyword_lists_negative_keywords_list(&self, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn negative_keyword_lists_negative_keywords_list(&self, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         AdvertiserNegativeKeywordListNegativeKeywordListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6939,7 +6937,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the parent negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the parent negative keyword list to which the negative keywords belong.
-    pub fn negative_keyword_lists_negative_keywords_replace(&self, request: ReplaceNegativeKeywordsRequest, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> {
+    pub fn negative_keyword_lists_negative_keywords_replace(&self, request: ReplaceNegativeKeywordsRequest, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {
         AdvertiserNegativeKeywordListNegativeKeywordReplaceCall {
             hub: self.hub,
             _request: request,
@@ -6959,7 +6957,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the negative keyword list will belong.
-    pub fn negative_keyword_lists_create(&self, request: NegativeKeywordList, advertiser_id: &str) -> AdvertiserNegativeKeywordListCreateCall<'a, C> {
+    pub fn negative_keyword_lists_create(&self, request: NegativeKeywordList, advertiser_id: &str) -> AdvertiserNegativeKeywordListCreateCall<'a> {
         AdvertiserNegativeKeywordListCreateCall {
             hub: self.hub,
             _request: request,
@@ -6978,7 +6976,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the negative keyword list to delete.
-    pub fn negative_keyword_lists_delete(&self, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListDeleteCall<'a, C> {
+    pub fn negative_keyword_lists_delete(&self, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListDeleteCall<'a> {
         AdvertiserNegativeKeywordListDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -6997,7 +6995,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the fetched negative keyword list belongs.
     /// * `negativeKeywordListId` - Required. The ID of the negative keyword list to fetch.
-    pub fn negative_keyword_lists_get(&self, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListGetCall<'a, C> {
+    pub fn negative_keyword_lists_get(&self, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListGetCall<'a> {
         AdvertiserNegativeKeywordListGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7015,7 +7013,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the fetched negative keyword lists belong.
-    pub fn negative_keyword_lists_list(&self, advertiser_id: &str) -> AdvertiserNegativeKeywordListListCall<'a, C> {
+    pub fn negative_keyword_lists_list(&self, advertiser_id: &str) -> AdvertiserNegativeKeywordListListCall<'a> {
         AdvertiserNegativeKeywordListListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7036,7 +7034,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the DV360 advertiser to which the negative keyword list belongs.
     /// * `negativeKeywordListId` - Output only. The unique ID of the negative keyword list. Assigned by the system.
-    pub fn negative_keyword_lists_patch(&self, request: NegativeKeywordList, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListPatchCall<'a, C> {
+    pub fn negative_keyword_lists_patch(&self, request: NegativeKeywordList, advertiser_id: &str, negative_keyword_list_id: &str) -> AdvertiserNegativeKeywordListPatchCall<'a> {
         AdvertiserNegativeKeywordListPatchCall {
             hub: self.hub,
             _request: request,
@@ -7058,7 +7056,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
-    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: &str, targeting_type: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, advertiser_id: &str, targeting_type: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         AdvertiserTargetingTypeAssignedTargetingOptionCreateCall {
             hub: self.hub,
             _request: request,
@@ -7079,7 +7077,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
-    pub fn targeting_types_assigned_targeting_options_delete(&self, advertiser_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_delete(&self, advertiser_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7100,7 +7098,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this advertiser that identifies the assigned targeting option being requested.
-    pub fn targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_get(&self, advertiser_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {
         AdvertiserTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7120,7 +7118,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `advertiserId` - Required. The ID of the advertiser.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`
-    pub fn targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, targeting_type: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_list(&self, advertiser_id: &str, targeting_type: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         AdvertiserTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7142,7 +7140,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser to audit.
-    pub fn audit(&self, advertiser_id: &str) -> AdvertiserAuditCall<'a, C> {
+    pub fn audit(&self, advertiser_id: &str) -> AdvertiserAuditCall<'a> {
         AdvertiserAuditCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7161,7 +7159,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Required. The ID of the advertiser.
-    pub fn bulk_edit_advertiser_assigned_targeting_options(&self, request: BulkEditAdvertiserAssignedTargetingOptionsRequest, advertiser_id: &str) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn bulk_edit_advertiser_assigned_targeting_options(&self, request: BulkEditAdvertiserAssignedTargetingOptionsRequest, advertiser_id: &str) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a> {
         AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall {
             hub: self.hub,
             _request: request,
@@ -7179,7 +7177,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser the line item belongs to.
-    pub fn bulk_list_advertiser_assigned_targeting_options(&self, advertiser_id: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn bulk_list_advertiser_assigned_targeting_options(&self, advertiser_id: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         AdvertiserBulkListAdvertiserAssignedTargetingOptionCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7200,7 +7198,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Advertiser) -> AdvertiserCreateCall<'a, C> {
+    pub fn create(&self, request: Advertiser) -> AdvertiserCreateCall<'a> {
         AdvertiserCreateCall {
             hub: self.hub,
             _request: request,
@@ -7217,7 +7215,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - The ID of the advertiser we need to delete.
-    pub fn delete(&self, advertiser_id: &str) -> AdvertiserDeleteCall<'a, C> {
+    pub fn delete(&self, advertiser_id: &str) -> AdvertiserDeleteCall<'a> {
         AdvertiserDeleteCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7234,7 +7232,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `advertiserId` - Required. The ID of the advertiser to fetch.
-    pub fn get(&self, advertiser_id: &str) -> AdvertiserGetCall<'a, C> {
+    pub fn get(&self, advertiser_id: &str) -> AdvertiserGetCall<'a> {
         AdvertiserGetCall {
             hub: self.hub,
             _advertiser_id: advertiser_id.to_string(),
@@ -7247,7 +7245,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists advertisers that are accessible to the current user. The order is defined by the order_by parameter. A single partner_id is required. Cross-partner listing is not supported.
-    pub fn list(&self) -> AdvertiserListCall<'a, C> {
+    pub fn list(&self) -> AdvertiserListCall<'a> {
         AdvertiserListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -7269,7 +7267,7 @@ impl<'a, C> AdvertiserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `advertiserId` - Output only. The unique ID of the advertiser. Assigned by the system.
-    pub fn patch(&self, request: Advertiser, advertiser_id: &str) -> AdvertiserPatchCall<'a, C> {
+    pub fn patch(&self, request: Advertiser, advertiser_id: &str) -> AdvertiserPatchCall<'a> {
         AdvertiserPatchCall {
             hub: self.hub,
             _request: request,
@@ -7314,15 +7312,15 @@ impl<'a, C> AdvertiserMethods<'a, C> {
 /// let rb = hub.combined_audiences();
 /// # }
 /// ```
-pub struct CombinedAudienceMethods<'a, C>
-    where C: 'a {
+pub struct CombinedAudienceMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CombinedAudienceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CombinedAudienceMethods<'a> {}
 
-impl<'a, C> CombinedAudienceMethods<'a, C> {
+impl<'a> CombinedAudienceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7331,7 +7329,7 @@ impl<'a, C> CombinedAudienceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `combinedAudienceId` - Required. The ID of the combined audience to fetch.
-    pub fn get(&self, combined_audience_id: &str) -> CombinedAudienceGetCall<'a, C> {
+    pub fn get(&self, combined_audience_id: &str) -> CombinedAudienceGetCall<'a> {
         CombinedAudienceGetCall {
             hub: self.hub,
             _combined_audience_id: combined_audience_id.to_string(),
@@ -7346,7 +7344,7 @@ impl<'a, C> CombinedAudienceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists combined audiences. The order is defined by the order_by parameter.
-    pub fn list(&self) -> CombinedAudienceListCall<'a, C> {
+    pub fn list(&self) -> CombinedAudienceListCall<'a> {
         CombinedAudienceListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -7394,15 +7392,15 @@ impl<'a, C> CombinedAudienceMethods<'a, C> {
 /// let rb = hub.custom_bidding_algorithms();
 /// # }
 /// ```
-pub struct CustomBiddingAlgorithmMethods<'a, C>
-    where C: 'a {
+pub struct CustomBiddingAlgorithmMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CustomBiddingAlgorithmMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CustomBiddingAlgorithmMethods<'a> {}
 
-impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
+impl<'a> CustomBiddingAlgorithmMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7411,7 +7409,7 @@ impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
     /// # Arguments
     ///
     /// * `customBiddingAlgorithmId` - Required. The ID of the custom bidding algorithm to fetch.
-    pub fn get(&self, custom_bidding_algorithm_id: &str) -> CustomBiddingAlgorithmGetCall<'a, C> {
+    pub fn get(&self, custom_bidding_algorithm_id: &str) -> CustomBiddingAlgorithmGetCall<'a> {
         CustomBiddingAlgorithmGetCall {
             hub: self.hub,
             _custom_bidding_algorithm_id: custom_bidding_algorithm_id.to_string(),
@@ -7426,7 +7424,7 @@ impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists custom bidding algorithms that are accessible to the current user and can be used in bidding stratgies. The order is defined by the order_by parameter.
-    pub fn list(&self) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn list(&self) -> CustomBiddingAlgorithmListCall<'a> {
         CustomBiddingAlgorithmListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -7474,15 +7472,15 @@ impl<'a, C> CustomBiddingAlgorithmMethods<'a, C> {
 /// let rb = hub.custom_lists();
 /// # }
 /// ```
-pub struct CustomListMethods<'a, C>
-    where C: 'a {
+pub struct CustomListMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CustomListMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CustomListMethods<'a> {}
 
-impl<'a, C> CustomListMethods<'a, C> {
+impl<'a> CustomListMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7491,7 +7489,7 @@ impl<'a, C> CustomListMethods<'a, C> {
     /// # Arguments
     ///
     /// * `customListId` - Required. The ID of the custom list to fetch.
-    pub fn get(&self, custom_list_id: &str) -> CustomListGetCall<'a, C> {
+    pub fn get(&self, custom_list_id: &str) -> CustomListGetCall<'a> {
         CustomListGetCall {
             hub: self.hub,
             _custom_list_id: custom_list_id.to_string(),
@@ -7505,7 +7503,7 @@ impl<'a, C> CustomListMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists custom lists. The order is defined by the order_by parameter.
-    pub fn list(&self) -> CustomListListCall<'a, C> {
+    pub fn list(&self) -> CustomListListCall<'a> {
         CustomListListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -7552,15 +7550,15 @@ impl<'a, C> CustomListMethods<'a, C> {
 /// let rb = hub.first_and_third_party_audiences();
 /// # }
 /// ```
-pub struct FirstAndThirdPartyAudienceMethods<'a, C>
-    where C: 'a {
+pub struct FirstAndThirdPartyAudienceMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FirstAndThirdPartyAudienceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FirstAndThirdPartyAudienceMethods<'a> {}
 
-impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
+impl<'a> FirstAndThirdPartyAudienceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7569,7 +7567,7 @@ impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `firstAndThirdPartyAudienceId` - Required. The ID of the first and third party audience to fetch.
-    pub fn get(&self, first_and_third_party_audience_id: &str) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
+    pub fn get(&self, first_and_third_party_audience_id: &str) -> FirstAndThirdPartyAudienceGetCall<'a> {
         FirstAndThirdPartyAudienceGetCall {
             hub: self.hub,
             _first_and_third_party_audience_id: first_and_third_party_audience_id.to_string(),
@@ -7584,7 +7582,7 @@ impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists first and third party audiences. The order is defined by the order_by parameter.
-    pub fn list(&self) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn list(&self) -> FirstAndThirdPartyAudienceListCall<'a> {
         FirstAndThirdPartyAudienceListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -7632,15 +7630,15 @@ impl<'a, C> FirstAndThirdPartyAudienceMethods<'a, C> {
 /// let rb = hub.floodlight_groups();
 /// # }
 /// ```
-pub struct FloodlightGroupMethods<'a, C>
-    where C: 'a {
+pub struct FloodlightGroupMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FloodlightGroupMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FloodlightGroupMethods<'a> {}
 
-impl<'a, C> FloodlightGroupMethods<'a, C> {
+impl<'a> FloodlightGroupMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7649,7 +7647,7 @@ impl<'a, C> FloodlightGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `floodlightGroupId` - Required. The ID of the Floodlight group to fetch.
-    pub fn get(&self, floodlight_group_id: &str) -> FloodlightGroupGetCall<'a, C> {
+    pub fn get(&self, floodlight_group_id: &str) -> FloodlightGroupGetCall<'a> {
         FloodlightGroupGetCall {
             hub: self.hub,
             _floodlight_group_id: floodlight_group_id.to_string(),
@@ -7668,7 +7666,7 @@ impl<'a, C> FloodlightGroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `floodlightGroupId` - Output only. The unique ID of the Floodlight group. Assigned by the system.
-    pub fn patch(&self, request: FloodlightGroup, floodlight_group_id: &str) -> FloodlightGroupPatchCall<'a, C> {
+    pub fn patch(&self, request: FloodlightGroup, floodlight_group_id: &str) -> FloodlightGroupPatchCall<'a> {
         FloodlightGroupPatchCall {
             hub: self.hub,
             _request: request,
@@ -7714,15 +7712,15 @@ impl<'a, C> FloodlightGroupMethods<'a, C> {
 /// let rb = hub.google_audiences();
 /// # }
 /// ```
-pub struct GoogleAudienceMethods<'a, C>
-    where C: 'a {
+pub struct GoogleAudienceMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for GoogleAudienceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for GoogleAudienceMethods<'a> {}
 
-impl<'a, C> GoogleAudienceMethods<'a, C> {
+impl<'a> GoogleAudienceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7731,7 +7729,7 @@ impl<'a, C> GoogleAudienceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `googleAudienceId` - Required. The ID of the Google audience to fetch.
-    pub fn get(&self, google_audience_id: &str) -> GoogleAudienceGetCall<'a, C> {
+    pub fn get(&self, google_audience_id: &str) -> GoogleAudienceGetCall<'a> {
         GoogleAudienceGetCall {
             hub: self.hub,
             _google_audience_id: google_audience_id.to_string(),
@@ -7746,7 +7744,7 @@ impl<'a, C> GoogleAudienceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists Google audiences. The order is defined by the order_by parameter.
-    pub fn list(&self) -> GoogleAudienceListCall<'a, C> {
+    pub fn list(&self) -> GoogleAudienceListCall<'a> {
         GoogleAudienceListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -7794,15 +7792,15 @@ impl<'a, C> GoogleAudienceMethods<'a, C> {
 /// let rb = hub.inventory_source_groups();
 /// # }
 /// ```
-pub struct InventorySourceGroupMethods<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for InventorySourceGroupMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for InventorySourceGroupMethods<'a> {}
 
-impl<'a, C> InventorySourceGroupMethods<'a, C> {
+impl<'a> InventorySourceGroupMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -7812,7 +7810,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `inventorySourceGroupId` - Required. The ID of the inventory source group to which the assignments are assigned.
-    pub fn assigned_inventory_sources_bulk_edit(&self, request: BulkEditAssignedInventorySourcesRequest, inventory_source_group_id: &str) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> {
+    pub fn assigned_inventory_sources_bulk_edit(&self, request: BulkEditAssignedInventorySourcesRequest, inventory_source_group_id: &str) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a> {
         InventorySourceGroupAssignedInventorySourceBulkEditCall {
             hub: self.hub,
             _request: request,
@@ -7831,7 +7829,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `inventorySourceGroupId` - Required. The ID of the inventory source group to which the assignment will be assigned.
-    pub fn assigned_inventory_sources_create(&self, request: AssignedInventorySource, inventory_source_group_id: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {
+    pub fn assigned_inventory_sources_create(&self, request: AssignedInventorySource, inventory_source_group_id: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
         InventorySourceGroupAssignedInventorySourceCreateCall {
             hub: self.hub,
             _request: request,
@@ -7852,7 +7850,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     ///
     /// * `inventorySourceGroupId` - Required. The ID of the inventory source group to which this assignment is assigned.
     /// * `assignedInventorySourceId` - Required. The ID of the assigned inventory source to delete.
-    pub fn assigned_inventory_sources_delete(&self, inventory_source_group_id: &str, assigned_inventory_source_id: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {
+    pub fn assigned_inventory_sources_delete(&self, inventory_source_group_id: &str, assigned_inventory_source_id: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
         InventorySourceGroupAssignedInventorySourceDeleteCall {
             hub: self.hub,
             _inventory_source_group_id: inventory_source_group_id.to_string(),
@@ -7872,7 +7870,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `inventorySourceGroupId` - Required. The ID of the inventory source group to which these assignments are assigned.
-    pub fn assigned_inventory_sources_list(&self, inventory_source_group_id: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn assigned_inventory_sources_list(&self, inventory_source_group_id: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         InventorySourceGroupAssignedInventorySourceListCall {
             hub: self.hub,
             _inventory_source_group_id: inventory_source_group_id.to_string(),
@@ -7895,7 +7893,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: InventorySourceGroup) -> InventorySourceGroupCreateCall<'a, C> {
+    pub fn create(&self, request: InventorySourceGroup) -> InventorySourceGroupCreateCall<'a> {
         InventorySourceGroupCreateCall {
             hub: self.hub,
             _request: request,
@@ -7914,7 +7912,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `inventorySourceGroupId` - Required. The ID of the inventory source group to delete.
-    pub fn delete(&self, inventory_source_group_id: &str) -> InventorySourceGroupDeleteCall<'a, C> {
+    pub fn delete(&self, inventory_source_group_id: &str) -> InventorySourceGroupDeleteCall<'a> {
         InventorySourceGroupDeleteCall {
             hub: self.hub,
             _inventory_source_group_id: inventory_source_group_id.to_string(),
@@ -7933,7 +7931,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `inventorySourceGroupId` - Required. The ID of the inventory source group to fetch.
-    pub fn get(&self, inventory_source_group_id: &str) -> InventorySourceGroupGetCall<'a, C> {
+    pub fn get(&self, inventory_source_group_id: &str) -> InventorySourceGroupGetCall<'a> {
         InventorySourceGroupGetCall {
             hub: self.hub,
             _inventory_source_group_id: inventory_source_group_id.to_string(),
@@ -7948,7 +7946,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists inventory source groups that are accessible to the current user. The order is defined by the order_by parameter.
-    pub fn list(&self) -> InventorySourceGroupListCall<'a, C> {
+    pub fn list(&self) -> InventorySourceGroupListCall<'a> {
         InventorySourceGroupListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -7971,7 +7969,7 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `inventorySourceGroupId` - Output only. The unique ID of the inventory source group. Assigned by the system.
-    pub fn patch(&self, request: InventorySourceGroup, inventory_source_group_id: &str) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn patch(&self, request: InventorySourceGroup, inventory_source_group_id: &str) -> InventorySourceGroupPatchCall<'a> {
         InventorySourceGroupPatchCall {
             hub: self.hub,
             _request: request,
@@ -8018,15 +8016,15 @@ impl<'a, C> InventorySourceGroupMethods<'a, C> {
 /// let rb = hub.inventory_sources();
 /// # }
 /// ```
-pub struct InventorySourceMethods<'a, C>
-    where C: 'a {
+pub struct InventorySourceMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for InventorySourceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for InventorySourceMethods<'a> {}
 
-impl<'a, C> InventorySourceMethods<'a, C> {
+impl<'a> InventorySourceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8035,7 +8033,7 @@ impl<'a, C> InventorySourceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `inventorySourceId` - Required. The ID of the inventory source to fetch.
-    pub fn get(&self, inventory_source_id: &str) -> InventorySourceGetCall<'a, C> {
+    pub fn get(&self, inventory_source_id: &str) -> InventorySourceGetCall<'a> {
         InventorySourceGetCall {
             hub: self.hub,
             _inventory_source_id: inventory_source_id.to_string(),
@@ -8049,7 +8047,7 @@ impl<'a, C> InventorySourceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists inventory sources that are accessible to the current user. The order is defined by the order_by parameter. If a filter by entity_status is not specified, inventory sources with entity status `ENTITY_STATUS_ARCHIVED` will not be included in the results.
-    pub fn list(&self) -> InventorySourceListCall<'a, C> {
+    pub fn list(&self) -> InventorySourceListCall<'a> {
         InventorySourceListCall {
             hub: self.hub,
             _partner_id: Default::default(),
@@ -8097,15 +8095,15 @@ impl<'a, C> InventorySourceMethods<'a, C> {
 /// let rb = hub.media();
 /// # }
 /// ```
-pub struct MediaMethods<'a, C>
-    where C: 'a {
+pub struct MediaMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MediaMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MediaMethods<'a> {}
 
-impl<'a, C> MediaMethods<'a, C> {
+impl<'a> MediaMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8114,7 +8112,7 @@ impl<'a, C> MediaMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Name of the media that is being downloaded. See ReadRequest.resource_name.
-    pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C> {
+    pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a> {
         MediaDownloadCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -8157,15 +8155,15 @@ impl<'a, C> MediaMethods<'a, C> {
 /// let rb = hub.partners();
 /// # }
 /// ```
-pub struct PartnerMethods<'a, C>
-    where C: 'a {
+pub struct PartnerMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PartnerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PartnerMethods<'a> {}
 
-impl<'a, C> PartnerMethods<'a, C> {
+impl<'a> PartnerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8176,7 +8174,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `partnerId` - The ID of the partner that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel to which the sites belong.
-    pub fn channels_sites_bulk_edit(&self, request: BulkEditSitesRequest, partner_id: &str, channel_id: &str) -> PartnerChannelSiteBulkEditCall<'a, C> {
+    pub fn channels_sites_bulk_edit(&self, request: BulkEditSitesRequest, partner_id: &str, channel_id: &str) -> PartnerChannelSiteBulkEditCall<'a> {
         PartnerChannelSiteBulkEditCall {
             hub: self.hub,
             _request: request,
@@ -8197,7 +8195,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `partnerId` - The ID of the partner that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel in which the site will be created.
-    pub fn channels_sites_create(&self, request: Site, partner_id: &str, channel_id: &str) -> PartnerChannelSiteCreateCall<'a, C> {
+    pub fn channels_sites_create(&self, request: Site, partner_id: &str, channel_id: &str) -> PartnerChannelSiteCreateCall<'a> {
         PartnerChannelSiteCreateCall {
             hub: self.hub,
             _request: request,
@@ -8219,7 +8217,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `partnerId` - The ID of the partner that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel to which the site belongs.
     /// * `urlOrAppId` - Required. The URL or app ID of the site to delete.
-    pub fn channels_sites_delete(&self, partner_id: &str, channel_id: &str, url_or_app_id: &str) -> PartnerChannelSiteDeleteCall<'a, C> {
+    pub fn channels_sites_delete(&self, partner_id: &str, channel_id: &str, url_or_app_id: &str) -> PartnerChannelSiteDeleteCall<'a> {
         PartnerChannelSiteDeleteCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8240,7 +8238,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `partnerId` - The ID of the partner that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel to which the requested sites belong.
-    pub fn channels_sites_list(&self, partner_id: &str, channel_id: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn channels_sites_list(&self, partner_id: &str, channel_id: &str) -> PartnerChannelSiteListCall<'a> {
         PartnerChannelSiteListCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8265,7 +8263,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `partnerId` - The ID of the partner that owns the parent channel.
     /// * `channelId` - Required. The ID of the parent channel whose sites will be replaced.
-    pub fn channels_sites_replace(&self, request: ReplaceSitesRequest, partner_id: &str, channel_id: &str) -> PartnerChannelSiteReplaceCall<'a, C> {
+    pub fn channels_sites_replace(&self, request: ReplaceSitesRequest, partner_id: &str, channel_id: &str) -> PartnerChannelSiteReplaceCall<'a> {
         PartnerChannelSiteReplaceCall {
             hub: self.hub,
             _request: request,
@@ -8285,7 +8283,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - The ID of the partner that owns the created channel.
-    pub fn channels_create(&self, request: Channel, partner_id: &str) -> PartnerChannelCreateCall<'a, C> {
+    pub fn channels_create(&self, request: Channel, partner_id: &str) -> PartnerChannelCreateCall<'a> {
         PartnerChannelCreateCall {
             hub: self.hub,
             _request: request,
@@ -8305,7 +8303,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `partnerId` - The ID of the partner that owns the fetched channel.
     /// * `channelId` - Required. The ID of the channel to fetch.
-    pub fn channels_get(&self, partner_id: &str, channel_id: &str) -> PartnerChannelGetCall<'a, C> {
+    pub fn channels_get(&self, partner_id: &str, channel_id: &str) -> PartnerChannelGetCall<'a> {
         PartnerChannelGetCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8324,7 +8322,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `partnerId` - The ID of the partner that owns the channels.
-    pub fn channels_list(&self, partner_id: &str) -> PartnerChannelListCall<'a, C> {
+    pub fn channels_list(&self, partner_id: &str) -> PartnerChannelListCall<'a> {
         PartnerChannelListCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8348,7 +8346,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `partnerId` - The ID of the partner that owns the created channel.
     /// * `channelId` - Output only. The unique ID of the channel. Assigned by the system.
-    pub fn channels_patch(&self, request: Channel, partner_id: &str, channel_id: &str) -> PartnerChannelPatchCall<'a, C> {
+    pub fn channels_patch(&self, request: Channel, partner_id: &str, channel_id: &str) -> PartnerChannelPatchCall<'a> {
         PartnerChannelPatchCall {
             hub: self.hub,
             _request: request,
@@ -8371,7 +8369,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
-    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, partner_id: &str, targeting_type: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_create(&self, request: AssignedTargetingOption, partner_id: &str, targeting_type: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         PartnerTargetingTypeAssignedTargetingOptionCreateCall {
             hub: self.hub,
             _request: request,
@@ -8392,7 +8390,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
     /// * `assignedTargetingOptionId` - Required. The ID of the assigned targeting option to delete.
-    pub fn targeting_types_assigned_targeting_options_delete(&self, partner_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_delete(&self, partner_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         PartnerTargetingTypeAssignedTargetingOptionDeleteCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8413,7 +8411,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
     /// * `assignedTargetingOptionId` - Required. An identifier unique to the targeting type in this partner that identifies the assigned targeting option being requested.
-    pub fn targeting_types_assigned_targeting_options_get(&self, partner_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_get(&self, partner_id: &str, targeting_type: &str, assigned_targeting_option_id: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {
         PartnerTargetingTypeAssignedTargetingOptionGetCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8433,7 +8431,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `partnerId` - Required. The ID of the partner.
     /// * `targetingType` - Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL`
-    pub fn targeting_types_assigned_targeting_options_list(&self, partner_id: &str, targeting_type: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_types_assigned_targeting_options_list(&self, partner_id: &str, targeting_type: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         PartnerTargetingTypeAssignedTargetingOptionListCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8456,7 +8454,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `partnerId` - Required. The ID of the partner.
-    pub fn bulk_edit_partner_assigned_targeting_options(&self, request: BulkEditPartnerAssignedTargetingOptionsRequest, partner_id: &str) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> {
+    pub fn bulk_edit_partner_assigned_targeting_options(&self, request: BulkEditPartnerAssignedTargetingOptionsRequest, partner_id: &str) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a> {
         PartnerBulkEditPartnerAssignedTargetingOptionCall {
             hub: self.hub,
             _request: request,
@@ -8474,7 +8472,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `partnerId` - Required. The ID of the partner to fetch.
-    pub fn get(&self, partner_id: &str) -> PartnerGetCall<'a, C> {
+    pub fn get(&self, partner_id: &str) -> PartnerGetCall<'a> {
         PartnerGetCall {
             hub: self.hub,
             _partner_id: partner_id.to_string(),
@@ -8487,7 +8485,7 @@ impl<'a, C> PartnerMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists partners that are accessible to the current user. The order is defined by the order_by parameter.
-    pub fn list(&self) -> PartnerListCall<'a, C> {
+    pub fn list(&self) -> PartnerListCall<'a> {
         PartnerListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -8533,15 +8531,15 @@ impl<'a, C> PartnerMethods<'a, C> {
 /// let rb = hub.sdfdownloadtasks();
 /// # }
 /// ```
-pub struct SdfdownloadtaskMethods<'a, C>
-    where C: 'a {
+pub struct SdfdownloadtaskMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SdfdownloadtaskMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SdfdownloadtaskMethods<'a> {}
 
-impl<'a, C> SdfdownloadtaskMethods<'a, C> {
+impl<'a> SdfdownloadtaskMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8550,7 +8548,7 @@ impl<'a, C> SdfdownloadtaskMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn operations_get(&self, name: &str) -> SdfdownloadtaskOperationGetCall<'a, C> {
+    pub fn operations_get(&self, name: &str) -> SdfdownloadtaskOperationGetCall<'a> {
         SdfdownloadtaskOperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -8567,7 +8565,7 @@ impl<'a, C> SdfdownloadtaskMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateSdfDownloadTaskRequest) -> SdfdownloadtaskCreateCall<'a, C> {
+    pub fn create(&self, request: CreateSdfDownloadTaskRequest) -> SdfdownloadtaskCreateCall<'a> {
         SdfdownloadtaskCreateCall {
             hub: self.hub,
             _request: request,
@@ -8610,15 +8608,15 @@ impl<'a, C> SdfdownloadtaskMethods<'a, C> {
 /// let rb = hub.targeting_types();
 /// # }
 /// ```
-pub struct TargetingTypeMethods<'a, C>
-    where C: 'a {
+pub struct TargetingTypeMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TargetingTypeMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TargetingTypeMethods<'a> {}
 
-impl<'a, C> TargetingTypeMethods<'a, C> {
+impl<'a> TargetingTypeMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8628,7 +8626,7 @@ impl<'a, C> TargetingTypeMethods<'a, C> {
     ///
     /// * `targetingType` - Required. The type of targeting option to retrieve.
     /// * `targetingOptionId` - Required. The ID of the of targeting option to retrieve.
-    pub fn targeting_options_get(&self, targeting_type: &str, targeting_option_id: &str) -> TargetingTypeTargetingOptionGetCall<'a, C> {
+    pub fn targeting_options_get(&self, targeting_type: &str, targeting_option_id: &str) -> TargetingTypeTargetingOptionGetCall<'a> {
         TargetingTypeTargetingOptionGetCall {
             hub: self.hub,
             _targeting_type: targeting_type.to_string(),
@@ -8647,7 +8645,7 @@ impl<'a, C> TargetingTypeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `targetingType` - Required. The type of targeting option to be listed.
-    pub fn targeting_options_list(&self, targeting_type: &str) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn targeting_options_list(&self, targeting_type: &str) -> TargetingTypeTargetingOptionListCall<'a> {
         TargetingTypeTargetingOptionListCall {
             hub: self.hub,
             _targeting_type: targeting_type.to_string(),
@@ -8670,7 +8668,7 @@ impl<'a, C> TargetingTypeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `targetingType` - Required. The type of targeting options to retrieve. Accepted values are: * `TARGETING_TYPE_GEO_REGION`
-    pub fn targeting_options_search(&self, request: SearchTargetingOptionsRequest, targeting_type: &str) -> TargetingTypeTargetingOptionSearchCall<'a, C> {
+    pub fn targeting_options_search(&self, request: SearchTargetingOptionsRequest, targeting_type: &str) -> TargetingTypeTargetingOptionSearchCall<'a> {
         TargetingTypeTargetingOptionSearchCall {
             hub: self.hub,
             _request: request,
@@ -8714,15 +8712,15 @@ impl<'a, C> TargetingTypeMethods<'a, C> {
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C>
-    where C: 'a {
+pub struct UserMethods<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserMethods<'a> {}
 
-impl<'a, C> UserMethods<'a, C> {
+impl<'a> UserMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -8732,7 +8730,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Required. The ID of the user to which the assigned user roles belong.
-    pub fn bulk_edit_assigned_user_roles(&self, request: BulkEditAssignedUserRolesRequest, user_id: &str) -> UserBulkEditAssignedUserRoleCall<'a, C> {
+    pub fn bulk_edit_assigned_user_roles(&self, request: BulkEditAssignedUserRolesRequest, user_id: &str) -> UserBulkEditAssignedUserRoleCall<'a> {
         UserBulkEditAssignedUserRoleCall {
             hub: self.hub,
             _request: request,
@@ -8750,7 +8748,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: User) -> UserCreateCall<'a, C> {
+    pub fn create(&self, request: User) -> UserCreateCall<'a> {
         UserCreateCall {
             hub: self.hub,
             _request: request,
@@ -8767,7 +8765,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `userId` - Required. The ID of the user to delete.
-    pub fn delete(&self, user_id: &str) -> UserDeleteCall<'a, C> {
+    pub fn delete(&self, user_id: &str) -> UserDeleteCall<'a> {
         UserDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -8784,7 +8782,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `userId` - Required. The ID of the user to fetch.
-    pub fn get(&self, user_id: &str) -> UserGetCall<'a, C> {
+    pub fn get(&self, user_id: &str) -> UserGetCall<'a> {
         UserGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -8797,7 +8795,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists users that are accessible to the current user. If two users have user roles on the same partner or advertiser, they can access each other.
-    pub fn list(&self) -> UserListCall<'a, C> {
+    pub fn list(&self) -> UserListCall<'a> {
         UserListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -8818,7 +8816,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Output only. The unique ID of the user. Assigned by the system.
-    pub fn patch(&self, request: User, user_id: &str) -> UserPatchCall<'a, C> {
+    pub fn patch(&self, request: User, user_id: &str) -> UserPatchCall<'a> {
         UserPatchCall {
             hub: self.hub,
             _request: request,
@@ -8878,10 +8876,10 @@ impl<'a, C> UserMethods<'a, C> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct AdvertiserAssetUploadCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserAssetUploadCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: CreateAssetRequest,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8889,9 +8887,9 @@ pub struct AdvertiserAssetUploadCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserAssetUploadCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserAssetUploadCall<'a> {}
 
-impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserAssetUploadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8974,8 +8972,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9003,7 +9000,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
                     },
                     _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                 };
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9015,7 +9012,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(content_type.0, content_type.1.to_string())
                         .body(hyper::body::Body::from(body_reader_bytes));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9084,7 +9081,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAssetRequest) -> AdvertiserAssetUploadCall<'a, C> {
+    pub fn request(mut self, new_value: CreateAssetRequest) -> AdvertiserAssetUploadCall<'a> {
         self._request = new_value;
         self
     }
@@ -9094,7 +9091,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserAssetUploadCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserAssetUploadCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -9104,7 +9101,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserAssetUploadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserAssetUploadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9129,7 +9126,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserAssetUploadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserAssetUploadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9149,7 +9146,7 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserAssetUploadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserAssetUploadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9193,10 +9190,10 @@ impl<'a, C> AdvertiserAssetUploadCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _campaign_id: String,
     _targeting_type: String,
@@ -9206,9 +9203,9 @@ pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9276,8 +9273,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9290,7 +9286,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9299,7 +9295,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9359,7 +9355,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -9369,7 +9365,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._campaign_id = new_value.to_string();
         self
     }
@@ -9379,7 +9375,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -9389,7 +9385,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -9399,7 +9395,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9424,7 +9420,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9444,7 +9440,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9492,10 +9488,10 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionGetCall<'a, C>
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _campaign_id: String,
     _targeting_type: String,
@@ -9508,9 +9504,9 @@ pub struct AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9589,8 +9585,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9603,7 +9598,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9612,7 +9607,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9672,7 +9667,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -9682,7 +9677,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._campaign_id = new_value.to_string();
         self
     }
@@ -9692,35 +9687,35 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCampaignAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedTargetingOptionId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `assignedTargetingOptionId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedTargetingOptionId` - `inheritance` Examples: * AssignedTargetingOptions with ID 1 or 2 `assignedTargetingOptionId="1" OR assignedTargetingOptionId="2"` * AssignedTargetingOptions with inheritance status of NOT_INHERITED or INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9730,7 +9725,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9755,7 +9750,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9775,7 +9770,7 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9823,10 +9818,10 @@ impl<'a, C> AdvertiserCampaignTargetingTypeAssignedTargetingOptionListCall<'a, C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _campaign_id: String,
     _page_token: Option<String>,
@@ -9838,9 +9833,9 @@ pub struct AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9918,8 +9913,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9932,7 +9926,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9941,7 +9935,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10001,7 +9995,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -10011,35 +10005,35 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._campaign_id = new_value.to_string();
         self
     }
     /// A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListCampaignAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is `5000`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingType desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR` on the same field. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `targetingType` - `inheritance` Examples: * AssignedTargetingOptions of targeting type TARGETING_TYPE_LANGUAGE or TARGETING_TYPE_GENDER `targetingType="TARGETING_TYPE_LANGUAGE" OR targetingType="TARGETING_TYPE_GENDER"` * AssignedTargetingOptions with inheritance status of NOT_INHERITED or INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10049,7 +10043,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10074,7 +10068,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10094,7 +10088,7 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10144,10 +10138,10 @@ impl<'a, C> AdvertiserCampaignBulkListCampaignAssignedTargetingOptionCall<'a, C>
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Campaign,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10155,9 +10149,9 @@ pub struct AdvertiserCampaignCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignCreateCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10233,8 +10227,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10248,7 +10241,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10259,7 +10252,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10318,7 +10311,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Campaign) -> AdvertiserCampaignCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Campaign) -> AdvertiserCampaignCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10328,7 +10321,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -10338,7 +10331,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10363,7 +10356,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10383,7 +10376,7 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10427,10 +10420,10 @@ impl<'a, C> AdvertiserCampaignCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _campaign_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10438,9 +10431,9 @@ pub struct AdvertiserCampaignDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10506,8 +10499,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10520,7 +10512,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10529,7 +10521,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10589,7 +10581,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -10599,7 +10591,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignDeleteCall<'a, C> {
+    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignDeleteCall<'a> {
         self._campaign_id = new_value.to_string();
         self
     }
@@ -10609,7 +10601,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10634,7 +10626,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10654,7 +10646,7 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10698,10 +10690,10 @@ impl<'a, C> AdvertiserCampaignDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _campaign_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10709,9 +10701,9 @@ pub struct AdvertiserCampaignGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignGetCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10777,8 +10769,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10791,7 +10782,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10800,7 +10791,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10860,7 +10851,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -10870,7 +10861,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignGetCall<'a, C> {
+    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignGetCall<'a> {
         self._campaign_id = new_value.to_string();
         self
     }
@@ -10880,7 +10871,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10905,7 +10896,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10925,7 +10916,7 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10973,10 +10964,10 @@ impl<'a, C> AdvertiserCampaignGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10987,9 +10978,9 @@ pub struct AdvertiserCampaignListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignListCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11066,8 +11057,7 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11080,7 +11070,7 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11089,7 +11079,7 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11149,35 +11139,35 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCampaigns` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserCampaignListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `entityStatus` * `updateTime` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by campaign properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator used on `updateTime` must be `GREATER THAN OR EQUAL TO (>=)` or `LESS THAN OR EQUAL TO (<=)`. * The operator must be `EQUALS (=)`. * Supported fields: - `campaignId` - `displayName` - `entityStatus` - `updateTime` (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) Examples: * All `ENTITY_STATUS_ACTIVE` or `ENTITY_STATUS_PAUSED` campaigns under an advertiser: `(entityStatus="ENTITY_STATUS_ACTIVE" OR entityStatus="ENTITY_STATUS_PAUSED")` * All campaigns with an update time less than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime<="2020-11-04T18:54:47Z"` * All campaigns with an update time greater than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime>="2020-11-04T18:54:47Z"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserCampaignListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11187,7 +11177,7 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11212,7 +11202,7 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11232,7 +11222,7 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11283,10 +11273,10 @@ impl<'a, C> AdvertiserCampaignListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCampaignPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCampaignPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Campaign,
     _advertiser_id: String,
     _campaign_id: String,
@@ -11296,9 +11286,9 @@ pub struct AdvertiserCampaignPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCampaignPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCampaignPatchCall<'a> {}
 
-impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCampaignPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11378,8 +11368,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11393,7 +11382,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11404,7 +11393,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11463,7 +11452,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Campaign) -> AdvertiserCampaignPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Campaign) -> AdvertiserCampaignPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -11473,7 +11462,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCampaignPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -11483,14 +11472,14 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignPatchCall<'a, C> {
+    pub fn campaign_id(mut self, new_value: &str) -> AdvertiserCampaignPatchCall<'a> {
         self._campaign_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserCampaignPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserCampaignPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11500,7 +11489,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCampaignPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11525,7 +11514,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCampaignPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11545,7 +11534,7 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCampaignPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11595,10 +11584,10 @@ impl<'a, C> AdvertiserCampaignPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelSiteBulkEditCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelSiteBulkEditCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditSitesRequest,
     _advertiser_id: String,
     _channel_id: String,
@@ -11607,9 +11596,9 @@ pub struct AdvertiserChannelSiteBulkEditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelSiteBulkEditCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelSiteBulkEditCall<'a> {}
 
-impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelSiteBulkEditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11686,8 +11675,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11701,7 +11689,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11712,7 +11700,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11771,7 +11759,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditSitesRequest) -> AdvertiserChannelSiteBulkEditCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditSitesRequest) -> AdvertiserChannelSiteBulkEditCall<'a> {
         self._request = new_value;
         self
     }
@@ -11781,7 +11769,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteBulkEditCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteBulkEditCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -11791,7 +11779,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteBulkEditCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteBulkEditCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -11801,7 +11789,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteBulkEditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteBulkEditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11826,7 +11814,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteBulkEditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteBulkEditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11846,7 +11834,7 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteBulkEditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteBulkEditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11897,10 +11885,10 @@ impl<'a, C> AdvertiserChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelSiteCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelSiteCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Site,
     _advertiser_id: String,
     _channel_id: String,
@@ -11910,9 +11898,9 @@ pub struct AdvertiserChannelSiteCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelSiteCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelSiteCreateCall<'a> {}
 
-impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelSiteCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11992,8 +11980,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12007,7 +11994,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12018,7 +12005,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12077,7 +12064,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Site) -> AdvertiserChannelSiteCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Site) -> AdvertiserChannelSiteCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12087,7 +12074,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -12097,14 +12084,14 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteCreateCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteCreateCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the parent channel.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelSiteCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelSiteCreateCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -12114,7 +12101,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12139,7 +12126,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12159,7 +12146,7 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12204,10 +12191,10 @@ impl<'a, C> AdvertiserChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelSiteDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelSiteDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _channel_id: String,
     _url_or_app_id: String,
@@ -12217,9 +12204,9 @@ pub struct AdvertiserChannelSiteDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelSiteDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelSiteDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelSiteDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12289,8 +12276,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12303,7 +12289,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12312,7 +12298,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12372,7 +12358,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -12382,7 +12368,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -12392,14 +12378,14 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn url_or_app_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a, C> {
+    pub fn url_or_app_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a> {
         self._url_or_app_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the parent channel.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelSiteDeleteCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -12409,7 +12395,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12434,7 +12420,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12454,7 +12440,7 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12503,10 +12489,10 @@ impl<'a, C> AdvertiserChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelSiteListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelSiteListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _channel_id: String,
     _partner_id: Option<String>,
@@ -12519,9 +12505,9 @@ pub struct AdvertiserChannelSiteListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelSiteListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelSiteListCall<'a> {}
 
-impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelSiteListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12602,8 +12588,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12616,7 +12601,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12625,7 +12610,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12685,7 +12670,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -12695,42 +12680,42 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the parent channel.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListSites` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `10000`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserChannelSiteListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `urlOrAppId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `urlOrAppId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by site fields. Supported syntax: * Filter expressions for site currently can only contain at most one * restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `urlOrAppId` Examples: * All sites for which the URL or app ID contains "google": `urlOrAppId : "google"`
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserChannelSiteListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -12740,7 +12725,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12765,7 +12750,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12785,7 +12770,7 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12835,10 +12820,10 @@ impl<'a, C> AdvertiserChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelSiteReplaceCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelSiteReplaceCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: ReplaceSitesRequest,
     _advertiser_id: String,
     _channel_id: String,
@@ -12847,9 +12832,9 @@ pub struct AdvertiserChannelSiteReplaceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelSiteReplaceCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelSiteReplaceCall<'a> {}
 
-impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelSiteReplaceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12926,8 +12911,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12941,7 +12925,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12952,7 +12936,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13011,7 +12995,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReplaceSitesRequest) -> AdvertiserChannelSiteReplaceCall<'a, C> {
+    pub fn request(mut self, new_value: ReplaceSitesRequest) -> AdvertiserChannelSiteReplaceCall<'a> {
         self._request = new_value;
         self
     }
@@ -13021,7 +13005,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteReplaceCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelSiteReplaceCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -13031,7 +13015,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteReplaceCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelSiteReplaceCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -13041,7 +13025,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteReplaceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelSiteReplaceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13066,7 +13050,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteReplaceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelSiteReplaceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13086,7 +13070,7 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteReplaceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelSiteReplaceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13137,10 +13121,10 @@ impl<'a, C> AdvertiserChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Channel,
     _advertiser_id: String,
     _partner_id: Option<String>,
@@ -13149,9 +13133,9 @@ pub struct AdvertiserChannelCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelCreateCall<'a> {}
 
-impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13230,8 +13214,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13245,7 +13228,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13256,7 +13239,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13315,7 +13298,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> AdvertiserChannelCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> AdvertiserChannelCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13325,14 +13308,14 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the created channel.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelCreateCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -13342,7 +13325,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13367,7 +13350,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13387,7 +13370,7 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13432,10 +13415,10 @@ impl<'a, C> AdvertiserChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _channel_id: String,
     _partner_id: Option<String>,
@@ -13444,9 +13427,9 @@ pub struct AdvertiserChannelGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelGetCall<'a> {}
 
-impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13515,8 +13498,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13529,7 +13511,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13538,7 +13520,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13598,7 +13580,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -13608,14 +13590,14 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelGetCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelGetCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the fetched channel.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -13625,7 +13607,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13650,7 +13632,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13670,7 +13652,7 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13719,10 +13701,10 @@ impl<'a, C> AdvertiserChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _partner_id: Option<String>,
     _page_token: Option<String>,
@@ -13734,9 +13716,9 @@ pub struct AdvertiserChannelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelListCall<'a> {}
 
-impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13816,8 +13798,7 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13830,7 +13811,7 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13839,7 +13820,7 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13899,42 +13880,42 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the channels.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListChannels` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserChannelListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserChannelListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserChannelListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserChannelListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `channelId` The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserChannelListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserChannelListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by channel fields. Supported syntax: * Filter expressions for channel currently can only contain at most one * restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `displayName` Examples: * All channels for which the display name contains "google": `displayName : "google"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserChannelListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserChannelListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -13944,7 +13925,7 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13969,7 +13950,7 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13989,7 +13970,7 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14041,10 +14022,10 @@ impl<'a, C> AdvertiserChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserChannelPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserChannelPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Channel,
     _advertiser_id: String,
     _channel_id: String,
@@ -14055,9 +14036,9 @@ pub struct AdvertiserChannelPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserChannelPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserChannelPatchCall<'a> {}
 
-impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserChannelPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14140,8 +14121,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14155,7 +14135,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14166,7 +14146,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14225,7 +14205,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> AdvertiserChannelPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -14235,7 +14215,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -14245,21 +14225,21 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The ID of the partner that owns the created channel.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserChannelPatchCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -14269,7 +14249,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserChannelPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14294,7 +14274,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserChannelPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14314,7 +14294,7 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserChannelPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14364,10 +14344,10 @@ impl<'a, C> AdvertiserChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCreativeCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCreativeCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Creative,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14375,9 +14355,9 @@ pub struct AdvertiserCreativeCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCreativeCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCreativeCreateCall<'a> {}
 
-impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCreativeCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14453,8 +14433,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14468,7 +14447,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14479,7 +14458,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14538,7 +14517,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Creative) -> AdvertiserCreativeCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Creative) -> AdvertiserCreativeCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -14548,7 +14527,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -14558,7 +14537,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14583,7 +14562,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14603,7 +14582,7 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14647,10 +14626,10 @@ impl<'a, C> AdvertiserCreativeCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCreativeDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCreativeDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _creative_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14658,9 +14637,9 @@ pub struct AdvertiserCreativeDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCreativeDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCreativeDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCreativeDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14726,8 +14705,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14740,7 +14718,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14749,7 +14727,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14809,7 +14787,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -14819,7 +14797,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AdvertiserCreativeDeleteCall<'a, C> {
+    pub fn creative_id(mut self, new_value: &str) -> AdvertiserCreativeDeleteCall<'a> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -14829,7 +14807,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14854,7 +14832,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14874,7 +14852,7 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14918,10 +14896,10 @@ impl<'a, C> AdvertiserCreativeDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCreativeGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCreativeGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _creative_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14929,9 +14907,9 @@ pub struct AdvertiserCreativeGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCreativeGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCreativeGetCall<'a> {}
 
-impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCreativeGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14997,8 +14975,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15011,7 +14988,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15020,7 +14997,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15080,7 +15057,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -15090,7 +15067,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AdvertiserCreativeGetCall<'a, C> {
+    pub fn creative_id(mut self, new_value: &str) -> AdvertiserCreativeGetCall<'a> {
         self._creative_id = new_value.to_string();
         self
     }
@@ -15100,7 +15077,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15125,7 +15102,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15145,7 +15122,7 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15193,10 +15170,10 @@ impl<'a, C> AdvertiserCreativeGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCreativeListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCreativeListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15207,9 +15184,9 @@ pub struct AdvertiserCreativeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCreativeListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCreativeListCall<'a> {}
 
-impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCreativeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15286,8 +15263,7 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15300,7 +15276,7 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15309,7 +15285,7 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15369,35 +15345,35 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCreatives` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserCreativeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `creativeId` (default) * `createTime` * `mediaDuration` * `dimensions` (sorts by width first, then by height) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `createTime desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by creative properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restriction for the same field must be combined by `OR`. * Restriction for different fields must be combined by `AND`. * Between `(` and `)` there can only be restrictions combined by `OR` for the same field. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)` for the following fields: - `entityStatus` - `creativeType`. - `dimensions` - `minDuration` - `maxDuration` - `approvalStatus` - `exchangeReviewStatus` - `dynamic` - `creativeId` * The operator must be `HAS (:)` for the following fields: - `lineItemIds` * For `entityStatus`, `minDuration`, `maxDuration`, and `dynamic` there may be at most one restriction. * For `dimensions`, the value is in the form of `"{width}x{height}"`. * For `exchangeReviewStatus`, the value is in the form of `{exchange}-{reviewStatus}`. * For `minDuration` and `maxDuration`, the value is in the form of `"{duration}s"`. Only seconds are supported with millisecond granularity. * There may be multiple `lineItemIds` restrictions in order to search against multiple possible line item IDs. * There may be multiple `creativeId` restrictions in order to search against multiple possible creative IDs. Examples: * All native creatives: `creativeType="CREATIVE_TYPE_NATIVE"` * All active creatives with 300x400 or 50x100 dimensions: `entityStatus="ENTITY_STATUS_ACTIVE" AND (dimensions="300x400" OR dimensions="50x100")` * All dynamic creatives that are approved by AdX or AppNexus, with a minimum duration of 5 seconds and 200ms. `dynamic="true" AND minDuration="5.2s" AND (exchangeReviewStatus="EXCHANGE_GOOGLE_AD_MANAGER-REVIEW_STATUS_APPROVED" OR exchangeReviewStatus="EXCHANGE_APPNEXUS-REVIEW_STATUS_APPROVED")` * All video creatives that are associated with line item ID 1 or 2: `creativeType="CREATIVE_TYPE_VIDEO" AND (lineItemIds:1 OR lineItemIds:2)` * Find creatives by multiple creative IDs: `creativeId=1 OR creativeId=2` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserCreativeListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -15407,7 +15383,7 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15432,7 +15408,7 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15452,7 +15428,7 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15503,10 +15479,10 @@ impl<'a, C> AdvertiserCreativeListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCreativePatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCreativePatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Creative,
     _advertiser_id: String,
     _creative_id: String,
@@ -15516,9 +15492,9 @@ pub struct AdvertiserCreativePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCreativePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCreativePatchCall<'a> {}
 
-impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCreativePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15598,8 +15574,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15613,7 +15588,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15624,7 +15599,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15683,7 +15658,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Creative) -> AdvertiserCreativePatchCall<'a, C> {
+    pub fn request(mut self, new_value: Creative) -> AdvertiserCreativePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -15693,7 +15668,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativePatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserCreativePatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -15703,14 +15678,14 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn creative_id(mut self, new_value: &str) -> AdvertiserCreativePatchCall<'a, C> {
+    pub fn creative_id(mut self, new_value: &str) -> AdvertiserCreativePatchCall<'a> {
         self._creative_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserCreativePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserCreativePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -15720,7 +15695,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreativePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15745,7 +15720,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreativePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15765,7 +15740,7 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreativePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15809,10 +15784,10 @@ impl<'a, C> AdvertiserCreativePatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _insertion_order_id: String,
     _targeting_type: String,
@@ -15822,9 +15797,9 @@ pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15892,8 +15867,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15906,7 +15880,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15915,7 +15889,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15975,7 +15949,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -15985,7 +15959,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._insertion_order_id = new_value.to_string();
         self
     }
@@ -15995,7 +15969,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -16005,7 +15979,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -16015,7 +15989,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16040,7 +16014,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16060,7 +16034,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16108,10 +16082,10 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionGetCall<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _insertion_order_id: String,
     _targeting_type: String,
@@ -16124,9 +16098,9 @@ pub struct AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16205,8 +16179,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16219,7 +16192,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16228,7 +16201,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16288,7 +16261,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -16298,7 +16271,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._insertion_order_id = new_value.to_string();
         self
     }
@@ -16308,35 +16281,35 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListInsertionOrderAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedTargetingOptionId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `assignedTargetingOptionId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedTargetingOptionId` - `inheritance` Examples: * AssignedTargetingOptions with ID 1 or 2 `assignedTargetingOptionId="1" OR assignedTargetingOptionId="2"` * AssignedTargetingOptions with inheritance status of NOT_INHERITED or INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -16346,7 +16319,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16371,7 +16344,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16391,7 +16364,7 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16439,10 +16412,10 @@ impl<'a, C> AdvertiserInsertionOrderTargetingTypeAssignedTargetingOptionListCall
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _insertion_order_id: String,
     _page_token: Option<String>,
@@ -16454,9 +16427,9 @@ pub struct AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOption
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16534,8 +16507,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16548,7 +16520,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16557,7 +16529,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16617,7 +16589,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -16627,35 +16599,35 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._insertion_order_id = new_value.to_string();
         self
     }
     /// A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListInsertionOrderAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is `5000`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingType desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR` on the same field. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `targetingType` - `inheritance` Examples: * AssignedTargetingOptions of targeting type TARGETING_TYPE_PROXIMITY_LOCATION_LIST or TARGETING_TYPE_CHANNEL `targetingType="TARGETING_TYPE_PROXIMITY_LOCATION_LIST" OR targetingType="TARGETING_TYPE_CHANNEL"` * AssignedTargetingOptions with inheritance status of NOT_INHERITED or INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -16665,7 +16637,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16690,7 +16662,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16710,7 +16682,7 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16760,10 +16732,10 @@ impl<'a, C> AdvertiserInsertionOrderBulkListInsertionOrderAssignedTargetingOptio
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: InsertionOrder,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16771,9 +16743,9 @@ pub struct AdvertiserInsertionOrderCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderCreateCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16849,8 +16821,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16864,7 +16835,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16875,7 +16846,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16934,7 +16905,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InsertionOrder) -> AdvertiserInsertionOrderCreateCall<'a, C> {
+    pub fn request(mut self, new_value: InsertionOrder) -> AdvertiserInsertionOrderCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -16944,7 +16915,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -16954,7 +16925,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16979,7 +16950,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16999,7 +16970,7 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17043,10 +17014,10 @@ impl<'a, C> AdvertiserInsertionOrderCreateCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _insertion_order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17054,9 +17025,9 @@ pub struct AdvertiserInsertionOrderDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17122,8 +17093,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17136,7 +17106,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17145,7 +17115,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17205,7 +17175,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -17215,7 +17185,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderDeleteCall<'a, C> {
+    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderDeleteCall<'a> {
         self._insertion_order_id = new_value.to_string();
         self
     }
@@ -17225,7 +17195,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17250,7 +17220,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17270,7 +17240,7 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17314,10 +17284,10 @@ impl<'a, C> AdvertiserInsertionOrderDeleteCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _insertion_order_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17325,9 +17295,9 @@ pub struct AdvertiserInsertionOrderGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderGetCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17393,8 +17363,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17407,7 +17376,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17416,7 +17385,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17476,7 +17445,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -17486,7 +17455,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderGetCall<'a, C> {
+    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderGetCall<'a> {
         self._insertion_order_id = new_value.to_string();
         self
     }
@@ -17496,7 +17465,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17521,7 +17490,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17541,7 +17510,7 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17589,10 +17558,10 @@ impl<'a, C> AdvertiserInsertionOrderGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -17603,9 +17572,9 @@ pub struct AdvertiserInsertionOrderListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderListCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17682,8 +17651,7 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17696,7 +17664,7 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17705,7 +17673,7 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17765,35 +17733,35 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListInsertionOrders` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserInsertionOrderListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * "displayName" (default) * "entityStatus" * "updateTime" The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by insertion order properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator used on `budget.budget_segments.date_range.end_date` must be LESS THAN (<). * The operator used on `updateTime` must be `GREATER THAN OR EQUAL TO (>=)` or `LESS THAN OR EQUAL TO (<=)`. * The operators used on all other fields must be `EQUALS (=)`. * Supported fields: - `campaignId` - `displayName` - `entityStatus` - `budget.budget_segments.date_range.end_date` (input as YYYY-MM-DD) - `updateTime` (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) Examples: * All insertion orders under a campaign: `campaignId="1234"` * All `ENTITY_STATUS_ACTIVE` or `ENTITY_STATUS_PAUSED` insertion orders under an advertiser: `(entityStatus="ENTITY_STATUS_ACTIVE" OR entityStatus="ENTITY_STATUS_PAUSED")` * All insertion orders whose budget segments' dates end before March 28, 2019: `budget.budget_segments.date_range.end_date<"2019-03-28"` * All insertion orders with an update time less than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime<="2020-11-04T18:54:47Z"` * All insertion orders with an update time greater than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime>="2020-11-04T18:54:47Z"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserInsertionOrderListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -17803,7 +17771,7 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17828,7 +17796,7 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17848,7 +17816,7 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17899,10 +17867,10 @@ impl<'a, C> AdvertiserInsertionOrderListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserInsertionOrderPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserInsertionOrderPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: InsertionOrder,
     _advertiser_id: String,
     _insertion_order_id: String,
@@ -17912,9 +17880,9 @@ pub struct AdvertiserInsertionOrderPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserInsertionOrderPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserInsertionOrderPatchCall<'a> {}
 
-impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserInsertionOrderPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17994,8 +17962,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18009,7 +17976,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18020,7 +17987,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18079,7 +18046,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InsertionOrder) -> AdvertiserInsertionOrderPatchCall<'a, C> {
+    pub fn request(mut self, new_value: InsertionOrder) -> AdvertiserInsertionOrderPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -18089,7 +18056,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserInsertionOrderPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -18099,14 +18066,14 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderPatchCall<'a, C> {
+    pub fn insertion_order_id(mut self, new_value: &str) -> AdvertiserInsertionOrderPatchCall<'a> {
         self._insertion_order_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserInsertionOrderPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserInsertionOrderPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -18116,7 +18083,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserInsertionOrderPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18141,7 +18108,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserInsertionOrderPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18161,7 +18128,7 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserInsertionOrderPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18211,10 +18178,10 @@ impl<'a, C> AdvertiserInsertionOrderPatchCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: AssignedTargetingOption,
     _advertiser_id: String,
     _line_item_id: String,
@@ -18224,9 +18191,9 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, 
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18304,8 +18271,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18319,7 +18285,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18330,7 +18296,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18389,7 +18355,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssignedTargetingOption) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: AssignedTargetingOption) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -18399,7 +18365,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -18409,7 +18375,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -18419,7 +18385,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -18429,7 +18395,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18454,7 +18420,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18474,7 +18440,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18518,10 +18484,10 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionCreateCall<'a,
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _line_item_id: String,
     _targeting_type: String,
@@ -18531,9 +18497,9 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, 
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18601,8 +18567,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18615,7 +18580,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18624,7 +18589,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18684,7 +18649,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -18694,7 +18659,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -18704,7 +18669,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -18714,7 +18679,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -18724,7 +18689,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18749,7 +18714,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18769,7 +18734,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18813,10 +18778,10 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionDeleteCall<'a,
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _line_item_id: String,
     _targeting_type: String,
@@ -18826,9 +18791,9 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18896,8 +18861,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18910,7 +18874,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18919,7 +18883,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18979,7 +18943,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -18989,7 +18953,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -18999,7 +18963,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -19009,7 +18973,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -19019,7 +18983,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19044,7 +19008,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19064,7 +19028,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19112,10 +19076,10 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionGetCall<'a, C>
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _line_item_id: String,
     _targeting_type: String,
@@ -19128,9 +19092,9 @@ pub struct AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19209,8 +19173,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19223,7 +19186,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19232,7 +19195,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19292,7 +19255,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -19302,7 +19265,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -19312,35 +19275,35 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListLineItemAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedTargetingOptionId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `assignedTargetingOptionId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedTargetingOptionId` - `inheritance` Examples: * AssignedTargetingOptions with ID 1 or 2 `assignedTargetingOptionId="1" OR assignedTargetingOptionId="2"` * AssignedTargetingOptions with inheritance status of NOT_INHERITED or INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -19350,7 +19313,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19375,7 +19338,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19395,7 +19358,7 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19445,10 +19408,10 @@ impl<'a, C> AdvertiserLineItemTargetingTypeAssignedTargetingOptionListCall<'a, C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditLineItemAssignedTargetingOptionsRequest,
     _advertiser_id: String,
     _line_item_id: String,
@@ -19457,9 +19420,9 @@ pub struct AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19536,8 +19499,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19551,7 +19513,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19562,7 +19524,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19621,7 +19583,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditLineItemAssignedTargetingOptionsRequest) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditLineItemAssignedTargetingOptionsRequest) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {
         self._request = new_value;
         self
     }
@@ -19631,7 +19593,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -19641,7 +19603,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -19651,7 +19613,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19676,7 +19638,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19696,7 +19658,7 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19744,10 +19706,10 @@ impl<'a, C> AdvertiserLineItemBulkEditLineItemAssignedTargetingOptionCall<'a, C>
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _line_item_id: String,
     _page_token: Option<String>,
@@ -19759,9 +19721,9 @@ pub struct AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19839,8 +19801,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19853,7 +19814,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19862,7 +19823,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19922,7 +19883,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -19932,35 +19893,35 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
     /// A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListLineItemAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is '5000'. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingType desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR` on the same field. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `targetingType` - `inheritance` Examples: * AssignedTargetingOptions of targeting type TARGETING_TYPE_PROXIMITY_LOCATION_LIST or TARGETING_TYPE_CHANNEL `targetingType="TARGETING_TYPE_PROXIMITY_LOCATION_LIST" OR targetingType="TARGETING_TYPE_CHANNEL"` * AssignedTargetingOptions with inheritance status of NOT_INHERITED or INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -19970,7 +19931,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19995,7 +19956,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20015,7 +19976,7 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20065,10 +20026,10 @@ impl<'a, C> AdvertiserLineItemBulkListLineItemAssignedTargetingOptionCall<'a, C>
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: LineItem,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20076,9 +20037,9 @@ pub struct AdvertiserLineItemCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemCreateCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20154,8 +20115,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20169,7 +20129,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20180,7 +20140,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20239,7 +20199,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LineItem) -> AdvertiserLineItemCreateCall<'a, C> {
+    pub fn request(mut self, new_value: LineItem) -> AdvertiserLineItemCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -20249,7 +20209,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -20259,7 +20219,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20284,7 +20244,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20304,7 +20264,7 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20348,10 +20308,10 @@ impl<'a, C> AdvertiserLineItemCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _line_item_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20359,9 +20319,9 @@ pub struct AdvertiserLineItemDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20427,8 +20387,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20441,7 +20400,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20450,7 +20409,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20510,7 +20469,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -20520,7 +20479,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemDeleteCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemDeleteCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -20530,7 +20489,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20555,7 +20514,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20575,7 +20534,7 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20625,10 +20584,10 @@ impl<'a, C> AdvertiserLineItemDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemGenerateDefaultCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemGenerateDefaultCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: GenerateDefaultLineItemRequest,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20636,9 +20595,9 @@ pub struct AdvertiserLineItemGenerateDefaultCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemGenerateDefaultCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemGenerateDefaultCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemGenerateDefaultCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20714,8 +20673,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20729,7 +20687,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20740,7 +20698,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20799,7 +20757,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateDefaultLineItemRequest) -> AdvertiserLineItemGenerateDefaultCall<'a, C> {
+    pub fn request(mut self, new_value: GenerateDefaultLineItemRequest) -> AdvertiserLineItemGenerateDefaultCall<'a> {
         self._request = new_value;
         self
     }
@@ -20809,7 +20767,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemGenerateDefaultCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemGenerateDefaultCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -20819,7 +20777,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemGenerateDefaultCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemGenerateDefaultCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20844,7 +20802,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemGenerateDefaultCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemGenerateDefaultCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20864,7 +20822,7 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemGenerateDefaultCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemGenerateDefaultCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20908,10 +20866,10 @@ impl<'a, C> AdvertiserLineItemGenerateDefaultCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _line_item_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20919,9 +20877,9 @@ pub struct AdvertiserLineItemGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemGetCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20987,8 +20945,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21001,7 +20958,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21010,7 +20967,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21070,7 +21027,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -21080,7 +21037,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemGetCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemGetCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
@@ -21090,7 +21047,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21115,7 +21072,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21135,7 +21092,7 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21183,10 +21140,10 @@ impl<'a, C> AdvertiserLineItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -21197,9 +21154,9 @@ pub struct AdvertiserLineItemListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemListCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21276,8 +21233,7 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21290,7 +21246,7 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21299,7 +21255,7 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21359,35 +21315,35 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListLineItems` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserLineItemListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * "displayName" (default) * "entityStatus" * “flight.dateRange.endDate” * "updateTime" The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by line item properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator used on `flight.dateRange.endDate` must be LESS THAN (<). * The operator used on `updateTime` must be `GREATER THAN OR EQUAL TO (>=)` or `LESS THAN OR EQUAL TO (<=)`. * The operator used on `warningMessages` must be `HAS (:)`. * The operators used on all other fields must be `EQUALS (=)`. * Supported fields: - `campaignId` - `displayName` - `insertionOrderId` - `entityStatus` - `lineItemId` - `lineItemType` - `flight.dateRange.endDate` (input formatted as YYYY-MM-DD) - `warningMessages` - `flight.triggerId` - `updateTime` (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) * The operator can be `NO LESS THAN (>=)` or `NO GREATER THAN (<=)`. - `updateTime` (format of ISO 8601) Examples: * All line items under an insertion order: `insertionOrderId="1234"` * All `ENTITY_STATUS_ACTIVE` or `ENTITY_STATUS_PAUSED` and `LINE_ITEM_TYPE_DISPLAY_DEFAULT` line items under an advertiser: `(entityStatus="ENTITY_STATUS_ACTIVE" OR entityStatus="ENTITY_STATUS_PAUSED") AND lineItemType="LINE_ITEM_TYPE_DISPLAY_DEFAULT"` * All line items whose flight dates end before March 28, 2019: `flight.dateRange.endDate<"2019-03-28"` * All line items that have `NO_VALID_CREATIVE` in `warningMessages`: `warningMessages:"NO_VALID_CREATIVE"` * All line items with an update time less than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime<="2020-11-04T18:54:47Z"` * All line items with an update time greater than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime>="2020-11-04T18:54:47Z"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserLineItemListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -21397,7 +21353,7 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21422,7 +21378,7 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21442,7 +21398,7 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21493,10 +21449,10 @@ impl<'a, C> AdvertiserLineItemListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLineItemPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLineItemPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: LineItem,
     _advertiser_id: String,
     _line_item_id: String,
@@ -21506,9 +21462,9 @@ pub struct AdvertiserLineItemPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLineItemPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLineItemPatchCall<'a> {}
 
-impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLineItemPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21588,8 +21544,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21603,7 +21558,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21614,7 +21569,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21673,7 +21628,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LineItem) -> AdvertiserLineItemPatchCall<'a, C> {
+    pub fn request(mut self, new_value: LineItem) -> AdvertiserLineItemPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -21683,7 +21638,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLineItemPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -21693,14 +21648,14 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemPatchCall<'a, C> {
+    pub fn line_item_id(mut self, new_value: &str) -> AdvertiserLineItemPatchCall<'a> {
         self._line_item_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserLineItemPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserLineItemPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -21710,7 +21665,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLineItemPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21735,7 +21690,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLineItemPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21755,7 +21710,7 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLineItemPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21805,10 +21760,10 @@ impl<'a, C> AdvertiserLineItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListAssignedLocationBulkEditCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListAssignedLocationBulkEditCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditAssignedLocationsRequest,
     _advertiser_id: String,
     _location_list_id: String,
@@ -21817,9 +21772,9 @@ pub struct AdvertiserLocationListAssignedLocationBulkEditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListAssignedLocationBulkEditCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListAssignedLocationBulkEditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21896,8 +21851,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21911,7 +21865,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21922,7 +21876,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21981,7 +21935,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditAssignedLocationsRequest) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditAssignedLocationsRequest) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a> {
         self._request = new_value;
         self
     }
@@ -21991,7 +21945,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -22001,7 +21955,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> {
+    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a> {
         self._location_list_id = new_value.to_string();
         self
     }
@@ -22011,7 +21965,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22036,7 +21990,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22056,7 +22010,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationBulkEditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22106,10 +22060,10 @@ impl<'a, C> AdvertiserLocationListAssignedLocationBulkEditCall<'a, C> where C: B
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListAssignedLocationCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListAssignedLocationCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: AssignedLocation,
     _advertiser_id: String,
     _location_list_id: String,
@@ -22118,9 +22072,9 @@ pub struct AdvertiserLocationListAssignedLocationCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListAssignedLocationCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListAssignedLocationCreateCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListAssignedLocationCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22193,8 +22147,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22208,7 +22161,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22219,7 +22172,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22278,7 +22231,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssignedLocation) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C> {
+    pub fn request(mut self, new_value: AssignedLocation) -> AdvertiserLocationListAssignedLocationCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -22288,7 +22241,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -22298,7 +22251,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C> {
+    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationCreateCall<'a> {
         self._location_list_id = new_value.to_string();
         self
     }
@@ -22308,7 +22261,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22333,7 +22286,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22353,7 +22306,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22397,10 +22350,10 @@ impl<'a, C> AdvertiserLocationListAssignedLocationCreateCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListAssignedLocationDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListAssignedLocationDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _location_list_id: String,
     _assigned_location_id: String,
@@ -22409,9 +22362,9 @@ pub struct AdvertiserLocationListAssignedLocationDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListAssignedLocationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListAssignedLocationDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListAssignedLocationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22478,8 +22431,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22492,7 +22444,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22501,7 +22453,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22561,7 +22513,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -22571,7 +22523,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> {
+    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a> {
         self._location_list_id = new_value.to_string();
         self
     }
@@ -22581,7 +22533,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_location_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> {
+    pub fn assigned_location_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationDeleteCall<'a> {
         self._assigned_location_id = new_value.to_string();
         self
     }
@@ -22591,7 +22543,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22616,7 +22568,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22636,7 +22588,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22684,10 +22636,10 @@ impl<'a, C> AdvertiserLocationListAssignedLocationDeleteCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListAssignedLocationListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListAssignedLocationListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _location_list_id: String,
     _page_token: Option<String>,
@@ -22699,9 +22651,9 @@ pub struct AdvertiserLocationListAssignedLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListAssignedLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListAssignedLocationListCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListAssignedLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22775,8 +22727,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22789,7 +22740,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22798,7 +22749,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22858,7 +22809,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -22868,35 +22819,35 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._location_list_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListAssignedLocations` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedLocationId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `assignedLocationId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by location list assignment fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedLocationId` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -22906,7 +22857,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListAssignedLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22931,7 +22882,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListAssignedLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22951,7 +22902,7 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListAssignedLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23001,10 +22952,10 @@ impl<'a, C> AdvertiserLocationListAssignedLocationListCall<'a, C> where C: Borro
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: LocationList,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23012,9 +22963,9 @@ pub struct AdvertiserLocationListCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListCreateCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23090,8 +23041,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23105,7 +23055,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23116,7 +23066,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23175,7 +23125,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LocationList) -> AdvertiserLocationListCreateCall<'a, C> {
+    pub fn request(mut self, new_value: LocationList) -> AdvertiserLocationListCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -23185,7 +23135,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -23195,7 +23145,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23220,7 +23170,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23240,7 +23190,7 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23284,10 +23234,10 @@ impl<'a, C> AdvertiserLocationListCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _location_list_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -23295,9 +23245,9 @@ pub struct AdvertiserLocationListGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListGetCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23363,8 +23313,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23377,7 +23326,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23386,7 +23335,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23446,7 +23395,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -23456,7 +23405,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListGetCall<'a, C> {
+    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListGetCall<'a> {
         self._location_list_id = new_value.to_string();
         self
     }
@@ -23466,7 +23415,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23491,7 +23440,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23511,7 +23460,7 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23559,10 +23508,10 @@ impl<'a, C> AdvertiserLocationListGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -23573,9 +23522,9 @@ pub struct AdvertiserLocationListListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListListCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23652,8 +23601,7 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23666,7 +23614,7 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23675,7 +23623,7 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23735,35 +23683,35 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListLocationLists` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. Defaults to `100` if not set. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserLocationListListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `locationListId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by location list fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `locationType` Examples: * All regional location list: `locationType="TARGETING_LOCATION_TYPE_REGIONAL"` * All proximity location list: `locationType="TARGETING_LOCATION_TYPE_PROXIMITY"`
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserLocationListListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -23773,7 +23721,7 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23798,7 +23746,7 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23818,7 +23766,7 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23869,10 +23817,10 @@ impl<'a, C> AdvertiserLocationListListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserLocationListPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserLocationListPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: LocationList,
     _advertiser_id: String,
     _location_list_id: String,
@@ -23882,9 +23830,9 @@ pub struct AdvertiserLocationListPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserLocationListPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserLocationListPatchCall<'a> {}
 
-impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserLocationListPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23964,8 +23912,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23979,7 +23926,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23990,7 +23937,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24049,7 +23996,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LocationList) -> AdvertiserLocationListPatchCall<'a, C> {
+    pub fn request(mut self, new_value: LocationList) -> AdvertiserLocationListPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -24059,7 +24006,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserLocationListPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -24069,14 +24016,14 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListPatchCall<'a, C> {
+    pub fn location_list_id(mut self, new_value: &str) -> AdvertiserLocationListPatchCall<'a> {
         self._location_list_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserLocationListPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserLocationListPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -24086,7 +24033,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserLocationListPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24111,7 +24058,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserLocationListPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24131,7 +24078,7 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserLocationListPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24181,10 +24128,10 @@ impl<'a, C> AdvertiserLocationListPatchCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserManualTriggerActivateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserManualTriggerActivateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: ActivateManualTriggerRequest,
     _advertiser_id: String,
     _trigger_id: String,
@@ -24193,9 +24140,9 @@ pub struct AdvertiserManualTriggerActivateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserManualTriggerActivateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserManualTriggerActivateCall<'a> {}
 
-impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserManualTriggerActivateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24272,8 +24219,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24287,7 +24233,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24298,7 +24244,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24357,7 +24303,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ActivateManualTriggerRequest) -> AdvertiserManualTriggerActivateCall<'a, C> {
+    pub fn request(mut self, new_value: ActivateManualTriggerRequest) -> AdvertiserManualTriggerActivateCall<'a> {
         self._request = new_value;
         self
     }
@@ -24367,7 +24313,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerActivateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerActivateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -24377,7 +24323,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerActivateCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerActivateCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -24387,7 +24333,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerActivateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerActivateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24412,7 +24358,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerActivateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerActivateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24432,7 +24378,7 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerActivateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerActivateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24482,10 +24428,10 @@ impl<'a, C> AdvertiserManualTriggerActivateCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserManualTriggerCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserManualTriggerCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: ManualTrigger,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -24493,9 +24439,9 @@ pub struct AdvertiserManualTriggerCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserManualTriggerCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserManualTriggerCreateCall<'a> {}
 
-impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserManualTriggerCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24571,8 +24517,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24586,7 +24531,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24597,7 +24542,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24656,7 +24601,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ManualTrigger) -> AdvertiserManualTriggerCreateCall<'a, C> {
+    pub fn request(mut self, new_value: ManualTrigger) -> AdvertiserManualTriggerCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -24666,7 +24611,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -24676,7 +24621,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24701,7 +24646,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24721,7 +24666,7 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24771,10 +24716,10 @@ impl<'a, C> AdvertiserManualTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserManualTriggerDeactivateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserManualTriggerDeactivateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: DeactivateManualTriggerRequest,
     _advertiser_id: String,
     _trigger_id: String,
@@ -24783,9 +24728,9 @@ pub struct AdvertiserManualTriggerDeactivateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserManualTriggerDeactivateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserManualTriggerDeactivateCall<'a> {}
 
-impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserManualTriggerDeactivateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24862,8 +24807,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24877,7 +24821,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24888,7 +24832,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24947,7 +24891,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeactivateManualTriggerRequest) -> AdvertiserManualTriggerDeactivateCall<'a, C> {
+    pub fn request(mut self, new_value: DeactivateManualTriggerRequest) -> AdvertiserManualTriggerDeactivateCall<'a> {
         self._request = new_value;
         self
     }
@@ -24957,7 +24901,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerDeactivateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerDeactivateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -24967,7 +24911,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerDeactivateCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerDeactivateCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -24977,7 +24921,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerDeactivateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerDeactivateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25002,7 +24946,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerDeactivateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerDeactivateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25022,7 +24966,7 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerDeactivateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerDeactivateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25066,10 +25010,10 @@ impl<'a, C> AdvertiserManualTriggerDeactivateCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserManualTriggerGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserManualTriggerGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _trigger_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -25077,9 +25021,9 @@ pub struct AdvertiserManualTriggerGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserManualTriggerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserManualTriggerGetCall<'a> {}
 
-impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserManualTriggerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -25145,8 +25089,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -25159,7 +25102,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -25168,7 +25111,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25228,7 +25171,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -25238,7 +25181,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerGetCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerGetCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -25248,7 +25191,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25273,7 +25216,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25293,7 +25236,7 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25341,10 +25284,10 @@ impl<'a, C> AdvertiserManualTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserManualTriggerListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserManualTriggerListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -25355,9 +25298,9 @@ pub struct AdvertiserManualTriggerListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserManualTriggerListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserManualTriggerListCall<'a> {}
 
-impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserManualTriggerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -25434,8 +25377,7 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -25448,7 +25390,7 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -25457,7 +25399,7 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25517,35 +25459,35 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListManualTriggers` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserManualTriggerListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `state` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by manual trigger properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `displayName` - `state` Examples: * All active manual triggers under an advertiser: `state="ACTIVE"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserManualTriggerListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -25555,7 +25497,7 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25580,7 +25522,7 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25600,7 +25542,7 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25651,10 +25593,10 @@ impl<'a, C> AdvertiserManualTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserManualTriggerPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserManualTriggerPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: ManualTrigger,
     _advertiser_id: String,
     _trigger_id: String,
@@ -25664,9 +25606,9 @@ pub struct AdvertiserManualTriggerPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserManualTriggerPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserManualTriggerPatchCall<'a> {}
 
-impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserManualTriggerPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -25746,8 +25688,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -25761,7 +25702,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -25772,7 +25713,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -25831,7 +25772,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ManualTrigger) -> AdvertiserManualTriggerPatchCall<'a, C> {
+    pub fn request(mut self, new_value: ManualTrigger) -> AdvertiserManualTriggerPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -25841,7 +25782,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserManualTriggerPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -25851,14 +25792,14 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerPatchCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AdvertiserManualTriggerPatchCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserManualTriggerPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserManualTriggerPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -25868,7 +25809,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserManualTriggerPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -25893,7 +25834,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserManualTriggerPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -25913,7 +25854,7 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserManualTriggerPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -25963,10 +25904,10 @@ impl<'a, C> AdvertiserManualTriggerPatchCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditNegativeKeywordsRequest,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
@@ -25975,9 +25916,9 @@ pub struct AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26054,8 +25995,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -26069,7 +26009,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -26080,7 +26020,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -26139,7 +26079,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditNegativeKeywordsRequest) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditNegativeKeywordsRequest) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {
         self._request = new_value;
         self
     }
@@ -26149,7 +26089,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -26159,7 +26099,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
@@ -26169,7 +26109,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26194,7 +26134,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26214,7 +26154,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -26264,10 +26204,10 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordBulkEditCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: NegativeKeyword,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
@@ -26276,9 +26216,9 @@ pub struct AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26355,8 +26295,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -26370,7 +26309,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -26381,7 +26320,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -26440,7 +26379,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: NegativeKeyword) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> {
+    pub fn request(mut self, new_value: NegativeKeyword) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -26450,7 +26389,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -26460,7 +26399,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
@@ -26470,7 +26409,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26495,7 +26434,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26515,7 +26454,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -26559,10 +26498,10 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordCreateCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
     _keyword_value: String,
@@ -26571,9 +26510,9 @@ pub struct AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26640,8 +26579,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -26654,7 +26592,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -26663,7 +26601,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -26723,7 +26661,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -26733,7 +26671,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
@@ -26743,7 +26681,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn keyword_value(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> {
+    pub fn keyword_value(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {
         self._keyword_value = new_value.to_string();
         self
     }
@@ -26753,7 +26691,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -26778,7 +26716,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -26798,7 +26736,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -26846,10 +26784,10 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordDeleteCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListNegativeKeywordListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
     _page_token: Option<String>,
@@ -26861,9 +26799,9 @@ pub struct AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -26941,8 +26879,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -26955,7 +26892,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -26964,7 +26901,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27024,7 +26961,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -27034,35 +26971,35 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListNegativeKeywords` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `1000`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `keywordValue` (default) The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `keywordValue desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by negative keyword fields. Supported syntax: * Filter expressions for negative keyword currently can only contain at most one * restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `keywordValue` Examples: * All negative keywords for which the keyword value contains "google": `keywordValue : "google"`
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -27072,7 +27009,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27097,7 +27034,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27117,7 +27054,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -27167,10 +27104,10 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordListCall<'a, C> where C:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: ReplaceNegativeKeywordsRequest,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
@@ -27179,9 +27116,9 @@ pub struct AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -27258,8 +27195,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -27273,7 +27209,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -27284,7 +27220,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27343,7 +27279,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReplaceNegativeKeywordsRequest) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> {
+    pub fn request(mut self, new_value: ReplaceNegativeKeywordsRequest) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {
         self._request = new_value;
         self
     }
@@ -27353,7 +27289,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -27363,7 +27299,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
@@ -27373,7 +27309,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27398,7 +27334,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27418,7 +27354,7 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -27468,10 +27404,10 @@ impl<'a, C> AdvertiserNegativeKeywordListNegativeKeywordReplaceCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: NegativeKeywordList,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27479,9 +27415,9 @@ pub struct AdvertiserNegativeKeywordListCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListCreateCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -27557,8 +27493,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -27572,7 +27507,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -27583,7 +27518,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27642,7 +27577,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: NegativeKeywordList) -> AdvertiserNegativeKeywordListCreateCall<'a, C> {
+    pub fn request(mut self, new_value: NegativeKeywordList) -> AdvertiserNegativeKeywordListCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -27652,7 +27587,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -27662,7 +27597,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27687,7 +27622,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27707,7 +27642,7 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -27751,10 +27686,10 @@ impl<'a, C> AdvertiserNegativeKeywordListCreateCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -27762,9 +27697,9 @@ pub struct AdvertiserNegativeKeywordListDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -27830,8 +27765,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -27844,7 +27778,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -27853,7 +27787,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -27913,7 +27847,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -27923,7 +27857,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListDeleteCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListDeleteCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
@@ -27933,7 +27867,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -27958,7 +27892,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -27978,7 +27912,7 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28022,10 +27956,10 @@ impl<'a, C> AdvertiserNegativeKeywordListDeleteCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -28033,9 +27967,9 @@ pub struct AdvertiserNegativeKeywordListGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListGetCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28101,8 +28035,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28115,7 +28048,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28124,7 +28057,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -28184,7 +28117,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -28194,7 +28127,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListGetCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListGetCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
@@ -28204,7 +28137,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -28229,7 +28162,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28249,7 +28182,7 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28295,10 +28228,10 @@ impl<'a, C> AdvertiserNegativeKeywordListGetCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -28307,9 +28240,9 @@ pub struct AdvertiserNegativeKeywordListListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListListCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28380,8 +28313,7 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28394,7 +28326,7 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28403,7 +28335,7 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -28463,21 +28395,21 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListNegativeKeywordLists` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserNegativeKeywordListListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserNegativeKeywordListListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. Defaults to `100` if not set. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserNegativeKeywordListListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserNegativeKeywordListListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -28487,7 +28419,7 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -28512,7 +28444,7 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28532,7 +28464,7 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28583,10 +28515,10 @@ impl<'a, C> AdvertiserNegativeKeywordListListCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserNegativeKeywordListPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserNegativeKeywordListPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: NegativeKeywordList,
     _advertiser_id: String,
     _negative_keyword_list_id: String,
@@ -28596,9 +28528,9 @@ pub struct AdvertiserNegativeKeywordListPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserNegativeKeywordListPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserNegativeKeywordListPatchCall<'a> {}
 
-impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserNegativeKeywordListPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28678,8 +28610,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -28693,7 +28624,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -28704,7 +28635,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -28763,7 +28694,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: NegativeKeywordList) -> AdvertiserNegativeKeywordListPatchCall<'a, C> {
+    pub fn request(mut self, new_value: NegativeKeywordList) -> AdvertiserNegativeKeywordListPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -28773,7 +28704,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -28783,14 +28714,14 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListPatchCall<'a, C> {
+    pub fn negative_keyword_list_id(mut self, new_value: &str) -> AdvertiserNegativeKeywordListPatchCall<'a> {
         self._negative_keyword_list_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserNegativeKeywordListPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserNegativeKeywordListPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -28800,7 +28731,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserNegativeKeywordListPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -28825,7 +28756,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserNegativeKeywordListPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -28845,7 +28776,7 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserNegativeKeywordListPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -28895,10 +28826,10 @@ impl<'a, C> AdvertiserNegativeKeywordListPatchCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: AssignedTargetingOption,
     _advertiser_id: String,
     _targeting_type: String,
@@ -28907,9 +28838,9 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {}
 
-impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -28986,8 +28917,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29001,7 +28931,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29012,7 +28942,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29071,7 +29001,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssignedTargetingOption) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: AssignedTargetingOption) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -29081,7 +29011,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -29091,7 +29021,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -29101,7 +29031,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -29126,7 +29056,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29146,7 +29076,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29190,10 +29120,10 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionCreateCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _targeting_type: String,
     _assigned_targeting_option_id: String,
@@ -29202,9 +29132,9 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -29271,8 +29201,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29285,7 +29214,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29294,7 +29223,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29354,7 +29283,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -29364,7 +29293,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -29374,7 +29303,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -29384,7 +29313,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -29409,7 +29338,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29429,7 +29358,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29473,10 +29402,10 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _targeting_type: String,
     _assigned_targeting_option_id: String,
@@ -29485,9 +29414,9 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {}
 
-impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -29554,8 +29483,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29568,7 +29496,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29577,7 +29505,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29637,7 +29565,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -29647,7 +29575,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -29657,7 +29585,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -29667,7 +29595,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -29692,7 +29620,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -29712,7 +29640,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -29760,10 +29688,10 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _targeting_type: String,
     _page_token: Option<String>,
@@ -29775,9 +29703,9 @@ pub struct AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {}
 
-impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -29855,8 +29783,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -29869,7 +29796,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -29878,7 +29805,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -29938,7 +29865,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -29948,35 +29875,35 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListAdvertiserAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedTargetingOptionId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `assignedTargetingOptionId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedTargetingOptionId` Examples: * AssignedTargetingOption with ID 123456 `assignedTargetingOptionId="123456"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -29986,7 +29913,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30011,7 +29938,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30031,7 +29958,7 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30076,10 +30003,10 @@ impl<'a, C> AdvertiserTargetingTypeAssignedTargetingOptionListCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserAuditCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserAuditCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _read_mask: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -30087,9 +30014,9 @@ pub struct AdvertiserAuditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserAuditCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserAuditCall<'a> {}
 
-impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserAuditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -30157,8 +30084,7 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -30171,7 +30097,7 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -30180,7 +30106,7 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -30240,14 +30166,14 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserAuditCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserAuditCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// Optional. The specific fields to return. If no mask is specified, all fields in the response proto will be filled. Valid values are: * usedLineItemsCount * usedInsertionOrdersCount * usedCampaignsCount * channelsCount * negativelyTargetedChannelsCount * negativeKeywordListsCount * adGroupCriteriaCount * campaignCriteriaCount
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> AdvertiserAuditCall<'a, C> {
+    pub fn read_mask(mut self, new_value: &str) -> AdvertiserAuditCall<'a> {
         self._read_mask = Some(new_value.to_string());
         self
     }
@@ -30257,7 +30183,7 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserAuditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserAuditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30282,7 +30208,7 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserAuditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserAuditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30302,7 +30228,7 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserAuditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserAuditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30352,10 +30278,10 @@ impl<'a, C> AdvertiserAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditAdvertiserAssignedTargetingOptionsRequest,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -30363,9 +30289,9 @@ pub struct AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -30441,8 +30367,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -30456,7 +30381,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -30467,7 +30392,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -30526,7 +30451,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditAdvertiserAssignedTargetingOptionsRequest) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditAdvertiserAssignedTargetingOptionsRequest) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a> {
         self._request = new_value;
         self
     }
@@ -30536,7 +30461,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -30546,7 +30471,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30571,7 +30496,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30591,7 +30516,7 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30639,10 +30564,10 @@ impl<'a, C> AdvertiserBulkEditAdvertiserAssignedTargetingOptionCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -30653,9 +30578,9 @@ pub struct AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -30732,8 +30657,7 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -30746,7 +30670,7 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -30755,7 +30679,7 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -30815,35 +30739,35 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// A token that lets the client fetch the next page of results. Typically, this is the value of next_page_token returned from the previous call to `BulkListAdvertiserAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The size must be an integer between `1` and `5000`. If unspecified, the default is '5000'. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `targetingType` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingType desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`.. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `targetingType` Examples: * targetingType with value TARGETING_TYPE_CHANNEL `targetingType="TARGETING_TYPE_CHANNEL"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -30853,7 +30777,7 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -30878,7 +30802,7 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -30898,7 +30822,7 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30948,19 +30872,19 @@ impl<'a, C> AdvertiserBulkListAdvertiserAssignedTargetingOptionCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserCreateCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Advertiser,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserCreateCall<'a> {}
 
-impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -31010,8 +30934,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -31025,7 +30948,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -31036,7 +30959,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -31095,7 +31018,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Advertiser) -> AdvertiserCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Advertiser) -> AdvertiserCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -31105,7 +31028,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -31130,7 +31053,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31150,7 +31073,7 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -31194,19 +31117,19 @@ impl<'a, C> AdvertiserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserDeleteCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserDeleteCall<'a> {}
 
-impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -31271,8 +31194,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -31285,7 +31207,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -31294,7 +31216,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -31354,7 +31276,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserDeleteCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -31364,7 +31286,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -31389,7 +31311,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31409,7 +31331,7 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -31453,19 +31375,19 @@ impl<'a, C> AdvertiserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserGetCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _advertiser_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserGetCall<'a> {}
 
-impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -31530,8 +31452,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -31544,7 +31465,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -31553,7 +31474,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -31613,7 +31534,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserGetCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
@@ -31623,7 +31544,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -31648,7 +31569,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31668,7 +31589,7 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -31717,10 +31638,10 @@ impl<'a, C> AdvertiserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserListCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -31731,9 +31652,9 @@ pub struct AdvertiserListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserListCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserListCall<'a> {}
 
-impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -31787,8 +31708,7 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -31801,7 +31721,7 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -31810,7 +31730,7 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -31867,35 +31787,35 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Required. The ID of the partner that the fetched advertisers should all belong to. The system only supports listing advertisers for one partner at a time.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> AdvertiserListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> AdvertiserListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListAdvertisers` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AdvertiserListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AdvertiserListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AdvertiserListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `entityStatus` * `updateTime` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AdvertiserListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AdvertiserListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by advertiser properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator used on `updateTime` must be `GREATER THAN OR EQUAL TO (>=)` or `LESS THAN OR EQUAL TO (<=)`. * The operator must be `EQUALS (=)`. * Supported fields: - `advertiserId` - `displayName` - `entityStatus` - `updateTime` (input in ISO 8601 format, or YYYY-MM-DDTHH:MM:SSZ) Examples: * All active advertisers under a partner: `entityStatus="ENTITY_STATUS_ACTIVE"` * All advertisers with an update time less than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime<="2020-11-04T18:54:47Z"` * All advertisers with an update time greater than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`: `updateTime>="2020-11-04T18:54:47Z"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AdvertiserListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AdvertiserListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -31905,7 +31825,7 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -31930,7 +31850,7 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -31950,7 +31870,7 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -32001,10 +31921,10 @@ impl<'a, C> AdvertiserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AdvertiserPatchCall<'a, C>
-    where C: 'a {
+pub struct AdvertiserPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Advertiser,
     _advertiser_id: String,
     _update_mask: Option<String>,
@@ -32013,9 +31933,9 @@ pub struct AdvertiserPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AdvertiserPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AdvertiserPatchCall<'a> {}
 
-impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AdvertiserPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -32094,8 +32014,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -32109,7 +32028,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -32120,7 +32039,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -32179,7 +32098,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Advertiser) -> AdvertiserPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Advertiser) -> AdvertiserPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -32189,14 +32108,14 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> AdvertiserPatchCall<'a> {
         self._advertiser_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AdvertiserPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AdvertiserPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -32206,7 +32125,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AdvertiserPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -32231,7 +32150,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AdvertiserPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32251,7 +32170,7 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AdvertiserPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -32297,10 +32216,10 @@ impl<'a, C> AdvertiserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CombinedAudienceGetCall<'a, C>
-    where C: 'a {
+pub struct CombinedAudienceGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _combined_audience_id: String,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -32309,9 +32228,9 @@ pub struct CombinedAudienceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CombinedAudienceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CombinedAudienceGetCall<'a> {}
 
-impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CombinedAudienceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -32382,8 +32301,7 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -32396,7 +32314,7 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -32405,7 +32323,7 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -32465,21 +32383,21 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn combined_audience_id(mut self, new_value: &str) -> CombinedAudienceGetCall<'a, C> {
+    pub fn combined_audience_id(mut self, new_value: &str) -> CombinedAudienceGetCall<'a> {
         self._combined_audience_id = new_value.to_string();
         self
     }
     /// The ID of the partner that has access to the fetched combined audience.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> CombinedAudienceGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> CombinedAudienceGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the fetched combined audience.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> CombinedAudienceGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> CombinedAudienceGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -32489,7 +32407,7 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CombinedAudienceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CombinedAudienceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -32514,7 +32432,7 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CombinedAudienceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CombinedAudienceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32534,7 +32452,7 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CombinedAudienceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CombinedAudienceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -32584,10 +32502,10 @@ impl<'a, C> CombinedAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CombinedAudienceListCall<'a, C>
-    where C: 'a {
+pub struct CombinedAudienceListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -32599,9 +32517,9 @@ pub struct CombinedAudienceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CombinedAudienceListCall<'a, C> {}
+impl<'a> client::CallBuilder for CombinedAudienceListCall<'a> {}
 
-impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CombinedAudienceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -32658,8 +32576,7 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -32672,7 +32589,7 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -32681,7 +32598,7 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -32738,42 +32655,42 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// The ID of the partner that has access to the fetched combined audiences.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> CombinedAudienceListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> CombinedAudienceListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCombinedAudiences` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CombinedAudienceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CombinedAudienceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CombinedAudienceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CombinedAudienceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `combinedAudienceId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CombinedAudienceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> CombinedAudienceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by combined audience fields. Supported syntax: * Filter expressions for combined audiences currently can only contain at most one restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `displayName` Examples: * All combined audiences for which the display name contains "Google": `displayName : "Google"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CombinedAudienceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CombinedAudienceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the fetched combined audiences.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> CombinedAudienceListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> CombinedAudienceListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -32783,7 +32700,7 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CombinedAudienceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CombinedAudienceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -32808,7 +32725,7 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CombinedAudienceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CombinedAudienceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -32828,7 +32745,7 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CombinedAudienceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CombinedAudienceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -32874,10 +32791,10 @@ impl<'a, C> CombinedAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomBiddingAlgorithmGetCall<'a, C>
-    where C: 'a {
+pub struct CustomBiddingAlgorithmGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _custom_bidding_algorithm_id: String,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -32886,9 +32803,9 @@ pub struct CustomBiddingAlgorithmGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomBiddingAlgorithmGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomBiddingAlgorithmGetCall<'a> {}
 
-impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomBiddingAlgorithmGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -32959,8 +32876,7 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -32973,7 +32889,7 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -32982,7 +32898,7 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -33042,21 +32958,21 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn custom_bidding_algorithm_id(mut self, new_value: &str) -> CustomBiddingAlgorithmGetCall<'a, C> {
+    pub fn custom_bidding_algorithm_id(mut self, new_value: &str) -> CustomBiddingAlgorithmGetCall<'a> {
         self._custom_bidding_algorithm_id = new_value.to_string();
         self
     }
     /// The ID of the DV360 partner that has access to the custom bidding algorithm.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> CustomBiddingAlgorithmGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> CustomBiddingAlgorithmGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the DV360 partner that has access to the custom bidding algorithm.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> CustomBiddingAlgorithmGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> CustomBiddingAlgorithmGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -33066,7 +32982,7 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomBiddingAlgorithmGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomBiddingAlgorithmGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -33091,7 +33007,7 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomBiddingAlgorithmGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomBiddingAlgorithmGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33111,7 +33027,7 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomBiddingAlgorithmGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomBiddingAlgorithmGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -33161,10 +33077,10 @@ impl<'a, C> CustomBiddingAlgorithmGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomBiddingAlgorithmListCall<'a, C>
-    where C: 'a {
+pub struct CustomBiddingAlgorithmListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -33176,9 +33092,9 @@ pub struct CustomBiddingAlgorithmListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomBiddingAlgorithmListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomBiddingAlgorithmListCall<'a> {}
 
-impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomBiddingAlgorithmListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -33235,8 +33151,7 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -33249,7 +33164,7 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -33258,7 +33173,7 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -33315,42 +33230,42 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// The ID of the DV360 partner that has access to the custom bidding algorithm.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCustomBiddingAlgorithms` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomBiddingAlgorithmListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by custom bidding algorithm fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND`. A sequence of restrictions * implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)` or `EQUALS (=)`. * The operator must be `CONTAINS (:)` for the following field: - `displayName` * The operator must be `EQUALS (=)` for the following field: - `customBiddingAlgorithmType` * For `displayName`, the value is a string. We return all custom bidding algorithms whose display_name contains such string. * For `customBiddingAlgorithmType`, the value is a string. We return all algorithms whose custom_bidding_algorithm_type is equal to the given type. Examples: * All custom bidding algorithms for which the display name contains "politics": `displayName:politics`. * All custom bidding algorithms for which the type is "SCRIPT_BASED": `customBiddingAlgorithmType=SCRIPT_BASED` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the DV360 advertiser that has access to the custom bidding algorithm.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> CustomBiddingAlgorithmListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -33360,7 +33275,7 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomBiddingAlgorithmListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomBiddingAlgorithmListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -33385,7 +33300,7 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomBiddingAlgorithmListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomBiddingAlgorithmListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33405,7 +33320,7 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomBiddingAlgorithmListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomBiddingAlgorithmListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -33450,10 +33365,10 @@ impl<'a, C> CustomBiddingAlgorithmListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomListGetCall<'a, C>
-    where C: 'a {
+pub struct CustomListGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _custom_list_id: String,
     _advertiser_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -33461,9 +33376,9 @@ pub struct CustomListGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomListGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomListGetCall<'a> {}
 
-impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomListGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -33531,8 +33446,7 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -33545,7 +33459,7 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -33554,7 +33468,7 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -33614,14 +33528,14 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn custom_list_id(mut self, new_value: &str) -> CustomListGetCall<'a, C> {
+    pub fn custom_list_id(mut self, new_value: &str) -> CustomListGetCall<'a> {
         self._custom_list_id = new_value.to_string();
         self
     }
     /// The ID of the DV360 advertiser that has access to the fetched custom lists.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> CustomListGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> CustomListGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -33631,7 +33545,7 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomListGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomListGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -33656,7 +33570,7 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomListGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomListGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33676,7 +33590,7 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomListGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomListGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -33725,10 +33639,10 @@ impl<'a, C> CustomListGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomListListCall<'a, C>
-    where C: 'a {
+pub struct CustomListListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
@@ -33739,9 +33653,9 @@ pub struct CustomListListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomListListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomListListCall<'a> {}
 
-impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomListListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -33795,8 +33709,7 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -33809,7 +33722,7 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -33818,7 +33731,7 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -33875,35 +33788,35 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListCustomLists` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomListListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomListListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomListListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomListListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `customListId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CustomListListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> CustomListListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by custom list fields. Supported syntax: * Filter expressions for custom lists currently can only contain at most one restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `displayName` Examples: * All custom lists for which the display name contains "Google": `displayName : "Google"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomListListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomListListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the DV360 advertiser that has access to the fetched custom lists.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> CustomListListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> CustomListListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -33913,7 +33826,7 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomListListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomListListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -33938,7 +33851,7 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomListListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomListListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -33958,7 +33871,7 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomListListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomListListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -34004,10 +33917,10 @@ impl<'a, C> CustomListListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FirstAndThirdPartyAudienceGetCall<'a, C>
-    where C: 'a {
+pub struct FirstAndThirdPartyAudienceGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _first_and_third_party_audience_id: String,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -34016,9 +33929,9 @@ pub struct FirstAndThirdPartyAudienceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FirstAndThirdPartyAudienceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FirstAndThirdPartyAudienceGetCall<'a> {}
 
-impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FirstAndThirdPartyAudienceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -34089,8 +34002,7 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -34103,7 +34015,7 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -34112,7 +34024,7 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -34172,21 +34084,21 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn first_and_third_party_audience_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
+    pub fn first_and_third_party_audience_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceGetCall<'a> {
         self._first_and_third_party_audience_id = new_value.to_string();
         self
     }
     /// The ID of the partner that has access to the fetched first and third party audience.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the fetched first and third party audience.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -34196,7 +34108,7 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FirstAndThirdPartyAudienceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FirstAndThirdPartyAudienceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -34221,7 +34133,7 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34241,7 +34153,7 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FirstAndThirdPartyAudienceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FirstAndThirdPartyAudienceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -34291,10 +34203,10 @@ impl<'a, C> FirstAndThirdPartyAudienceGetCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FirstAndThirdPartyAudienceListCall<'a, C>
-    where C: 'a {
+pub struct FirstAndThirdPartyAudienceListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -34306,9 +34218,9 @@ pub struct FirstAndThirdPartyAudienceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FirstAndThirdPartyAudienceListCall<'a, C> {}
+impl<'a> client::CallBuilder for FirstAndThirdPartyAudienceListCall<'a> {}
 
-impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FirstAndThirdPartyAudienceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -34365,8 +34277,7 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -34379,7 +34290,7 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -34388,7 +34299,7 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -34445,42 +34356,42 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
     /// The ID of the partner that has access to the fetched first and third party audiences.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListFirstAndThirdPartyAudiences` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `firstAndThirdPartyAudienceId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by first and third party audience fields. Supported syntax: * Filter expressions for first and third party audiences currently can only contain at most one restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `displayName` Examples: * All first and third party audiences for which the display name contains "Google": `displayName : "Google"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the fetched first and third party audiences.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -34490,7 +34401,7 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FirstAndThirdPartyAudienceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FirstAndThirdPartyAudienceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -34515,7 +34426,7 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FirstAndThirdPartyAudienceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34535,7 +34446,7 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FirstAndThirdPartyAudienceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FirstAndThirdPartyAudienceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -34580,10 +34491,10 @@ impl<'a, C> FirstAndThirdPartyAudienceListCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FloodlightGroupGetCall<'a, C>
-    where C: 'a {
+pub struct FloodlightGroupGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _floodlight_group_id: String,
     _partner_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -34591,9 +34502,9 @@ pub struct FloodlightGroupGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FloodlightGroupGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FloodlightGroupGetCall<'a> {}
 
-impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FloodlightGroupGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -34661,8 +34572,7 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -34675,7 +34585,7 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -34684,7 +34594,7 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -34744,14 +34654,14 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn floodlight_group_id(mut self, new_value: &str) -> FloodlightGroupGetCall<'a, C> {
+    pub fn floodlight_group_id(mut self, new_value: &str) -> FloodlightGroupGetCall<'a> {
         self._floodlight_group_id = new_value.to_string();
         self
     }
     /// Required. The partner context by which the Floodlight group is being accessed.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> FloodlightGroupGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> FloodlightGroupGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -34761,7 +34671,7 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FloodlightGroupGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FloodlightGroupGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -34786,7 +34696,7 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FloodlightGroupGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FloodlightGroupGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -34806,7 +34716,7 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FloodlightGroupGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FloodlightGroupGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -34858,10 +34768,10 @@ impl<'a, C> FloodlightGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FloodlightGroupPatchCall<'a, C>
-    where C: 'a {
+pub struct FloodlightGroupPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: FloodlightGroup,
     _floodlight_group_id: String,
     _update_mask: Option<String>,
@@ -34871,9 +34781,9 @@ pub struct FloodlightGroupPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FloodlightGroupPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for FloodlightGroupPatchCall<'a> {}
 
-impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FloodlightGroupPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -34951,8 +34861,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -34966,7 +34875,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -34977,7 +34886,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -35036,7 +34945,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FloodlightGroup) -> FloodlightGroupPatchCall<'a, C> {
+    pub fn request(mut self, new_value: FloodlightGroup) -> FloodlightGroupPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -35046,21 +34955,21 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn floodlight_group_id(mut self, new_value: &str) -> FloodlightGroupPatchCall<'a, C> {
+    pub fn floodlight_group_id(mut self, new_value: &str) -> FloodlightGroupPatchCall<'a> {
         self._floodlight_group_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> FloodlightGroupPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> FloodlightGroupPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Required. The partner context by which the Floodlight group is being accessed.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> FloodlightGroupPatchCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> FloodlightGroupPatchCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -35070,7 +34979,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FloodlightGroupPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FloodlightGroupPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -35095,7 +35004,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FloodlightGroupPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FloodlightGroupPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35115,7 +35024,7 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FloodlightGroupPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FloodlightGroupPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -35161,10 +35070,10 @@ impl<'a, C> FloodlightGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GoogleAudienceGetCall<'a, C>
-    where C: 'a {
+pub struct GoogleAudienceGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _google_audience_id: String,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -35173,9 +35082,9 @@ pub struct GoogleAudienceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GoogleAudienceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for GoogleAudienceGetCall<'a> {}
 
-impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GoogleAudienceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -35246,8 +35155,7 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -35260,7 +35168,7 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -35269,7 +35177,7 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -35329,21 +35237,21 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn google_audience_id(mut self, new_value: &str) -> GoogleAudienceGetCall<'a, C> {
+    pub fn google_audience_id(mut self, new_value: &str) -> GoogleAudienceGetCall<'a> {
         self._google_audience_id = new_value.to_string();
         self
     }
     /// The ID of the partner that has access to the fetched Google audience.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> GoogleAudienceGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> GoogleAudienceGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the fetched Google audience.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> GoogleAudienceGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> GoogleAudienceGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -35353,7 +35261,7 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleAudienceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleAudienceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -35378,7 +35286,7 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GoogleAudienceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GoogleAudienceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35398,7 +35306,7 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleAudienceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleAudienceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -35448,10 +35356,10 @@ impl<'a, C> GoogleAudienceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct GoogleAudienceListCall<'a, C>
-    where C: 'a {
+pub struct GoogleAudienceListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -35463,9 +35371,9 @@ pub struct GoogleAudienceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for GoogleAudienceListCall<'a, C> {}
+impl<'a> client::CallBuilder for GoogleAudienceListCall<'a> {}
 
-impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> GoogleAudienceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -35522,8 +35430,7 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -35536,7 +35443,7 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -35545,7 +35452,7 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -35602,42 +35509,42 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// The ID of the partner that has access to the fetched Google audiences.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> GoogleAudienceListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> GoogleAudienceListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListGoogleAudiences` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GoogleAudienceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> GoogleAudienceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> GoogleAudienceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> GoogleAudienceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `googleAudienceId` (default) * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> GoogleAudienceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> GoogleAudienceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by Google audience fields. Supported syntax: * Filter expressions for Google audiences currently can only contain at most one restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `displayName` Examples: * All Google audiences for which the display name contains "Google": `displayName : "Google"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> GoogleAudienceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> GoogleAudienceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the fetched Google audiences.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> GoogleAudienceListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> GoogleAudienceListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -35647,7 +35554,7 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleAudienceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GoogleAudienceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -35672,7 +35579,7 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> GoogleAudienceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> GoogleAudienceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35692,7 +35599,7 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleAudienceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GoogleAudienceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -35742,10 +35649,10 @@ impl<'a, C> GoogleAudienceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupAssignedInventorySourceBulkEditCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditAssignedInventorySourcesRequest,
     _inventory_source_group_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -35753,9 +35660,9 @@ pub struct InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupAssignedInventorySourceBulkEditCall<'a> {}
 
-impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -35831,8 +35738,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -35846,7 +35752,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -35857,7 +35763,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -35916,7 +35822,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditAssignedInventorySourcesRequest) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditAssignedInventorySourcesRequest) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a> {
         self._request = new_value;
         self
     }
@@ -35926,7 +35832,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
@@ -35936,7 +35842,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -35961,7 +35867,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -35981,7 +35887,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -36033,10 +35939,10 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceBulkEditCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupAssignedInventorySourceCreateCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupAssignedInventorySourceCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: AssignedInventorySource,
     _inventory_source_group_id: String,
     _partner_id: Option<String>,
@@ -36046,9 +35952,9 @@ pub struct InventorySourceGroupAssignedInventorySourceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupAssignedInventorySourceCreateCall<'a> {}
 
-impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -36130,8 +36036,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -36145,7 +36050,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -36156,7 +36061,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -36215,7 +36120,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssignedInventorySource) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: AssignedInventorySource) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -36225,21 +36130,21 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the parent inventory source group. Only this partner will have write access to this assigned inventory source.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the parent inventory source group. The parent partner will not have access to this assigned inventory source.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -36249,7 +36154,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -36274,7 +36179,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36294,7 +36199,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -36340,10 +36245,10 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceCreateCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupAssignedInventorySourceDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _inventory_source_group_id: String,
     _assigned_inventory_source_id: String,
     _partner_id: Option<String>,
@@ -36353,9 +36258,9 @@ pub struct InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {}
 
-impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -36427,8 +36332,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -36441,7 +36345,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -36450,7 +36354,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -36510,7 +36414,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
@@ -36520,21 +36424,21 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_inventory_source_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {
+    pub fn assigned_inventory_source_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
         self._assigned_inventory_source_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the parent inventory source group. Only this partner has write access to this assigned inventory source.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the parent inventory source group. The parent partner does not have access to this assigned inventory source.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -36544,7 +36448,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -36569,7 +36473,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36589,7 +36493,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -36639,10 +36543,10 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceDeleteCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupAssignedInventorySourceListCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupAssignedInventorySourceListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _inventory_source_group_id: String,
     _partner_id: Option<String>,
     _page_token: Option<String>,
@@ -36655,9 +36559,9 @@ pub struct InventorySourceGroupAssignedInventorySourceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupAssignedInventorySourceListCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupAssignedInventorySourceListCall<'a> {}
 
-impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupAssignedInventorySourceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -36740,8 +36644,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -36754,7 +36657,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -36763,7 +36666,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -36823,49 +36726,49 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
     /// The ID of the partner that has access to the assignment. If the parent inventory source group is advertiser-owned, the assignment cannot be accessed via a partner.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListAssignedInventorySources` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedInventorySourceId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `assignedInventorySourceId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned inventory source fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedInventorySourceId` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the assignment. If the parent inventory source group is partner-owned, only advertisers to which the parent group is explicitly shared can access the assigned inventory source.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -36875,7 +36778,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupAssignedInventorySourceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -36900,7 +36803,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupAssignedInventorySourceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -36920,7 +36823,7 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupAssignedInventorySourceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -36972,10 +36875,10 @@ impl<'a, C> InventorySourceGroupAssignedInventorySourceListCall<'a, C> where C: 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupCreateCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: InventorySourceGroup,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -36984,9 +36887,9 @@ pub struct InventorySourceGroupCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupCreateCall<'a> {}
 
-impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -37042,8 +36945,7 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -37057,7 +36959,7 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -37068,7 +36970,7 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -37127,21 +37029,21 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InventorySourceGroup) -> InventorySourceGroupCreateCall<'a, C> {
+    pub fn request(mut self, new_value: InventorySourceGroup) -> InventorySourceGroupCreateCall<'a> {
         self._request = new_value;
         self
     }
     /// The ID of the partner that owns the inventory source group. Only this partner will have write access to this group. Only advertisers to which this group is explicitly shared will have read access to this group.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupCreateCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the inventory source group. The parent partner will not have access to this group.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupCreateCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -37151,7 +37053,7 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -37176,7 +37078,7 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37196,7 +37098,7 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -37242,10 +37144,10 @@ impl<'a, C> InventorySourceGroupCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupDeleteCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _inventory_source_group_id: String,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -37254,9 +37156,9 @@ pub struct InventorySourceGroupDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupDeleteCall<'a> {}
 
-impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -37327,8 +37229,7 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -37341,7 +37242,7 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -37350,7 +37251,7 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -37410,21 +37311,21 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupDeleteCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupDeleteCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
     /// The ID of the partner that owns the inventory source group. Only this partner has write access to this group.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupDeleteCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupDeleteCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the inventory source group. The parent partner does not have access to this group.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupDeleteCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -37434,7 +37335,7 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -37459,7 +37360,7 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37479,7 +37380,7 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -37525,10 +37426,10 @@ impl<'a, C> InventorySourceGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupGetCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _inventory_source_group_id: String,
     _partner_id: Option<String>,
     _advertiser_id: Option<String>,
@@ -37537,9 +37438,9 @@ pub struct InventorySourceGroupGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupGetCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupGetCall<'a> {}
 
-impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -37610,8 +37511,7 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -37624,7 +37524,7 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -37633,7 +37533,7 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -37693,21 +37593,21 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupGetCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupGetCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
     /// The ID of the partner that has access to the inventory source group. A partner cannot access an advertiser-owned inventory source group.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the inventory source group. If an inventory source group is partner-owned, only advertisers to which the group is explicitly shared can access the group.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -37717,7 +37617,7 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -37742,7 +37642,7 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -37762,7 +37662,7 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -37812,10 +37712,10 @@ impl<'a, C> InventorySourceGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupListCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -37827,9 +37727,9 @@ pub struct InventorySourceGroupListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupListCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupListCall<'a> {}
 
-impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -37886,8 +37786,7 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -37900,7 +37799,7 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -37909,7 +37808,7 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -37966,42 +37865,42 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
     /// The ID of the partner that has access to the inventory source group. A partner cannot access advertiser-owned inventory source groups.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListInventorySources` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> InventorySourceGroupListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> InventorySourceGroupListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> InventorySourceGroupListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> InventorySourceGroupListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `inventorySourceGroupId` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> InventorySourceGroupListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> InventorySourceGroupListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by inventory source group properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `inventorySourceGroupId` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> InventorySourceGroupListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> InventorySourceGroupListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the inventory source group. If an inventory source group is partner-owned, only advertisers to which the group is explicitly shared can access the group.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -38011,7 +37910,7 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -38036,7 +37935,7 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38056,7 +37955,7 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -38109,10 +38008,10 @@ impl<'a, C> InventorySourceGroupListCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGroupPatchCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGroupPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: InventorySourceGroup,
     _inventory_source_group_id: String,
     _update_mask: Option<String>,
@@ -38123,9 +38022,9 @@ pub struct InventorySourceGroupPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGroupPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGroupPatchCall<'a> {}
 
-impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGroupPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -38206,8 +38105,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -38221,7 +38119,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -38232,7 +38130,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -38291,7 +38189,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InventorySourceGroup) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn request(mut self, new_value: InventorySourceGroup) -> InventorySourceGroupPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -38301,28 +38199,28 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn inventory_source_group_id(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a> {
         self._inventory_source_group_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The ID of the partner that owns the inventory source group. Only this partner has write access to this group.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the inventory source group. The parent partner does not have access to this group.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceGroupPatchCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -38332,7 +38230,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGroupPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -38357,7 +38255,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGroupPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38377,7 +38275,7 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGroupPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -38422,10 +38320,10 @@ impl<'a, C> InventorySourceGroupPatchCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceGetCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _inventory_source_id: String,
     _partner_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -38433,9 +38331,9 @@ pub struct InventorySourceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceGetCall<'a> {}
 
-impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -38503,8 +38401,7 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -38517,7 +38414,7 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -38526,7 +38423,7 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -38586,14 +38483,14 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn inventory_source_id(mut self, new_value: &str) -> InventorySourceGetCall<'a, C> {
+    pub fn inventory_source_id(mut self, new_value: &str) -> InventorySourceGetCall<'a> {
         self._inventory_source_id = new_value.to_string();
         self
     }
     /// Required. The ID of the DV360 partner to which the fetched inventory source is permissioned.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceGetCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
@@ -38603,7 +38500,7 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -38628,7 +38525,7 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38648,7 +38545,7 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -38698,10 +38595,10 @@ impl<'a, C> InventorySourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InventorySourceListCall<'a, C>
-    where C: 'a {
+pub struct InventorySourceListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -38713,9 +38610,9 @@ pub struct InventorySourceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InventorySourceListCall<'a, C> {}
+impl<'a> client::CallBuilder for InventorySourceListCall<'a> {}
 
-impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InventorySourceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -38772,8 +38669,7 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -38786,7 +38682,7 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -38795,7 +38691,7 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -38852,42 +38748,42 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// The ID of the partner that has access to the inventory source.
     ///
     /// Sets the *partner id* query property to the given value.
-    pub fn partner_id(mut self, new_value: &str) -> InventorySourceListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> InventorySourceListCall<'a> {
         self._partner_id = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListInventorySources` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> InventorySourceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> InventorySourceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> InventorySourceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> InventorySourceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> InventorySourceListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> InventorySourceListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by inventory source properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `status.entityStatus` - `commitment` - `deliveryMethod` - `rateDetails.rateType` - `exchange` Examples: * All active inventory sources: `status.entityStatus="ENTITY_STATUS_ACTIVE"` * Inventory sources belonging to Google Ad Manager or Rubicon exchanges: `exchange="EXCHANGE_GOOGLE_AD_MANAGER" OR exchange="EXCHANGE_RUBICON"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> InventorySourceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> InventorySourceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that has access to the inventory source.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> InventorySourceListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -38897,7 +38793,7 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InventorySourceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -38922,7 +38818,7 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InventorySourceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -38942,7 +38838,7 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InventorySourceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -38991,19 +38887,19 @@ impl<'a, C> InventorySourceListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaDownloadCall<'a, C>
-    where C: 'a {
+pub struct MediaDownloadCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaDownloadCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaDownloadCall<'a> {}
 
-impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaDownloadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -39084,8 +38980,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -39098,7 +38993,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -39107,7 +39002,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -39167,7 +39062,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> MediaDownloadCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> MediaDownloadCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -39177,7 +39072,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -39202,7 +39097,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39222,7 +39117,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaDownloadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaDownloadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -39272,10 +39167,10 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelSiteBulkEditCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelSiteBulkEditCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditSitesRequest,
     _partner_id: String,
     _channel_id: String,
@@ -39284,9 +39179,9 @@ pub struct PartnerChannelSiteBulkEditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelSiteBulkEditCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelSiteBulkEditCall<'a> {}
 
-impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelSiteBulkEditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -39363,8 +39258,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -39378,7 +39272,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -39389,7 +39283,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -39448,7 +39342,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditSitesRequest) -> PartnerChannelSiteBulkEditCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditSitesRequest) -> PartnerChannelSiteBulkEditCall<'a> {
         self._request = new_value;
         self
     }
@@ -39458,7 +39352,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteBulkEditCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteBulkEditCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -39468,7 +39362,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteBulkEditCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteBulkEditCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -39478,7 +39372,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteBulkEditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteBulkEditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -39503,7 +39397,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteBulkEditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteBulkEditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39523,7 +39417,7 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteBulkEditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteBulkEditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -39574,10 +39468,10 @@ impl<'a, C> PartnerChannelSiteBulkEditCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelSiteCreateCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelSiteCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Site,
     _partner_id: String,
     _channel_id: String,
@@ -39587,9 +39481,9 @@ pub struct PartnerChannelSiteCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelSiteCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelSiteCreateCall<'a> {}
 
-impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelSiteCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -39669,8 +39563,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -39684,7 +39577,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -39695,7 +39588,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -39754,7 +39647,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Site) -> PartnerChannelSiteCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Site) -> PartnerChannelSiteCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -39764,7 +39657,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteCreateCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -39774,14 +39667,14 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteCreateCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteCreateCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// The ID of the advertiser that owns the parent channel.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelSiteCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelSiteCreateCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -39791,7 +39684,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -39816,7 +39709,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -39836,7 +39729,7 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -39881,10 +39774,10 @@ impl<'a, C> PartnerChannelSiteCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelSiteDeleteCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelSiteDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _channel_id: String,
     _url_or_app_id: String,
@@ -39894,9 +39787,9 @@ pub struct PartnerChannelSiteDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelSiteDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelSiteDeleteCall<'a> {}
 
-impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelSiteDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -39966,8 +39859,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -39980,7 +39872,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -39989,7 +39881,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -40049,7 +39941,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -40059,7 +39951,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -40069,14 +39961,14 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn url_or_app_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a, C> {
+    pub fn url_or_app_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a> {
         self._url_or_app_id = new_value.to_string();
         self
     }
     /// The ID of the advertiser that owns the parent channel.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelSiteDeleteCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -40086,7 +39978,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -40111,7 +40003,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -40131,7 +40023,7 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -40180,10 +40072,10 @@ impl<'a, C> PartnerChannelSiteDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelSiteListCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelSiteListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _channel_id: String,
     _page_token: Option<String>,
@@ -40196,9 +40088,9 @@ pub struct PartnerChannelSiteListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelSiteListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelSiteListCall<'a> {}
 
-impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelSiteListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -40279,8 +40171,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -40293,7 +40184,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -40302,7 +40193,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -40362,7 +40253,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -40372,42 +40263,42 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListSites` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `10000`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerChannelSiteListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `urlOrAppId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `urlOrAppId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by site fields. Supported syntax: * Filter expressions for site currently can only contain at most one * restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `urlOrAppId` Examples: * All sites for which the URL or app ID contains "google": `urlOrAppId : "google"`
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the parent channel.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelSiteListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -40417,7 +40308,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -40442,7 +40333,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -40462,7 +40353,7 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -40512,10 +40403,10 @@ impl<'a, C> PartnerChannelSiteListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelSiteReplaceCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelSiteReplaceCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: ReplaceSitesRequest,
     _partner_id: String,
     _channel_id: String,
@@ -40524,9 +40415,9 @@ pub struct PartnerChannelSiteReplaceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelSiteReplaceCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelSiteReplaceCall<'a> {}
 
-impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelSiteReplaceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -40603,8 +40494,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -40618,7 +40508,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -40629,7 +40519,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -40688,7 +40578,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReplaceSitesRequest) -> PartnerChannelSiteReplaceCall<'a, C> {
+    pub fn request(mut self, new_value: ReplaceSitesRequest) -> PartnerChannelSiteReplaceCall<'a> {
         self._request = new_value;
         self
     }
@@ -40698,7 +40588,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteReplaceCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelSiteReplaceCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -40708,7 +40598,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteReplaceCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelSiteReplaceCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
@@ -40718,7 +40608,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteReplaceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelSiteReplaceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -40743,7 +40633,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteReplaceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelSiteReplaceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -40763,7 +40653,7 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteReplaceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelSiteReplaceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -40814,10 +40704,10 @@ impl<'a, C> PartnerChannelSiteReplaceCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelCreateCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Channel,
     _partner_id: String,
     _advertiser_id: Option<String>,
@@ -40826,9 +40716,9 @@ pub struct PartnerChannelCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelCreateCall<'a> {}
 
-impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -40907,8 +40797,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -40922,7 +40811,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -40933,7 +40822,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -40992,7 +40881,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> PartnerChannelCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> PartnerChannelCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -41002,14 +40891,14 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelCreateCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
     /// The ID of the advertiser that owns the created channel.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelCreateCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelCreateCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -41019,7 +40908,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -41044,7 +40933,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41064,7 +40953,7 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -41109,10 +40998,10 @@ impl<'a, C> PartnerChannelCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelGetCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _channel_id: String,
     _advertiser_id: Option<String>,
@@ -41121,9 +41010,9 @@ pub struct PartnerChannelGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelGetCall<'a> {}
 
-impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -41192,8 +41081,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -41206,7 +41094,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -41215,7 +41103,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -41275,7 +41163,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelGetCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -41285,14 +41173,14 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelGetCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelGetCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// The ID of the advertiser that owns the fetched channel.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -41302,7 +41190,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -41327,7 +41215,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41347,7 +41235,7 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -41396,10 +41284,10 @@ impl<'a, C> PartnerChannelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelListCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -41411,9 +41299,9 @@ pub struct PartnerChannelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelListCall<'a> {}
 
-impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -41493,8 +41381,7 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -41507,7 +41394,7 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -41516,7 +41403,7 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -41576,42 +41463,42 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelListCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListChannels` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerChannelListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerChannelListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerChannelListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerChannelListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) * `channelId` The default sorting order is ascending. To specify descending order for a field, a suffix " desc" should be added to the field name. Example: `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PartnerChannelListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> PartnerChannelListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by channel fields. Supported syntax: * Filter expressions for channel currently can only contain at most one * restriction. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: - `displayName` Examples: * All channels for which the display name contains "google": `displayName : "google"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PartnerChannelListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> PartnerChannelListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the channels.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -41621,7 +41508,7 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -41646,7 +41533,7 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41666,7 +41553,7 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -41718,10 +41605,10 @@ impl<'a, C> PartnerChannelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerChannelPatchCall<'a, C>
-    where C: 'a {
+pub struct PartnerChannelPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: Channel,
     _partner_id: String,
     _channel_id: String,
@@ -41732,9 +41619,9 @@ pub struct PartnerChannelPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerChannelPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerChannelPatchCall<'a> {}
 
-impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerChannelPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -41817,8 +41704,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -41832,7 +41718,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -41843,7 +41729,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -41902,7 +41788,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> PartnerChannelPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> PartnerChannelPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -41912,7 +41798,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelPatchCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerChannelPatchCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -41922,21 +41808,21 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelPatchCall<'a, C> {
+    pub fn channel_id(mut self, new_value: &str) -> PartnerChannelPatchCall<'a> {
         self._channel_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PartnerChannelPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PartnerChannelPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// The ID of the advertiser that owns the created channel.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelPatchCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> PartnerChannelPatchCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -41946,7 +41832,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerChannelPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -41971,7 +41857,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerChannelPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -41991,7 +41877,7 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerChannelPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -42041,10 +41927,10 @@ impl<'a, C> PartnerChannelPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
-    where C: 'a {
+pub struct PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: AssignedTargetingOption,
     _partner_id: String,
     _targeting_type: String,
@@ -42053,9 +41939,9 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {}
 
-impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -42132,8 +42018,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -42147,7 +42032,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -42158,7 +42043,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -42217,7 +42102,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AssignedTargetingOption) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: AssignedTargetingOption) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -42227,7 +42112,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -42237,7 +42122,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -42247,7 +42132,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -42272,7 +42157,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42292,7 +42177,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -42336,10 +42221,10 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionCreateCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
-    where C: 'a {
+pub struct PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _targeting_type: String,
     _assigned_targeting_option_id: String,
@@ -42348,9 +42233,9 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {}
 
-impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -42417,8 +42302,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -42431,7 +42315,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -42440,7 +42324,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -42500,7 +42384,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -42510,7 +42394,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -42520,7 +42404,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -42530,7 +42414,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -42555,7 +42439,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42575,7 +42459,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -42619,10 +42503,10 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionDeleteCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C>
-    where C: 'a {
+pub struct PartnerTargetingTypeAssignedTargetingOptionGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _targeting_type: String,
     _assigned_targeting_option_id: String,
@@ -42631,9 +42515,9 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {}
 
-impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -42700,8 +42584,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -42714,7 +42597,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -42723,7 +42606,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -42783,7 +42666,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -42793,7 +42676,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -42803,7 +42686,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn assigned_targeting_option_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._assigned_targeting_option_id = new_value.to_string();
         self
     }
@@ -42813,7 +42696,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -42838,7 +42721,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -42858,7 +42741,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -42906,10 +42789,10 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionGetCall<'a, C> where C: B
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C>
-    where C: 'a {
+pub struct PartnerTargetingTypeAssignedTargetingOptionListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _targeting_type: String,
     _page_token: Option<String>,
@@ -42921,9 +42804,9 @@ pub struct PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {}
 
-impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -43001,8 +42884,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -43015,7 +42897,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -43024,7 +42906,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -43084,7 +42966,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -43094,35 +42976,35 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListPartnerAssignedTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `assignedTargetingOptionId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `assignedTargetingOptionId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by assigned targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `OR`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `assignedTargetingOptionId` Examples: * AssignedTargetingOption with ID 123456 `assignedTargetingOptionId="123456"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -43132,7 +43014,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -43157,7 +43039,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43177,7 +43059,7 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerTargetingTypeAssignedTargetingOptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -43227,10 +43109,10 @@ impl<'a, C> PartnerTargetingTypeAssignedTargetingOptionListCall<'a, C> where C: 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C>
-    where C: 'a {
+pub struct PartnerBulkEditPartnerAssignedTargetingOptionCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditPartnerAssignedTargetingOptionsRequest,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -43238,9 +43120,9 @@ pub struct PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerBulkEditPartnerAssignedTargetingOptionCall<'a> {}
 
-impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -43316,8 +43198,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -43331,7 +43212,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -43342,7 +43223,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -43401,7 +43282,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditPartnerAssignedTargetingOptionsRequest) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditPartnerAssignedTargetingOptionsRequest) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a> {
         self._request = new_value;
         self
     }
@@ -43411,7 +43292,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -43421,7 +43302,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -43446,7 +43327,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43466,7 +43347,7 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -43510,19 +43391,19 @@ impl<'a, C> PartnerBulkEditPartnerAssignedTargetingOptionCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerGetCall<'a, C>
-    where C: 'a {
+pub struct PartnerGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _partner_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerGetCall<'a> {}
 
-impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -43587,8 +43468,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -43601,7 +43481,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -43610,7 +43490,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -43670,7 +43550,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn partner_id(mut self, new_value: &str) -> PartnerGetCall<'a, C> {
+    pub fn partner_id(mut self, new_value: &str) -> PartnerGetCall<'a> {
         self._partner_id = new_value.to_string();
         self
     }
@@ -43680,7 +43560,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -43705,7 +43585,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43725,7 +43605,7 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -43773,10 +43653,10 @@ impl<'a, C> PartnerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PartnerListCall<'a, C>
-    where C: 'a {
+pub struct PartnerListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
@@ -43786,9 +43666,9 @@ pub struct PartnerListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PartnerListCall<'a, C> {}
+impl<'a> client::CallBuilder for PartnerListCall<'a> {}
 
-impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PartnerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -43839,8 +43719,7 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -43853,7 +43732,7 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -43862,7 +43741,7 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -43919,28 +43798,28 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListPartners` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PartnerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PartnerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PartnerListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PartnerListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> PartnerListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> PartnerListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by partner properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `AND` or `OR` logical operators. A sequence of restrictions implicitly uses `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. * Supported fields: - `entityStatus` Examples: * All active partners: `entityStatus="ENTITY_STATUS_ACTIVE"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PartnerListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> PartnerListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -43950,7 +43829,7 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PartnerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -43975,7 +43854,7 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PartnerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PartnerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -43995,7 +43874,7 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PartnerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -44039,19 +43918,19 @@ impl<'a, C> PartnerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SdfdownloadtaskOperationGetCall<'a, C>
-    where C: 'a {
+pub struct SdfdownloadtaskOperationGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SdfdownloadtaskOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SdfdownloadtaskOperationGetCall<'a> {}
 
-impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SdfdownloadtaskOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -44116,8 +43995,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -44130,7 +44008,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -44139,7 +44017,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -44199,7 +44077,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SdfdownloadtaskOperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SdfdownloadtaskOperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -44209,7 +44087,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SdfdownloadtaskOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SdfdownloadtaskOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -44234,7 +44112,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SdfdownloadtaskOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SdfdownloadtaskOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44254,7 +44132,7 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SdfdownloadtaskOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SdfdownloadtaskOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -44304,19 +44182,19 @@ impl<'a, C> SdfdownloadtaskOperationGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SdfdownloadtaskCreateCall<'a, C>
-    where C: 'a {
+pub struct SdfdownloadtaskCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: CreateSdfDownloadTaskRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SdfdownloadtaskCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SdfdownloadtaskCreateCall<'a> {}
 
-impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SdfdownloadtaskCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -44366,8 +44244,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -44381,7 +44258,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -44392,7 +44269,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -44451,7 +44328,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateSdfDownloadTaskRequest) -> SdfdownloadtaskCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateSdfDownloadTaskRequest) -> SdfdownloadtaskCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -44461,7 +44338,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SdfdownloadtaskCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SdfdownloadtaskCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -44486,7 +44363,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SdfdownloadtaskCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SdfdownloadtaskCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44506,7 +44383,7 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SdfdownloadtaskCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SdfdownloadtaskCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -44551,10 +44428,10 @@ impl<'a, C> SdfdownloadtaskCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TargetingTypeTargetingOptionGetCall<'a, C>
-    where C: 'a {
+pub struct TargetingTypeTargetingOptionGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _targeting_type: String,
     _targeting_option_id: String,
     _advertiser_id: Option<String>,
@@ -44563,9 +44440,9 @@ pub struct TargetingTypeTargetingOptionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TargetingTypeTargetingOptionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TargetingTypeTargetingOptionGetCall<'a> {}
 
-impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TargetingTypeTargetingOptionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -44634,8 +44511,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -44648,7 +44524,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -44657,7 +44533,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -44717,7 +44593,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -44727,14 +44603,14 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_option_id(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a, C> {
+    pub fn targeting_option_id(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a> {
         self._targeting_option_id = new_value.to_string();
         self
     }
     /// Required. The Advertiser this request is being made in the context of.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> TargetingTypeTargetingOptionGetCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -44744,7 +44620,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TargetingTypeTargetingOptionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TargetingTypeTargetingOptionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -44769,7 +44645,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TargetingTypeTargetingOptionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TargetingTypeTargetingOptionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -44789,7 +44665,7 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TargetingTypeTargetingOptionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TargetingTypeTargetingOptionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -44838,10 +44714,10 @@ impl<'a, C> TargetingTypeTargetingOptionGetCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TargetingTypeTargetingOptionListCall<'a, C>
-    where C: 'a {
+pub struct TargetingTypeTargetingOptionListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _targeting_type: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -44853,9 +44729,9 @@ pub struct TargetingTypeTargetingOptionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TargetingTypeTargetingOptionListCall<'a, C> {}
+impl<'a> client::CallBuilder for TargetingTypeTargetingOptionListCall<'a> {}
 
-impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TargetingTypeTargetingOptionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -44935,8 +44811,7 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -44949,7 +44824,7 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -44958,7 +44833,7 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -45018,42 +44893,42 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListTargetingOptions` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`. Returns error code `INVALID_ARGUMENT` if an invalid value is specified.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> TargetingTypeTargetingOptionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `targetingOptionId` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. Example: `targetingOptionId desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by targeting option properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by `OR` logical operators. * A restriction has the form of `{field} {operator} {value}`. * The operator must be "=" (equal sign). * Supported fields: - `carrierAndIspDetails.type` - `geoRegionDetails.geoRegionType` - `targetingOptionId` Examples: * All `GEO REGION` targeting options that belong to sub type `GEO_REGION_TYPE_COUNTRY` or `GEO_REGION_TYPE_STATE`: `geoRegionDetails.geoRegionType="GEO_REGION_TYPE_COUNTRY" OR geoRegionDetails.geoRegionType="GEO_REGION_TYPE_STATE"` * All `CARRIER AND ISP` targeting options that belong to sub type `CARRIER_AND_ISP_TYPE_CARRIER`: `carrierAndIspDetails.type="CARRIER_AND_ISP_TYPE_CARRIER"`. The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Required. The Advertiser this request is being made in the context of.
     ///
     /// Sets the *advertiser id* query property to the given value.
-    pub fn advertiser_id(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn advertiser_id(mut self, new_value: &str) -> TargetingTypeTargetingOptionListCall<'a> {
         self._advertiser_id = Some(new_value.to_string());
         self
     }
@@ -45063,7 +44938,7 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TargetingTypeTargetingOptionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TargetingTypeTargetingOptionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -45088,7 +44963,7 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TargetingTypeTargetingOptionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TargetingTypeTargetingOptionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45108,7 +44983,7 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TargetingTypeTargetingOptionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TargetingTypeTargetingOptionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -45158,10 +45033,10 @@ impl<'a, C> TargetingTypeTargetingOptionListCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TargetingTypeTargetingOptionSearchCall<'a, C>
-    where C: 'a {
+pub struct TargetingTypeTargetingOptionSearchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: SearchTargetingOptionsRequest,
     _targeting_type: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -45169,9 +45044,9 @@ pub struct TargetingTypeTargetingOptionSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TargetingTypeTargetingOptionSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for TargetingTypeTargetingOptionSearchCall<'a> {}
 
-impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TargetingTypeTargetingOptionSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -45247,8 +45122,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -45262,7 +45136,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -45273,7 +45147,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -45332,7 +45206,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchTargetingOptionsRequest) -> TargetingTypeTargetingOptionSearchCall<'a, C> {
+    pub fn request(mut self, new_value: SearchTargetingOptionsRequest) -> TargetingTypeTargetingOptionSearchCall<'a> {
         self._request = new_value;
         self
     }
@@ -45342,7 +45216,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionSearchCall<'a, C> {
+    pub fn targeting_type(mut self, new_value: &str) -> TargetingTypeTargetingOptionSearchCall<'a> {
         self._targeting_type = new_value.to_string();
         self
     }
@@ -45352,7 +45226,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TargetingTypeTargetingOptionSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TargetingTypeTargetingOptionSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -45377,7 +45251,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TargetingTypeTargetingOptionSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TargetingTypeTargetingOptionSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45397,7 +45271,7 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TargetingTypeTargetingOptionSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TargetingTypeTargetingOptionSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -45447,10 +45321,10 @@ impl<'a, C> TargetingTypeTargetingOptionSearchCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserBulkEditAssignedUserRoleCall<'a, C>
-    where C: 'a {
+pub struct UserBulkEditAssignedUserRoleCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: BulkEditAssignedUserRolesRequest,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -45458,9 +45332,9 @@ pub struct UserBulkEditAssignedUserRoleCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserBulkEditAssignedUserRoleCall<'a, C> {}
+impl<'a> client::CallBuilder for UserBulkEditAssignedUserRoleCall<'a> {}
 
-impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserBulkEditAssignedUserRoleCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -45536,8 +45410,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -45551,7 +45424,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -45562,7 +45435,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -45621,7 +45494,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BulkEditAssignedUserRolesRequest) -> UserBulkEditAssignedUserRoleCall<'a, C> {
+    pub fn request(mut self, new_value: BulkEditAssignedUserRolesRequest) -> UserBulkEditAssignedUserRoleCall<'a> {
         self._request = new_value;
         self
     }
@@ -45631,7 +45504,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserBulkEditAssignedUserRoleCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserBulkEditAssignedUserRoleCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -45641,7 +45514,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserBulkEditAssignedUserRoleCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserBulkEditAssignedUserRoleCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -45666,7 +45539,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserBulkEditAssignedUserRoleCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserBulkEditAssignedUserRoleCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45686,7 +45559,7 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserBulkEditAssignedUserRoleCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserBulkEditAssignedUserRoleCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -45736,19 +45609,19 @@ impl<'a, C> UserBulkEditAssignedUserRoleCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserCreateCall<'a, C>
-    where C: 'a {
+pub struct UserCreateCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: User,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for UserCreateCall<'a> {}
 
-impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -45798,8 +45671,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -45813,7 +45685,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -45824,7 +45696,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -45883,7 +45755,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: User) -> UserCreateCall<'a, C> {
+    pub fn request(mut self, new_value: User) -> UserCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -45893,7 +45765,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -45918,7 +45790,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -45938,7 +45810,7 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -45982,19 +45854,19 @@ impl<'a, C> UserCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDeleteCall<'a, C>
-    where C: 'a {
+pub struct UserDeleteCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDeleteCall<'a> {}
 
-impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -46059,8 +45931,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -46073,7 +45944,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -46082,7 +45953,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -46142,7 +46013,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDeleteCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDeleteCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -46152,7 +46023,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -46177,7 +46048,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46197,7 +46068,7 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -46241,19 +46112,19 @@ impl<'a, C> UserDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserGetCall<'a, C>
-    where C: 'a {
+pub struct UserGetCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserGetCall<'a, C> {}
+impl<'a> client::CallBuilder for UserGetCall<'a> {}
 
-impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -46318,8 +46189,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -46332,7 +46202,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -46341,7 +46211,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -46401,7 +46271,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -46411,7 +46281,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -46436,7 +46306,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46456,7 +46326,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -46504,10 +46374,10 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserListCall<'a, C>
-    where C: 'a {
+pub struct UserListCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
@@ -46517,9 +46387,9 @@ pub struct UserListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserListCall<'a, C> {}
+impl<'a> client::CallBuilder for UserListCall<'a> {}
 
-impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -46570,8 +46440,7 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -46584,7 +46453,7 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -46593,7 +46462,7 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -46650,28 +46519,28 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// A token identifying a page of results the server should return. Typically, this is the value of next_page_token returned from the previous call to `ListUsers` method. If not specified, the first page of results will be returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> UserListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Must be between `1` and `100`. If unspecified will default to `100`.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> UserListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> UserListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Field by which to sort the list. Acceptable values are: * `displayName` (default) The default sorting order is ascending. To specify descending order for a field, a suffix "desc" should be added to the field name. For example, `displayName desc`.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> UserListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> UserListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Allows filtering by user properties. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `AND`. * A restriction has the form of `{field} {operator} {value}`. * The operator must be `CONTAINS (:)` or `EQUALS (=)`. * The operator must be `CONTAINS (:)` for the following fields: - `displayName` - `email` * The operator must be `EQUALS (=)` for the following fields: - `assignedUserRole.userRole` - `assignedUserRole.partnerId` - `assignedUserRole.advertiserId` - `assignedUserRole.entityType`: A synthetic field of AssignedUserRole used for filtering. Identifies the type of entity to which the user role is assigned. Valid values are `Partner` and `Advertiser`. - `assignedUserRole.parentPartnerId`: A synthetic field of AssignedUserRole used for filtering. Identifies the parent partner of the entity to which the user role is assigned." Examples: * The user with displayName containing `foo`: `displayName:"foo"` * The user with email containing `bar`: `email:"bar"` * All users with standard user roles: `assignedUserRole.userRole="STANDARD"` * All users with user roles for partner 123: `assignedUserRole.partnerId="123"` * All users with user roles for advertiser 123: `assignedUserRole.advertiserId="123"` * All users with partner level user roles: `entityType="PARTNER"` * All users with user roles for partner 123 and advertisers under partner 123: `parentPartnerId="123"` The length of this field should be no more than 500 characters.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> UserListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> UserListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -46681,7 +46550,7 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -46706,7 +46575,7 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -46726,7 +46595,7 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -46777,10 +46646,10 @@ impl<'a, C> UserListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserPatchCall<'a, C>
-    where C: 'a {
+pub struct UserPatchCall<'a>
+    where  {
 
-    hub: &'a DisplayVideo<C>,
+    hub: &'a DisplayVideo<>,
     _request: User,
     _user_id: String,
     _update_mask: Option<String>,
@@ -46789,9 +46658,9 @@ pub struct UserPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for UserPatchCall<'a> {}
 
-impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -46870,8 +46739,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -46885,7 +46753,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -46896,7 +46764,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -46955,7 +46823,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: User) -> UserPatchCall<'a, C> {
+    pub fn request(mut self, new_value: User) -> UserPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -46965,14 +46833,14 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserPatchCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserPatchCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
     /// Required. The mask to control which fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> UserPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> UserPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -46982,7 +46850,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -47007,7 +46875,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -47027,7 +46895,7 @@ impl<'a, C> UserPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

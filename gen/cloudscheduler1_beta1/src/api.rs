@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,35 +105,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudScheduler<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudScheduler<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudScheduler<C> {}
+impl<'a, > client::Hub for CloudScheduler<> {}
 
-impl<'a, C> CloudScheduler<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudScheduler<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudScheduler<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudScheduler<> {
         CloudScheduler {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudscheduler.googleapis.com/".to_string(),
             _root_url: "https://cloudscheduler.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -555,15 +553,15 @@ impl client::Part for Status {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -573,7 +571,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The location name. For example: `projects/PROJECT_ID/locations/LOCATION_ID`.
-    pub fn locations_jobs_create(&self, request: Job, parent: &str) -> ProjectLocationJobCreateCall<'a, C> {
+    pub fn locations_jobs_create(&self, request: Job, parent: &str) -> ProjectLocationJobCreateCall<'a> {
         ProjectLocationJobCreateCall {
             hub: self.hub,
             _request: request,
@@ -591,7 +589,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The job name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
-    pub fn locations_jobs_delete(&self, name: &str) -> ProjectLocationJobDeleteCall<'a, C> {
+    pub fn locations_jobs_delete(&self, name: &str) -> ProjectLocationJobDeleteCall<'a> {
         ProjectLocationJobDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -609,7 +607,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The job name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
-    pub fn locations_jobs_get(&self, name: &str) -> ProjectLocationJobGetCall<'a, C> {
+    pub fn locations_jobs_get(&self, name: &str) -> ProjectLocationJobGetCall<'a> {
         ProjectLocationJobGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -626,7 +624,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The location name. For example: `projects/PROJECT_ID/locations/LOCATION_ID`.
-    pub fn locations_jobs_list(&self, parent: &str) -> ProjectLocationJobListCall<'a, C> {
+    pub fn locations_jobs_list(&self, parent: &str) -> ProjectLocationJobListCall<'a> {
         ProjectLocationJobListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -647,7 +645,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Optionally caller-specified in CreateJob, after which it becomes output only. The job name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`. * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]), hyphens (-), colons (:), or periods (.). For more information, see [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects) * `LOCATION_ID` is the canonical ID for the job's location. The list of available locations can be obtained by calling ListLocations. For more information, see https://cloud.google.com/about/locations/. * `JOB_ID` can contain only letters ([A-Za-z]), numbers ([0-9]), hyphens (-), or underscores (_). The maximum length is 500 characters.
-    pub fn locations_jobs_patch(&self, request: Job, name: &str) -> ProjectLocationJobPatchCall<'a, C> {
+    pub fn locations_jobs_patch(&self, request: Job, name: &str) -> ProjectLocationJobPatchCall<'a> {
         ProjectLocationJobPatchCall {
             hub: self.hub,
             _request: request,
@@ -667,7 +665,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The job name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
-    pub fn locations_jobs_pause(&self, request: PauseJobRequest, name: &str) -> ProjectLocationJobPauseCall<'a, C> {
+    pub fn locations_jobs_pause(&self, request: PauseJobRequest, name: &str) -> ProjectLocationJobPauseCall<'a> {
         ProjectLocationJobPauseCall {
             hub: self.hub,
             _request: request,
@@ -686,7 +684,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The job name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
-    pub fn locations_jobs_resume(&self, request: ResumeJobRequest, name: &str) -> ProjectLocationJobResumeCall<'a, C> {
+    pub fn locations_jobs_resume(&self, request: ResumeJobRequest, name: &str) -> ProjectLocationJobResumeCall<'a> {
         ProjectLocationJobResumeCall {
             hub: self.hub,
             _request: request,
@@ -705,7 +703,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The job name. For example: `projects/PROJECT_ID/locations/LOCATION_ID/jobs/JOB_ID`.
-    pub fn locations_jobs_run(&self, request: RunJobRequest, name: &str) -> ProjectLocationJobRunCall<'a, C> {
+    pub fn locations_jobs_run(&self, request: RunJobRequest, name: &str) -> ProjectLocationJobRunCall<'a> {
         ProjectLocationJobRunCall {
             hub: self.hub,
             _request: request,
@@ -723,7 +721,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -740,7 +738,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -800,10 +798,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobCreateCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _request: Job,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -811,9 +809,9 @@ pub struct ProjectLocationJobCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -889,8 +887,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -904,7 +901,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -915,7 +912,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -974,7 +971,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Job) -> ProjectLocationJobCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Job) -> ProjectLocationJobCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -984,7 +981,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -994,7 +991,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1019,7 +1016,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1039,7 +1036,7 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1084,10 +1081,10 @@ impl<'a, C> ProjectLocationJobCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _name: String,
     _legacy_app_engine_cron: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1095,9 +1092,9 @@ pub struct ProjectLocationJobDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1165,8 +1162,7 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1179,7 +1175,7 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1188,7 +1184,7 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1248,14 +1244,14 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// This field is used to manage the legacy App Engine Cron jobs using the Cloud Scheduler API. If the field is set to true, the job in the __cron queue with the corresponding name will be deleted instead.
     ///
     /// Sets the *legacy app engine cron* query property to the given value.
-    pub fn legacy_app_engine_cron(mut self, new_value: bool) -> ProjectLocationJobDeleteCall<'a, C> {
+    pub fn legacy_app_engine_cron(mut self, new_value: bool) -> ProjectLocationJobDeleteCall<'a> {
         self._legacy_app_engine_cron = Some(new_value);
         self
     }
@@ -1265,7 +1261,7 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1290,7 +1286,7 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1310,7 +1306,7 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1354,19 +1350,19 @@ impl<'a, C> ProjectLocationJobDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobGetCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobGetCall<'a> {}
 
-impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1431,8 +1427,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1445,7 +1440,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1454,7 +1449,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1514,7 +1509,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1524,7 +1519,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1549,7 +1544,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1569,7 +1564,7 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1616,10 +1611,10 @@ impl<'a, C> ProjectLocationJobGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobListCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1629,9 +1624,9 @@ pub struct ProjectLocationJobListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobListCall<'a> {}
 
-impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1705,8 +1700,7 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1719,7 +1713,7 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1728,7 +1722,7 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1788,28 +1782,28 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationJobListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server will return. To request the first page results, page_token must be empty. To request the next page of results, page_token must be the value of next_page_token returned from the previous call to ListJobs. It is an error to switch the value of filter or order_by while iterating through pages.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationJobListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationJobListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The maximum page size is 500. If unspecified, the page size will be the maximum. Fewer jobs than requested might be returned, even if more jobs exist; use next_page_token to determine if more jobs exist.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationJobListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationJobListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// This field is used to manage the legacy App Engine Cron jobs using the Cloud Scheduler API. If the field is set to true, the jobs in the __cron queue will be listed instead.
     ///
     /// Sets the *legacy app engine cron* query property to the given value.
-    pub fn legacy_app_engine_cron(mut self, new_value: bool) -> ProjectLocationJobListCall<'a, C> {
+    pub fn legacy_app_engine_cron(mut self, new_value: bool) -> ProjectLocationJobListCall<'a> {
         self._legacy_app_engine_cron = Some(new_value);
         self
     }
@@ -1819,7 +1813,7 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1844,7 +1838,7 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1864,7 +1858,7 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1915,10 +1909,10 @@ impl<'a, C> ProjectLocationJobListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobPatchCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _request: Job,
     _name: String,
     _update_mask: Option<String>,
@@ -1927,9 +1921,9 @@ pub struct ProjectLocationJobPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2008,8 +2002,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2023,7 +2016,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2034,7 +2027,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2093,7 +2086,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Job) -> ProjectLocationJobPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Job) -> ProjectLocationJobPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2103,14 +2096,14 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A mask used to specify which fields of the job are being updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationJobPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationJobPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2120,7 +2113,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2145,7 +2138,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2165,7 +2158,7 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2215,10 +2208,10 @@ impl<'a, C> ProjectLocationJobPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobPauseCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobPauseCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _request: PauseJobRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2226,9 +2219,9 @@ pub struct ProjectLocationJobPauseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobPauseCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobPauseCall<'a> {}
 
-impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobPauseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2304,8 +2297,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2319,7 +2311,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2330,7 +2322,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2389,7 +2381,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PauseJobRequest) -> ProjectLocationJobPauseCall<'a, C> {
+    pub fn request(mut self, new_value: PauseJobRequest) -> ProjectLocationJobPauseCall<'a> {
         self._request = new_value;
         self
     }
@@ -2399,7 +2391,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobPauseCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobPauseCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2409,7 +2401,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobPauseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobPauseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2434,7 +2426,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobPauseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobPauseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2454,7 +2446,7 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobPauseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobPauseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2504,10 +2496,10 @@ impl<'a, C> ProjectLocationJobPauseCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobResumeCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobResumeCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _request: ResumeJobRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2515,9 +2507,9 @@ pub struct ProjectLocationJobResumeCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobResumeCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobResumeCall<'a> {}
 
-impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobResumeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2593,8 +2585,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2608,7 +2599,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2619,7 +2610,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2678,7 +2669,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResumeJobRequest) -> ProjectLocationJobResumeCall<'a, C> {
+    pub fn request(mut self, new_value: ResumeJobRequest) -> ProjectLocationJobResumeCall<'a> {
         self._request = new_value;
         self
     }
@@ -2688,7 +2679,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobResumeCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobResumeCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2698,7 +2689,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobResumeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobResumeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2723,7 +2714,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobResumeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobResumeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2743,7 +2734,7 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobResumeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobResumeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2793,10 +2784,10 @@ impl<'a, C> ProjectLocationJobResumeCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationJobRunCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationJobRunCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _request: RunJobRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2804,9 +2795,9 @@ pub struct ProjectLocationJobRunCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationJobRunCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationJobRunCall<'a> {}
 
-impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationJobRunCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2882,8 +2873,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2897,7 +2887,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2908,7 +2898,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2967,7 +2957,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RunJobRequest) -> ProjectLocationJobRunCall<'a, C> {
+    pub fn request(mut self, new_value: RunJobRequest) -> ProjectLocationJobRunCall<'a> {
         self._request = new_value;
         self
     }
@@ -2977,7 +2967,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationJobRunCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationJobRunCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2987,7 +2977,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobRunCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationJobRunCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3012,7 +3002,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobRunCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationJobRunCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3032,7 +3022,7 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobRunCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationJobRunCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3076,19 +3066,19 @@ impl<'a, C> ProjectLocationJobRunCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGetCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3153,8 +3143,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3167,7 +3156,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3176,7 +3165,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3236,7 +3225,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3246,7 +3235,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3271,7 +3260,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3291,7 +3280,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3338,10 +3327,10 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationListCall<'a>
+    where  {
 
-    hub: &'a CloudScheduler<C>,
+    hub: &'a CloudScheduler<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3351,9 +3340,9 @@ pub struct ProjectLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
 
-impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3427,8 +3416,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3441,7 +3429,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3450,7 +3438,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3510,28 +3498,28 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of results to return. If not set, the service will select a default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A filter to narrow down results to a preferred subset. The filtering language accepts strings like "displayName=tokyo", and is documented in more detail in [AIP-160](https://google.aip.dev/160).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3541,7 +3529,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3566,7 +3554,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3586,7 +3574,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

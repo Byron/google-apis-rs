@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-adsensehost4d1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/adsensehost4d1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/adsensehost4d1-cli).
 
 # Usage
 
-This documentation was generated from the *AdSense Host* API at revision *20200930*. The CLI is at version *2.0.0*.
+This documentation was generated from the *AdSense Host* API at revision *20200930*. The CLI is at version *2.0.3*.
 
 ```bash
 adsensehost4d1 [options]

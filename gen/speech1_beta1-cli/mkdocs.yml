@@ -1,8 +1,8 @@
-site_name: Speech v2.0.0+20181005
+site_name: Speech v2.0.3+20181005
 site_url: http://byron.github.io/google-apis-rs/google-speech1_beta1-cli
 site_description: A complete library to interact with Speech (protocol v1beta1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/speech1_beta1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/speech1_beta1-cli
 
 docs_dir: docs
 site_dir: build_html

@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Appengine<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Appengine,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -2267,7 +2266,7 @@ async fn main() {
     
     let mut app = App::new("appengine1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20181005")
+           .version("2.0.3+20181005")
            .about("The App Engine Admin API enables developers to provision and manage their App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_beta4_cli")
            .arg(Arg::with_name("url")

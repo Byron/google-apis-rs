@@ -1,8 +1,8 @@
-site_name: Cloud User Accounts v2.0.0+20160316
+site_name: Cloud User Accounts v2.0.3+20160316
 site_url: http://byron.github.io/google-apis-rs/google-clouduseraccountsvm_beta-cli
 site_description: A complete library to interact with Cloud User Accounts (protocol vm_beta)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/clouduseraccountsvm_beta-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/clouduseraccountsvm_beta-cli
 
 docs_dir: docs
 site_dir: build_html

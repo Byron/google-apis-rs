@@ -1,8 +1,8 @@
-site_name: AdSense v2.0.0+20201002
+site_name: AdSense v2.0.3+20201002
 site_url: http://byron.github.io/google-apis-rs/google-adsense1d4-cli
 site_description: A complete library to interact with AdSense (protocol v1.4)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adsense1d4-cli
 
 docs_dir: docs
 site_dir: build_html

@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-dfareporting3d4-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting3d4-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d4-cli).
 
 # Usage
 
-This documentation was generated from the *Dfareporting* API at revision *20210210*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Dfareporting* API at revision *20210210*. The CLI is at version *2.0.3*.
 
 ```bash
 dfareporting3d4 [options]

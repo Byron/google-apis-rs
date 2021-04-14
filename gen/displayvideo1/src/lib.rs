@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Display Video* crate version *2.0.0+20210325*, where *20210325* is the exact revision of the *displayvideo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Display Video* crate version *2.0.3+20210325*, where *20210325* is the exact revision of the *displayvideo:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Display Video* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/display-video/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/displayvideo1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/displayvideo1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](DisplayVideo) ... 

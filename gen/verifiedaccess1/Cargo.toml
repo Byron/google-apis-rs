@@ -4,12 +4,12 @@
 [package]
 
 name = "google-verifiedaccess1"
-version = "2.0.0+20210302"
+version = "2.0.3+20210302"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with verifiedaccess (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/verifiedaccess1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/verifiedaccess1"
 homepage = "https://developers.google.com/chrome/verified-access"
-documentation = "https://docs.rs/google-verifiedaccess1/2.0.0+20210302"
+documentation = "https://docs.rs/google-verifiedaccess1/2.0.3+20210302"
 license = "MIT"
 keywords = ["verifiedaccess", "google", "protocol", "web", "api"]
 autobins = false

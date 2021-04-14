@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -121,35 +120,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Docs<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Docs<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Docs<C> {}
+impl<'a, > client::Hub for Docs<> {}
 
-impl<'a, C> Docs<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Docs<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Docs<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Docs<> {
         Docs {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://docs.googleapis.com/".to_string(),
             _root_url: "https://docs.googleapis.com/".to_string(),
         }
     }
 
-    pub fn documents(&'a self) -> DocumentMethods<'a, C> {
+    pub fn documents(&'a self) -> DocumentMethods<'a> {
         DocumentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3484,15 +3482,15 @@ impl client::Part for WriteControl {}
 /// let rb = hub.documents();
 /// # }
 /// ```
-pub struct DocumentMethods<'a, C>
-    where C: 'a {
+pub struct DocumentMethods<'a>
+    where  {
 
-    hub: &'a Docs<C>,
+    hub: &'a Docs<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DocumentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DocumentMethods<'a> {}
 
-impl<'a, C> DocumentMethods<'a, C> {
+impl<'a> DocumentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3502,7 +3500,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `documentId` - The ID of the document to update.
-    pub fn batch_update(&self, request: BatchUpdateDocumentRequest, document_id: &str) -> DocumentBatchUpdateCall<'a, C> {
+    pub fn batch_update(&self, request: BatchUpdateDocumentRequest, document_id: &str) -> DocumentBatchUpdateCall<'a> {
         DocumentBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3520,7 +3518,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Document) -> DocumentCreateCall<'a, C> {
+    pub fn create(&self, request: Document) -> DocumentCreateCall<'a> {
         DocumentCreateCall {
             hub: self.hub,
             _request: request,
@@ -3537,7 +3535,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `documentId` - The ID of the document to retrieve.
-    pub fn get(&self, document_id: &str) -> DocumentGetCall<'a, C> {
+    pub fn get(&self, document_id: &str) -> DocumentGetCall<'a> {
         DocumentGetCall {
             hub: self.hub,
             _document_id: document_id.to_string(),
@@ -3595,10 +3593,10 @@ impl<'a, C> DocumentMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct DocumentBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a Docs<C>,
+    hub: &'a Docs<>,
     _request: BatchUpdateDocumentRequest,
     _document_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3606,9 +3604,9 @@ pub struct DocumentBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentBatchUpdateCall<'a> {}
 
-impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3680,8 +3678,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3695,7 +3692,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3706,7 +3703,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3765,7 +3762,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateDocumentRequest) -> DocumentBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUpdateDocumentRequest) -> DocumentBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3775,7 +3772,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn document_id(mut self, new_value: &str) -> DocumentBatchUpdateCall<'a, C> {
+    pub fn document_id(mut self, new_value: &str) -> DocumentBatchUpdateCall<'a> {
         self._document_id = new_value.to_string();
         self
     }
@@ -3785,7 +3782,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3810,7 +3807,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3830,7 +3827,7 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3880,19 +3877,19 @@ impl<'a, C> DocumentBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentCreateCall<'a, C>
-    where C: 'a {
+pub struct DocumentCreateCall<'a>
+    where  {
 
-    hub: &'a Docs<C>,
+    hub: &'a Docs<>,
     _request: Document,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentCreateCall<'a> {}
 
-impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3942,8 +3939,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3957,7 +3953,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3968,7 +3964,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4027,7 +4023,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Document) -> DocumentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Document) -> DocumentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4037,7 +4033,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4062,7 +4058,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4082,7 +4078,7 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4127,10 +4123,10 @@ impl<'a, C> DocumentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentGetCall<'a, C>
-    where C: 'a {
+pub struct DocumentGetCall<'a>
+    where  {
 
-    hub: &'a Docs<C>,
+    hub: &'a Docs<>,
     _document_id: String,
     _suggestions_view_mode: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4138,9 +4134,9 @@ pub struct DocumentGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentGetCall<'a> {}
 
-impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4204,8 +4200,7 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4218,7 +4213,7 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4227,7 +4222,7 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4287,14 +4282,14 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn document_id(mut self, new_value: &str) -> DocumentGetCall<'a, C> {
+    pub fn document_id(mut self, new_value: &str) -> DocumentGetCall<'a> {
         self._document_id = new_value.to_string();
         self
     }
     /// The suggestions view mode to apply to the document. This allows viewing the document with all suggestions inline, accepted or rejected. If one is not specified, DEFAULT_FOR_CURRENT_ACCESS is used.
     ///
     /// Sets the *suggestions view mode* query property to the given value.
-    pub fn suggestions_view_mode(mut self, new_value: &str) -> DocumentGetCall<'a, C> {
+    pub fn suggestions_view_mode(mut self, new_value: &str) -> DocumentGetCall<'a> {
         self._suggestions_view_mode = Some(new_value.to_string());
         self
     }
@@ -4304,7 +4299,7 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4329,7 +4324,7 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4349,7 +4344,7 @@ impl<'a, C> DocumentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

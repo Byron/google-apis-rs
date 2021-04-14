@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudTrace<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::CloudTrace,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -381,7 +380,7 @@ async fn main() {
     
     let mut app = App::new("cloudtrace2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210319")
+           .version("2.0.3+20210319")
            .about("Sends application trace data to Cloud Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Cloud Trace API directly. If you are looking to instrument your application for Cloud Trace, we recommend using OpenCensus. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli")
            .arg(Arg::with_name("url")

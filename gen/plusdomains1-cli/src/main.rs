@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::PlusDomains<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::PlusDomains,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -1095,7 +1094,7 @@ async fn main() {
     
     let mut app = App::new("plusdomains1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20190616")
+           .version("2.0.3+20190616")
            .about("Builds on top of the Google+ platform for Google Apps Domains.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plusdomains1_cli")
            .arg(Arg::with_name("url")

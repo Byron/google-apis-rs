@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-managedidentities1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/managedidentities1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/managedidentities1-cli).
 
 # Usage
 
-This documentation was generated from the *Managed Service for Microsoft Active Directory Consumer API* API at revision *20210324*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Managed Service for Microsoft Active Directory Consumer API* API at revision *20210324*. The CLI is at version *2.0.3*.
 
 ```bash
 managedidentities1 [options]

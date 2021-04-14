@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-appengine1_beta4-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta4-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/appengine1_beta4-cli).
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20181005*. The CLI is at version *2.0.0*.
+This documentation was generated from the *appengine* API at revision *20181005*. The CLI is at version *2.0.3*.
 
 ```bash
 appengine1-beta4 [options]

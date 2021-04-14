@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudUserAccounts<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::CloudUserAccounts,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -1822,7 +1821,7 @@ async fn main() {
     
     let mut app = App::new("clouduseraccountsvm-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20160316")
+           .version("2.0.3+20160316")
            .about("Creates and manages users and groups for accessing Google Compute Engine virtual machines.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouduseraccountsvm_beta_cli")
            .arg(Arg::with_name("url")

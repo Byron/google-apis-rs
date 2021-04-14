@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Libraryagent* crate version *2.0.0+20210330*, where *20210330* is the exact revision of the *libraryagent:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Libraryagent* crate version *2.0.3+20210330*, where *20210330* is the exact revision of the *libraryagent:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Libraryagent* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/docs/quota).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/libraryagent1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/libraryagent1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Libraryagent) ... 

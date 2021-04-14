@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,41 +104,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudAsset<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudAsset<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudAsset<C> {}
+impl<'a, > client::Hub for CloudAsset<> {}
 
-impl<'a, C> CloudAsset<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudAsset<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudAsset<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudAsset<> {
         CloudAsset {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudasset.googleapis.com/".to_string(),
             _root_url: "https://cloudasset.googleapis.com/".to_string(),
         }
     }
 
-    pub fn feeds(&'a self) -> FeedMethods<'a, C> {
+    pub fn feeds(&'a self) -> FeedMethods<'a> {
         FeedMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1866,15 +1864,15 @@ impl client::Part for ZypperPatch {}
 /// let rb = hub.feeds();
 /// # }
 /// ```
-pub struct FeedMethods<'a, C>
-    where C: 'a {
+pub struct FeedMethods<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FeedMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FeedMethods<'a> {}
 
-impl<'a, C> FeedMethods<'a, C> {
+impl<'a> FeedMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1884,7 +1882,7 @@ impl<'a, C> FeedMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the project/folder/organization where this feed should be created in. It can only be an organization number (such as "organizations/123"), a folder number (such as "folders/123"), a project ID (such as "projects/my-project-id")", or a project number (such as "projects/12345").
-    pub fn create(&self, request: CreateFeedRequest, parent: &str) -> FeedCreateCall<'a, C> {
+    pub fn create(&self, request: CreateFeedRequest, parent: &str) -> FeedCreateCall<'a> {
         FeedCreateCall {
             hub: self.hub,
             _request: request,
@@ -1902,7 +1900,7 @@ impl<'a, C> FeedMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the feed and it must be in the format of: projects/project_number/feeds/feed_id folders/folder_number/feeds/feed_id organizations/organization_number/feeds/feed_id
-    pub fn delete(&self, name: &str) -> FeedDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> FeedDeleteCall<'a> {
         FeedDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1919,7 +1917,7 @@ impl<'a, C> FeedMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Feed and it must be in the format of: projects/project_number/feeds/feed_id folders/folder_number/feeds/feed_id organizations/organization_number/feeds/feed_id
-    pub fn get(&self, name: &str) -> FeedGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> FeedGetCall<'a> {
         FeedGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1936,7 +1934,7 @@ impl<'a, C> FeedMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent project/folder/organization whose feeds are to be listed. It can only be using project/folder/organization number (such as "folders/12345")", or a project ID (such as "projects/my-project-id").
-    pub fn list(&self, parent: &str) -> FeedListCall<'a, C> {
+    pub fn list(&self, parent: &str) -> FeedListCall<'a> {
         FeedListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1954,7 +1952,7 @@ impl<'a, C> FeedMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The format will be projects/{project_number}/feeds/{client-assigned_feed_identifier} or folders/{folder_number}/feeds/{client-assigned_feed_identifier} or organizations/{organization_number}/feeds/{client-assigned_feed_identifier} The client-assigned feed identifier must be unique within the parent project/folder/organization.
-    pub fn patch(&self, request: UpdateFeedRequest, name: &str) -> FeedPatchCall<'a, C> {
+    pub fn patch(&self, request: UpdateFeedRequest, name: &str) -> FeedPatchCall<'a> {
         FeedPatchCall {
             hub: self.hub,
             _request: request,
@@ -1998,15 +1996,15 @@ impl<'a, C> FeedMethods<'a, C> {
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2015,7 +2013,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2058,15 +2056,15 @@ impl<'a, C> OperationMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2075,7 +2073,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `scope` - Required. The relative name of the root asset. Only resources and IAM policies within the scope will be analyzed. This can only be an organization number (such as "organizations/123"), a folder number (such as "folders/123"), a project ID (such as "projects/my-project-id"), or a project number (such as "projects/12345"). To know how to get organization id, visit [here ](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id). To know how to get folder or project id, visit [here ](https://cloud.google.com/resource-manager/docs/creating-managing-folders#viewing_or_listing_folders_and_projects).
-    pub fn analyze_iam_policy(&self, scope: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analyze_iam_policy(&self, scope: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         MethodAnalyzeIamPolicyCall {
             hub: self.hub,
             _scope: scope.to_string(),
@@ -2104,7 +2102,7 @@ impl<'a, C> MethodMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `scope` - Required. The relative name of the root asset. Only resources and IAM policies within the scope will be analyzed. This can only be an organization number (such as "organizations/123"), a folder number (such as "folders/123"), a project ID (such as "projects/my-project-id"), or a project number (such as "projects/12345"). To know how to get organization id, visit [here ](https://cloud.google.com/resource-manager/docs/creating-managing-organization#retrieving_your_organization_id). To know how to get folder or project id, visit [here ](https://cloud.google.com/resource-manager/docs/creating-managing-folders#viewing_or_listing_folders_and_projects).
-    pub fn analyze_iam_policy_longrunning(&self, request: AnalyzeIamPolicyLongrunningRequest, scope: &str) -> MethodAnalyzeIamPolicyLongrunningCall<'a, C> {
+    pub fn analyze_iam_policy_longrunning(&self, request: AnalyzeIamPolicyLongrunningRequest, scope: &str) -> MethodAnalyzeIamPolicyLongrunningCall<'a> {
         MethodAnalyzeIamPolicyLongrunningCall {
             hub: self.hub,
             _request: request,
@@ -2122,7 +2120,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The relative name of the root asset. It can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id")", or a project number (such as "projects/12345").
-    pub fn batch_get_assets_history(&self, parent: &str) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn batch_get_assets_history(&self, parent: &str) -> MethodBatchGetAssetsHistoryCall<'a> {
         MethodBatchGetAssetsHistoryCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2144,7 +2142,7 @@ impl<'a, C> MethodMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The relative name of the root asset. This can only be an organization number (such as "organizations/123"), a project ID (such as "projects/my-project-id"), or a project number (such as "projects/12345"), or a folder number (such as "folders/123").
-    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> MethodExportAssetCall<'a, C> {
+    pub fn export_assets(&self, request: ExportAssetsRequest, parent: &str) -> MethodExportAssetCall<'a> {
         MethodExportAssetCall {
             hub: self.hub,
             _request: request,
@@ -2162,7 +2160,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `scope` - Required. A scope can be a project, a folder, or an organization. The search is limited to the IAM policies within the `scope`. The caller must be granted the [`cloudasset.assets.searchAllIamPolicies`](https://cloud.google.com/asset-inventory/docs/access-control#required_permissions) permission on the desired scope. The allowed values are: * projects/{PROJECT_ID} (e.g., "projects/foo-bar") * projects/{PROJECT_NUMBER} (e.g., "projects/12345678") * folders/{FOLDER_NUMBER} (e.g., "folders/1234567") * organizations/{ORGANIZATION_NUMBER} (e.g., "organizations/123456")
-    pub fn search_all_iam_policies(&self, scope: &str) -> MethodSearchAllIamPolicyCall<'a, C> {
+    pub fn search_all_iam_policies(&self, scope: &str) -> MethodSearchAllIamPolicyCall<'a> {
         MethodSearchAllIamPolicyCall {
             hub: self.hub,
             _scope: scope.to_string(),
@@ -2182,7 +2180,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `scope` - Required. A scope can be a project, a folder, or an organization. The search is limited to the resources within the `scope`. The caller must be granted the [`cloudasset.assets.searchAllResources`](https://cloud.google.com/asset-inventory/docs/access-control#required_permissions) permission on the desired scope. The allowed values are: * projects/{PROJECT_ID} (e.g., "projects/foo-bar") * projects/{PROJECT_NUMBER} (e.g., "projects/12345678") * folders/{FOLDER_NUMBER} (e.g., "folders/1234567") * organizations/{ORGANIZATION_NUMBER} (e.g., "organizations/123456")
-    pub fn search_all_resources(&self, scope: &str) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn search_all_resources(&self, scope: &str) -> MethodSearchAllResourceCall<'a> {
         MethodSearchAllResourceCall {
             hub: self.hub,
             _scope: scope.to_string(),
@@ -2244,10 +2242,10 @@ impl<'a, C> MethodMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FeedCreateCall<'a, C>
-    where C: 'a {
+pub struct FeedCreateCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _request: CreateFeedRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2255,9 +2253,9 @@ pub struct FeedCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FeedCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for FeedCreateCall<'a> {}
 
-impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FeedCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2333,8 +2331,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2348,7 +2345,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2359,7 +2356,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2418,7 +2415,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateFeedRequest) -> FeedCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateFeedRequest) -> FeedCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2428,7 +2425,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FeedCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FeedCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2438,7 +2435,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2463,7 +2460,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FeedCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FeedCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2483,7 +2480,7 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FeedCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FeedCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2527,19 +2524,19 @@ impl<'a, C> FeedCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FeedDeleteCall<'a, C>
-    where C: 'a {
+pub struct FeedDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FeedDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for FeedDeleteCall<'a> {}
 
-impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FeedDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2604,8 +2601,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2618,7 +2614,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2627,7 +2623,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2687,7 +2683,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FeedDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FeedDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2697,7 +2693,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2722,7 +2718,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FeedDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FeedDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2742,7 +2738,7 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FeedDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FeedDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2786,19 +2782,19 @@ impl<'a, C> FeedDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FeedGetCall<'a, C>
-    where C: 'a {
+pub struct FeedGetCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FeedGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FeedGetCall<'a> {}
 
-impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FeedGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2863,8 +2859,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2877,7 +2872,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2886,7 +2881,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2946,7 +2941,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FeedGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FeedGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2956,7 +2951,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2981,7 +2976,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FeedGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FeedGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3001,7 +2996,7 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FeedGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FeedGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3045,19 +3040,19 @@ impl<'a, C> FeedGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FeedListCall<'a, C>
-    where C: 'a {
+pub struct FeedListCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FeedListCall<'a, C> {}
+impl<'a> client::CallBuilder for FeedListCall<'a> {}
 
-impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FeedListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3122,8 +3117,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3136,7 +3130,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3145,7 +3139,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3205,7 +3199,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FeedListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FeedListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3215,7 +3209,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3240,7 +3234,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FeedListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FeedListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3260,7 +3254,7 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FeedListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FeedListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3310,10 +3304,10 @@ impl<'a, C> FeedListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FeedPatchCall<'a, C>
-    where C: 'a {
+pub struct FeedPatchCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _request: UpdateFeedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3321,9 +3315,9 @@ pub struct FeedPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FeedPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for FeedPatchCall<'a> {}
 
-impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FeedPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3399,8 +3393,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3414,7 +3407,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3425,7 +3418,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3484,7 +3477,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateFeedRequest) -> FeedPatchCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateFeedRequest) -> FeedPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -3494,7 +3487,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FeedPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FeedPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3504,7 +3497,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FeedPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3529,7 +3522,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FeedPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FeedPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3549,7 +3542,7 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FeedPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FeedPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3593,19 +3586,19 @@ impl<'a, C> FeedPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C>
-    where C: 'a {
+pub struct OperationGetCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationGetCall<'a> {}
 
-impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3670,8 +3663,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3684,7 +3676,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3693,7 +3685,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3753,7 +3745,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3763,7 +3755,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3788,7 +3780,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3808,7 +3800,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3863,10 +3855,10 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodAnalyzeIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct MethodAnalyzeIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _scope: String,
     _execution_timeout: Option<String>,
     _analysis_query_resource_selector_full_resource_name: Option<String>,
@@ -3884,9 +3876,9 @@ pub struct MethodAnalyzeIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodAnalyzeIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodAnalyzeIamPolicyCall<'a> {}
 
-impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodAnalyzeIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3988,8 +3980,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4002,7 +3993,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4011,7 +4002,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4071,70 +4062,70 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn scope(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn scope(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         self._scope = new_value.to_string();
         self
     }
     /// Optional. Amount of time executable has to complete. See JSON representation of [Duration](https://developers.google.com/protocol-buffers/docs/proto3#json). If this field is set with a value less than the RPC deadline, and the execution of your query hasn't finished in the specified execution timeout, you will get a response with partial result. Otherwise, your query's execution will continue until the RPC deadline. If it's not finished until then, you will get a DEADLINE_EXCEEDED error. Default is empty.
     ///
     /// Sets the *execution timeout* query property to the given value.
-    pub fn execution_timeout(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn execution_timeout(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         self._execution_timeout = Some(new_value.to_string());
         self
     }
     /// Required. The [full resource name] (https://cloud.google.com/asset-inventory/docs/resource-name-format) of a resource of [supported resource types](https://cloud.google.com/asset-inventory/docs/supported-asset-types#analyzable_asset_types).
     ///
     /// Sets the *analysis query.resource selector.full resource name* query property to the given value.
-    pub fn analysis_query_resource_selector_full_resource_name(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_resource_selector_full_resource_name(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_resource_selector_full_resource_name = Some(new_value.to_string());
         self
     }
     /// Optional. If true, the result will output resource edges, starting from the policy attached resource, to any expanded resources. Default is false.
     ///
     /// Sets the *analysis query.options.output resource edges* query property to the given value.
-    pub fn analysis_query_options_output_resource_edges(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_options_output_resource_edges(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_options_output_resource_edges = Some(new_value);
         self
     }
     /// Optional. If true, the result will output group identity edges, starting from the binding's group members, to any expanded identities. Default is false.
     ///
     /// Sets the *analysis query.options.output group edges* query property to the given value.
-    pub fn analysis_query_options_output_group_edges(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_options_output_group_edges(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_options_output_group_edges = Some(new_value);
         self
     }
     /// Optional. If true, the access section of result will expand any roles appearing in IAM policy bindings to include their permissions. If IamPolicyAnalysisQuery.access_selector is specified, the access section of the result will be determined by the selector, and this flag is not allowed to set. Default is false.
     ///
     /// Sets the *analysis query.options.expand roles* query property to the given value.
-    pub fn analysis_query_options_expand_roles(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_options_expand_roles(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_options_expand_roles = Some(new_value);
         self
     }
     /// Optional. If true and IamPolicyAnalysisQuery.resource_selector is not specified, the resource section of the result will expand any resource attached to an IAM policy to include resources lower in the resource hierarchy. For example, if the request analyzes for which resources user A has permission P, and the results include an IAM policy with P on a GCP folder, the results will also include resources in that folder with permission P. If true and IamPolicyAnalysisQuery.resource_selector is specified, the resource section of the result will expand the specified resource to include resources lower in the resource hierarchy. Only project or lower resources are supported. Folder and organization resource cannot be used together with this option. For example, if the request analyzes for which users have permission P on a GCP project with this option enabled, the results will include all users who have permission P on that project or any lower resource. Default is false.
     ///
     /// Sets the *analysis query.options.expand resources* query property to the given value.
-    pub fn analysis_query_options_expand_resources(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_options_expand_resources(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_options_expand_resources = Some(new_value);
         self
     }
     /// Optional. If true, the identities section of the result will expand any Google groups appearing in an IAM policy binding. If IamPolicyAnalysisQuery.identity_selector is specified, the identity in the result will be determined by the selector, and this flag is not allowed to set. Default is false.
     ///
     /// Sets the *analysis query.options.expand groups* query property to the given value.
-    pub fn analysis_query_options_expand_groups(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_options_expand_groups(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_options_expand_groups = Some(new_value);
         self
     }
     /// Optional. If true, the response will include access analysis from identities to resources via service account impersonation. This is a very expensive operation, because many derived queries will be executed. We highly recommend you use AssetService.AnalyzeIamPolicyLongrunning rpc instead. For example, if the request analyzes for which resources user A has permission P, and there's an IAM policy states user A has iam.serviceAccounts.getAccessToken permission to a service account SA, and there's another IAM policy states service account SA has permission P to a GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Another example, if the request analyzes for who has permission P to a GCP folder F, and there's an IAM policy states user A has iam.serviceAccounts.actAs permission to a service account SA, and there's another IAM policy states service account SA has permission P to the GCP folder F, then user A potentially has access to the GCP folder F. And those advanced analysis results will be included in AnalyzeIamPolicyResponse.service_account_impersonation_analysis. Default is false.
     ///
     /// Sets the *analysis query.options.analyze service account impersonation* query property to the given value.
-    pub fn analysis_query_options_analyze_service_account_impersonation(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_options_analyze_service_account_impersonation(mut self, new_value: bool) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_options_analyze_service_account_impersonation = Some(new_value);
         self
     }
     /// Required. The identity appear in the form of members in [IAM policy binding](https://cloud.google.com/iam/reference/rest/v1/Binding). The examples of supported forms are: "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com". Notice that wildcard characters (such as * and ?) are not supported. You must give a specific identity.
     ///
     /// Sets the *analysis query.identity selector.identity* query property to the given value.
-    pub fn analysis_query_identity_selector_identity(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn analysis_query_identity_selector_identity(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_identity_selector_identity = Some(new_value.to_string());
         self
     }
@@ -4142,7 +4133,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Append the given value to the *analysis query.access selector.roles* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_analysis_query_access_selector_roles(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn add_analysis_query_access_selector_roles(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_access_selector_roles.push(new_value.to_string());
         self
     }
@@ -4150,7 +4141,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Append the given value to the *analysis query.access selector.permissions* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_analysis_query_access_selector_permissions(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn add_analysis_query_access_selector_permissions(mut self, new_value: &str) -> MethodAnalyzeIamPolicyCall<'a> {
         self._analysis_query_access_selector_permissions.push(new_value.to_string());
         self
     }
@@ -4160,7 +4151,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodAnalyzeIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodAnalyzeIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4185,7 +4176,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodAnalyzeIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodAnalyzeIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4205,7 +4196,7 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodAnalyzeIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodAnalyzeIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4255,10 +4246,10 @@ impl<'a, C> MethodAnalyzeIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodAnalyzeIamPolicyLongrunningCall<'a, C>
-    where C: 'a {
+pub struct MethodAnalyzeIamPolicyLongrunningCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _request: AnalyzeIamPolicyLongrunningRequest,
     _scope: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4266,9 +4257,9 @@ pub struct MethodAnalyzeIamPolicyLongrunningCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodAnalyzeIamPolicyLongrunningCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodAnalyzeIamPolicyLongrunningCall<'a> {}
 
-impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodAnalyzeIamPolicyLongrunningCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4344,8 +4335,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4359,7 +4349,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4370,7 +4360,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4429,7 +4419,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeIamPolicyLongrunningRequest) -> MethodAnalyzeIamPolicyLongrunningCall<'a, C> {
+    pub fn request(mut self, new_value: AnalyzeIamPolicyLongrunningRequest) -> MethodAnalyzeIamPolicyLongrunningCall<'a> {
         self._request = new_value;
         self
     }
@@ -4439,7 +4429,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn scope(mut self, new_value: &str) -> MethodAnalyzeIamPolicyLongrunningCall<'a, C> {
+    pub fn scope(mut self, new_value: &str) -> MethodAnalyzeIamPolicyLongrunningCall<'a> {
         self._scope = new_value.to_string();
         self
     }
@@ -4449,7 +4439,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodAnalyzeIamPolicyLongrunningCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodAnalyzeIamPolicyLongrunningCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4474,7 +4464,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodAnalyzeIamPolicyLongrunningCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodAnalyzeIamPolicyLongrunningCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4494,7 +4484,7 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodAnalyzeIamPolicyLongrunningCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodAnalyzeIamPolicyLongrunningCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4542,10 +4532,10 @@ impl<'a, C> MethodAnalyzeIamPolicyLongrunningCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodBatchGetAssetsHistoryCall<'a, C>
-    where C: 'a {
+pub struct MethodBatchGetAssetsHistoryCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _parent: String,
     _read_time_window_start_time: Option<String>,
     _read_time_window_end_time: Option<String>,
@@ -4556,9 +4546,9 @@ pub struct MethodBatchGetAssetsHistoryCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodBatchGetAssetsHistoryCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodBatchGetAssetsHistoryCall<'a> {}
 
-impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodBatchGetAssetsHistoryCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4637,8 +4627,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4651,7 +4640,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4660,7 +4649,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4720,28 +4709,28 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Start time of the time window (exclusive).
     ///
     /// Sets the *read time window.start time* query property to the given value.
-    pub fn read_time_window_start_time(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn read_time_window_start_time(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a> {
         self._read_time_window_start_time = Some(new_value.to_string());
         self
     }
     /// End time of the time window (inclusive). If not specified, the current timestamp is used instead.
     ///
     /// Sets the *read time window.end time* query property to the given value.
-    pub fn read_time_window_end_time(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn read_time_window_end_time(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a> {
         self._read_time_window_end_time = Some(new_value.to_string());
         self
     }
     /// Optional. The content type.
     ///
     /// Sets the *content type* query property to the given value.
-    pub fn content_type(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn content_type(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a> {
         self._content_type = Some(new_value.to_string());
         self
     }
@@ -4749,7 +4738,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Append the given value to the *asset names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_asset_names(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn add_asset_names(mut self, new_value: &str) -> MethodBatchGetAssetsHistoryCall<'a> {
         self._asset_names.push(new_value.to_string());
         self
     }
@@ -4759,7 +4748,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodBatchGetAssetsHistoryCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodBatchGetAssetsHistoryCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4784,7 +4773,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodBatchGetAssetsHistoryCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodBatchGetAssetsHistoryCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4804,7 +4793,7 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodBatchGetAssetsHistoryCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodBatchGetAssetsHistoryCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4854,10 +4843,10 @@ impl<'a, C> MethodBatchGetAssetsHistoryCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodExportAssetCall<'a, C>
-    where C: 'a {
+pub struct MethodExportAssetCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _request: ExportAssetsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4865,9 +4854,9 @@ pub struct MethodExportAssetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodExportAssetCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodExportAssetCall<'a> {}
 
-impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodExportAssetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4943,8 +4932,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4958,7 +4946,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4969,7 +4957,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5028,7 +5016,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ExportAssetsRequest) -> MethodExportAssetCall<'a, C> {
+    pub fn request(mut self, new_value: ExportAssetsRequest) -> MethodExportAssetCall<'a> {
         self._request = new_value;
         self
     }
@@ -5038,7 +5026,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> MethodExportAssetCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> MethodExportAssetCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -5048,7 +5036,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodExportAssetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodExportAssetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5073,7 +5061,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodExportAssetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodExportAssetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5093,7 +5081,7 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodExportAssetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodExportAssetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5140,10 +5128,10 @@ impl<'a, C> MethodExportAssetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodSearchAllIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct MethodSearchAllIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _scope: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -5153,9 +5141,9 @@ pub struct MethodSearchAllIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodSearchAllIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodSearchAllIamPolicyCall<'a> {}
 
-impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodSearchAllIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5229,8 +5217,7 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5243,7 +5230,7 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5252,7 +5239,7 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5312,28 +5299,28 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn scope(mut self, new_value: &str) -> MethodSearchAllIamPolicyCall<'a, C> {
+    pub fn scope(mut self, new_value: &str) -> MethodSearchAllIamPolicyCall<'a> {
         self._scope = new_value.to_string();
         self
     }
     /// Optional. The query statement. See [how to construct a query](https://cloud.google.com/asset-inventory/docs/searching-iam-policies#how_to_construct_a_query) for more information. If not specified or empty, it will search all the IAM policies within the specified `scope`. Note that the query string is compared against each Cloud IAM policy binding, including its members, roles, and Cloud IAM conditions. The returned Cloud IAM policies will only contain the bindings that match your query. To learn more about the IAM policy structure, see [IAM policy doc](https://cloud.google.com/iam/docs/policies#structure). Examples: * `policy:amy@gmail.com` to find IAM policy bindings that specify user "amy@gmail.com". * `policy:roles/compute.admin` to find IAM policy bindings that specify the Compute Admin role. * `policy:comp*` to find IAM policy bindings that contain "comp" as a prefix of any word in the binding. * `policy.role.permissions:storage.buckets.update` to find IAM policy bindings that specify a role containing "storage.buckets.update" permission. Note that if callers don't have `iam.roles.get` access to a role's included permissions, policy bindings that specify this role will be dropped from the search results. * `policy.role.permissions:upd*` to find IAM policy bindings that specify a role containing "upd" as a prefix of any word in the role permission. Note that if callers don't have `iam.roles.get` access to a role's included permissions, policy bindings that specify this role will be dropped from the search results. * `resource:organizations/123456` to find IAM policy bindings that are set on "organizations/123456". * `resource=//cloudresourcemanager.googleapis.com/projects/myproject` to find IAM policy bindings that are set on the project named "myproject". * `Important` to find IAM policy bindings that contain "Important" as a word in any of the searchable fields (except for the included permissions). * `resource:(instance1 OR instance2) policy:amy` to find IAM policy bindings that are set on resources "instance1" or "instance2" and also specify user "amy".
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> MethodSearchAllIamPolicyCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> MethodSearchAllIamPolicyCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. If present, retrieve the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of all other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MethodSearchAllIamPolicyCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MethodSearchAllIamPolicyCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The page size for search result pagination. Page size is capped at 500 even if a larger value is given. If set to zero, server will pick an appropriate default. Returned results may be fewer than requested. When this happens, there could be more results as long as `next_page_token` is returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MethodSearchAllIamPolicyCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MethodSearchAllIamPolicyCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5343,7 +5330,7 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSearchAllIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSearchAllIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5368,7 +5355,7 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodSearchAllIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodSearchAllIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5388,7 +5375,7 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodSearchAllIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodSearchAllIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5437,10 +5424,10 @@ impl<'a, C> MethodSearchAllIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodSearchAllResourceCall<'a, C>
-    where C: 'a {
+pub struct MethodSearchAllResourceCall<'a>
+    where  {
 
-    hub: &'a CloudAsset<C>,
+    hub: &'a CloudAsset<>,
     _scope: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -5452,9 +5439,9 @@ pub struct MethodSearchAllResourceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodSearchAllResourceCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodSearchAllResourceCall<'a> {}
 
-impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodSearchAllResourceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5536,8 +5523,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5550,7 +5536,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5559,7 +5545,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5619,35 +5605,35 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn scope(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn scope(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a> {
         self._scope = new_value.to_string();
         self
     }
     /// Optional. The query statement. See [how to construct a query](https://cloud.google.com/asset-inventory/docs/searching-resources#how_to_construct_a_query) for more information. If not specified or empty, it will search all the resources within the specified `scope`. Examples: * `name:Important` to find Cloud resources whose name contains "Important" as a word. * `name=Important` to find the Cloud resource whose name is exactly "Important". * `displayName:Impor*` to find Cloud resources whose display name contains "Impor" as a prefix of any word in the field. * `location:us-west*` to find Cloud resources whose location contains both "us" and "west" as prefixes. * `labels:prod` to find Cloud resources whose labels contain "prod" as a key or value. * `labels.env:prod` to find Cloud resources that have a label "env" and its value is "prod". * `labels.env:*` to find Cloud resources that have a label "env". * `kmsKey:key` to find Cloud resources encrypted with a customer-managed encryption key whose name contains the word "key". * `state:ACTIVE` to find Cloud resources whose state contains "ACTIVE" as a word. * `createTime<1609459200` to find Cloud resources that were created before "2021-01-01 00:00:00 UTC". 1609459200 is the epoch timestamp of "2021-01-01 00:00:00 UTC" in seconds. * `updateTime>1609459200` to find Cloud resources that were updated after "2021-01-01 00:00:00 UTC". 1609459200 is the epoch timestamp of "2021-01-01 00:00:00 UTC" in seconds. * `Important` to find Cloud resources that contain "Important" as a word in any of the searchable fields. * `Impor*` to find Cloud resources that contain "Impor" as a prefix of any word in any of the searchable fields. * `Important location:(us-west1 OR global)` to find Cloud resources that contain "Important" as a word in any of the searchable fields and are also located in the "us-west1" region or the "global" location.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. If present, then retrieve the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of all other method parameters, must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The page size for search result pagination. Page size is capped at 500 even if a larger value is given. If set to zero, server will pick an appropriate default. Returned results may be fewer than requested. When this happens, there could be more results as long as `next_page_token` is returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MethodSearchAllResourceCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. A comma separated list of fields specifying the sorting order of the results. The default order is ascending. Add " DESC" after the field name to indicate descending order. Redundant space characters are ignored. Example: "location DESC, name". Only string fields in the response are sortable, including `name`, `displayName`, `description`, `location`. All the other fields such as repeated fields (e.g., `networkTags`), map fields (e.g., `labels`) and struct fields (e.g., `additionalAttributes`) are not supported.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -5655,7 +5641,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Append the given value to the *asset types* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_asset_types(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn add_asset_types(mut self, new_value: &str) -> MethodSearchAllResourceCall<'a> {
         self._asset_types.push(new_value.to_string());
         self
     }
@@ -5665,7 +5651,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSearchAllResourceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodSearchAllResourceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5690,7 +5676,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodSearchAllResourceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodSearchAllResourceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5710,7 +5696,7 @@ impl<'a, C> MethodSearchAllResourceCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodSearchAllResourceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodSearchAllResourceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -103,38 +102,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Speech<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Speech<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Speech<C> {}
+impl<'a, > client::Hub for Speech<> {}
 
-impl<'a, C> Speech<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Speech<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Speech<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Speech<> {
         Speech {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://speech.googleapis.com/".to_string(),
             _root_url: "https://speech.googleapis.com/".to_string(),
         }
     }
 
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
-    pub fn speech(&'a self) -> SpeechMethods<'a, C> {
+    pub fn speech(&'a self) -> SpeechMethods<'a> {
         SpeechMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -513,15 +511,15 @@ impl client::Part for WordInfo {}
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a Speech<C>,
+    hub: &'a Speech<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -530,7 +528,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -543,7 +541,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
-    pub fn list(&self) -> OperationListCall<'a, C> {
+    pub fn list(&self) -> OperationListCall<'a> {
         OperationListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -589,15 +587,15 @@ impl<'a, C> OperationMethods<'a, C> {
 /// let rb = hub.speech();
 /// # }
 /// ```
-pub struct SpeechMethods<'a, C>
-    where C: 'a {
+pub struct SpeechMethods<'a>
+    where  {
 
-    hub: &'a Speech<C>,
+    hub: &'a Speech<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SpeechMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SpeechMethods<'a> {}
 
-impl<'a, C> SpeechMethods<'a, C> {
+impl<'a> SpeechMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -606,7 +604,7 @@ impl<'a, C> SpeechMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn longrunningrecognize(&self, request: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a, C> {
+    pub fn longrunningrecognize(&self, request: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a> {
         SpeechLongrunningrecognizeCall {
             hub: self.hub,
             _request: request,
@@ -623,7 +621,7 @@ impl<'a, C> SpeechMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn recognize(&self, request: RecognizeRequest) -> SpeechRecognizeCall<'a, C> {
+    pub fn recognize(&self, request: RecognizeRequest) -> SpeechRecognizeCall<'a> {
         SpeechRecognizeCall {
             hub: self.hub,
             _request: request,
@@ -674,19 +672,19 @@ impl<'a, C> SpeechMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C>
-    where C: 'a {
+pub struct OperationGetCall<'a>
+    where  {
 
-    hub: &'a Speech<C>,
+    hub: &'a Speech<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationGetCall<'a> {}
 
-impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -751,8 +749,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -765,7 +762,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -774,7 +771,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -834,7 +831,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -844,7 +841,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -869,7 +866,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -889,7 +886,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -937,10 +934,10 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a, C>
-    where C: 'a {
+pub struct OperationListCall<'a>
+    where  {
 
-    hub: &'a Speech<C>,
+    hub: &'a Speech<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
@@ -950,9 +947,9 @@ pub struct OperationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationListCall<'a> {}
 
-impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1003,8 +1000,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1017,7 +1013,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1026,7 +1022,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1083,28 +1079,28 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The name of the operation's parent resource.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
         self._name = Some(new_value.to_string());
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1114,7 +1110,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1139,7 +1135,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1159,7 +1155,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1209,19 +1205,19 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpeechLongrunningrecognizeCall<'a, C>
-    where C: 'a {
+pub struct SpeechLongrunningrecognizeCall<'a>
+    where  {
 
-    hub: &'a Speech<C>,
+    hub: &'a Speech<>,
     _request: LongRunningRecognizeRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpeechLongrunningrecognizeCall<'a, C> {}
+impl<'a> client::CallBuilder for SpeechLongrunningrecognizeCall<'a> {}
 
-impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpeechLongrunningrecognizeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1271,8 +1267,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1286,7 +1281,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1297,7 +1292,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1356,7 +1351,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a, C> {
+    pub fn request(mut self, new_value: LongRunningRecognizeRequest) -> SpeechLongrunningrecognizeCall<'a> {
         self._request = new_value;
         self
     }
@@ -1366,7 +1361,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechLongrunningrecognizeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechLongrunningrecognizeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1391,7 +1386,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpeechLongrunningrecognizeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpeechLongrunningrecognizeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1411,7 +1406,7 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpeechLongrunningrecognizeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpeechLongrunningrecognizeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1461,19 +1456,19 @@ impl<'a, C> SpeechLongrunningrecognizeCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpeechRecognizeCall<'a, C>
-    where C: 'a {
+pub struct SpeechRecognizeCall<'a>
+    where  {
 
-    hub: &'a Speech<C>,
+    hub: &'a Speech<>,
     _request: RecognizeRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SpeechRecognizeCall<'a, C> {}
+impl<'a> client::CallBuilder for SpeechRecognizeCall<'a> {}
 
-impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpeechRecognizeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1523,8 +1518,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1538,7 +1532,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1549,7 +1543,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1608,7 +1602,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RecognizeRequest) -> SpeechRecognizeCall<'a, C> {
+    pub fn request(mut self, new_value: RecognizeRequest) -> SpeechRecognizeCall<'a> {
         self._request = new_value;
         self
     }
@@ -1618,7 +1612,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechRecognizeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpeechRecognizeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1643,7 +1637,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpeechRecognizeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpeechRecognizeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1663,7 +1657,7 @@ impl<'a, C> SpeechRecognizeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SpeechRecognizeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SpeechRecognizeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

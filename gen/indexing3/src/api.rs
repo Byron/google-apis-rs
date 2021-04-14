@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -100,35 +99,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Indexing<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Indexing<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Indexing<C> {}
+impl<'a, > client::Hub for Indexing<> {}
 
-impl<'a, C> Indexing<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Indexing<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Indexing<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Indexing<> {
         Indexing {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://indexing.googleapis.com/".to_string(),
             _root_url: "https://indexing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn url_notifications(&'a self) -> UrlNotificationMethods<'a, C> {
+    pub fn url_notifications(&'a self) -> UrlNotificationMethods<'a> {
         UrlNotificationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -260,20 +258,20 @@ impl client::ResponseResult for UrlNotificationMetadata {}
 /// let rb = hub.url_notifications();
 /// # }
 /// ```
-pub struct UrlNotificationMethods<'a, C>
-    where C: 'a {
+pub struct UrlNotificationMethods<'a>
+    where  {
 
-    hub: &'a Indexing<C>,
+    hub: &'a Indexing<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UrlNotificationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UrlNotificationMethods<'a> {}
 
-impl<'a, C> UrlNotificationMethods<'a, C> {
+impl<'a> UrlNotificationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets metadata about a Web Document. This method can _only_ be used to query URLs that were previously seen in successful Indexing API notifications. Includes the latest `UrlNotification` received via this API.
-    pub fn get_metadata(&self) -> UrlNotificationGetMetadataCall<'a, C> {
+    pub fn get_metadata(&self) -> UrlNotificationGetMetadataCall<'a> {
         UrlNotificationGetMetadataCall {
             hub: self.hub,
             _url: Default::default(),
@@ -290,7 +288,7 @@ impl<'a, C> UrlNotificationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn publish(&self, request: UrlNotification) -> UrlNotificationPublishCall<'a, C> {
+    pub fn publish(&self, request: UrlNotification) -> UrlNotificationPublishCall<'a> {
         UrlNotificationPublishCall {
             hub: self.hub,
             _request: request,
@@ -342,19 +340,19 @@ impl<'a, C> UrlNotificationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlNotificationGetMetadataCall<'a, C>
-    where C: 'a {
+pub struct UrlNotificationGetMetadataCall<'a>
+    where  {
 
-    hub: &'a Indexing<C>,
+    hub: &'a Indexing<>,
     _url: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UrlNotificationGetMetadataCall<'a, C> {}
+impl<'a> client::CallBuilder for UrlNotificationGetMetadataCall<'a> {}
 
-impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UrlNotificationGetMetadataCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -396,8 +394,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -410,7 +407,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -419,7 +416,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -476,7 +473,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
     /// URL that is being queried.
     ///
     /// Sets the *url* query property to the given value.
-    pub fn url(mut self, new_value: &str) -> UrlNotificationGetMetadataCall<'a, C> {
+    pub fn url(mut self, new_value: &str) -> UrlNotificationGetMetadataCall<'a> {
         self._url = Some(new_value.to_string());
         self
     }
@@ -486,7 +483,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationGetMetadataCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationGetMetadataCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -511,7 +508,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationGetMetadataCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationGetMetadataCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -531,7 +528,7 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlNotificationGetMetadataCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UrlNotificationGetMetadataCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -581,19 +578,19 @@ impl<'a, C> UrlNotificationGetMetadataCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UrlNotificationPublishCall<'a, C>
-    where C: 'a {
+pub struct UrlNotificationPublishCall<'a>
+    where  {
 
-    hub: &'a Indexing<C>,
+    hub: &'a Indexing<>,
     _request: UrlNotification,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UrlNotificationPublishCall<'a, C> {}
+impl<'a> client::CallBuilder for UrlNotificationPublishCall<'a> {}
 
-impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UrlNotificationPublishCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -643,8 +640,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -658,7 +654,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -669,7 +665,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -728,7 +724,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UrlNotification) -> UrlNotificationPublishCall<'a, C> {
+    pub fn request(mut self, new_value: UrlNotification) -> UrlNotificationPublishCall<'a> {
         self._request = new_value;
         self
     }
@@ -738,7 +734,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationPublishCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UrlNotificationPublishCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -763,7 +759,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationPublishCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UrlNotificationPublishCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -783,7 +779,7 @@ impl<'a, C> UrlNotificationPublishCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UrlNotificationPublishCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UrlNotificationPublishCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

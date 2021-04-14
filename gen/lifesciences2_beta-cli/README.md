@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-lifesciences2_beta-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/lifesciences2_beta-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/lifesciences2_beta-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud Life Sciences* API at revision *20210319*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud Life Sciences* API at revision *20210319*. The CLI is at version *2.0.3*.
 
 ```bash
 lifesciences2-beta [options]

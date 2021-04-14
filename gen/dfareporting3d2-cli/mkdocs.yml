@@ -1,8 +1,8 @@
-site_name: dfareporting v2.0.0+20190531
+site_name: dfareporting v2.0.3+20190531
 site_url: http://byron.github.io/google-apis-rs/google-dfareporting3d2-cli
 site_description: A complete library to interact with dfareporting (protocol v3.2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting3d2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d2-cli
 
 docs_dir: docs
 site_dir: build_html

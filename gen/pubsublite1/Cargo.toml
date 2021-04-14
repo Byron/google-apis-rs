@@ -4,12 +4,12 @@
 [package]
 
 name = "google-pubsublite1"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with PubsubLite (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/pubsublite1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pubsublite1"
 homepage = "https://cloud.google.com/pubsub/lite/docs"
-documentation = "https://docs.rs/google-pubsublite1/2.0.0+20210322"
+documentation = "https://docs.rs/google-pubsublite1/2.0.3+20210322"
 license = "MIT"
 keywords = ["pubsublite", "google", "protocol", "web", "api"]
 autobins = false

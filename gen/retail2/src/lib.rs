@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Retail* crate version *2.0.0+20210319*, where *20210319* is the exact revision of the *retail:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Cloud Retail* crate version *2.0.3+20210319*, where *20210319* is the exact revision of the *retail:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Cloud Retail* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/recommendations).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/retail2).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/retail2).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudRetail) ... 

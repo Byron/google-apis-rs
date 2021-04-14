@@ -4,10 +4,10 @@
 [package]
 
 name = "google-smartdevicemanagement1-cli"
-version = "2.0.0+20210319"
+version = "2.0.3+20210319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Smart Device Management (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/smartdevicemanagement1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/smartdevicemanagement1-cli"
 homepage = "https://developers.google.com/nest/device-access"
 documentation = "http://byron.github.io/google-apis-rs/google_smartdevicemanagement1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-smartdevicemanagement1]
 path = "../smartdevicemanagement1"
-version = "2.0.0+20210319"
+version = "2.0.3+20210319"

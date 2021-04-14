@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gmailpostmastertools1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Postmaster Tools (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gmailpostmastertools1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/gmailpostmastertools1"
 homepage = "https://developers.google.com/gmail/postmaster"
-documentation = "https://docs.rs/google-gmailpostmastertools1/2.0.0+20210330"
+documentation = "https://docs.rs/google-gmailpostmastertools1/2.0.3+20210330"
 license = "MIT"
 keywords = ["gmailpostmastertools", "google", "protocol", "web", "api"]
 autobins = false

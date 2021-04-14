@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct SiteVerification<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct SiteVerification<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for SiteVerification<C> {}
+impl<'a, > client::Hub for SiteVerification<> {}
 
-impl<'a, C> SiteVerification<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > SiteVerification<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SiteVerification<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SiteVerification<> {
         SiteVerification {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/siteVerification/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn web_resource(&'a self) -> WebResourceMethods<'a, C> {
+    pub fn web_resource(&'a self) -> WebResourceMethods<'a> {
         WebResourceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -319,15 +317,15 @@ impl client::Part for SiteVerificationWebResourceResourceSite {}
 /// let rb = hub.web_resource();
 /// # }
 /// ```
-pub struct WebResourceMethods<'a, C>
-    where C: 'a {
+pub struct WebResourceMethods<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
 }
 
-impl<'a, C> client::MethodsBuilder for WebResourceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for WebResourceMethods<'a> {}
 
-impl<'a, C> WebResourceMethods<'a, C> {
+impl<'a> WebResourceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -336,7 +334,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - The id of a verified site or domain.
-    pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a, C> {
+    pub fn delete(&self, id: &str) -> WebResourceDeleteCall<'a> {
         WebResourceDeleteCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -353,7 +351,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `id` - The id of a verified site or domain.
-    pub fn get(&self, id: &str) -> WebResourceGetCall<'a, C> {
+    pub fn get(&self, id: &str) -> WebResourceGetCall<'a> {
         WebResourceGetCall {
             hub: self.hub,
             _id: id.to_string(),
@@ -370,7 +368,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_token(&self, request: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C> {
+    pub fn get_token(&self, request: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a> {
         WebResourceGetTokenCall {
             hub: self.hub,
             _request: request,
@@ -388,7 +386,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `verificationMethod` - The method to use for verifying a site or domain.
-    pub fn insert(&self, request: SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a, C> {
+    pub fn insert(&self, request: SiteVerificationWebResourceResource, verification_method: &str) -> WebResourceInsertCall<'a> {
         WebResourceInsertCall {
             hub: self.hub,
             _request: request,
@@ -402,7 +400,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get the list of your verified websites and domains.
-    pub fn list(&self) -> WebResourceListCall<'a, C> {
+    pub fn list(&self) -> WebResourceListCall<'a> {
         WebResourceListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -419,7 +417,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The id of a verified site or domain.
-    pub fn patch(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a, C> {
+    pub fn patch(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourcePatchCall<'a> {
         WebResourcePatchCall {
             hub: self.hub,
             _request: request,
@@ -438,7 +436,7 @@ impl<'a, C> WebResourceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `id` - The id of a verified site or domain.
-    pub fn update(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a, C> {
+    pub fn update(&self, request: SiteVerificationWebResourceResource, id: &str) -> WebResourceUpdateCall<'a> {
         WebResourceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -490,19 +488,19 @@ impl<'a, C> WebResourceMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceDeleteCall<'a, C>
-    where C: 'a {
+pub struct WebResourceDeleteCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourceDeleteCall<'a> {}
 
-impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -562,8 +560,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -576,7 +573,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -585,7 +582,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -635,7 +632,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> WebResourceDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -645,7 +642,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -666,7 +663,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -686,7 +683,7 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -730,19 +727,19 @@ impl<'a, C> WebResourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceGetCall<'a, C>
-    where C: 'a {
+pub struct WebResourceGetCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourceGetCall<'a> {}
 
-impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -803,8 +800,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -817,7 +813,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -826,7 +822,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -886,7 +882,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> WebResourceGetCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -896,7 +892,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -917,7 +913,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -937,7 +933,7 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -987,19 +983,19 @@ impl<'a, C> WebResourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceGetTokenCall<'a, C>
-    where C: 'a {
+pub struct WebResourceGetTokenCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _request: SiteVerificationWebResourceGettokenRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourceGetTokenCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourceGetTokenCall<'a> {}
 
-impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourceGetTokenCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1049,8 +1045,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1064,7 +1059,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1075,7 +1070,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1134,7 +1129,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a, C> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceGettokenRequest) -> WebResourceGetTokenCall<'a> {
         self._request = new_value;
         self
     }
@@ -1144,7 +1139,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetTokenCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceGetTokenCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1165,7 +1160,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetTokenCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceGetTokenCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1185,7 +1180,7 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceGetTokenCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceGetTokenCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1235,10 +1230,10 @@ impl<'a, C> WebResourceGetTokenCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceInsertCall<'a, C>
-    where C: 'a {
+pub struct WebResourceInsertCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _request: SiteVerificationWebResourceResource,
     _verification_method: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1246,9 +1241,9 @@ pub struct WebResourceInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourceInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourceInsertCall<'a> {}
 
-impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourceInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1299,8 +1294,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1314,7 +1308,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1325,7 +1319,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1384,7 +1378,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceInsertCall<'a, C> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -1394,7 +1388,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a, C> {
+    pub fn verification_method(mut self, new_value: &str) -> WebResourceInsertCall<'a> {
         self._verification_method = new_value.to_string();
         self
     }
@@ -1404,7 +1398,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1425,7 +1419,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1445,7 +1439,7 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1489,18 +1483,18 @@ impl<'a, C> WebResourceInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceListCall<'a, C>
-    where C: 'a {
+pub struct WebResourceListCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourceListCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourceListCall<'a> {}
 
-impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1539,8 +1533,7 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1553,7 +1546,7 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1562,7 +1555,7 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1622,7 +1615,7 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1643,7 +1636,7 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1663,7 +1656,7 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1713,10 +1706,10 @@ impl<'a, C> WebResourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourcePatchCall<'a, C>
-    where C: 'a {
+pub struct WebResourcePatchCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _request: SiteVerificationWebResourceResource,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1724,9 +1717,9 @@ pub struct WebResourcePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourcePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourcePatchCall<'a> {}
 
-impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourcePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1798,8 +1791,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1813,7 +1805,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1824,7 +1816,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1883,7 +1875,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourcePatchCall<'a, C> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourcePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -1893,7 +1885,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> WebResourcePatchCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -1903,7 +1895,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourcePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourcePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1924,7 +1916,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourcePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourcePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1944,7 +1936,7 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourcePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourcePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1994,10 +1986,10 @@ impl<'a, C> WebResourcePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WebResourceUpdateCall<'a, C>
-    where C: 'a {
+pub struct WebResourceUpdateCall<'a>
+    where  {
 
-    hub: &'a SiteVerification<C>,
+    hub: &'a SiteVerification<>,
     _request: SiteVerificationWebResourceResource,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2005,9 +1997,9 @@ pub struct WebResourceUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WebResourceUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for WebResourceUpdateCall<'a> {}
 
-impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WebResourceUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2079,8 +2071,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2094,7 +2085,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2105,7 +2096,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2164,7 +2155,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: SiteVerificationWebResourceResource) -> WebResourceUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2174,7 +2165,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> WebResourceUpdateCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -2184,7 +2175,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WebResourceUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2205,7 +2196,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> WebResourceUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WebResourceUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2225,7 +2216,7 @@ impl<'a, C> WebResourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WebResourceUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

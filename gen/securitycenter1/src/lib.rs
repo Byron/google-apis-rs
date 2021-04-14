@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Security Command Center* crate version *2.0.0+20210326*, where *20210326* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Security Command Center* crate version *2.0.3+20210326*, where *20210326* is the exact revision of the *securitycenter:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Security Command Center* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/security-command-center).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/securitycenter1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](SecurityCommandCenter) ... 

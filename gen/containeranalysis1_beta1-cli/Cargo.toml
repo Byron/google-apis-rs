@@ -4,10 +4,10 @@
 [package]
 
 name = "google-containeranalysis1_beta1-cli"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Container Analysis (protocol v1beta1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/containeranalysis1_beta1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/containeranalysis1_beta1-cli"
 homepage = "https://cloud.google.com/container-analysis/api/reference/rest/"
 documentation = "http://byron.github.io/google-apis-rs/google_containeranalysis1_beta1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-containeranalysis1_beta1]
 path = "../containeranalysis1_beta1"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"

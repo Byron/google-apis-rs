@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -147,41 +146,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct PeopleService<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct PeopleService<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for PeopleService<C> {}
+impl<'a, > client::Hub for PeopleService<> {}
 
-impl<'a, C> PeopleService<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > PeopleService<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PeopleService<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PeopleService<> {
         PeopleService {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://people.googleapis.com/".to_string(),
             _root_url: "https://people.googleapis.com/".to_string(),
         }
     }
 
-    pub fn contact_groups(&'a self) -> ContactGroupMethods<'a, C> {
+    pub fn contact_groups(&'a self) -> ContactGroupMethods<'a> {
         ContactGroupMethods { hub: &self }
     }
-    pub fn other_contacts(&'a self) -> OtherContactMethods<'a, C> {
+    pub fn other_contacts(&'a self) -> OtherContactMethods<'a> {
         OtherContactMethods { hub: &self }
     }
-    pub fn people(&'a self) -> PeopleMethods<'a, C> {
+    pub fn people(&'a self) -> PeopleMethods<'a> {
         PeopleMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1863,15 +1861,15 @@ impl client::Part for UserDefined {}
 /// let rb = hub.contact_groups();
 /// # }
 /// ```
-pub struct ContactGroupMethods<'a, C>
-    where C: 'a {
+pub struct ContactGroupMethods<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ContactGroupMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ContactGroupMethods<'a> {}
 
-impl<'a, C> ContactGroupMethods<'a, C> {
+impl<'a> ContactGroupMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1881,7 +1879,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - Required. The resource name of the contact group to modify.
-    pub fn members_modify(&self, request: ModifyContactGroupMembersRequest, resource_name: &str) -> ContactGroupMemberModifyCall<'a, C> {
+    pub fn members_modify(&self, request: ModifyContactGroupMembersRequest, resource_name: &str) -> ContactGroupMemberModifyCall<'a> {
         ContactGroupMemberModifyCall {
             hub: self.hub,
             _request: request,
@@ -1895,7 +1893,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get a list of contact groups owned by the authenticated user by specifying a list of contact group resource names.
-    pub fn batch_get(&self) -> ContactGroupBatchGetCall<'a, C> {
+    pub fn batch_get(&self) -> ContactGroupBatchGetCall<'a> {
         ContactGroupBatchGetCall {
             hub: self.hub,
             _resource_names: Default::default(),
@@ -1914,7 +1912,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateContactGroupRequest) -> ContactGroupCreateCall<'a, C> {
+    pub fn create(&self, request: CreateContactGroupRequest) -> ContactGroupCreateCall<'a> {
         ContactGroupCreateCall {
             hub: self.hub,
             _request: request,
@@ -1931,7 +1929,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact group to delete.
-    pub fn delete(&self, resource_name: &str) -> ContactGroupDeleteCall<'a, C> {
+    pub fn delete(&self, resource_name: &str) -> ContactGroupDeleteCall<'a> {
         ContactGroupDeleteCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -1949,7 +1947,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact group to get.
-    pub fn get(&self, resource_name: &str) -> ContactGroupGetCall<'a, C> {
+    pub fn get(&self, resource_name: &str) -> ContactGroupGetCall<'a> {
         ContactGroupGetCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -1964,7 +1962,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all contact groups owned by the authenticated user. Members of the contact groups are not populated.
-    pub fn list(&self) -> ContactGroupListCall<'a, C> {
+    pub fn list(&self) -> ContactGroupListCall<'a> {
         ContactGroupListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -1985,7 +1983,7 @@ impl<'a, C> ContactGroupMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - The resource name for the contact group, assigned by the server. An ASCII string, in the form of `contactGroups/{contact_group_id}`.
-    pub fn update(&self, request: UpdateContactGroupRequest, resource_name: &str) -> ContactGroupUpdateCall<'a, C> {
+    pub fn update(&self, request: UpdateContactGroupRequest, resource_name: &str) -> ContactGroupUpdateCall<'a> {
         ContactGroupUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2029,15 +2027,15 @@ impl<'a, C> ContactGroupMethods<'a, C> {
 /// let rb = hub.other_contacts();
 /// # }
 /// ```
-pub struct OtherContactMethods<'a, C>
-    where C: 'a {
+pub struct OtherContactMethods<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OtherContactMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OtherContactMethods<'a> {}
 
-impl<'a, C> OtherContactMethods<'a, C> {
+impl<'a> OtherContactMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2047,7 +2045,7 @@ impl<'a, C> OtherContactMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - Required. The resource name of the "Other contact" to copy.
-    pub fn copy_other_contact_to_my_contacts_group(&self, request: CopyOtherContactToMyContactsGroupRequest, resource_name: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> {
+    pub fn copy_other_contact_to_my_contacts_group(&self, request: CopyOtherContactToMyContactsGroupRequest, resource_name: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
         OtherContactCopyOtherContactToMyContactsGroupCall {
             hub: self.hub,
             _request: request,
@@ -2061,7 +2059,7 @@ impl<'a, C> OtherContactMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all "Other contacts", that is contacts that are not in a contact group. "Other contacts" are typically auto created contacts from interactions.
-    pub fn list(&self) -> OtherContactListCall<'a, C> {
+    pub fn list(&self) -> OtherContactListCall<'a> {
         OtherContactListCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -2078,7 +2076,7 @@ impl<'a, C> OtherContactMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of contacts in the authenticated user's other contacts that matches the search query. The query matches on a contact's `names`, `emailAddresses`, and `phoneNumbers` fields that are from the OTHER_CONTACT source.
-    pub fn search(&self) -> OtherContactSearchCall<'a, C> {
+    pub fn search(&self) -> OtherContactSearchCall<'a> {
         OtherContactSearchCall {
             hub: self.hub,
             _read_mask: Default::default(),
@@ -2123,15 +2121,15 @@ impl<'a, C> OtherContactMethods<'a, C> {
 /// let rb = hub.people();
 /// # }
 /// ```
-pub struct PeopleMethods<'a, C>
-    where C: 'a {
+pub struct PeopleMethods<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PeopleMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PeopleMethods<'a> {}
 
-impl<'a, C> PeopleMethods<'a, C> {
+impl<'a> PeopleMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2140,7 +2138,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name to return connections for. Only `people/me` is valid.
-    pub fn connections_list(&self, resource_name: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn connections_list(&self, resource_name: &str) -> PeopleConnectionListCall<'a> {
         PeopleConnectionListCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2165,7 +2163,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_create_contacts(&self, request: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a, C> {
+    pub fn batch_create_contacts(&self, request: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a> {
         PeopleBatchCreateContactCall {
             hub: self.hub,
             _request: request,
@@ -2182,7 +2180,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_delete_contacts(&self, request: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a, C> {
+    pub fn batch_delete_contacts(&self, request: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a> {
         PeopleBatchDeleteContactCall {
             hub: self.hub,
             _request: request,
@@ -2199,7 +2197,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_update_contacts(&self, request: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a, C> {
+    pub fn batch_update_contacts(&self, request: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a> {
         PeopleBatchUpdateContactCall {
             hub: self.hub,
             _request: request,
@@ -2216,7 +2214,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create_contact(&self, request: Person) -> PeopleCreateContactCall<'a, C> {
+    pub fn create_contact(&self, request: Person) -> PeopleCreateContactCall<'a> {
         PeopleCreateContactCall {
             hub: self.hub,
             _request: request,
@@ -2235,7 +2233,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact to delete.
-    pub fn delete_contact(&self, resource_name: &str) -> PeopleDeleteContactCall<'a, C> {
+    pub fn delete_contact(&self, resource_name: &str) -> PeopleDeleteContactCall<'a> {
         PeopleDeleteContactCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2252,7 +2250,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the contact whose photo will be deleted.
-    pub fn delete_contact_photo(&self, resource_name: &str) -> PeopleDeleteContactPhotoCall<'a, C> {
+    pub fn delete_contact_photo(&self, resource_name: &str) -> PeopleDeleteContactPhotoCall<'a> {
         PeopleDeleteContactPhotoCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2271,7 +2269,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Required. The resource name of the person to provide information about. - To get information about the authenticated user, specify `people/me`. - To get information about a google account, specify `people/{account_id}`. - To get information about a contact, specify the resource name that identifies the contact as returned by [`people.connections.list`](/people/api/rest/v1/people.connections/list).
-    pub fn get(&self, resource_name: &str) -> PeopleGetCall<'a, C> {
+    pub fn get(&self, resource_name: &str) -> PeopleGetCall<'a> {
         PeopleGetCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -2287,7 +2285,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides information about a list of specific people by specifying a list of requested resource names. Use `people/me` to indicate the authenticated user. The request returns a 400 error if 'personFields' is not specified.
-    pub fn get_batch_get(&self) -> PeopleGetBatchGetCall<'a, C> {
+    pub fn get_batch_get(&self) -> PeopleGetBatchGetCall<'a> {
         PeopleGetBatchGetCall {
             hub: self.hub,
             _sources: Default::default(),
@@ -2303,7 +2301,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of domain profiles and domain contacts in the authenticated user's domain directory.
-    pub fn list_directory_people(&self) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn list_directory_people(&self) -> PeopleListDirectoryPeopleCall<'a> {
         PeopleListDirectoryPeopleCall {
             hub: self.hub,
             _sync_token: Default::default(),
@@ -2322,7 +2320,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of contacts in the authenticated user's grouped contacts that matches the search query. The query matches on a contact's `names`, `nickNames`, `emailAddresses`, `phoneNumbers`, and `organizations` fields that are from the CONTACT" source.
-    pub fn search_contacts(&self) -> PeopleSearchContactCall<'a, C> {
+    pub fn search_contacts(&self) -> PeopleSearchContactCall<'a> {
         PeopleSearchContactCall {
             hub: self.hub,
             _read_mask: Default::default(),
@@ -2337,7 +2335,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Provides a list of domain profiles and domain contacts in the authenticated user's domain directory that match the search query.
-    pub fn search_directory_people(&self) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn search_directory_people(&self) -> PeopleSearchDirectoryPeopleCall<'a> {
         PeopleSearchDirectoryPeopleCall {
             hub: self.hub,
             _sources: Default::default(),
@@ -2360,7 +2358,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - The resource name for the person, assigned by the server. An ASCII string with a max length of 27 characters, in the form of `people/{person_id}`.
-    pub fn update_contact(&self, request: Person, resource_name: &str) -> PeopleUpdateContactCall<'a, C> {
+    pub fn update_contact(&self, request: Person, resource_name: &str) -> PeopleUpdateContactCall<'a> {
         PeopleUpdateContactCall {
             hub: self.hub,
             _request: request,
@@ -2382,7 +2380,7 @@ impl<'a, C> PeopleMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `resourceName` - Required. Person resource name
-    pub fn update_contact_photo(&self, request: UpdateContactPhotoRequest, resource_name: &str) -> PeopleUpdateContactPhotoCall<'a, C> {
+    pub fn update_contact_photo(&self, request: UpdateContactPhotoRequest, resource_name: &str) -> PeopleUpdateContactPhotoCall<'a> {
         PeopleUpdateContactPhotoCall {
             hub: self.hub,
             _request: request,
@@ -2440,10 +2438,10 @@ impl<'a, C> PeopleMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupMemberModifyCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupMemberModifyCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: ModifyContactGroupMembersRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2451,9 +2449,9 @@ pub struct ContactGroupMemberModifyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupMemberModifyCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupMemberModifyCall<'a> {}
 
-impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupMemberModifyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2529,8 +2527,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2544,7 +2541,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2555,7 +2552,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2614,7 +2611,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ModifyContactGroupMembersRequest) -> ContactGroupMemberModifyCall<'a, C> {
+    pub fn request(mut self, new_value: ModifyContactGroupMembersRequest) -> ContactGroupMemberModifyCall<'a> {
         self._request = new_value;
         self
     }
@@ -2624,7 +2621,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupMemberModifyCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupMemberModifyCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -2634,7 +2631,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupMemberModifyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupMemberModifyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2659,7 +2656,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupMemberModifyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupMemberModifyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2679,7 +2676,7 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupMemberModifyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupMemberModifyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2726,10 +2723,10 @@ impl<'a, C> ContactGroupMemberModifyCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupBatchGetCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupBatchGetCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_names: Vec<String>,
     _max_members: Option<i32>,
     _group_fields: Option<String>,
@@ -2738,9 +2735,9 @@ pub struct ContactGroupBatchGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupBatchGetCall<'a> {}
 
-impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2790,8 +2787,7 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2804,7 +2800,7 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2813,7 +2809,7 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2871,21 +2867,21 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Append the given value to the *resource names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_resource_names(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a, C> {
+    pub fn add_resource_names(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a> {
         self._resource_names.push(new_value.to_string());
         self
     }
     /// Optional. Specifies the maximum number of members to return for each group. Defaults to 0 if not set, which will return zero members.
     ///
     /// Sets the *max members* query property to the given value.
-    pub fn max_members(mut self, new_value: i32) -> ContactGroupBatchGetCall<'a, C> {
+    pub fn max_members(mut self, new_value: i32) -> ContactGroupBatchGetCall<'a> {
         self._max_members = Some(new_value);
         self
     }
     /// Optional. A field mask to restrict which fields on the group are returned. Defaults to `metadata`, `groupType`, `memberCount`, and `name` if not set or set to empty. Valid fields are: * clientData * groupType * memberCount * metadata * name
     ///
     /// Sets the *group fields* query property to the given value.
-    pub fn group_fields(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a, C> {
+    pub fn group_fields(mut self, new_value: &str) -> ContactGroupBatchGetCall<'a> {
         self._group_fields = Some(new_value.to_string());
         self
     }
@@ -2895,7 +2891,7 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2920,7 +2916,7 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2940,7 +2936,7 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2990,19 +2986,19 @@ impl<'a, C> ContactGroupBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupCreateCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupCreateCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: CreateContactGroupRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupCreateCall<'a> {}
 
-impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3052,8 +3048,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3067,7 +3062,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3078,7 +3073,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3137,7 +3132,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateContactGroupRequest) -> ContactGroupCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateContactGroupRequest) -> ContactGroupCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3147,7 +3142,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3172,7 +3167,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3192,7 +3187,7 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3237,10 +3232,10 @@ impl<'a, C> ContactGroupCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupDeleteCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupDeleteCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_name: String,
     _delete_contacts: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3248,9 +3243,9 @@ pub struct ContactGroupDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupDeleteCall<'a> {}
 
-impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3318,8 +3313,7 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3332,7 +3326,7 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3341,7 +3335,7 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3401,14 +3395,14 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupDeleteCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupDeleteCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Optional. Set to true to also delete the contacts in the specified group.
     ///
     /// Sets the *delete contacts* query property to the given value.
-    pub fn delete_contacts(mut self, new_value: bool) -> ContactGroupDeleteCall<'a, C> {
+    pub fn delete_contacts(mut self, new_value: bool) -> ContactGroupDeleteCall<'a> {
         self._delete_contacts = Some(new_value);
         self
     }
@@ -3418,7 +3412,7 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3443,7 +3437,7 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3463,7 +3457,7 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3509,10 +3503,10 @@ impl<'a, C> ContactGroupDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupGetCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupGetCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_name: String,
     _max_members: Option<i32>,
     _group_fields: Option<String>,
@@ -3521,9 +3515,9 @@ pub struct ContactGroupGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupGetCall<'a> {}
 
-impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3594,8 +3588,7 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3608,7 +3601,7 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3617,7 +3610,7 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3677,21 +3670,21 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupGetCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupGetCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Optional. Specifies the maximum number of members to return. Defaults to 0 if not set, which will return zero members.
     ///
     /// Sets the *max members* query property to the given value.
-    pub fn max_members(mut self, new_value: i32) -> ContactGroupGetCall<'a, C> {
+    pub fn max_members(mut self, new_value: i32) -> ContactGroupGetCall<'a> {
         self._max_members = Some(new_value);
         self
     }
     /// Optional. A field mask to restrict which fields on the group are returned. Defaults to `metadata`, `groupType`, `memberCount`, and `name` if not set or set to empty. Valid fields are: * clientData * groupType * memberCount * metadata * name
     ///
     /// Sets the *group fields* query property to the given value.
-    pub fn group_fields(mut self, new_value: &str) -> ContactGroupGetCall<'a, C> {
+    pub fn group_fields(mut self, new_value: &str) -> ContactGroupGetCall<'a> {
         self._group_fields = Some(new_value.to_string());
         self
     }
@@ -3701,7 +3694,7 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3726,7 +3719,7 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3746,7 +3739,7 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3794,10 +3787,10 @@ impl<'a, C> ContactGroupGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupListCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupListCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _sync_token: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3807,9 +3800,9 @@ pub struct ContactGroupListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupListCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupListCall<'a> {}
 
-impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3860,8 +3853,7 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3874,7 +3866,7 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3883,7 +3875,7 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3940,28 +3932,28 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Optional. A sync token, returned by a previous call to `contactgroups.list`. Only resources changed since the sync token was created will be returned.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> ContactGroupListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> ContactGroupListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Optional. The next_page_token value returned from a previous call to [ListContactGroups](/people/api/rest/v1/contactgroups/list). Requests the next page of resources.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ContactGroupListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ContactGroupListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of resources to return. Valid values are between 1 and 1000, inclusive. Defaults to 30 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ContactGroupListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ContactGroupListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. A field mask to restrict which fields on the group are returned. Defaults to `metadata`, `groupType`, `memberCount`, and `name` if not set or set to empty. Valid fields are: * clientData * groupType * memberCount * metadata * name
     ///
     /// Sets the *group fields* query property to the given value.
-    pub fn group_fields(mut self, new_value: &str) -> ContactGroupListCall<'a, C> {
+    pub fn group_fields(mut self, new_value: &str) -> ContactGroupListCall<'a> {
         self._group_fields = Some(new_value.to_string());
         self
     }
@@ -3971,7 +3963,7 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3996,7 +3988,7 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4016,7 +4008,7 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4066,10 +4058,10 @@ impl<'a, C> ContactGroupListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ContactGroupUpdateCall<'a, C>
-    where C: 'a {
+pub struct ContactGroupUpdateCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: UpdateContactGroupRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4077,9 +4069,9 @@ pub struct ContactGroupUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ContactGroupUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ContactGroupUpdateCall<'a> {}
 
-impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ContactGroupUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4155,8 +4147,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4170,7 +4161,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4181,7 +4172,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4240,7 +4231,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateContactGroupRequest) -> ContactGroupUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateContactGroupRequest) -> ContactGroupUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4250,7 +4241,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> ContactGroupUpdateCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> ContactGroupUpdateCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -4260,7 +4251,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ContactGroupUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4285,7 +4276,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ContactGroupUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4305,7 +4296,7 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ContactGroupUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4355,10 +4346,10 @@ impl<'a, C> ContactGroupUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OtherContactCopyOtherContactToMyContactsGroupCall<'a, C>
-    where C: 'a {
+pub struct OtherContactCopyOtherContactToMyContactsGroupCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: CopyOtherContactToMyContactsGroupRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4366,9 +4357,9 @@ pub struct OtherContactCopyOtherContactToMyContactsGroupCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> {}
+impl<'a> client::CallBuilder for OtherContactCopyOtherContactToMyContactsGroupCall<'a> {}
 
-impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4444,8 +4435,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4459,7 +4449,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4470,7 +4460,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4529,7 +4519,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CopyOtherContactToMyContactsGroupRequest) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> {
+    pub fn request(mut self, new_value: CopyOtherContactToMyContactsGroupRequest) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
         self._request = new_value;
         self
     }
@@ -4539,7 +4529,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -4549,7 +4539,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4574,7 +4564,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4594,7 +4584,7 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactCopyOtherContactToMyContactsGroupCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4643,10 +4633,10 @@ impl<'a, C> OtherContactCopyOtherContactToMyContactsGroupCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OtherContactListCall<'a, C>
-    where C: 'a {
+pub struct OtherContactListCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _sync_token: Option<String>,
     _request_sync_token: Option<bool>,
     _read_mask: Option<String>,
@@ -4657,9 +4647,9 @@ pub struct OtherContactListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OtherContactListCall<'a, C> {}
+impl<'a> client::CallBuilder for OtherContactListCall<'a> {}
 
-impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OtherContactListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4713,8 +4703,7 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4727,7 +4716,7 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4736,7 +4725,7 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4793,35 +4782,35 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Optional. A sync token, received from a previous `ListOtherContacts` call. Provide this to retrieve only the resources changed since the last request. Sync requests that specify `sync_token` have an additional rate limit. When syncing, all other parameters provided to `ListOtherContacts` must match the call that provided the sync token.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> OtherContactListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> OtherContactListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
     /// Optional. Whether the response should include `next_sync_token`, which can be used to get all changes since the last request. For subsequent sync requests use the `sync_token` param instead. Initial sync requests that specify `request_sync_token` have an additional rate limit.
     ///
     /// Sets the *request sync token* query property to the given value.
-    pub fn request_sync_token(mut self, new_value: bool) -> OtherContactListCall<'a, C> {
+    pub fn request_sync_token(mut self, new_value: bool) -> OtherContactListCall<'a> {
         self._request_sync_token = Some(new_value);
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * emailAddresses * names * phoneNumbers
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> OtherContactListCall<'a, C> {
+    pub fn read_mask(mut self, new_value: &str) -> OtherContactListCall<'a> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous `ListOtherContacts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListOtherContacts` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OtherContactListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OtherContactListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of "Other contacts" to include in the response. Valid values are between 1 and 1000, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OtherContactListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OtherContactListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4831,7 +4820,7 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4856,7 +4845,7 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OtherContactListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OtherContactListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4876,7 +4865,7 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4923,10 +4912,10 @@ impl<'a, C> OtherContactListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OtherContactSearchCall<'a, C>
-    where C: 'a {
+pub struct OtherContactSearchCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _read_mask: Option<String>,
     _query: Option<String>,
     _page_size: Option<i32>,
@@ -4935,9 +4924,9 @@ pub struct OtherContactSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OtherContactSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for OtherContactSearchCall<'a> {}
 
-impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OtherContactSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4985,8 +4974,7 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4999,7 +4987,7 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5008,7 +4996,7 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5065,21 +5053,21 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * emailAddresses * names * phoneNumbers
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> OtherContactSearchCall<'a, C> {
+    pub fn read_mask(mut self, new_value: &str) -> OtherContactSearchCall<'a> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Required. The plain-text query for the request. The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n".
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OtherContactSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> OtherContactSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. The number of results to return. Defaults to 10 if field is not set, or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OtherContactSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OtherContactSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5089,7 +5077,7 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OtherContactSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5114,7 +5102,7 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OtherContactSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OtherContactSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5134,7 +5122,7 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OtherContactSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5186,10 +5174,10 @@ impl<'a, C> OtherContactSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleConnectionListCall<'a, C>
-    where C: 'a {
+pub struct PeopleConnectionListCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_name: String,
     _sync_token: Option<String>,
     _sources: Vec<String>,
@@ -5204,9 +5192,9 @@ pub struct PeopleConnectionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleConnectionListCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleConnectionListCall<'a> {}
 
-impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleConnectionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5297,8 +5285,7 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5311,7 +5298,7 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5320,7 +5307,7 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5380,14 +5367,14 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Optional. A sync token, received from a previous `ListConnections` call. Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to `ListConnections` except `page_size` and `page_token` must match the initial call that provided the sync token. Sync tokens expire after seven days, after which a full sync request without a `sync_token` should be made.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -5395,49 +5382,49 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. The order in which the connections should be sorted. Defaults to `LAST_MODIFIED_ASCENDING`.
     ///
     /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn sort_order(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._sort_order = Some(new_value.to_string());
         self
     }
     /// Optional. Whether the response should include `next_sync_token` on the last page, which can be used to get all changes since the last request. For subsequent sync requests use the `sync_token` param instead. Initial full sync requests that specify `request_sync_token` and do not specify `sync_token` have an additional rate limit per user. Each client should generally only be doing a full sync once every few days per user and so should not hit this limit.
     ///
     /// Sets the *request sync token* query property to the given value.
-    pub fn request_sync_token(mut self, new_value: bool) -> PeopleConnectionListCall<'a, C> {
+    pub fn request_sync_token(mut self, new_value: bool) -> PeopleConnectionListCall<'a> {
         self._request_sync_token = Some(new_value);
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._request_mask_include_field = Some(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._person_fields = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous `ListConnections` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListConnections` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of connections to include in the response. Valid values are between 1 and 1000, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleConnectionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleConnectionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5447,7 +5434,7 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleConnectionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleConnectionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5472,7 +5459,7 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleConnectionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleConnectionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5492,7 +5479,7 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleConnectionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleConnectionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5542,19 +5529,19 @@ impl<'a, C> PeopleConnectionListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleBatchCreateContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleBatchCreateContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: BatchCreateContactsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleBatchCreateContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleBatchCreateContactCall<'a> {}
 
-impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleBatchCreateContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5604,8 +5591,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5619,7 +5605,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5630,7 +5616,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5689,7 +5675,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a, C> {
+    pub fn request(mut self, new_value: BatchCreateContactsRequest) -> PeopleBatchCreateContactCall<'a> {
         self._request = new_value;
         self
     }
@@ -5699,7 +5685,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchCreateContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchCreateContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5724,7 +5710,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchCreateContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchCreateContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5744,7 +5730,7 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchCreateContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchCreateContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5794,19 +5780,19 @@ impl<'a, C> PeopleBatchCreateContactCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleBatchDeleteContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleBatchDeleteContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: BatchDeleteContactsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleBatchDeleteContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleBatchDeleteContactCall<'a> {}
 
-impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleBatchDeleteContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5856,8 +5842,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5871,7 +5856,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5882,7 +5867,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5941,7 +5926,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a, C> {
+    pub fn request(mut self, new_value: BatchDeleteContactsRequest) -> PeopleBatchDeleteContactCall<'a> {
         self._request = new_value;
         self
     }
@@ -5951,7 +5936,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchDeleteContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchDeleteContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5976,7 +5961,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchDeleteContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchDeleteContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5996,7 +5981,7 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchDeleteContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchDeleteContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6046,19 +6031,19 @@ impl<'a, C> PeopleBatchDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleBatchUpdateContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleBatchUpdateContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: BatchUpdateContactsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleBatchUpdateContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleBatchUpdateContactCall<'a> {}
 
-impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleBatchUpdateContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6108,8 +6093,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6123,7 +6107,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6134,7 +6118,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6193,7 +6177,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUpdateContactsRequest) -> PeopleBatchUpdateContactCall<'a> {
         self._request = new_value;
         self
     }
@@ -6203,7 +6187,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchUpdateContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleBatchUpdateContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6228,7 +6212,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchUpdateContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleBatchUpdateContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6248,7 +6232,7 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchUpdateContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleBatchUpdateContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6300,10 +6284,10 @@ impl<'a, C> PeopleBatchUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleCreateContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleCreateContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: Person,
     _sources: Vec<String>,
     _person_fields: Option<String>,
@@ -6312,9 +6296,9 @@ pub struct PeopleCreateContactCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleCreateContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleCreateContactCall<'a> {}
 
-impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleCreateContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6372,8 +6356,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6387,7 +6370,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6398,7 +6381,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6457,7 +6440,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Person) -> PeopleCreateContactCall<'a, C> {
+    pub fn request(mut self, new_value: Person) -> PeopleCreateContactCall<'a> {
         self._request = new_value;
         self
     }
@@ -6465,14 +6448,14 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleCreateContactCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleCreateContactCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Defaults to all fields if not set. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleCreateContactCall<'a, C> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleCreateContactCall<'a> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -6482,7 +6465,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleCreateContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleCreateContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6507,7 +6490,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleCreateContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleCreateContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6527,7 +6510,7 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleCreateContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleCreateContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6571,19 +6554,19 @@ impl<'a, C> PeopleCreateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleDeleteContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleDeleteContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleDeleteContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleDeleteContactCall<'a> {}
 
-impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleDeleteContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6648,8 +6631,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6662,7 +6644,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6671,7 +6653,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6731,7 +6713,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -6741,7 +6723,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6766,7 +6748,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6786,7 +6768,7 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6832,10 +6814,10 @@ impl<'a, C> PeopleDeleteContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleDeleteContactPhotoCall<'a, C>
-    where C: 'a {
+pub struct PeopleDeleteContactPhotoCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_name: String,
     _sources: Vec<String>,
     _person_fields: Option<String>,
@@ -6844,9 +6826,9 @@ pub struct PeopleDeleteContactPhotoCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleDeleteContactPhotoCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleDeleteContactPhotoCall<'a> {}
 
-impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleDeleteContactPhotoCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6919,8 +6901,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6933,7 +6914,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6942,7 +6923,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7002,7 +6983,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -7010,14 +6991,14 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. A field mask to restrict which fields on the person are returned. Multiple fields can be specified by separating them with commas. Defaults to empty if not set, which will skip the post mutate get. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a, C> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleDeleteContactPhotoCall<'a> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -7027,7 +7008,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactPhotoCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleDeleteContactPhotoCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7052,7 +7033,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactPhotoCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleDeleteContactPhotoCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7072,7 +7053,7 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactPhotoCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleDeleteContactPhotoCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7119,10 +7100,10 @@ impl<'a, C> PeopleDeleteContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleGetCall<'a, C>
-    where C: 'a {
+pub struct PeopleGetCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _resource_name: String,
     _sources: Vec<String>,
     _request_mask_include_field: Option<String>,
@@ -7132,9 +7113,9 @@ pub struct PeopleGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleGetCall<'a> {}
 
-impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7210,8 +7191,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7224,7 +7204,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7233,7 +7213,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7293,7 +7273,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleGetCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleGetCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -7301,21 +7281,21 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleGetCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleGetCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetCall<'a, C> {
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetCall<'a> {
         self._request_mask_include_field = Some(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on the person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleGetCall<'a, C> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleGetCall<'a> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -7325,7 +7305,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7350,7 +7330,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7370,7 +7350,7 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7418,10 +7398,10 @@ impl<'a, C> PeopleGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleGetBatchGetCall<'a, C>
-    where C: 'a {
+pub struct PeopleGetBatchGetCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _sources: Vec<String>,
     _resource_names: Vec<String>,
     _request_mask_include_field: Option<String>,
@@ -7431,9 +7411,9 @@ pub struct PeopleGetBatchGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleGetBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleGetBatchGetCall<'a> {}
 
-impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleGetBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7488,8 +7468,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7502,7 +7481,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7511,7 +7490,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7569,7 +7548,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
@@ -7577,21 +7556,21 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *resource names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_resource_names(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C> {
+    pub fn add_resource_names(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
         self._resource_names.push(new_value.to_string());
         self
     }
     /// Required. Comma-separated list of person fields to be included in the response. Each path should start with `person.`: for example, `person.names` or `person.photos`.
     ///
     /// Sets the *request mask.include field* query property to the given value.
-    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C> {
+    pub fn request_mask_include_field(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
         self._request_mask_include_field = Some(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -7601,7 +7580,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleGetBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7626,7 +7605,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleGetBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7646,7 +7625,7 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleGetBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7697,10 +7676,10 @@ impl<'a, C> PeopleGetBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleListDirectoryPeopleCall<'a, C>
-    where C: 'a {
+pub struct PeopleListDirectoryPeopleCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _sync_token: Option<String>,
     _sources: Vec<String>,
     _request_sync_token: Option<bool>,
@@ -7713,9 +7692,9 @@ pub struct PeopleListDirectoryPeopleCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleListDirectoryPeopleCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleListDirectoryPeopleCall<'a> {}
 
-impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleListDirectoryPeopleCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7779,8 +7758,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7793,7 +7771,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7802,7 +7780,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7859,7 +7837,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Optional. A sync token, received from a previous `ListDirectoryPeople` call. Provide this to retrieve only the resources changed since the last request. When syncing, all other parameters provided to `ListDirectoryPeople` must match the call that provided the sync token.
     ///
     /// Sets the *sync token* query property to the given value.
-    pub fn sync_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn sync_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
         self._sync_token = Some(new_value.to_string());
         self
     }
@@ -7867,35 +7845,35 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. Whether the response should include `next_sync_token`, which can be used to get all changes since the last request. For subsequent sync requests use the `sync_token` param instead.
     ///
     /// Sets the *request sync token* query property to the given value.
-    pub fn request_sync_token(mut self, new_value: bool) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn request_sync_token(mut self, new_value: bool) -> PeopleListDirectoryPeopleCall<'a> {
         self._request_sync_token = Some(new_value);
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn read_mask(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous `ListDirectoryPeople` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDirectoryPeople` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of people to include in the response. Valid values are between 1 and 1000, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleListDirectoryPeopleCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7903,7 +7881,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Append the given value to the *merge sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleListDirectoryPeopleCall<'a> {
         self._merge_sources.push(new_value.to_string());
         self
     }
@@ -7913,7 +7891,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListDirectoryPeopleCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleListDirectoryPeopleCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7938,7 +7916,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleListDirectoryPeopleCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleListDirectoryPeopleCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7958,7 +7936,7 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListDirectoryPeopleCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleListDirectoryPeopleCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8005,10 +7983,10 @@ impl<'a, C> PeopleListDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleSearchContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleSearchContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _read_mask: Option<String>,
     _query: Option<String>,
     _page_size: Option<i32>,
@@ -8017,9 +7995,9 @@ pub struct PeopleSearchContactCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleSearchContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleSearchContactCall<'a> {}
 
-impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleSearchContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8067,8 +8045,7 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8081,7 +8058,7 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8090,7 +8067,7 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8147,21 +8124,21 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchContactCall<'a, C> {
+    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchContactCall<'a> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Required. The plain-text query for the request. The query is used to match prefix phrases of the fields on a person. For example, a person with name "foo name" matches queries such as "f", "fo", "foo", "foo n", "nam", etc., but not "oo n".
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> PeopleSearchContactCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> PeopleSearchContactCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. The number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleSearchContactCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleSearchContactCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8171,7 +8148,7 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8196,7 +8173,7 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8216,7 +8193,7 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8266,10 +8243,10 @@ impl<'a, C> PeopleSearchContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleSearchDirectoryPeopleCall<'a, C>
-    where C: 'a {
+pub struct PeopleSearchDirectoryPeopleCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _sources: Vec<String>,
     _read_mask: Option<String>,
     _query: Option<String>,
@@ -8281,9 +8258,9 @@ pub struct PeopleSearchDirectoryPeopleCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleSearchDirectoryPeopleCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleSearchDirectoryPeopleCall<'a> {}
 
-impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleSearchDirectoryPeopleCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8344,8 +8321,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8358,7 +8334,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8367,7 +8343,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8425,35 +8401,35 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Required. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *read mask* query property to the given value.
-    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn read_mask(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._read_mask = Some(new_value.to_string());
         self
     }
     /// Required. Prefix query that matches fields in the person. Does NOT use the read_mask for determining what fields to match.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// Optional. A page token, received from a previous `SearchDirectoryPeople` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `SearchDirectoryPeople` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The number of people to include in the response. Valid values are between 1 and 500, inclusive. Defaults to 100 if not set or set to 0.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8461,7 +8437,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Append the given value to the *merge sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn add_merge_sources(mut self, new_value: &str) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._merge_sources.push(new_value.to_string());
         self
     }
@@ -8471,7 +8447,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchDirectoryPeopleCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleSearchDirectoryPeopleCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8496,7 +8472,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchDirectoryPeopleCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleSearchDirectoryPeopleCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8516,7 +8492,7 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchDirectoryPeopleCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleSearchDirectoryPeopleCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8569,10 +8545,10 @@ impl<'a, C> PeopleSearchDirectoryPeopleCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleUpdateContactCall<'a, C>
-    where C: 'a {
+pub struct PeopleUpdateContactCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: Person,
     _resource_name: String,
     _update_person_fields: Option<String>,
@@ -8583,9 +8559,9 @@ pub struct PeopleUpdateContactCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleUpdateContactCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleUpdateContactCall<'a> {}
 
-impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleUpdateContactCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8672,8 +8648,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8687,7 +8662,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8698,7 +8673,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8757,7 +8732,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Person) -> PeopleUpdateContactCall<'a, C> {
+    pub fn request(mut self, new_value: Person) -> PeopleUpdateContactCall<'a> {
         self._request = new_value;
         self
     }
@@ -8767,14 +8742,14 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
     /// Required. A field mask to restrict which fields on the person are updated. Multiple fields can be specified by separating them with commas. All updated fields will be replaced. Valid values are: * addresses * biographies * birthdays * calendarUrls * clientData * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * relations * sipAddresses * urls * userDefined
     ///
     /// Sets the *update person fields* query property to the given value.
-    pub fn update_person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C> {
+    pub fn update_person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
         self._update_person_fields = Some(new_value.to_string());
         self
     }
@@ -8782,14 +8757,14 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Append the given value to the *sources* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_sources(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C> {
+    pub fn add_sources(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
         self._sources.push(new_value.to_string());
         self
     }
     /// Optional. A field mask to restrict which fields on each person are returned. Multiple fields can be specified by separating them with commas. Defaults to all fields if not set. Valid values are: * addresses * ageRanges * biographies * birthdays * calendarUrls * clientData * coverPhotos * emailAddresses * events * externalIds * genders * imClients * interests * locales * locations * memberships * metadata * miscKeywords * names * nicknames * occupations * organizations * phoneNumbers * photos * relations * sipAddresses * skills * urls * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
-    pub fn person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C> {
+    pub fn person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a> {
         self._person_fields = Some(new_value.to_string());
         self
     }
@@ -8799,7 +8774,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8824,7 +8799,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8844,7 +8819,7 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8894,10 +8869,10 @@ impl<'a, C> PeopleUpdateContactCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PeopleUpdateContactPhotoCall<'a, C>
-    where C: 'a {
+pub struct PeopleUpdateContactPhotoCall<'a>
+    where  {
 
-    hub: &'a PeopleService<C>,
+    hub: &'a PeopleService<>,
     _request: UpdateContactPhotoRequest,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8905,9 +8880,9 @@ pub struct PeopleUpdateContactPhotoCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PeopleUpdateContactPhotoCall<'a, C> {}
+impl<'a> client::CallBuilder for PeopleUpdateContactPhotoCall<'a> {}
 
-impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PeopleUpdateContactPhotoCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8983,8 +8958,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8998,7 +8972,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9009,7 +8983,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9068,7 +9042,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateContactPhotoRequest) -> PeopleUpdateContactPhotoCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateContactPhotoRequest) -> PeopleUpdateContactPhotoCall<'a> {
         self._request = new_value;
         self
     }
@@ -9078,7 +9052,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactPhotoCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> PeopleUpdateContactPhotoCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -9088,7 +9062,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactPhotoCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PeopleUpdateContactPhotoCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9113,7 +9087,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactPhotoCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PeopleUpdateContactPhotoCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9133,7 +9107,7 @@ impl<'a, C> PeopleUpdateContactPhotoCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactPhotoCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PeopleUpdateContactPhotoCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

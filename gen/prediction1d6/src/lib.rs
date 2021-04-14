@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *prediction* crate version *2.0.0+20160511*, where *20160511* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *prediction* crate version *2.0.3+20160511*, where *20160511* is the exact revision of the *prediction:v1.6* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *prediction* *v1d6* API can be found at the
 //! [official documentation site](https://developers.google.com/prediction/docs/developer-guide).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/prediction1d6).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Prediction) ... 

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -99,35 +98,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Libraryagent<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Libraryagent<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Libraryagent<C> {}
+impl<'a, > client::Hub for Libraryagent<> {}
 
-impl<'a, C> Libraryagent<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Libraryagent<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Libraryagent<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Libraryagent<> {
         Libraryagent {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://libraryagent.googleapis.com/".to_string(),
             _root_url: "https://libraryagent.googleapis.com/".to_string(),
         }
     }
 
-    pub fn shelves(&'a self) -> ShelveMethods<'a, C> {
+    pub fn shelves(&'a self) -> ShelveMethods<'a> {
         ShelveMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -278,15 +276,15 @@ impl client::ResponseResult for GoogleExampleLibraryagentV1Shelf {}
 /// let rb = hub.shelves();
 /// # }
 /// ```
-pub struct ShelveMethods<'a, C>
-    where C: 'a {
+pub struct ShelveMethods<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ShelveMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ShelveMethods<'a> {}
 
-impl<'a, C> ShelveMethods<'a, C> {
+impl<'a> ShelveMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -295,7 +293,7 @@ impl<'a, C> ShelveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the book to borrow.
-    pub fn books_borrow(&self, name: &str) -> ShelveBookBorrowCall<'a, C> {
+    pub fn books_borrow(&self, name: &str) -> ShelveBookBorrowCall<'a> {
         ShelveBookBorrowCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -312,7 +310,7 @@ impl<'a, C> ShelveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the book to retrieve.
-    pub fn books_get(&self, name: &str) -> ShelveBookGetCall<'a, C> {
+    pub fn books_get(&self, name: &str) -> ShelveBookGetCall<'a> {
         ShelveBookGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -329,7 +327,7 @@ impl<'a, C> ShelveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the shelf whose books we'd like to list.
-    pub fn books_list(&self, parent: &str) -> ShelveBookListCall<'a, C> {
+    pub fn books_list(&self, parent: &str) -> ShelveBookListCall<'a> {
         ShelveBookListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -348,7 +346,7 @@ impl<'a, C> ShelveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the book to return.
-    pub fn books_return(&self, name: &str) -> ShelveBookReturnCall<'a, C> {
+    pub fn books_return(&self, name: &str) -> ShelveBookReturnCall<'a> {
         ShelveBookReturnCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -365,7 +363,7 @@ impl<'a, C> ShelveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the shelf to retrieve.
-    pub fn get(&self, name: &str) -> ShelveGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> ShelveGetCall<'a> {
         ShelveGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -378,7 +376,7 @@ impl<'a, C> ShelveMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists shelves. The order is unspecified but deterministic. Newly created shelves will not necessarily be added to the end of this list.
-    pub fn list(&self) -> ShelveListCall<'a, C> {
+    pub fn list(&self) -> ShelveListCall<'a> {
         ShelveListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -430,19 +428,19 @@ impl<'a, C> ShelveMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShelveBookBorrowCall<'a, C>
-    where C: 'a {
+pub struct ShelveBookBorrowCall<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShelveBookBorrowCall<'a, C> {}
+impl<'a> client::CallBuilder for ShelveBookBorrowCall<'a> {}
 
-impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShelveBookBorrowCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -507,8 +505,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -521,7 +518,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -530,7 +527,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -590,7 +587,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ShelveBookBorrowCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ShelveBookBorrowCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -600,7 +597,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookBorrowCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookBorrowCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -625,7 +622,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookBorrowCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookBorrowCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -645,7 +642,7 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookBorrowCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookBorrowCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -689,19 +686,19 @@ impl<'a, C> ShelveBookBorrowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShelveBookGetCall<'a, C>
-    where C: 'a {
+pub struct ShelveBookGetCall<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShelveBookGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ShelveBookGetCall<'a> {}
 
-impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShelveBookGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -766,8 +763,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -780,7 +776,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -789,7 +785,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -849,7 +845,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ShelveBookGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ShelveBookGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -859,7 +855,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -884,7 +880,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -904,7 +900,7 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -950,10 +946,10 @@ impl<'a, C> ShelveBookGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShelveBookListCall<'a, C>
-    where C: 'a {
+pub struct ShelveBookListCall<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -962,9 +958,9 @@ pub struct ShelveBookListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShelveBookListCall<'a, C> {}
+impl<'a> client::CallBuilder for ShelveBookListCall<'a> {}
 
-impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShelveBookListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1035,8 +1031,7 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1049,7 +1044,7 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1058,7 +1053,7 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1118,21 +1113,21 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ShelveBookListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ShelveBookListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListBooksResponse.next_page_token. returned from the previous call to `ListBooks` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ShelveBookListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ShelveBookListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer books than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ShelveBookListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ShelveBookListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1142,7 +1137,7 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1167,7 +1162,7 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1187,7 +1182,7 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1231,19 +1226,19 @@ impl<'a, C> ShelveBookListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShelveBookReturnCall<'a, C>
-    where C: 'a {
+pub struct ShelveBookReturnCall<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShelveBookReturnCall<'a, C> {}
+impl<'a> client::CallBuilder for ShelveBookReturnCall<'a> {}
 
-impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShelveBookReturnCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1308,8 +1303,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1322,7 +1316,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1331,7 +1325,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1391,7 +1385,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ShelveBookReturnCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ShelveBookReturnCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1401,7 +1395,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookReturnCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveBookReturnCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1426,7 +1420,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookReturnCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShelveBookReturnCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1446,7 +1440,7 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookReturnCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveBookReturnCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1490,19 +1484,19 @@ impl<'a, C> ShelveBookReturnCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShelveGetCall<'a, C>
-    where C: 'a {
+pub struct ShelveGetCall<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShelveGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ShelveGetCall<'a> {}
 
-impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShelveGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1567,8 +1561,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1581,7 +1574,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1590,7 +1583,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1650,7 +1643,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ShelveGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ShelveGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1660,7 +1653,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1685,7 +1678,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShelveGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShelveGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1705,7 +1698,7 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1751,10 +1744,10 @@ impl<'a, C> ShelveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ShelveListCall<'a, C>
-    where C: 'a {
+pub struct ShelveListCall<'a>
+    where  {
 
-    hub: &'a Libraryagent<C>,
+    hub: &'a Libraryagent<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1762,9 +1755,9 @@ pub struct ShelveListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ShelveListCall<'a, C> {}
+impl<'a> client::CallBuilder for ShelveListCall<'a> {}
 
-impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ShelveListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1809,8 +1802,7 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1823,7 +1815,7 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1832,7 +1824,7 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1889,14 +1881,14 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// A token identifying a page of results the server should return. Typically, this is the value of ListShelvesResponse.next_page_token returned from the previous call to `ListShelves` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ShelveListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ShelveListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer shelves than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ShelveListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ShelveListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1906,7 +1898,7 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ShelveListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1931,7 +1923,7 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ShelveListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ShelveListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1951,7 +1943,7 @@ impl<'a, C> ShelveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ShelveListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

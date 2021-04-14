@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -101,35 +100,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Licensing<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Licensing<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Licensing<C> {}
+impl<'a, > client::Hub for Licensing<> {}
 
-impl<'a, C> Licensing<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Licensing<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Licensing<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Licensing<> {
         Licensing {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://licensing.googleapis.com/".to_string(),
             _root_url: "https://licensing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn license_assignments(&'a self) -> LicenseAssignmentMethods<'a, C> {
+    pub fn license_assignments(&'a self) -> LicenseAssignmentMethods<'a> {
         LicenseAssignmentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -298,15 +296,15 @@ impl client::ResponseResult for LicenseAssignmentList {}
 /// let rb = hub.license_assignments();
 /// # }
 /// ```
-pub struct LicenseAssignmentMethods<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentMethods<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LicenseAssignmentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LicenseAssignmentMethods<'a> {}
 
-impl<'a, C> LicenseAssignmentMethods<'a, C> {
+impl<'a> LicenseAssignmentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -317,7 +315,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a, C> {
+    pub fn delete(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentDeleteCall<'a> {
         LicenseAssignmentDeleteCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -338,7 +336,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a, C> {
+    pub fn get(&self, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentGetCall<'a> {
         LicenseAssignmentGetCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -359,7 +357,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
-    pub fn insert(&self, request: LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a, C> {
+    pub fn insert(&self, request: LicenseAssignmentInsert, product_id: &str, sku_id: &str) -> LicenseAssignmentInsertCall<'a> {
         LicenseAssignmentInsertCall {
             hub: self.hub,
             _request: request,
@@ -379,7 +377,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     ///
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `customerId` - Customer's `customerId`. A previous version of this API accepted the primary domain name as a value for this field. If the customer is suspended, the server returns an error.
-    pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a, C> {
+    pub fn list_for_product(&self, product_id: &str, customer_id: &str) -> LicenseAssignmentListForProductCall<'a> {
         LicenseAssignmentListForProductCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -401,7 +399,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `customerId` - Customer's `customerId`. A previous version of this API accepted the primary domain name as a value for this field. If the customer is suspended, the server returns an error.
-    pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn list_for_product_and_sku(&self, product_id: &str, sku_id: &str, customer_id: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         LicenseAssignmentListForProductAndSkuCall {
             hub: self.hub,
             _product_id: product_id.to_string(),
@@ -425,7 +423,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn patch(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a, C> {
+    pub fn patch(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentPatchCall<'a> {
         LicenseAssignmentPatchCall {
             hub: self.hub,
             _request: request,
@@ -448,7 +446,7 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
     /// * `productId` - A product's unique identifier. For more information about products in this version of the API, see Products and SKUs.
     /// * `skuId` - A product SKU's unique identifier. For more information about available SKUs in this version of the API, see Products and SKUs.
     /// * `userId` - The user's current primary email address. If the user's email address changes, use the new email address in your API requests. Since a `userId` is subject to change, do not use a `userId` value as a key for persistent data. This key could break if the current user's email address changes. If the `userId` is suspended, the license status changes.
-    pub fn update(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a, C> {
+    pub fn update(&self, request: LicenseAssignment, product_id: &str, sku_id: &str, user_id: &str) -> LicenseAssignmentUpdateCall<'a> {
         LicenseAssignmentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -502,10 +500,10 @@ impl<'a, C> LicenseAssignmentMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentDeleteCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentDeleteCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _product_id: String,
     _sku_id: String,
     _user_id: String,
@@ -514,9 +512,9 @@ pub struct LicenseAssignmentDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentDeleteCall<'a> {}
 
-impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -579,8 +577,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -593,7 +590,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -602,7 +599,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -662,7 +659,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -672,7 +669,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -682,7 +679,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentDeleteCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -692,7 +689,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -717,7 +714,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -737,7 +734,7 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -781,10 +778,10 @@ impl<'a, C> LicenseAssignmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentGetCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentGetCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _product_id: String,
     _sku_id: String,
     _user_id: String,
@@ -793,9 +790,9 @@ pub struct LicenseAssignmentGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentGetCall<'a> {}
 
-impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -858,8 +855,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -872,7 +868,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -881,7 +877,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -941,7 +937,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -951,7 +947,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -961,7 +957,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentGetCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -971,7 +967,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -996,7 +992,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1016,7 +1012,7 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1066,10 +1062,10 @@ impl<'a, C> LicenseAssignmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentInsertCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentInsertCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _request: LicenseAssignmentInsert,
     _product_id: String,
     _sku_id: String,
@@ -1078,9 +1074,9 @@ pub struct LicenseAssignmentInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentInsertCall<'a> {}
 
-impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1153,8 +1149,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1168,7 +1163,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1179,7 +1174,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1238,7 +1233,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a, C> {
+    pub fn request(mut self, new_value: LicenseAssignmentInsert) -> LicenseAssignmentInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -1248,7 +1243,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1258,7 +1253,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a, C> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentInsertCall<'a> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1268,7 +1263,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1293,7 +1288,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1313,7 +1308,7 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1359,10 +1354,10 @@ impl<'a, C> LicenseAssignmentInsertCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentListForProductCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentListForProductCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _product_id: String,
     _customer_id: String,
     _page_token: Option<String>,
@@ -1372,9 +1367,9 @@ pub struct LicenseAssignmentListForProductCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentListForProductCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentListForProductCall<'a> {}
 
-impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentListForProductCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1442,8 +1437,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1456,7 +1450,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1465,7 +1459,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1525,7 +1519,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1535,21 +1529,21 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a> {
         self._customer_id = new_value.to_string();
         self
     }
     /// Token to fetch the next page of data. The `maxResults` query string is related to the `pageToken` since `maxResults` determines how many entries are returned on each page. This is an optional query string. If not specified, the server returns the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The `maxResults` query string determines how many entries are returned on each page of a large response. This is an optional parameter. The value must be a positive number.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -1559,7 +1553,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1584,7 +1578,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1604,7 +1598,7 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentListForProductCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1650,10 +1644,10 @@ impl<'a, C> LicenseAssignmentListForProductCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentListForProductAndSkuCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentListForProductAndSkuCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _product_id: String,
     _sku_id: String,
     _customer_id: String,
@@ -1664,9 +1658,9 @@ pub struct LicenseAssignmentListForProductAndSkuCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentListForProductAndSkuCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentListForProductAndSkuCall<'a> {}
 
-impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentListForProductAndSkuCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1735,8 +1729,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1749,7 +1742,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1758,7 +1751,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1818,7 +1811,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -1828,7 +1821,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -1838,21 +1831,21 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         self._customer_id = new_value.to_string();
         self
     }
     /// Token to fetch the next page of data. The `maxResults` query string is related to the `pageToken` since `maxResults` determines how many entries are returned on each page. This is an optional query string. If not specified, the server returns the first page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The `maxResults` query string determines how many entries are returned on each page of a large response. This is an optional parameter. The value must be a positive number.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -1862,7 +1855,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentListForProductAndSkuCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1887,7 +1880,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentListForProductAndSkuCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1907,7 +1900,7 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentListForProductAndSkuCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1957,10 +1950,10 @@ impl<'a, C> LicenseAssignmentListForProductAndSkuCall<'a, C> where C: BorrowMut<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentPatchCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentPatchCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _request: LicenseAssignment,
     _product_id: String,
     _sku_id: String,
@@ -1970,9 +1963,9 @@ pub struct LicenseAssignmentPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentPatchCall<'a> {}
 
-impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2046,8 +2039,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2061,7 +2053,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2072,7 +2064,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2131,7 +2123,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentPatchCall<'a, C> {
+    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2141,7 +2133,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2151,7 +2143,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -2161,7 +2153,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentPatchCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2171,7 +2163,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2196,7 +2188,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2216,7 +2208,7 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2266,10 +2258,10 @@ impl<'a, C> LicenseAssignmentPatchCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LicenseAssignmentUpdateCall<'a, C>
-    where C: 'a {
+pub struct LicenseAssignmentUpdateCall<'a>
+    where  {
 
-    hub: &'a Licensing<C>,
+    hub: &'a Licensing<>,
     _request: LicenseAssignment,
     _product_id: String,
     _sku_id: String,
@@ -2279,9 +2271,9 @@ pub struct LicenseAssignmentUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LicenseAssignmentUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for LicenseAssignmentUpdateCall<'a> {}
 
-impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LicenseAssignmentUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2355,8 +2347,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2370,7 +2361,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2381,7 +2372,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2440,7 +2431,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: LicenseAssignment) -> LicenseAssignmentUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2450,7 +2441,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C> {
+    pub fn product_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a> {
         self._product_id = new_value.to_string();
         self
     }
@@ -2460,7 +2451,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C> {
+    pub fn sku_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a> {
         self._sku_id = new_value.to_string();
         self
     }
@@ -2470,7 +2461,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> LicenseAssignmentUpdateCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2480,7 +2471,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LicenseAssignmentUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2505,7 +2496,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LicenseAssignmentUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2525,7 +2516,7 @@ impl<'a, C> LicenseAssignmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LicenseAssignmentUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

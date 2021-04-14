@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -141,62 +140,61 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct DriveHub<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct DriveHub<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for DriveHub<C> {}
+impl<'a, > client::Hub for DriveHub<> {}
 
-impl<'a, C> DriveHub<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > DriveHub<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DriveHub<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DriveHub<> {
         DriveHub {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.2".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn about(&'a self) -> AboutMethods<'a, C> {
+    pub fn about(&'a self) -> AboutMethods<'a> {
         AboutMethods { hub: &self }
     }
-    pub fn changes(&'a self) -> ChangeMethods<'a, C> {
+    pub fn changes(&'a self) -> ChangeMethods<'a> {
         ChangeMethods { hub: &self }
     }
-    pub fn channels(&'a self) -> ChannelMethods<'a, C> {
+    pub fn channels(&'a self) -> ChannelMethods<'a> {
         ChannelMethods { hub: &self }
     }
-    pub fn comments(&'a self) -> CommentMethods<'a, C> {
+    pub fn comments(&'a self) -> CommentMethods<'a> {
         CommentMethods { hub: &self }
     }
-    pub fn drives(&'a self) -> DriveMethods<'a, C> {
+    pub fn drives(&'a self) -> DriveMethods<'a> {
         DriveMethods { hub: &self }
     }
-    pub fn files(&'a self) -> FileMethods<'a, C> {
+    pub fn files(&'a self) -> FileMethods<'a> {
         FileMethods { hub: &self }
     }
-    pub fn permissions(&'a self) -> PermissionMethods<'a, C> {
+    pub fn permissions(&'a self) -> PermissionMethods<'a> {
         PermissionMethods { hub: &self }
     }
-    pub fn replies(&'a self) -> ReplyMethods<'a, C> {
+    pub fn replies(&'a self) -> ReplyMethods<'a> {
         ReplyMethods { hub: &self }
     }
-    pub fn revisions(&'a self) -> RevisionMethods<'a, C> {
+    pub fn revisions(&'a self) -> RevisionMethods<'a> {
         RevisionMethods { hub: &self }
     }
-    pub fn teamdrives(&'a self) -> TeamdriveMethods<'a, C> {
+    pub fn teamdrives(&'a self) -> TeamdriveMethods<'a> {
         TeamdriveMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.2`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1828,20 +1826,20 @@ impl client::Part for TeamDriveRestrictions {}
 /// let rb = hub.about();
 /// # }
 /// ```
-pub struct AboutMethods<'a, C>
-    where C: 'a {
+pub struct AboutMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AboutMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AboutMethods<'a> {}
 
-impl<'a, C> AboutMethods<'a, C> {
+impl<'a> AboutMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets information about the user, the user's Drive, and system capabilities.
-    pub fn get(&self) -> AboutGetCall<'a, C> {
+    pub fn get(&self) -> AboutGetCall<'a> {
         AboutGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1883,20 +1881,20 @@ impl<'a, C> AboutMethods<'a, C> {
 /// let rb = hub.changes();
 /// # }
 /// ```
-pub struct ChangeMethods<'a, C>
-    where C: 'a {
+pub struct ChangeMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ChangeMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ChangeMethods<'a> {}
 
-impl<'a, C> ChangeMethods<'a, C> {
+impl<'a> ChangeMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the starting pageToken for listing future changes.
-    pub fn get_start_page_token(&self) -> ChangeGetStartPageTokenCall<'a, C> {
+    pub fn get_start_page_token(&self) -> ChangeGetStartPageTokenCall<'a> {
         ChangeGetStartPageTokenCall {
             hub: self.hub,
             _team_drive_id: Default::default(),
@@ -1916,7 +1914,7 @@ impl<'a, C> ChangeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `pageToken` - The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response or to the response from the getStartPageToken method.
-    pub fn list(&self, page_token: &str) -> ChangeListCall<'a, C> {
+    pub fn list(&self, page_token: &str) -> ChangeListCall<'a> {
         ChangeListCall {
             hub: self.hub,
             _page_token: page_token.to_string(),
@@ -1946,7 +1944,7 @@ impl<'a, C> ChangeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `pageToken` - The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response or to the response from the getStartPageToken method.
-    pub fn watch(&self, request: Channel, page_token: &str) -> ChangeWatchCall<'a, C> {
+    pub fn watch(&self, request: Channel, page_token: &str) -> ChangeWatchCall<'a> {
         ChangeWatchCall {
             hub: self.hub,
             _request: request,
@@ -2002,15 +2000,15 @@ impl<'a, C> ChangeMethods<'a, C> {
 /// let rb = hub.channels();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C>
-    where C: 'a {
+pub struct ChannelMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ChannelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ChannelMethods<'a> {}
 
-impl<'a, C> ChannelMethods<'a, C> {
+impl<'a> ChannelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2019,7 +2017,7 @@ impl<'a, C> ChannelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, C> {
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a> {
         ChannelStopCall {
             hub: self.hub,
             _request: request,
@@ -2062,15 +2060,15 @@ impl<'a, C> ChannelMethods<'a, C> {
 /// let rb = hub.comments();
 /// # }
 /// ```
-pub struct CommentMethods<'a, C>
-    where C: 'a {
+pub struct CommentMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CommentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CommentMethods<'a> {}
 
-impl<'a, C> CommentMethods<'a, C> {
+impl<'a> CommentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2080,7 +2078,7 @@ impl<'a, C> CommentMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn create(&self, request: Comment, file_id: &str) -> CommentCreateCall<'a, C> {
+    pub fn create(&self, request: Comment, file_id: &str) -> CommentCreateCall<'a> {
         CommentCreateCall {
             hub: self.hub,
             _request: request,
@@ -2099,7 +2097,7 @@ impl<'a, C> CommentMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a, C> {
+    pub fn delete(&self, file_id: &str, comment_id: &str) -> CommentDeleteCall<'a> {
         CommentDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2118,7 +2116,7 @@ impl<'a, C> CommentMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a, C> {
+    pub fn get(&self, file_id: &str, comment_id: &str) -> CommentGetCall<'a> {
         CommentGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2137,7 +2135,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> CommentListCall<'a, C> {
+    pub fn list(&self, file_id: &str) -> CommentListCall<'a> {
         CommentListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2160,7 +2158,7 @@ impl<'a, C> CommentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn update(&self, request: Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a, C> {
+    pub fn update(&self, request: Comment, file_id: &str, comment_id: &str) -> CommentUpdateCall<'a> {
         CommentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2205,15 +2203,15 @@ impl<'a, C> CommentMethods<'a, C> {
 /// let rb = hub.drives();
 /// # }
 /// ```
-pub struct DriveMethods<'a, C>
-    where C: 'a {
+pub struct DriveMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DriveMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DriveMethods<'a> {}
 
-impl<'a, C> DriveMethods<'a, C> {
+impl<'a> DriveMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2223,7 +2221,7 @@ impl<'a, C> DriveMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `requestId` - An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a shared drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same shared drive. If the shared drive already exists a 409 error will be returned.
-    pub fn create(&self, request: Drive, request_id: &str) -> DriveCreateCall<'a, C> {
+    pub fn create(&self, request: Drive, request_id: &str) -> DriveCreateCall<'a> {
         DriveCreateCall {
             hub: self.hub,
             _request: request,
@@ -2241,7 +2239,7 @@ impl<'a, C> DriveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn delete(&self, drive_id: &str) -> DriveDeleteCall<'a, C> {
+    pub fn delete(&self, drive_id: &str) -> DriveDeleteCall<'a> {
         DriveDeleteCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2258,7 +2256,7 @@ impl<'a, C> DriveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn get(&self, drive_id: &str) -> DriveGetCall<'a, C> {
+    pub fn get(&self, drive_id: &str) -> DriveGetCall<'a> {
         DriveGetCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2276,7 +2274,7 @@ impl<'a, C> DriveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn hide(&self, drive_id: &str) -> DriveHideCall<'a, C> {
+    pub fn hide(&self, drive_id: &str) -> DriveHideCall<'a> {
         DriveHideCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2289,7 +2287,7 @@ impl<'a, C> DriveMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the user's shared drives.
-    pub fn list(&self) -> DriveListCall<'a, C> {
+    pub fn list(&self) -> DriveListCall<'a> {
         DriveListCall {
             hub: self.hub,
             _use_domain_admin_access: Default::default(),
@@ -2309,7 +2307,7 @@ impl<'a, C> DriveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `driveId` - The ID of the shared drive.
-    pub fn unhide(&self, drive_id: &str) -> DriveUnhideCall<'a, C> {
+    pub fn unhide(&self, drive_id: &str) -> DriveUnhideCall<'a> {
         DriveUnhideCall {
             hub: self.hub,
             _drive_id: drive_id.to_string(),
@@ -2327,7 +2325,7 @@ impl<'a, C> DriveMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `driveId` - The ID of the shared drive.
-    pub fn update(&self, request: Drive, drive_id: &str) -> DriveUpdateCall<'a, C> {
+    pub fn update(&self, request: Drive, drive_id: &str) -> DriveUpdateCall<'a> {
         DriveUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2372,15 +2370,15 @@ impl<'a, C> DriveMethods<'a, C> {
 /// let rb = hub.files();
 /// # }
 /// ```
-pub struct FileMethods<'a, C>
-    where C: 'a {
+pub struct FileMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FileMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FileMethods<'a> {}
 
-impl<'a, C> FileMethods<'a, C> {
+impl<'a> FileMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2390,7 +2388,7 @@ impl<'a, C> FileMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn copy(&self, request: File, file_id: &str) -> FileCopyCall<'a, C> {
+    pub fn copy(&self, request: File, file_id: &str) -> FileCopyCall<'a> {
         FileCopyCall {
             hub: self.hub,
             _request: request,
@@ -2415,7 +2413,7 @@ impl<'a, C> FileMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: File) -> FileCreateCall<'a, C> {
+    pub fn create(&self, request: File) -> FileCreateCall<'a> {
         FileCreateCall {
             hub: self.hub,
             _request: request,
@@ -2440,7 +2438,7 @@ impl<'a, C> FileMethods<'a, C> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a, C> {
+    pub fn delete(&self, file_id: &str) -> FileDeleteCall<'a> {
         FileDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2456,7 +2454,7 @@ impl<'a, C> FileMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Permanently deletes all of the user's trashed files.
-    pub fn empty_trash(&self) -> FileEmptyTrashCall<'a, C> {
+    pub fn empty_trash(&self) -> FileEmptyTrashCall<'a> {
         FileEmptyTrashCall {
             hub: self.hub,
             _enforce_single_parent: Default::default(),
@@ -2474,7 +2472,7 @@ impl<'a, C> FileMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `mimeType` - The MIME type of the format requested for this export.
-    pub fn export(&self, file_id: &str, mime_type: &str) -> FileExportCall<'a, C> {
+    pub fn export(&self, file_id: &str, mime_type: &str) -> FileExportCall<'a> {
         FileExportCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2488,7 +2486,7 @@ impl<'a, C> FileMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Generates a set of file IDs which can be provided in create or copy requests.
-    pub fn generate_ids(&self) -> FileGenerateIdCall<'a, C> {
+    pub fn generate_ids(&self) -> FileGenerateIdCall<'a> {
         FileGenerateIdCall {
             hub: self.hub,
             _space: Default::default(),
@@ -2506,7 +2504,7 @@ impl<'a, C> FileMethods<'a, C> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn get(&self, file_id: &str) -> FileGetCall<'a, C> {
+    pub fn get(&self, file_id: &str) -> FileGetCall<'a> {
         FileGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2523,7 +2521,7 @@ impl<'a, C> FileMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists or searches files.
-    pub fn list(&self) -> FileListCall<'a, C> {
+    pub fn list(&self) -> FileListCall<'a> {
         FileListCall {
             hub: self.hub,
             _team_drive_id: Default::default(),
@@ -2554,7 +2552,7 @@ impl<'a, C> FileMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn update(&self, request: File, file_id: &str) -> FileUpdateCall<'a, C> {
+    pub fn update(&self, request: File, file_id: &str) -> FileUpdateCall<'a> {
         FileUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2582,7 +2580,7 @@ impl<'a, C> FileMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
-    pub fn watch(&self, request: Channel, file_id: &str) -> FileWatchCall<'a, C> {
+    pub fn watch(&self, request: Channel, file_id: &str) -> FileWatchCall<'a> {
         FileWatchCall {
             hub: self.hub,
             _request: request,
@@ -2630,15 +2628,15 @@ impl<'a, C> FileMethods<'a, C> {
 /// let rb = hub.permissions();
 /// # }
 /// ```
-pub struct PermissionMethods<'a, C>
-    where C: 'a {
+pub struct PermissionMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PermissionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PermissionMethods<'a> {}
 
-impl<'a, C> PermissionMethods<'a, C> {
+impl<'a> PermissionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2648,7 +2646,7 @@ impl<'a, C> PermissionMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file or shared drive.
-    pub fn create(&self, request: Permission, file_id: &str) -> PermissionCreateCall<'a, C> {
+    pub fn create(&self, request: Permission, file_id: &str) -> PermissionCreateCall<'a> {
         PermissionCreateCall {
             hub: self.hub,
             _request: request,
@@ -2675,7 +2673,7 @@ impl<'a, C> PermissionMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file or shared drive.
     /// * `permissionId` - The ID of the permission.
-    pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a, C> {
+    pub fn delete(&self, file_id: &str, permission_id: &str) -> PermissionDeleteCall<'a> {
         PermissionDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2697,7 +2695,7 @@ impl<'a, C> PermissionMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `permissionId` - The ID of the permission.
-    pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a, C> {
+    pub fn get(&self, file_id: &str, permission_id: &str) -> PermissionGetCall<'a> {
         PermissionGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2718,7 +2716,7 @@ impl<'a, C> PermissionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file or shared drive.
-    pub fn list(&self, file_id: &str) -> PermissionListCall<'a, C> {
+    pub fn list(&self, file_id: &str) -> PermissionListCall<'a> {
         PermissionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2743,7 +2741,7 @@ impl<'a, C> PermissionMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file or shared drive.
     /// * `permissionId` - The ID of the permission.
-    pub fn update(&self, request: Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a, C> {
+    pub fn update(&self, request: Permission, file_id: &str, permission_id: &str) -> PermissionUpdateCall<'a> {
         PermissionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2793,15 +2791,15 @@ impl<'a, C> PermissionMethods<'a, C> {
 /// let rb = hub.replies();
 /// # }
 /// ```
-pub struct ReplyMethods<'a, C>
-    where C: 'a {
+pub struct ReplyMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ReplyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ReplyMethods<'a> {}
 
-impl<'a, C> ReplyMethods<'a, C> {
+impl<'a> ReplyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2812,7 +2810,7 @@ impl<'a, C> ReplyMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn create(&self, request: Reply, file_id: &str, comment_id: &str) -> ReplyCreateCall<'a, C> {
+    pub fn create(&self, request: Reply, file_id: &str, comment_id: &str) -> ReplyCreateCall<'a> {
         ReplyCreateCall {
             hub: self.hub,
             _request: request,
@@ -2833,7 +2831,7 @@ impl<'a, C> ReplyMethods<'a, C> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a, C> {
+    pub fn delete(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyDeleteCall<'a> {
         ReplyDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2854,7 +2852,7 @@ impl<'a, C> ReplyMethods<'a, C> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a, C> {
+    pub fn get(&self, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyGetCall<'a> {
         ReplyGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2875,7 +2873,7 @@ impl<'a, C> ReplyMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
-    pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a, C> {
+    pub fn list(&self, file_id: &str, comment_id: &str) -> ReplyListCall<'a> {
         ReplyListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2899,7 +2897,7 @@ impl<'a, C> ReplyMethods<'a, C> {
     /// * `fileId` - The ID of the file.
     /// * `commentId` - The ID of the comment.
     /// * `replyId` - The ID of the reply.
-    pub fn update(&self, request: Reply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a, C> {
+    pub fn update(&self, request: Reply, file_id: &str, comment_id: &str, reply_id: &str) -> ReplyUpdateCall<'a> {
         ReplyUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2945,15 +2943,15 @@ impl<'a, C> ReplyMethods<'a, C> {
 /// let rb = hub.revisions();
 /// # }
 /// ```
-pub struct RevisionMethods<'a, C>
-    where C: 'a {
+pub struct RevisionMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for RevisionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for RevisionMethods<'a> {}
 
-impl<'a, C> RevisionMethods<'a, C> {
+impl<'a> RevisionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2963,7 +2961,7 @@ impl<'a, C> RevisionMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a, C> {
+    pub fn delete(&self, file_id: &str, revision_id: &str) -> RevisionDeleteCall<'a> {
         RevisionDeleteCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -2982,7 +2980,7 @@ impl<'a, C> RevisionMethods<'a, C> {
     ///
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a, C> {
+    pub fn get(&self, file_id: &str, revision_id: &str) -> RevisionGetCall<'a> {
         RevisionGetCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3001,7 +2999,7 @@ impl<'a, C> RevisionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `fileId` - The ID of the file.
-    pub fn list(&self, file_id: &str) -> RevisionListCall<'a, C> {
+    pub fn list(&self, file_id: &str) -> RevisionListCall<'a> {
         RevisionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
@@ -3022,7 +3020,7 @@ impl<'a, C> RevisionMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `fileId` - The ID of the file.
     /// * `revisionId` - The ID of the revision.
-    pub fn update(&self, request: Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a, C> {
+    pub fn update(&self, request: Revision, file_id: &str, revision_id: &str) -> RevisionUpdateCall<'a> {
         RevisionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3067,15 +3065,15 @@ impl<'a, C> RevisionMethods<'a, C> {
 /// let rb = hub.teamdrives();
 /// # }
 /// ```
-pub struct TeamdriveMethods<'a, C>
-    where C: 'a {
+pub struct TeamdriveMethods<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TeamdriveMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TeamdriveMethods<'a> {}
 
-impl<'a, C> TeamdriveMethods<'a, C> {
+impl<'a> TeamdriveMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -3085,7 +3083,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `requestId` - An ID, such as a random UUID, which uniquely identifies this user's request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned.
-    pub fn create(&self, request: TeamDrive, request_id: &str) -> TeamdriveCreateCall<'a, C> {
+    pub fn create(&self, request: TeamDrive, request_id: &str) -> TeamdriveCreateCall<'a> {
         TeamdriveCreateCall {
             hub: self.hub,
             _request: request,
@@ -3103,7 +3101,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `teamDriveId` - The ID of the Team Drive
-    pub fn delete(&self, team_drive_id: &str) -> TeamdriveDeleteCall<'a, C> {
+    pub fn delete(&self, team_drive_id: &str) -> TeamdriveDeleteCall<'a> {
         TeamdriveDeleteCall {
             hub: self.hub,
             _team_drive_id: team_drive_id.to_string(),
@@ -3120,7 +3118,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
     /// # Arguments
     ///
     /// * `teamDriveId` - The ID of the Team Drive
-    pub fn get(&self, team_drive_id: &str) -> TeamdriveGetCall<'a, C> {
+    pub fn get(&self, team_drive_id: &str) -> TeamdriveGetCall<'a> {
         TeamdriveGetCall {
             hub: self.hub,
             _team_drive_id: team_drive_id.to_string(),
@@ -3134,7 +3132,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Deprecated use drives.list instead.
-    pub fn list(&self) -> TeamdriveListCall<'a, C> {
+    pub fn list(&self) -> TeamdriveListCall<'a> {
         TeamdriveListCall {
             hub: self.hub,
             _use_domain_admin_access: Default::default(),
@@ -3155,7 +3153,7 @@ impl<'a, C> TeamdriveMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `teamDriveId` - The ID of the Team Drive
-    pub fn update(&self, request: TeamDrive, team_drive_id: &str) -> TeamdriveUpdateCall<'a, C> {
+    pub fn update(&self, request: TeamDrive, team_drive_id: &str) -> TeamdriveUpdateCall<'a> {
         TeamdriveUpdateCall {
             hub: self.hub,
             _request: request,
@@ -3208,18 +3206,18 @@ impl<'a, C> TeamdriveMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AboutGetCall<'a, C>
-    where C: 'a {
+pub struct AboutGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AboutGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AboutGetCall<'a> {}
 
-impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AboutGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3258,8 +3256,7 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3272,7 +3269,7 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3281,7 +3278,7 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3341,7 +3338,7 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AboutGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AboutGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3362,7 +3359,7 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AboutGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3382,7 +3379,7 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AboutGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AboutGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3430,10 +3427,10 @@ impl<'a, C> AboutGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeGetStartPageTokenCall<'a, C>
-    where C: 'a {
+pub struct ChangeGetStartPageTokenCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -3443,9 +3440,9 @@ pub struct ChangeGetStartPageTokenCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChangeGetStartPageTokenCall<'a, C> {}
+impl<'a> client::CallBuilder for ChangeGetStartPageTokenCall<'a> {}
 
-impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChangeGetStartPageTokenCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3496,8 +3493,7 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3510,7 +3506,7 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3519,7 +3515,7 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3576,28 +3572,28 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeGetStartPageTokenCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// The ID of the shared drive for which the starting pageToken for listing future changes from that shared drive is returned.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> ChangeGetStartPageTokenCall<'a> {
         self._drive_id = Some(new_value.to_string());
         self
     }
@@ -3607,7 +3603,7 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeGetStartPageTokenCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeGetStartPageTokenCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3628,7 +3624,7 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetStartPageTokenCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetStartPageTokenCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3648,7 +3644,7 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeGetStartPageTokenCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeGetStartPageTokenCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3704,10 +3700,10 @@ impl<'a, C> ChangeGetStartPageTokenCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeListCall<'a, C>
-    where C: 'a {
+pub struct ChangeListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _page_token: String,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
@@ -3726,9 +3722,9 @@ pub struct ChangeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChangeListCall<'a, C> {}
+impl<'a> client::CallBuilder for ChangeListCall<'a> {}
 
-impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChangeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3804,8 +3800,7 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3818,7 +3813,7 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3827,7 +3822,7 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3887,91 +3882,91 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a> {
         self._page_token = new_value.to_string();
         self
     }
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeListCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeListCall<'a> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query within the user corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
     ///
     /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> ChangeListCall<'a, C> {
+    pub fn spaces(mut self, new_value: &str) -> ChangeListCall<'a> {
         self._spaces = Some(new_value.to_string());
         self
     }
     /// Whether to restrict the results to changes inside the My Drive hierarchy. This omits changes to files such as those in the Application Data folder or shared files which have not been added to My Drive.
     ///
     /// Sets the *restrict to my drive* query property to the given value.
-    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._restrict_to_my_drive = Some(new_value);
         self
     }
     /// The maximum number of changes to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ChangeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ChangeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._include_team_drive_items = Some(new_value);
         self
     }
     /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
     ///
     /// Sets the *include removed* query property to the given value.
-    pub fn include_removed(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn include_removed(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._include_removed = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeListCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeListCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
-    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// Whether changes should include the file resource if the file is still accessible by the user at the time of the request, even when a file was removed from the list of changes and there will be no further change entries for this file.
     ///
     /// Sets the *include corpus removals* query property to the given value.
-    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeListCall<'a, C> {
+    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeListCall<'a> {
         self._include_corpus_removals = Some(new_value);
         self
     }
     /// The shared drive from which changes are returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> ChangeListCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> ChangeListCall<'a> {
         self._drive_id = Some(new_value.to_string());
         self
     }
@@ -3981,7 +3976,7 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4002,7 +3997,7 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4022,7 +4017,7 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4084,10 +4079,10 @@ impl<'a, C> ChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChangeWatchCall<'a, C>
-    where C: 'a {
+pub struct ChangeWatchCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Channel,
     _page_token: String,
     _team_drive_id: Option<String>,
@@ -4107,9 +4102,9 @@ pub struct ChangeWatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChangeWatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ChangeWatchCall<'a> {}
 
-impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChangeWatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4196,8 +4191,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4211,7 +4205,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4222,7 +4216,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4281,7 +4275,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChangeWatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> ChangeWatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4291,91 +4285,91 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ChangeWatchCall<'a> {
         self._page_token = new_value.to_string();
         self
     }
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query within the user corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
     ///
     /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a, C> {
+    pub fn spaces(mut self, new_value: &str) -> ChangeWatchCall<'a> {
         self._spaces = Some(new_value.to_string());
         self
     }
     /// Whether to restrict the results to changes inside the My Drive hierarchy. This omits changes to files such as those in the Application Data folder or shared files which have not been added to My Drive.
     ///
     /// Sets the *restrict to my drive* query property to the given value.
-    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn restrict_to_my_drive(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._restrict_to_my_drive = Some(new_value);
         self
     }
     /// The maximum number of changes to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ChangeWatchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ChangeWatchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn include_team_drive_items(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._include_team_drive_items = Some(new_value);
         self
     }
     /// Whether to include changes indicating that items have been removed from the list of changes, for example by deletion or loss of access.
     ///
     /// Sets the *include removed* query property to the given value.
-    pub fn include_removed(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn include_removed(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._include_removed = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeWatchCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> ChangeWatchCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
-    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// Whether changes should include the file resource if the file is still accessible by the user at the time of the request, even when a file was removed from the list of changes and there will be no further change entries for this file.
     ///
     /// Sets the *include corpus removals* query property to the given value.
-    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeWatchCall<'a, C> {
+    pub fn include_corpus_removals(mut self, new_value: bool) -> ChangeWatchCall<'a> {
         self._include_corpus_removals = Some(new_value);
         self
     }
     /// The shared drive from which changes are returned. If specified the change IDs will be reflective of the shared drive; use the combined drive ID and change ID as an identifier.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> ChangeWatchCall<'a> {
         self._drive_id = Some(new_value.to_string());
         self
     }
@@ -4385,7 +4379,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeWatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChangeWatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4406,7 +4400,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeWatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4426,7 +4420,7 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeWatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeWatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4476,19 +4470,19 @@ impl<'a, C> ChangeWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C>
-    where C: 'a {
+pub struct ChannelStopCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Channel,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ChannelStopCall<'a, C> {}
+impl<'a> client::CallBuilder for ChannelStopCall<'a> {}
 
-impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ChannelStopCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4537,8 +4531,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4552,7 +4545,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4563,7 +4556,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4612,7 +4605,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a> {
         self._request = new_value;
         self
     }
@@ -4622,7 +4615,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ChannelStopCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4643,7 +4636,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4663,7 +4656,7 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4713,10 +4706,10 @@ impl<'a, C> ChannelStopCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentCreateCall<'a, C>
-    where C: 'a {
+pub struct CommentCreateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Comment,
     _file_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4724,9 +4717,9 @@ pub struct CommentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentCreateCall<'a> {}
 
-impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4798,8 +4791,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4813,7 +4805,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4824,7 +4816,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4883,7 +4875,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Comment) -> CommentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4893,7 +4885,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentCreateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> CommentCreateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -4903,7 +4895,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4924,7 +4916,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4944,7 +4936,7 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4988,10 +4980,10 @@ impl<'a, C> CommentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentDeleteCall<'a, C>
-    where C: 'a {
+pub struct CommentDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _comment_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4999,9 +4991,9 @@ pub struct CommentDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentDeleteCall<'a> {}
 
-impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5062,8 +5054,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5076,7 +5067,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5085,7 +5076,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5135,7 +5126,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -5145,7 +5136,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentDeleteCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -5155,7 +5146,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5176,7 +5167,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5196,7 +5187,7 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5241,10 +5232,10 @@ impl<'a, C> CommentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentGetCall<'a, C>
-    where C: 'a {
+pub struct CommentGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _comment_id: String,
     _include_deleted: Option<bool>,
@@ -5253,9 +5244,9 @@ pub struct CommentGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentGetCall<'a> {}
 
-impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5320,8 +5311,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5334,7 +5324,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5343,7 +5333,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5403,7 +5393,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> CommentGetCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -5413,14 +5403,14 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentGetCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
     /// Whether to return deleted comments. Deleted comments will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a, C> {
+    pub fn include_deleted(mut self, new_value: bool) -> CommentGetCall<'a> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -5430,7 +5420,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5451,7 +5441,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5471,7 +5461,7 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5519,10 +5509,10 @@ impl<'a, C> CommentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentListCall<'a, C>
-    where C: 'a {
+pub struct CommentListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _start_modified_time: Option<String>,
     _page_token: Option<String>,
@@ -5533,9 +5523,9 @@ pub struct CommentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentListCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentListCall<'a> {}
 
-impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5608,8 +5598,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5622,7 +5611,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5631,7 +5620,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5691,35 +5680,35 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> CommentListCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// The minimum value of 'modifiedTime' for the result comments (RFC 3339 date-time).
     ///
     /// Sets the *start modified time* query property to the given value.
-    pub fn start_modified_time(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn start_modified_time(mut self, new_value: &str) -> CommentListCall<'a> {
         self._start_modified_time = Some(new_value.to_string());
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CommentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of comments to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CommentListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CommentListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Whether to include deleted comments. Deleted comments will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a, C> {
+    pub fn include_deleted(mut self, new_value: bool) -> CommentListCall<'a> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -5729,7 +5718,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5750,7 +5739,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5770,7 +5759,7 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5820,10 +5809,10 @@ impl<'a, C> CommentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CommentUpdateCall<'a, C>
-    where C: 'a {
+pub struct CommentUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Comment,
     _file_id: String,
     _comment_id: String,
@@ -5832,9 +5821,9 @@ pub struct CommentUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CommentUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for CommentUpdateCall<'a> {}
 
-impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CommentUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5907,8 +5896,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5922,7 +5910,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5933,7 +5921,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5992,7 +5980,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Comment) -> CommentUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6002,7 +5990,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> CommentUpdateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -6012,7 +6000,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> CommentUpdateCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -6022,7 +6010,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CommentUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6043,7 +6031,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CommentUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6063,7 +6051,7 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CommentUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CommentUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6113,10 +6101,10 @@ impl<'a, C> CommentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveCreateCall<'a, C>
-    where C: 'a {
+pub struct DriveCreateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Drive,
     _request_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6124,9 +6112,9 @@ pub struct DriveCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveCreateCall<'a> {}
 
-impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6177,8 +6165,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6192,7 +6179,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6203,7 +6190,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6262,7 +6249,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Drive) -> DriveCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Drive) -> DriveCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6272,7 +6259,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request_id(mut self, new_value: &str) -> DriveCreateCall<'a, C> {
+    pub fn request_id(mut self, new_value: &str) -> DriveCreateCall<'a> {
         self._request_id = new_value.to_string();
         self
     }
@@ -6282,7 +6269,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6303,7 +6290,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6323,7 +6310,7 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6367,19 +6354,19 @@ impl<'a, C> DriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveDeleteCall<'a, C>
-    where C: 'a {
+pub struct DriveDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveDeleteCall<'a> {}
 
-impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6439,8 +6426,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6453,7 +6439,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6462,7 +6448,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6512,7 +6498,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveDeleteCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveDeleteCall<'a> {
         self._drive_id = new_value.to_string();
         self
     }
@@ -6522,7 +6508,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6543,7 +6529,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6563,7 +6549,7 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6608,10 +6594,10 @@ impl<'a, C> DriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveGetCall<'a, C>
-    where C: 'a {
+pub struct DriveGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _drive_id: String,
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6619,9 +6605,9 @@ pub struct DriveGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveGetCall<'a> {}
 
-impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6685,8 +6671,7 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6699,7 +6684,7 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6708,7 +6693,7 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6768,14 +6753,14 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveGetCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveGetCall<'a> {
         self._drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveGetCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveGetCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -6785,7 +6770,7 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6806,7 +6791,7 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6826,7 +6811,7 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6870,19 +6855,19 @@ impl<'a, C> DriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveHideCall<'a, C>
-    where C: 'a {
+pub struct DriveHideCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveHideCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveHideCall<'a> {}
 
-impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveHideCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6943,8 +6928,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6957,7 +6941,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6966,7 +6950,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7026,7 +7010,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveHideCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveHideCall<'a> {
         self._drive_id = new_value.to_string();
         self
     }
@@ -7036,7 +7020,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveHideCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveHideCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7057,7 +7041,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveHideCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveHideCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7077,7 +7061,7 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveHideCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveHideCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7125,10 +7109,10 @@ impl<'a, C> DriveHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveListCall<'a, C>
-    where C: 'a {
+pub struct DriveListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _use_domain_admin_access: Option<bool>,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -7138,9 +7122,9 @@ pub struct DriveListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveListCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveListCall<'a> {}
 
-impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7191,8 +7175,7 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7205,7 +7188,7 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7214,7 +7197,7 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7271,28 +7254,28 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Issue the request as a domain administrator; if set to true, then all shared drives of the domain in which the requester is an administrator are returned.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveListCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveListCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Query string for searching shared drives.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> DriveListCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> DriveListCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token for shared drives.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DriveListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> DriveListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of shared drives to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> DriveListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> DriveListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7302,7 +7285,7 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7323,7 +7306,7 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7343,7 +7326,7 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7387,19 +7370,19 @@ impl<'a, C> DriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveUnhideCall<'a, C>
-    where C: 'a {
+pub struct DriveUnhideCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveUnhideCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveUnhideCall<'a> {}
 
-impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveUnhideCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7460,8 +7443,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7474,7 +7456,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7483,7 +7465,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7543,7 +7525,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveUnhideCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveUnhideCall<'a> {
         self._drive_id = new_value.to_string();
         self
     }
@@ -7553,7 +7535,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUnhideCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUnhideCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7574,7 +7556,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveUnhideCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveUnhideCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7594,7 +7576,7 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUnhideCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUnhideCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7645,10 +7627,10 @@ impl<'a, C> DriveUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DriveUpdateCall<'a, C>
-    where C: 'a {
+pub struct DriveUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Drive,
     _drive_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -7657,9 +7639,9 @@ pub struct DriveUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DriveUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for DriveUpdateCall<'a> {}
 
-impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DriveUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7734,8 +7716,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7749,7 +7730,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7760,7 +7741,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7819,7 +7800,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Drive) -> DriveUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Drive) -> DriveUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -7829,14 +7810,14 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn drive_id(mut self, new_value: &str) -> DriveUpdateCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> DriveUpdateCall<'a> {
         self._drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveUpdateCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> DriveUpdateCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -7846,7 +7827,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DriveUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7867,7 +7848,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> DriveUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DriveUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7887,7 +7868,7 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DriveUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7944,10 +7925,10 @@ impl<'a, C> DriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileCopyCall<'a, C>
-    where C: 'a {
+pub struct FileCopyCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: File,
     _file_id: String,
     _supports_team_drives: Option<bool>,
@@ -7962,9 +7943,9 @@ pub struct FileCopyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileCopyCall<'a, C> {}
+impl<'a> client::CallBuilder for FileCopyCall<'a> {}
 
-impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileCopyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8057,8 +8038,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8072,7 +8052,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8083,7 +8063,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8142,7 +8122,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: File) -> FileCopyCall<'a, C> {
+    pub fn request(mut self, new_value: File) -> FileCopyCall<'a> {
         self._request = new_value;
         self
     }
@@ -8152,56 +8132,56 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> FileCopyCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileCopyCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileCopyCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileCopyCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileCopyCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A language hint for OCR processing during image import (ISO 639-1 code).
     ///
     /// Sets the *ocr language* query property to the given value.
-    pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a, C> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileCopyCall<'a> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
     /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
-    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCopyCall<'a, C> {
+    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCopyCall<'a> {
         self._keep_revision_forever = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCopyCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCopyCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether to ignore the domain's default visibility settings for the created file. Domain administrators can choose to make all uploaded files visible to the domain by default; this parameter bypasses that behavior for the request. Permissions are still inherited from parent folders.
     ///
     /// Sets the *ignore default visibility* query property to the given value.
-    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCopyCall<'a, C> {
+    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCopyCall<'a> {
         self._ignore_default_visibility = Some(new_value);
         self
     }
     /// Deprecated. Copying files into multiple folders is no longer supported. Use shortcuts instead.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a, C> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCopyCall<'a> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -8211,7 +8191,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCopyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCopyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8232,7 +8212,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileCopyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileCopyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8252,7 +8232,7 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileCopyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileCopyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8311,10 +8291,10 @@ impl<'a, C> FileCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct FileCreateCall<'a, C>
-    where C: 'a {
+pub struct FileCreateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: File,
     _use_content_as_indexable_text: Option<bool>,
     _supports_team_drives: Option<bool>,
@@ -8329,9 +8309,9 @@ pub struct FileCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for FileCreateCall<'a> {}
 
-impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8417,8 +8397,7 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8458,7 +8437,7 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8474,7 +8453,7 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -8515,7 +8494,6 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         if size > 5497558138880 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 5497558138880))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -8523,10 +8501,10 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -8605,63 +8583,63 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: File) -> FileCreateCall<'a, C> {
+    pub fn request(mut self, new_value: File) -> FileCreateCall<'a> {
         self._request = new_value;
         self
     }
     /// Whether to use the uploaded content as indexable text.
     ///
     /// Sets the *use content as indexable text* query property to the given value.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileCreateCall<'a, C> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileCreateCall<'a> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileCreateCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileCreateCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileCreateCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileCreateCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A language hint for OCR processing during image import (ISO 639-1 code).
     ///
     /// Sets the *ocr language* query property to the given value.
-    pub fn ocr_language(mut self, new_value: &str) -> FileCreateCall<'a, C> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileCreateCall<'a> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
     /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
-    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCreateCall<'a, C> {
+    pub fn keep_revision_forever(mut self, new_value: bool) -> FileCreateCall<'a> {
         self._keep_revision_forever = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCreateCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileCreateCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether to ignore the domain's default visibility settings for the created file. Domain administrators can choose to make all uploaded files visible to the domain by default; this parameter bypasses that behavior for the request. Permissions are still inherited from parent folders.
     ///
     /// Sets the *ignore default visibility* query property to the given value.
-    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCreateCall<'a, C> {
+    pub fn ignore_default_visibility(mut self, new_value: bool) -> FileCreateCall<'a> {
         self._ignore_default_visibility = Some(new_value);
         self
     }
     /// Deprecated. Creating files in multiple folders is no longer supported.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCreateCall<'a, C> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileCreateCall<'a> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -8671,7 +8649,7 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8692,7 +8670,7 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8712,7 +8690,7 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8759,10 +8737,10 @@ impl<'a, C> FileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileDeleteCall<'a, C>
-    where C: 'a {
+pub struct FileDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -8772,9 +8750,9 @@ pub struct FileDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for FileDeleteCall<'a> {}
 
-impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8843,8 +8821,7 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8857,7 +8834,7 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8866,7 +8843,7 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8916,28 +8893,28 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> FileDeleteCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileDeleteCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileDeleteCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileDeleteCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileDeleteCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Deprecated. If an item is not in a shared drive and its last parent is deleted but the item itself is not, the item will be placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileDeleteCall<'a, C> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileDeleteCall<'a> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -8947,7 +8924,7 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8968,7 +8945,7 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8988,7 +8965,7 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9033,19 +9010,19 @@ impl<'a, C> FileDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileEmptyTrashCall<'a, C>
-    where C: 'a {
+pub struct FileEmptyTrashCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _enforce_single_parent: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileEmptyTrashCall<'a, C> {}
+impl<'a> client::CallBuilder for FileEmptyTrashCall<'a> {}
 
-impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileEmptyTrashCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9086,8 +9063,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9100,7 +9076,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9109,7 +9085,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9156,7 +9132,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Deprecated. If an item is not in a shared drive and its last parent is deleted but the item itself is not, the item will be placed under its owner's root.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileEmptyTrashCall<'a, C> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileEmptyTrashCall<'a> {
         self._enforce_single_parent = Some(new_value);
         self
     }
@@ -9166,7 +9142,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileEmptyTrashCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileEmptyTrashCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9187,7 +9163,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileEmptyTrashCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileEmptyTrashCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9207,7 +9183,7 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileEmptyTrashCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileEmptyTrashCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9254,10 +9230,10 @@ impl<'a, C> FileEmptyTrashCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileExportCall<'a, C>
-    where C: 'a {
+pub struct FileExportCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _mime_type: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9265,9 +9241,9 @@ pub struct FileExportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileExportCall<'a, C> {}
+impl<'a> client::CallBuilder for FileExportCall<'a> {}
 
-impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileExportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9328,8 +9304,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9342,7 +9317,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9351,7 +9326,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9401,7 +9376,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileExportCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> FileExportCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -9411,7 +9386,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn mime_type(mut self, new_value: &str) -> FileExportCall<'a, C> {
+    pub fn mime_type(mut self, new_value: &str) -> FileExportCall<'a> {
         self._mime_type = new_value.to_string();
         self
     }
@@ -9421,7 +9396,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileExportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileExportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9442,7 +9417,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileExportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileExportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9462,7 +9437,7 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileExportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileExportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9508,10 +9483,10 @@ impl<'a, C> FileExportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileGenerateIdCall<'a, C>
-    where C: 'a {
+pub struct FileGenerateIdCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _space: Option<String>,
     _count: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9519,9 +9494,9 @@ pub struct FileGenerateIdCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileGenerateIdCall<'a, C> {}
+impl<'a> client::CallBuilder for FileGenerateIdCall<'a> {}
 
-impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileGenerateIdCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9566,8 +9541,7 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9580,7 +9554,7 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9589,7 +9563,7 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9646,14 +9620,14 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// The space in which the IDs can be used to create new files. Supported values are 'drive' and 'appDataFolder'.
     ///
     /// Sets the *space* query property to the given value.
-    pub fn space(mut self, new_value: &str) -> FileGenerateIdCall<'a, C> {
+    pub fn space(mut self, new_value: &str) -> FileGenerateIdCall<'a> {
         self._space = Some(new_value.to_string());
         self
     }
     /// The number of IDs to return.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> FileGenerateIdCall<'a, C> {
+    pub fn count(mut self, new_value: i32) -> FileGenerateIdCall<'a> {
         self._count = Some(new_value);
         self
     }
@@ -9663,7 +9637,7 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGenerateIdCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGenerateIdCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9684,7 +9658,7 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileGenerateIdCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileGenerateIdCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9704,7 +9678,7 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileGenerateIdCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileGenerateIdCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9757,10 +9731,10 @@ impl<'a, C> FileGenerateIdCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileGetCall<'a, C>
-    where C: 'a {
+pub struct FileGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -9771,9 +9745,9 @@ pub struct FileGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FileGetCall<'a> {}
 
-impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9862,8 +9836,7 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9876,7 +9849,7 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9885,7 +9858,7 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9945,35 +9918,35 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> FileGetCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileGetCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileGetCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileGetCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileGetCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileGetCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileGetCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a, C> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileGetCall<'a> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -9983,7 +9956,7 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10004,7 +9977,7 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10024,7 +9997,7 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10082,10 +10055,10 @@ impl<'a, C> FileGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileListCall<'a, C>
-    where C: 'a {
+pub struct FileListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _team_drive_id: Option<String>,
     _supports_team_drives: Option<bool>,
     _supports_all_drives: Option<bool>,
@@ -10105,9 +10078,9 @@ pub struct FileListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileListCall<'a, C> {}
+impl<'a> client::CallBuilder for FileListCall<'a> {}
 
-impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10188,8 +10161,7 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10202,7 +10174,7 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10211,7 +10183,7 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10268,98 +10240,98 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Deprecated use driveId instead.
     ///
     /// Sets the *team drive id* query property to the given value.
-    pub fn team_drive_id(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> FileListCall<'a> {
         self._team_drive_id = Some(new_value.to_string());
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileListCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileListCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileListCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileListCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of spaces to query within the corpus. Supported values are 'drive', 'appDataFolder' and 'photos'.
     ///
     /// Sets the *spaces* query property to the given value.
-    pub fn spaces(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn spaces(mut self, new_value: &str) -> FileListCall<'a> {
         self._spaces = Some(new_value.to_string());
         self
     }
     /// A query for filtering the file results. See the "Search for Files" guide for supported syntax.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> FileListCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FileListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of files to return per page. Partial or empty result pages are possible even before the end of the files list has been reached.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FileListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FileListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// A comma-separated list of sort keys. Valid keys are 'createdTime', 'folder', 'modifiedByMeTime', 'modifiedTime', 'name', 'name_natural', 'quotaBytesUsed', 'recency', 'sharedWithMeTime', 'starred', and 'viewedByMeTime'. Each key sorts ascending by default, but may be reversed with the 'desc' modifier. Example usage: ?orderBy=folder,modifiedTime desc,name. Please note that there is a current limitation for users with approximately one million files in which the requested sort order is ignored.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> FileListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Deprecated use includeItemsFromAllDrives instead.
     ///
     /// Sets the *include team drive items* query property to the given value.
-    pub fn include_team_drive_items(mut self, new_value: bool) -> FileListCall<'a, C> {
+    pub fn include_team_drive_items(mut self, new_value: bool) -> FileListCall<'a> {
         self._include_team_drive_items = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileListCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether both My Drive and shared drive items should be included in results.
     ///
     /// Sets the *include items from all drives* query property to the given value.
-    pub fn include_items_from_all_drives(mut self, new_value: bool) -> FileListCall<'a, C> {
+    pub fn include_items_from_all_drives(mut self, new_value: bool) -> FileListCall<'a> {
         self._include_items_from_all_drives = Some(new_value);
         self
     }
     /// ID of the shared drive to search.
     ///
     /// Sets the *drive id* query property to the given value.
-    pub fn drive_id(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn drive_id(mut self, new_value: &str) -> FileListCall<'a> {
         self._drive_id = Some(new_value.to_string());
         self
     }
     /// The source of files to list. Deprecated: use 'corpora' instead.
     ///
     /// Sets the *corpus* query property to the given value.
-    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn corpus(mut self, new_value: &str) -> FileListCall<'a> {
         self._corpus = Some(new_value.to_string());
         self
     }
     /// Groupings of files to which the query applies. Supported groupings are: 'user' (files created by, opened by, or shared directly with the user), 'drive' (files in the specified shared drive as indicated by the 'driveId'), 'domain' (files shared to the user's domain), and 'allDrives' (A combination of 'user' and 'drive' for all drives where the user is a member). When able, use 'user' or 'drive', instead of 'allDrives', for efficiency.
     ///
     /// Sets the *corpora* query property to the given value.
-    pub fn corpora(mut self, new_value: &str) -> FileListCall<'a, C> {
+    pub fn corpora(mut self, new_value: &str) -> FileListCall<'a> {
         self._corpora = Some(new_value.to_string());
         self
     }
@@ -10369,7 +10341,7 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10390,7 +10362,7 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10410,7 +10382,7 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10470,10 +10442,10 @@ impl<'a, C> FileListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct FileUpdateCall<'a, C>
-    where C: 'a {
+pub struct FileUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: File,
     _file_id: String,
     _use_content_as_indexable_text: Option<bool>,
@@ -10490,9 +10462,9 @@ pub struct FileUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for FileUpdateCall<'a> {}
 
-impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileUpdateCall<'a> {
 
     /// Perform the operation you have build so far, but without uploading. This is used to e.g. renaming or updating the description for a file
     pub async fn doit_without_upload(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, File)> {
@@ -10590,8 +10562,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10605,7 +10576,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10616,7 +10587,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10779,8 +10750,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10820,7 +10790,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10836,7 +10806,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -10877,7 +10847,6 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         if size > 5497558138880 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 5497558138880))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -10885,10 +10854,10 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -10967,7 +10936,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: File) -> FileUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: File) -> FileUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10977,70 +10946,70 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> FileUpdateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Whether to use the uploaded content as indexable text.
     ///
     /// Sets the *use content as indexable text* query property to the given value.
-    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a, C> {
+    pub fn use_content_as_indexable_text(mut self, new_value: bool) -> FileUpdateCall<'a> {
         self._use_content_as_indexable_text = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileUpdateCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileUpdateCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileUpdateCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileUpdateCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// A comma-separated list of parent IDs to remove.
     ///
     /// Sets the *remove parents* query property to the given value.
-    pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C> {
+    pub fn remove_parents(mut self, new_value: &str) -> FileUpdateCall<'a> {
         self._remove_parents = Some(new_value.to_string());
         self
     }
     /// A language hint for OCR processing during image import (ISO 639-1 code).
     ///
     /// Sets the *ocr language* query property to the given value.
-    pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a, C> {
+    pub fn ocr_language(mut self, new_value: &str) -> FileUpdateCall<'a> {
         self._ocr_language = Some(new_value.to_string());
         self
     }
     /// Whether to set the 'keepForever' field in the new head revision. This is only applicable to files with binary content in Google Drive. Only 200 revisions for the file can be kept forever. If the limit is reached, try deleting pinned revisions.
     ///
     /// Sets the *keep revision forever* query property to the given value.
-    pub fn keep_revision_forever(mut self, new_value: bool) -> FileUpdateCall<'a, C> {
+    pub fn keep_revision_forever(mut self, new_value: bool) -> FileUpdateCall<'a> {
         self._keep_revision_forever = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileUpdateCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileUpdateCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Deprecated. Adding files to multiple folders is no longer supported. Use shortcuts instead.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a, C> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> FileUpdateCall<'a> {
         self._enforce_single_parent = Some(new_value);
         self
     }
     /// A comma-separated list of parent IDs to add.
     ///
     /// Sets the *add parents* query property to the given value.
-    pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a, C> {
+    pub fn add_parents(mut self, new_value: &str) -> FileUpdateCall<'a> {
         self._add_parents = Some(new_value.to_string());
         self
     }
@@ -11050,7 +11019,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11071,7 +11040,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11091,7 +11060,7 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11150,10 +11119,10 @@ impl<'a, C> FileUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FileWatchCall<'a, C>
-    where C: 'a {
+pub struct FileWatchCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Channel,
     _file_id: String,
     _supports_team_drives: Option<bool>,
@@ -11165,9 +11134,9 @@ pub struct FileWatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FileWatchCall<'a, C> {}
+impl<'a> client::CallBuilder for FileWatchCall<'a> {}
 
-impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FileWatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11267,8 +11236,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11282,7 +11250,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11293,7 +11261,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11352,7 +11320,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> FileWatchCall<'a, C> {
+    pub fn request(mut self, new_value: Channel) -> FileWatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -11362,35 +11330,35 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> FileWatchCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> FileWatchCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> FileWatchCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> FileWatchCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> FileWatchCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileWatchCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> FileWatchCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a, C> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> FileWatchCall<'a> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -11400,7 +11368,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileWatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FileWatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11421,7 +11389,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FileWatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11441,7 +11409,7 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FileWatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FileWatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11499,10 +11467,10 @@ impl<'a, C> FileWatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionCreateCall<'a, C>
-    where C: 'a {
+pub struct PermissionCreateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Permission,
     _file_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -11518,9 +11486,9 @@ pub struct PermissionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PermissionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PermissionCreateCall<'a> {}
 
-impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PermissionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11616,8 +11584,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11631,7 +11598,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11642,7 +11609,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11701,7 +11668,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Permission) -> PermissionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Permission) -> PermissionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -11711,63 +11678,63 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionCreateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionCreateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.
     ///
     /// Sets the *transfer ownership* query property to the given value.
-    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._transfer_ownership = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to send a notification email when sharing to users or groups. This defaults to true for users and groups, and is not allowed for other requests. It must not be disabled for ownership transfers.
     ///
     /// Sets the *send notification email* query property to the given value.
-    pub fn send_notification_email(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn send_notification_email(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._send_notification_email = Some(new_value);
         self
     }
     /// This parameter will only take effect if the item is not in a shared drive and the request is attempting to transfer the ownership of the item. If set to true, the item will be moved to the new owner's My Drive root folder and all prior parents removed. If set to false, parents are not changed.
     ///
     /// Sets the *move to new owners root* query property to the given value.
-    pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn move_to_new_owners_root(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._move_to_new_owners_root = Some(new_value);
         self
     }
     /// Deprecated. See moveToNewOwnersRoot for details.
     ///
     /// Sets the *enforce single parent* query property to the given value.
-    pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionCreateCall<'a, C> {
+    pub fn enforce_single_parent(mut self, new_value: bool) -> PermissionCreateCall<'a> {
         self._enforce_single_parent = Some(new_value);
         self
     }
     /// A plain text custom message to include in the notification email.
     ///
     /// Sets the *email message* query property to the given value.
-    pub fn email_message(mut self, new_value: &str) -> PermissionCreateCall<'a, C> {
+    pub fn email_message(mut self, new_value: &str) -> PermissionCreateCall<'a> {
         self._email_message = Some(new_value.to_string());
         self
     }
@@ -11777,7 +11744,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11798,7 +11765,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11818,7 +11785,7 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11865,10 +11832,10 @@ impl<'a, C> PermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionDeleteCall<'a, C>
-    where C: 'a {
+pub struct PermissionDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -11879,9 +11846,9 @@ pub struct PermissionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PermissionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PermissionDeleteCall<'a> {}
 
-impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PermissionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11951,8 +11918,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11965,7 +11931,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11974,7 +11940,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12024,7 +11990,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionDeleteCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12034,28 +12000,28 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a, C> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionDeleteCall<'a> {
         self._permission_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionDeleteCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
@@ -12065,7 +12031,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12086,7 +12052,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12106,7 +12072,7 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12153,10 +12119,10 @@ impl<'a, C> PermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionGetCall<'a, C>
-    where C: 'a {
+pub struct PermissionGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _permission_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -12167,9 +12133,9 @@ pub struct PermissionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PermissionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PermissionGetCall<'a> {}
 
-impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PermissionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12240,8 +12206,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12254,7 +12219,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12263,7 +12228,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12323,7 +12288,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionGetCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12333,28 +12298,28 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a, C> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionGetCall<'a> {
         self._permission_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionGetCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionGetCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionGetCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionGetCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
@@ -12364,7 +12329,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12385,7 +12350,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12405,7 +12370,7 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12455,10 +12420,10 @@ impl<'a, C> PermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionListCall<'a, C>
-    where C: 'a {
+pub struct PermissionListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
@@ -12471,9 +12436,9 @@ pub struct PermissionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PermissionListCall<'a, C> {}
+impl<'a> client::CallBuilder for PermissionListCall<'a> {}
 
-impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PermissionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12552,8 +12517,7 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12566,7 +12530,7 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12575,7 +12539,7 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12635,49 +12599,49 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionListCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionListCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionListCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionListCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionListCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PermissionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PermissionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of permissions to return per page. When not set for files in a shared drive, at most 100 results will be returned. When not set for files that are not in a shared drive, the entire list will be returned.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PermissionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PermissionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Specifies which additional view's permissions to include in the response. Only 'published' is supported.
     ///
     /// Sets the *include permissions for view* query property to the given value.
-    pub fn include_permissions_for_view(mut self, new_value: &str) -> PermissionListCall<'a, C> {
+    pub fn include_permissions_for_view(mut self, new_value: &str) -> PermissionListCall<'a> {
         self._include_permissions_for_view = Some(new_value.to_string());
         self
     }
@@ -12687,7 +12651,7 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12708,7 +12672,7 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12728,7 +12692,7 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12783,10 +12747,10 @@ impl<'a, C> PermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PermissionUpdateCall<'a, C>
-    where C: 'a {
+pub struct PermissionUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Permission,
     _file_id: String,
     _permission_id: String,
@@ -12800,9 +12764,9 @@ pub struct PermissionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PermissionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for PermissionUpdateCall<'a> {}
 
-impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PermissionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12890,8 +12854,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12905,7 +12868,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12916,7 +12879,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12975,7 +12938,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Permission) -> PermissionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Permission) -> PermissionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12985,7 +12948,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> PermissionUpdateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -12995,42 +12958,42 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a, C> {
+    pub fn permission_id(mut self, new_value: &str) -> PermissionUpdateCall<'a> {
         self._permission_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if the file ID parameter refers to a shared drive and the requester is an administrator of the domain to which the shared drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.
     ///
     /// Sets the *transfer ownership* query property to the given value.
-    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
+    pub fn transfer_ownership(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
         self._transfer_ownership = Some(new_value);
         self
     }
     /// Deprecated use supportsAllDrives instead.
     ///
     /// Sets the *supports team drives* query property to the given value.
-    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
+    pub fn supports_team_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
         self._supports_team_drives = Some(new_value);
         self
     }
     /// Whether the requesting application supports both My Drives and shared drives.
     ///
     /// Sets the *supports all drives* query property to the given value.
-    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
+    pub fn supports_all_drives(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
         self._supports_all_drives = Some(new_value);
         self
     }
     /// Whether to remove the expiration date.
     ///
     /// Sets the *remove expiration* query property to the given value.
-    pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a, C> {
+    pub fn remove_expiration(mut self, new_value: bool) -> PermissionUpdateCall<'a> {
         self._remove_expiration = Some(new_value);
         self
     }
@@ -13040,7 +13003,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PermissionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13061,7 +13024,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> PermissionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PermissionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13081,7 +13044,7 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PermissionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13131,10 +13094,10 @@ impl<'a, C> PermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyCreateCall<'a, C>
-    where C: 'a {
+pub struct ReplyCreateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Reply,
     _file_id: String,
     _comment_id: String,
@@ -13143,9 +13106,9 @@ pub struct ReplyCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReplyCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ReplyCreateCall<'a> {}
 
-impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReplyCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13218,8 +13181,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13233,7 +13195,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13244,7 +13206,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13303,7 +13265,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reply) -> ReplyCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Reply) -> ReplyCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13313,7 +13275,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyCreateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyCreateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13323,7 +13285,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyCreateCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyCreateCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13333,7 +13295,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13354,7 +13316,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13374,7 +13336,7 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13418,10 +13380,10 @@ impl<'a, C> ReplyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyDeleteCall<'a, C>
-    where C: 'a {
+pub struct ReplyDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -13430,9 +13392,9 @@ pub struct ReplyDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReplyDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ReplyDeleteCall<'a> {}
 
-impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReplyDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13494,8 +13456,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13508,7 +13469,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13517,7 +13478,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13567,7 +13528,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyDeleteCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13577,7 +13538,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyDeleteCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13587,7 +13548,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a, C> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyDeleteCall<'a> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -13597,7 +13558,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13618,7 +13579,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13638,7 +13599,7 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13683,10 +13644,10 @@ impl<'a, C> ReplyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyGetCall<'a, C>
-    where C: 'a {
+pub struct ReplyGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _comment_id: String,
     _reply_id: String,
@@ -13696,9 +13657,9 @@ pub struct ReplyGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReplyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ReplyGetCall<'a> {}
 
-impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReplyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13764,8 +13725,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13778,7 +13738,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13787,7 +13747,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13847,7 +13807,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyGetCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -13857,7 +13817,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyGetCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -13867,14 +13827,14 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a, C> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyGetCall<'a> {
         self._reply_id = new_value.to_string();
         self
     }
     /// Whether to return deleted replies. Deleted replies will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a, C> {
+    pub fn include_deleted(mut self, new_value: bool) -> ReplyGetCall<'a> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -13884,7 +13844,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13905,7 +13865,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13925,7 +13885,7 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13972,10 +13932,10 @@ impl<'a, C> ReplyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyListCall<'a, C>
-    where C: 'a {
+pub struct ReplyListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _comment_id: String,
     _page_token: Option<String>,
@@ -13986,9 +13946,9 @@ pub struct ReplyListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReplyListCall<'a, C> {}
+impl<'a> client::CallBuilder for ReplyListCall<'a> {}
 
-impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReplyListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14059,8 +14019,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14073,7 +14032,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14082,7 +14041,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14142,7 +14101,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyListCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14152,28 +14111,28 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyListCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ReplyListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of replies to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ReplyListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ReplyListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Whether to include deleted replies. Deleted replies will not include their original content.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a, C> {
+    pub fn include_deleted(mut self, new_value: bool) -> ReplyListCall<'a> {
         self._include_deleted = Some(new_value);
         self
     }
@@ -14183,7 +14142,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14204,7 +14163,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14224,7 +14183,7 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14274,10 +14233,10 @@ impl<'a, C> ReplyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReplyUpdateCall<'a, C>
-    where C: 'a {
+pub struct ReplyUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Reply,
     _file_id: String,
     _comment_id: String,
@@ -14287,9 +14246,9 @@ pub struct ReplyUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReplyUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ReplyUpdateCall<'a> {}
 
-impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReplyUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14363,8 +14322,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14378,7 +14336,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14389,7 +14347,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14448,7 +14406,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Reply) -> ReplyUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Reply) -> ReplyUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -14458,7 +14416,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> ReplyUpdateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14468,7 +14426,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C> {
+    pub fn comment_id(mut self, new_value: &str) -> ReplyUpdateCall<'a> {
         self._comment_id = new_value.to_string();
         self
     }
@@ -14478,7 +14436,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a, C> {
+    pub fn reply_id(mut self, new_value: &str) -> ReplyUpdateCall<'a> {
         self._reply_id = new_value.to_string();
         self
     }
@@ -14488,7 +14446,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReplyUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14509,7 +14467,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ReplyUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReplyUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14529,7 +14487,7 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReplyUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14573,10 +14531,10 @@ impl<'a, C> ReplyUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionDeleteCall<'a, C>
-    where C: 'a {
+pub struct RevisionDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _revision_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14584,9 +14542,9 @@ pub struct RevisionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for RevisionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for RevisionDeleteCall<'a> {}
 
-impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RevisionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14647,8 +14605,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14661,7 +14618,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14670,7 +14627,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14720,7 +14677,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionDeleteCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -14730,7 +14687,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a, C> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionDeleteCall<'a> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -14740,7 +14697,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14761,7 +14718,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14781,7 +14738,7 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14831,10 +14788,10 @@ impl<'a, C> RevisionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionGetCall<'a, C>
-    where C: 'a {
+pub struct RevisionGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _revision_id: String,
     _acknowledge_abuse: Option<bool>,
@@ -14843,9 +14800,9 @@ pub struct RevisionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for RevisionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for RevisionGetCall<'a> {}
 
-impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RevisionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14926,8 +14883,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14940,7 +14896,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14949,7 +14905,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15009,7 +14965,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionGetCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -15019,14 +14975,14 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a, C> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionGetCall<'a> {
         self._revision_id = new_value.to_string();
         self
     }
     /// Whether the user is acknowledging the risk of downloading known malware or other abusive files. This is only applicable when alt=media.
     ///
     /// Sets the *acknowledge abuse* query property to the given value.
-    pub fn acknowledge_abuse(mut self, new_value: bool) -> RevisionGetCall<'a, C> {
+    pub fn acknowledge_abuse(mut self, new_value: bool) -> RevisionGetCall<'a> {
         self._acknowledge_abuse = Some(new_value);
         self
     }
@@ -15036,7 +14992,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15057,7 +15013,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15077,7 +15033,7 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15123,10 +15079,10 @@ impl<'a, C> RevisionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionListCall<'a, C>
-    where C: 'a {
+pub struct RevisionListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _file_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15135,9 +15091,9 @@ pub struct RevisionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for RevisionListCall<'a, C> {}
+impl<'a> client::CallBuilder for RevisionListCall<'a> {}
 
-impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RevisionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15204,8 +15160,7 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15218,7 +15173,7 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15227,7 +15182,7 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15287,21 +15242,21 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionListCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
     /// The token for continuing a previous list request on the next page. This should be set to the value of 'nextPageToken' from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> RevisionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> RevisionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of revisions to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> RevisionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> RevisionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -15311,7 +15266,7 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15332,7 +15287,7 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15352,7 +15307,7 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15402,10 +15357,10 @@ impl<'a, C> RevisionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionUpdateCall<'a, C>
-    where C: 'a {
+pub struct RevisionUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: Revision,
     _file_id: String,
     _revision_id: String,
@@ -15414,9 +15369,9 @@ pub struct RevisionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for RevisionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for RevisionUpdateCall<'a> {}
 
-impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RevisionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15489,8 +15444,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15504,7 +15458,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15515,7 +15469,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15574,7 +15528,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Revision) -> RevisionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Revision) -> RevisionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15584,7 +15538,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C> {
+    pub fn file_id(mut self, new_value: &str) -> RevisionUpdateCall<'a> {
         self._file_id = new_value.to_string();
         self
     }
@@ -15594,7 +15548,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a, C> {
+    pub fn revision_id(mut self, new_value: &str) -> RevisionUpdateCall<'a> {
         self._revision_id = new_value.to_string();
         self
     }
@@ -15604,7 +15558,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15625,7 +15579,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15645,7 +15599,7 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15695,10 +15649,10 @@ impl<'a, C> RevisionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveCreateCall<'a, C>
-    where C: 'a {
+pub struct TeamdriveCreateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: TeamDrive,
     _request_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15706,9 +15660,9 @@ pub struct TeamdriveCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TeamdriveCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for TeamdriveCreateCall<'a> {}
 
-impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TeamdriveCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15759,8 +15713,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15774,7 +15727,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15785,7 +15738,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15844,7 +15797,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveCreateCall<'a, C> {
+    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15854,7 +15807,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request_id(mut self, new_value: &str) -> TeamdriveCreateCall<'a, C> {
+    pub fn request_id(mut self, new_value: &str) -> TeamdriveCreateCall<'a> {
         self._request_id = new_value.to_string();
         self
     }
@@ -15864,7 +15817,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15885,7 +15838,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15905,7 +15858,7 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15949,19 +15902,19 @@ impl<'a, C> TeamdriveCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveDeleteCall<'a, C>
-    where C: 'a {
+pub struct TeamdriveDeleteCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _team_drive_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TeamdriveDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TeamdriveDeleteCall<'a> {}
 
-impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TeamdriveDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16021,8 +15974,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16035,7 +15987,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16044,7 +15996,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16094,7 +16046,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveDeleteCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveDeleteCall<'a> {
         self._team_drive_id = new_value.to_string();
         self
     }
@@ -16104,7 +16056,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16125,7 +16077,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16145,7 +16097,7 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16190,10 +16142,10 @@ impl<'a, C> TeamdriveDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveGetCall<'a, C>
-    where C: 'a {
+pub struct TeamdriveGetCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _team_drive_id: String,
     _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16201,9 +16153,9 @@ pub struct TeamdriveGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TeamdriveGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TeamdriveGetCall<'a> {}
 
-impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TeamdriveGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16267,8 +16219,7 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16281,7 +16232,7 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16290,7 +16241,7 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16350,14 +16301,14 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveGetCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveGetCall<'a> {
         self._team_drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveGetCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveGetCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -16367,7 +16318,7 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16388,7 +16339,7 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16408,7 +16359,7 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16456,10 +16407,10 @@ impl<'a, C> TeamdriveGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveListCall<'a, C>
-    where C: 'a {
+pub struct TeamdriveListCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _use_domain_admin_access: Option<bool>,
     _q: Option<String>,
     _page_token: Option<String>,
@@ -16469,9 +16420,9 @@ pub struct TeamdriveListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TeamdriveListCall<'a, C> {}
+impl<'a> client::CallBuilder for TeamdriveListCall<'a> {}
 
-impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TeamdriveListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16522,8 +16473,7 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16536,7 +16486,7 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16545,7 +16495,7 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16602,28 +16552,28 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Issue the request as a domain administrator; if set to true, then all Team Drives of the domain in which the requester is an administrator are returned.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveListCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveListCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Query string for searching Team Drives.
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> TeamdriveListCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> TeamdriveListCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
     /// Page token for Team Drives.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TeamdriveListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TeamdriveListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of Team Drives to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TeamdriveListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> TeamdriveListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -16633,7 +16583,7 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16654,7 +16604,7 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16674,7 +16624,7 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16725,10 +16675,10 @@ impl<'a, C> TeamdriveListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TeamdriveUpdateCall<'a, C>
-    where C: 'a {
+pub struct TeamdriveUpdateCall<'a>
+    where  {
 
-    hub: &'a DriveHub<C>,
+    hub: &'a DriveHub<>,
     _request: TeamDrive,
     _team_drive_id: String,
     _use_domain_admin_access: Option<bool>,
@@ -16737,9 +16687,9 @@ pub struct TeamdriveUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TeamdriveUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for TeamdriveUpdateCall<'a> {}
 
-impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TeamdriveUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16814,8 +16764,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16829,7 +16778,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16840,7 +16789,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16899,7 +16848,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: TeamDrive) -> TeamdriveUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -16909,14 +16858,14 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveUpdateCall<'a, C> {
+    pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveUpdateCall<'a> {
         self._team_drive_id = new_value.to_string();
         self
     }
     /// Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.
     ///
     /// Sets the *use domain admin access* query property to the given value.
-    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveUpdateCall<'a, C> {
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveUpdateCall<'a> {
         self._use_domain_admin_access = Some(new_value);
         self
     }
@@ -16926,7 +16875,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TeamdriveUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16947,7 +16896,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TeamdriveUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16967,7 +16916,7 @@ impl<'a, C> TeamdriveUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TeamdriveUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

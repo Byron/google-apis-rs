@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct DriveActivityHub<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct DriveActivityHub<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for DriveActivityHub<C> {}
+impl<'a, > client::Hub for DriveActivityHub<> {}
 
-impl<'a, C> DriveActivityHub<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > DriveActivityHub<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DriveActivityHub<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DriveActivityHub<> {
         DriveActivityHub {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://driveactivity.googleapis.com/".to_string(),
             _root_url: "https://driveactivity.googleapis.com/".to_string(),
         }
     }
 
-    pub fn activity(&'a self) -> ActivityMethods<'a, C> {
+    pub fn activity(&'a self) -> ActivityMethods<'a> {
         ActivityMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1091,15 +1089,15 @@ impl client::Part for User {}
 /// let rb = hub.activity();
 /// # }
 /// ```
-pub struct ActivityMethods<'a, C>
-    where C: 'a {
+pub struct ActivityMethods<'a>
+    where  {
 
-    hub: &'a DriveActivityHub<C>,
+    hub: &'a DriveActivityHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ActivityMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ActivityMethods<'a> {}
 
-impl<'a, C> ActivityMethods<'a, C> {
+impl<'a> ActivityMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1108,7 +1106,7 @@ impl<'a, C> ActivityMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn query(&self, request: QueryDriveActivityRequest) -> ActivityQueryCall<'a, C> {
+    pub fn query(&self, request: QueryDriveActivityRequest) -> ActivityQueryCall<'a> {
         ActivityQueryCall {
             hub: self.hub,
             _request: request,
@@ -1165,19 +1163,19 @@ impl<'a, C> ActivityMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActivityQueryCall<'a, C>
-    where C: 'a {
+pub struct ActivityQueryCall<'a>
+    where  {
 
-    hub: &'a DriveActivityHub<C>,
+    hub: &'a DriveActivityHub<>,
     _request: QueryDriveActivityRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActivityQueryCall<'a, C> {}
+impl<'a> client::CallBuilder for ActivityQueryCall<'a> {}
 
-impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActivityQueryCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1227,8 +1225,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1242,7 +1239,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1253,7 +1250,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1312,7 +1309,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: QueryDriveActivityRequest) -> ActivityQueryCall<'a, C> {
+    pub fn request(mut self, new_value: QueryDriveActivityRequest) -> ActivityQueryCall<'a> {
         self._request = new_value;
         self
     }
@@ -1322,7 +1319,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityQueryCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActivityQueryCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1347,7 +1344,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityQueryCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityQueryCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1367,7 +1364,7 @@ impl<'a, C> ActivityQueryCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityQueryCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityQueryCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

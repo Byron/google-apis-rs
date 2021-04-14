@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Networkconnectivity<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Networkconnectivity,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -2933,7 +2932,7 @@ async fn main() {
     
     let mut app = App::new("networkconnectivity1-alpha1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210324")
+           .version("2.0.3+20210324")
            .about("The Network Connectivity API will be home to various services which provide information pertaining to network connectivity.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_networkconnectivity1_alpha1_cli")
            .arg(Arg::with_name("url")

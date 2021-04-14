@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -189,35 +188,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Fitness<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Fitness<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Fitness<C> {}
+impl<'a, > client::Hub for Fitness<> {}
 
-impl<'a, C> Fitness<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Fitness<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Fitness<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Fitness<> {
         Fitness {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://fitness.googleapis.com/fitness/v1/users/".to_string(),
             _root_url: "https://fitness.googleapis.com/".to_string(),
         }
     }
 
-    pub fn users(&'a self) -> UserMethods<'a, C> {
+    pub fn users(&'a self) -> UserMethods<'a> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -795,15 +793,15 @@ impl client::Part for ValueMapValEntry {}
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C>
-    where C: 'a {
+pub struct UserMethods<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserMethods<'a> {}
 
-impl<'a, C> UserMethods<'a, C> {
+impl<'a> UserMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -813,7 +811,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `userId` - List data points for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
-    pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a, C> {
+    pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a> {
         UserDataSourceDataPointChangeListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -835,7 +833,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// * `userId` - Delete a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a, C> {
+    pub fn data_sources_datasets_delete(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetDeleteCall<'a> {
         UserDataSourceDatasetDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -856,7 +854,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// * `userId` - Retrieve a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - Dataset identifier that is a composite of the minimum data point start time and maximum data point end time represented as nanoseconds from the epoch. The ID is formatted like: "startTime-endTime" where startTime and endTime are 64 bit integers.
-    pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn data_sources_datasets_get(&self, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetGetCall<'a> {
         UserDataSourceDatasetGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -880,7 +878,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// * `userId` - Patch a dataset for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     /// * `datasetId` - This field is not used, and can be safely omitted.
-    pub fn data_sources_datasets_patch(&self, request: Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a, C> {
+    pub fn data_sources_datasets_patch(&self, request: Dataset, user_id: &str, data_source_id: &str, dataset_id: &str) -> UserDataSourceDatasetPatchCall<'a> {
         UserDataSourceDatasetPatchCall {
             hub: self.hub,
             _request: request,
@@ -901,7 +899,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Create the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn data_sources_create(&self, request: DataSource, user_id: &str) -> UserDataSourceCreateCall<'a, C> {
+    pub fn data_sources_create(&self, request: DataSource, user_id: &str) -> UserDataSourceCreateCall<'a> {
         UserDataSourceCreateCall {
             hub: self.hub,
             _request: request,
@@ -920,7 +918,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to delete.
-    pub fn data_sources_delete(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDeleteCall<'a, C> {
+    pub fn data_sources_delete(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDeleteCall<'a> {
         UserDataSourceDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -939,7 +937,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `userId` - Retrieve a data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to retrieve.
-    pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a, C> {
+    pub fn data_sources_get(&self, user_id: &str, data_source_id: &str) -> UserDataSourceGetCall<'a> {
         UserDataSourceGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -957,7 +955,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `userId` - List data sources for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a, C> {
+    pub fn data_sources_list(&self, user_id: &str) -> UserDataSourceListCall<'a> {
         UserDataSourceListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -977,7 +975,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `userId` - Update the data source for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source to update.
-    pub fn data_sources_update(&self, request: DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a, C> {
+    pub fn data_sources_update(&self, request: DataSource, user_id: &str, data_source_id: &str) -> UserDataSourceUpdateCall<'a> {
         UserDataSourceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -997,7 +995,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `userId` - Aggregate data for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn dataset_aggregate(&self, request: AggregateRequest, user_id: &str) -> UserDatasetAggregateCall<'a, C> {
+    pub fn dataset_aggregate(&self, request: AggregateRequest, user_id: &str) -> UserDatasetAggregateCall<'a> {
         UserDatasetAggregateCall {
             hub: self.hub,
             _request: request,
@@ -1016,7 +1014,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `userId` - Delete a session for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `sessionId` - The ID of the session to be deleted.
-    pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a, C> {
+    pub fn sessions_delete(&self, user_id: &str, session_id: &str) -> UserSessionDeleteCall<'a> {
         UserSessionDeleteCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1034,7 +1032,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `userId` - List sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
-    pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a, C> {
+    pub fn sessions_list(&self, user_id: &str) -> UserSessionListCall<'a> {
         UserSessionListCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -1058,7 +1056,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `userId` - Create sessions for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `sessionId` - The ID of the session to be created.
-    pub fn sessions_update(&self, request: Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a, C> {
+    pub fn sessions_update(&self, request: Session, user_id: &str, session_id: &str) -> UserSessionUpdateCall<'a> {
         UserSessionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1113,10 +1111,10 @@ impl<'a, C> UserMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDataPointChangeListCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceDataPointChangeListCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _data_source_id: String,
     _page_token: Option<String>,
@@ -1126,9 +1124,9 @@ pub struct UserDataSourceDataPointChangeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceDataPointChangeListCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceDataPointChangeListCall<'a> {}
 
-impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceDataPointChangeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1196,8 +1194,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1210,7 +1207,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1219,7 +1216,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1279,7 +1276,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1289,21 +1286,21 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large result sets. To get the next page of results, set this parameter to the value of nextPageToken from the previous response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDataPointChangeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// If specified, no more than this many data point changes will be included in the response.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a> {
         self._limit = Some(new_value);
         self
     }
@@ -1313,7 +1310,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDataPointChangeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDataPointChangeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1338,7 +1335,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDataPointChangeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDataPointChangeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1358,7 +1355,7 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDataPointChangeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDataPointChangeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1402,10 +1399,10 @@ impl<'a, C> UserDataSourceDataPointChangeListCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDatasetDeleteCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceDatasetDeleteCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _data_source_id: String,
     _dataset_id: String,
@@ -1414,9 +1411,9 @@ pub struct UserDataSourceDatasetDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceDatasetDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceDatasetDeleteCall<'a> {}
 
-impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceDatasetDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1478,8 +1475,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1492,7 +1488,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1501,7 +1497,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1551,7 +1547,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1561,7 +1557,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1571,7 +1567,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a, C> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetDeleteCall<'a> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -1581,7 +1577,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1606,7 +1602,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1626,7 +1622,7 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1672,10 +1668,10 @@ impl<'a, C> UserDataSourceDatasetDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDatasetGetCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceDatasetGetCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _data_source_id: String,
     _dataset_id: String,
@@ -1686,9 +1682,9 @@ pub struct UserDataSourceDatasetGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceDatasetGetCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceDatasetGetCall<'a> {}
 
-impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceDatasetGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1757,8 +1753,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1771,7 +1766,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1780,7 +1775,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1840,7 +1835,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -1850,7 +1845,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -1860,21 +1855,21 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
         self._dataset_id = new_value.to_string();
         self
     }
     /// The continuation token, which is used to page through large datasets. To get the next page of a dataset, set this parameter to the value of nextPageToken from the previous response. Each subsequent call will yield a partial dataset with data point end timestamps that are strictly smaller than those in the previous partial response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> UserDataSourceDatasetGetCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// If specified, no more than this many data points will be included in the dataset. If there are more data points in the dataset, nextPageToken will be set in the dataset response. The limit is applied from the end of the time range. That is, if pageToken is absent, the limit most recent data points will be returned.
     ///
     /// Sets the *limit* query property to the given value.
-    pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn limit(mut self, new_value: i32) -> UserDataSourceDatasetGetCall<'a> {
         self._limit = Some(new_value);
         self
     }
@@ -1884,7 +1879,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1909,7 +1904,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1929,7 +1924,7 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1979,10 +1974,10 @@ impl<'a, C> UserDataSourceDatasetGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDatasetPatchCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceDatasetPatchCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _request: Dataset,
     _user_id: String,
     _data_source_id: String,
@@ -1992,9 +1987,9 @@ pub struct UserDataSourceDatasetPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceDatasetPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceDatasetPatchCall<'a> {}
 
-impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceDatasetPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2068,8 +2063,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2083,7 +2077,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2094,7 +2088,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2153,7 +2147,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Dataset) -> UserDataSourceDatasetPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Dataset) -> UserDataSourceDatasetPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2163,7 +2157,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2173,7 +2167,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2183,7 +2177,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a, C> {
+    pub fn dataset_id(mut self, new_value: &str) -> UserDataSourceDatasetPatchCall<'a> {
         self._dataset_id = new_value.to_string();
         self
     }
@@ -2193,7 +2187,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDatasetPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2218,7 +2212,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDatasetPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2238,7 +2232,7 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDatasetPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2288,10 +2282,10 @@ impl<'a, C> UserDataSourceDatasetPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceCreateCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceCreateCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _request: DataSource,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2299,9 +2293,9 @@ pub struct UserDataSourceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceCreateCall<'a> {}
 
-impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2373,8 +2367,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2388,7 +2381,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2399,7 +2392,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2458,7 +2451,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DataSource) -> UserDataSourceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: DataSource) -> UserDataSourceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2468,7 +2461,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceCreateCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2478,7 +2471,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2503,7 +2496,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2523,7 +2516,7 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2567,10 +2560,10 @@ impl<'a, C> UserDataSourceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceDeleteCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceDeleteCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _data_source_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2578,9 +2571,9 @@ pub struct UserDataSourceDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceDeleteCall<'a> {}
 
-impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2642,8 +2635,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2656,7 +2648,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2665,7 +2657,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2725,7 +2717,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -2735,7 +2727,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceDeleteCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -2745,7 +2737,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2770,7 +2762,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2790,7 +2782,7 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2834,10 +2826,10 @@ impl<'a, C> UserDataSourceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceGetCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceGetCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _data_source_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2845,9 +2837,9 @@ pub struct UserDataSourceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceGetCall<'a> {}
 
-impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2909,8 +2901,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2923,7 +2914,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2932,7 +2923,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2992,7 +2983,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3002,7 +2993,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceGetCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -3012,7 +3003,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3037,7 +3028,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3057,7 +3048,7 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3102,10 +3093,10 @@ impl<'a, C> UserDataSourceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceListCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceListCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _data_type_name: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3113,9 +3104,9 @@ pub struct UserDataSourceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceListCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceListCall<'a> {}
 
-impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3181,8 +3172,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3195,7 +3185,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3204,7 +3194,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3264,7 +3254,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceListCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3272,7 +3262,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Append the given value to the *data type name* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a, C> {
+    pub fn add_data_type_name(mut self, new_value: &str) -> UserDataSourceListCall<'a> {
         self._data_type_name.push(new_value.to_string());
         self
     }
@@ -3282,7 +3272,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3307,7 +3297,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3327,7 +3317,7 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3377,10 +3367,10 @@ impl<'a, C> UserDataSourceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDataSourceUpdateCall<'a, C>
-    where C: 'a {
+pub struct UserDataSourceUpdateCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _request: DataSource,
     _user_id: String,
     _data_source_id: String,
@@ -3389,9 +3379,9 @@ pub struct UserDataSourceUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDataSourceUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDataSourceUpdateCall<'a> {}
 
-impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDataSourceUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3464,8 +3454,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3479,7 +3468,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3490,7 +3479,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3549,7 +3538,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DataSource) -> UserDataSourceUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: DataSource) -> UserDataSourceUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3559,7 +3548,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3569,7 +3558,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a, C> {
+    pub fn data_source_id(mut self, new_value: &str) -> UserDataSourceUpdateCall<'a> {
         self._data_source_id = new_value.to_string();
         self
     }
@@ -3579,7 +3568,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDataSourceUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3604,7 +3593,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDataSourceUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3624,7 +3613,7 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDataSourceUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3674,10 +3663,10 @@ impl<'a, C> UserDataSourceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDatasetAggregateCall<'a, C>
-    where C: 'a {
+pub struct UserDatasetAggregateCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _request: AggregateRequest,
     _user_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3685,9 +3674,9 @@ pub struct UserDatasetAggregateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserDatasetAggregateCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDatasetAggregateCall<'a> {}
 
-impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDatasetAggregateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3759,8 +3748,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3774,7 +3762,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3785,7 +3773,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3844,7 +3832,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AggregateRequest) -> UserDatasetAggregateCall<'a, C> {
+    pub fn request(mut self, new_value: AggregateRequest) -> UserDatasetAggregateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3854,7 +3842,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDatasetAggregateCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDatasetAggregateCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -3864,7 +3852,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDatasetAggregateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDatasetAggregateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3889,7 +3877,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserDatasetAggregateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDatasetAggregateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3909,7 +3897,7 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserDatasetAggregateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserDatasetAggregateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3953,10 +3941,10 @@ impl<'a, C> UserDatasetAggregateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSessionDeleteCall<'a, C>
-    where C: 'a {
+pub struct UserSessionDeleteCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _session_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3964,9 +3952,9 @@ pub struct UserSessionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserSessionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for UserSessionDeleteCall<'a> {}
 
-impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserSessionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4027,8 +4015,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4041,7 +4028,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4050,7 +4037,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4100,7 +4087,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4110,7 +4097,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a, C> {
+    pub fn session_id(mut self, new_value: &str) -> UserSessionDeleteCall<'a> {
         self._session_id = new_value.to_string();
         self
     }
@@ -4120,7 +4107,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4145,7 +4132,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4165,7 +4152,7 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4214,10 +4201,10 @@ impl<'a, C> UserSessionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSessionListCall<'a, C>
-    where C: 'a {
+pub struct UserSessionListCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _user_id: String,
     _start_time: Option<String>,
     _page_token: Option<String>,
@@ -4229,9 +4216,9 @@ pub struct UserSessionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserSessionListCall<'a, C> {}
+impl<'a> client::CallBuilder for UserSessionListCall<'a> {}
 
-impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserSessionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4309,8 +4296,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4323,7 +4309,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4332,7 +4318,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4392,35 +4378,35 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionListCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response. If this time is omitted but endTime is specified, all sessions from the start of time up to endTime will be returned.
     ///
     /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a, C> {
+    pub fn start_time(mut self, new_value: &str) -> UserSessionListCall<'a> {
         self._start_time = Some(new_value.to_string());
         self
     }
     /// The continuation token, which is used for incremental syncing. To get the next batch of changes, set this parameter to the value of nextPageToken from the previous response. The page token is ignored if either start or end time is specified. If none of start time, end time, and the page token is specified, sessions modified in the last 30 days are returned.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> UserSessionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// If true, and if both startTime and endTime are omitted, session deletions will be returned.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a, C> {
+    pub fn include_deleted(mut self, new_value: bool) -> UserSessionListCall<'a> {
         self._include_deleted = Some(new_value);
         self
     }
     /// An RFC3339 timestamp. Only sessions ending between the start and end times will be included in the response. If this time is omitted but startTime is specified, all sessions from startTime to the end of time will be returned.
     ///
     /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a, C> {
+    pub fn end_time(mut self, new_value: &str) -> UserSessionListCall<'a> {
         self._end_time = Some(new_value.to_string());
         self
     }
@@ -4428,7 +4414,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Append the given value to the *activity type* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_activity_type(mut self, new_value: i32) -> UserSessionListCall<'a, C> {
+    pub fn add_activity_type(mut self, new_value: i32) -> UserSessionListCall<'a> {
         self._activity_type.push(new_value);
         self
     }
@@ -4438,7 +4424,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4463,7 +4449,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4483,7 +4469,7 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4533,10 +4519,10 @@ impl<'a, C> UserSessionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSessionUpdateCall<'a, C>
-    where C: 'a {
+pub struct UserSessionUpdateCall<'a>
+    where  {
 
-    hub: &'a Fitness<C>,
+    hub: &'a Fitness<>,
     _request: Session,
     _user_id: String,
     _session_id: String,
@@ -4545,9 +4531,9 @@ pub struct UserSessionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserSessionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for UserSessionUpdateCall<'a> {}
 
-impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserSessionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4620,8 +4606,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4635,7 +4620,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4646,7 +4631,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4705,7 +4690,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Session) -> UserSessionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Session) -> UserSessionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4715,7 +4700,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
@@ -4725,7 +4710,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a, C> {
+    pub fn session_id(mut self, new_value: &str) -> UserSessionUpdateCall<'a> {
         self._session_id = new_value.to_string();
         self
     }
@@ -4735,7 +4720,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSessionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4760,7 +4745,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSessionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4780,7 +4765,7 @@ impl<'a, C> UserSessionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSessionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

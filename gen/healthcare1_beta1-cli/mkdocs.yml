@@ -1,8 +1,8 @@
-site_name: Cloud Healthcare v2.0.0+20210317
+site_name: Cloud Healthcare v2.0.3+20210317
 site_url: http://byron.github.io/google-apis-rs/google-healthcare1_beta1-cli
 site_description: A complete library to interact with Cloud Healthcare (protocol v1beta1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/healthcare1_beta1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/healthcare1_beta1-cli
 
 docs_dir: docs
 site_dir: build_html

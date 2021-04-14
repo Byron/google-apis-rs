@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,68 +104,67 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Games<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Games<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Games<C> {}
+impl<'a, > client::Hub for Games<> {}
 
-impl<'a, C> Games<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Games<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Games<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Games<> {
         Games {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://games.googleapis.com/".to_string(),
             _root_url: "https://games.googleapis.com/".to_string(),
         }
     }
 
-    pub fn achievement_definitions(&'a self) -> AchievementDefinitionMethods<'a, C> {
+    pub fn achievement_definitions(&'a self) -> AchievementDefinitionMethods<'a> {
         AchievementDefinitionMethods { hub: &self }
     }
-    pub fn achievements(&'a self) -> AchievementMethods<'a, C> {
+    pub fn achievements(&'a self) -> AchievementMethods<'a> {
         AchievementMethods { hub: &self }
     }
-    pub fn applications(&'a self) -> ApplicationMethods<'a, C> {
+    pub fn applications(&'a self) -> ApplicationMethods<'a> {
         ApplicationMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a, C> {
+    pub fn events(&'a self) -> EventMethods<'a> {
         EventMethods { hub: &self }
     }
-    pub fn leaderboards(&'a self) -> LeaderboardMethods<'a, C> {
+    pub fn leaderboards(&'a self) -> LeaderboardMethods<'a> {
         LeaderboardMethods { hub: &self }
     }
-    pub fn metagame(&'a self) -> MetagameMethods<'a, C> {
+    pub fn metagame(&'a self) -> MetagameMethods<'a> {
         MetagameMethods { hub: &self }
     }
-    pub fn players(&'a self) -> PlayerMethods<'a, C> {
+    pub fn players(&'a self) -> PlayerMethods<'a> {
         PlayerMethods { hub: &self }
     }
-    pub fn revisions(&'a self) -> RevisionMethods<'a, C> {
+    pub fn revisions(&'a self) -> RevisionMethods<'a> {
         RevisionMethods { hub: &self }
     }
-    pub fn scores(&'a self) -> ScoreMethods<'a, C> {
+    pub fn scores(&'a self) -> ScoreMethods<'a> {
         ScoreMethods { hub: &self }
     }
-    pub fn snapshots(&'a self) -> SnapshotMethods<'a, C> {
+    pub fn snapshots(&'a self) -> SnapshotMethods<'a> {
         SnapshotMethods { hub: &self }
     }
-    pub fn snapshots_extended(&'a self) -> SnapshotsExtendedMethods<'a, C> {
+    pub fn snapshots_extended(&'a self) -> SnapshotsExtendedMethods<'a> {
         SnapshotsExtendedMethods { hub: &self }
     }
-    pub fn stats(&'a self) -> StatMethods<'a, C> {
+    pub fn stats(&'a self) -> StatMethods<'a> {
         StatMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1936,20 +1934,20 @@ impl client::Part for PlayerName {}
 /// let rb = hub.achievement_definitions();
 /// # }
 /// ```
-pub struct AchievementDefinitionMethods<'a, C>
-    where C: 'a {
+pub struct AchievementDefinitionMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AchievementDefinitionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AchievementDefinitionMethods<'a> {}
 
-impl<'a, C> AchievementDefinitionMethods<'a, C> {
+impl<'a> AchievementDefinitionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the achievement definitions for your application.
-    pub fn list(&self) -> AchievementDefinitionListCall<'a, C> {
+    pub fn list(&self) -> AchievementDefinitionListCall<'a> {
         AchievementDefinitionListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1994,15 +1992,15 @@ impl<'a, C> AchievementDefinitionMethods<'a, C> {
 /// let rb = hub.achievements();
 /// # }
 /// ```
-pub struct AchievementMethods<'a, C>
-    where C: 'a {
+pub struct AchievementMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AchievementMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AchievementMethods<'a> {}
 
-impl<'a, C> AchievementMethods<'a, C> {
+impl<'a> AchievementMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2012,7 +2010,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
     /// * `stepsToIncrement` - The number of steps to increment.
-    pub fn increment(&self, achievement_id: &str, steps_to_increment: i32) -> AchievementIncrementCall<'a, C> {
+    pub fn increment(&self, achievement_id: &str, steps_to_increment: i32) -> AchievementIncrementCall<'a> {
         AchievementIncrementCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -2031,7 +2029,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn list(&self, player_id: &str) -> AchievementListCall<'a, C> {
+    pub fn list(&self, player_id: &str) -> AchievementListCall<'a> {
         AchievementListCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
@@ -2052,7 +2050,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reveal(&self, achievement_id: &str) -> AchievementRevealCall<'a, C> {
+    pub fn reveal(&self, achievement_id: &str) -> AchievementRevealCall<'a> {
         AchievementRevealCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -2070,7 +2068,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
     /// * `steps` - The minimum value to set the steps to.
-    pub fn set_steps_at_least(&self, achievement_id: &str, steps: i32) -> AchievementSetStepsAtLeastCall<'a, C> {
+    pub fn set_steps_at_least(&self, achievement_id: &str, steps: i32) -> AchievementSetStepsAtLeastCall<'a> {
         AchievementSetStepsAtLeastCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -2088,7 +2086,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn unlock(&self, achievement_id: &str) -> AchievementUnlockCall<'a, C> {
+    pub fn unlock(&self, achievement_id: &str) -> AchievementUnlockCall<'a> {
         AchievementUnlockCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -2105,7 +2103,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_multiple(&self, request: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C> {
+    pub fn update_multiple(&self, request: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a> {
         AchievementUpdateMultipleCall {
             hub: self.hub,
             _request: request,
@@ -2148,15 +2146,15 @@ impl<'a, C> AchievementMethods<'a, C> {
 /// let rb = hub.applications();
 /// # }
 /// ```
-pub struct ApplicationMethods<'a, C>
-    where C: 'a {
+pub struct ApplicationMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ApplicationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ApplicationMethods<'a> {}
 
-impl<'a, C> ApplicationMethods<'a, C> {
+impl<'a> ApplicationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2165,7 +2163,7 @@ impl<'a, C> ApplicationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn get(&self, application_id: &str) -> ApplicationGetCall<'a, C> {
+    pub fn get(&self, application_id: &str) -> ApplicationGetCall<'a> {
         ApplicationGetCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -2180,7 +2178,7 @@ impl<'a, C> ApplicationMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a URL for the requested end point type.
-    pub fn get_end_point(&self) -> ApplicationGetEndPointCall<'a, C> {
+    pub fn get_end_point(&self) -> ApplicationGetEndPointCall<'a> {
         ApplicationGetEndPointCall {
             hub: self.hub,
             _end_point_type: Default::default(),
@@ -2194,7 +2192,7 @@ impl<'a, C> ApplicationMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Indicate that the currently authenticated user is playing your application.
-    pub fn played(&self) -> ApplicationPlayedCall<'a, C> {
+    pub fn played(&self) -> ApplicationPlayedCall<'a> {
         ApplicationPlayedCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2210,7 +2208,7 @@ impl<'a, C> ApplicationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn verify(&self, application_id: &str) -> ApplicationVerifyCall<'a, C> {
+    pub fn verify(&self, application_id: &str) -> ApplicationVerifyCall<'a> {
         ApplicationVerifyCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -2253,20 +2251,20 @@ impl<'a, C> ApplicationMethods<'a, C> {
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a, C>
-    where C: 'a {
+pub struct EventMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for EventMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for EventMethods<'a> {}
 
-impl<'a, C> EventMethods<'a, C> {
+impl<'a> EventMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list showing the current progress on events in this application for the currently authenticated user.
-    pub fn list_by_player(&self) -> EventListByPlayerCall<'a, C> {
+    pub fn list_by_player(&self) -> EventListByPlayerCall<'a> {
         EventListByPlayerCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -2281,7 +2279,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of the event definitions in this application.
-    pub fn list_definitions(&self) -> EventListDefinitionCall<'a, C> {
+    pub fn list_definitions(&self) -> EventListDefinitionCall<'a> {
         EventListDefinitionCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -2300,7 +2298,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn record(&self, request: EventRecordRequest) -> EventRecordCall<'a, C> {
+    pub fn record(&self, request: EventRecordRequest) -> EventRecordCall<'a> {
         EventRecordCall {
             hub: self.hub,
             _request: request,
@@ -2344,15 +2342,15 @@ impl<'a, C> EventMethods<'a, C> {
 /// let rb = hub.leaderboards();
 /// # }
 /// ```
-pub struct LeaderboardMethods<'a, C>
-    where C: 'a {
+pub struct LeaderboardMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LeaderboardMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LeaderboardMethods<'a> {}
 
-impl<'a, C> LeaderboardMethods<'a, C> {
+impl<'a> LeaderboardMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2361,7 +2359,7 @@ impl<'a, C> LeaderboardMethods<'a, C> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn get(&self, leaderboard_id: &str) -> LeaderboardGetCall<'a, C> {
+    pub fn get(&self, leaderboard_id: &str) -> LeaderboardGetCall<'a> {
         LeaderboardGetCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -2375,7 +2373,7 @@ impl<'a, C> LeaderboardMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the leaderboard metadata for your application.
-    pub fn list(&self) -> LeaderboardListCall<'a, C> {
+    pub fn list(&self) -> LeaderboardListCall<'a> {
         LeaderboardListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -2420,20 +2418,20 @@ impl<'a, C> LeaderboardMethods<'a, C> {
 /// let rb = hub.metagame();
 /// # }
 /// ```
-pub struct MetagameMethods<'a, C>
-    where C: 'a {
+pub struct MetagameMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MetagameMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MetagameMethods<'a> {}
 
-impl<'a, C> MetagameMethods<'a, C> {
+impl<'a> MetagameMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Return the metagame configuration data for the calling application.
-    pub fn get_metagame_config(&self) -> MetagameGetMetagameConfigCall<'a, C> {
+    pub fn get_metagame_config(&self) -> MetagameGetMetagameConfigCall<'a> {
         MetagameGetMetagameConfigCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2450,7 +2448,7 @@ impl<'a, C> MetagameMethods<'a, C> {
     ///
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
     /// * `collection` - The collection of categories for which data will be returned.
-    pub fn list_categories_by_player(&self, player_id: &str, collection: &str) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn list_categories_by_player(&self, player_id: &str, collection: &str) -> MetagameListCategoriesByPlayerCall<'a> {
         MetagameListCategoriesByPlayerCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
@@ -2497,15 +2495,15 @@ impl<'a, C> MetagameMethods<'a, C> {
 /// let rb = hub.players();
 /// # }
 /// ```
-pub struct PlayerMethods<'a, C>
-    where C: 'a {
+pub struct PlayerMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PlayerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PlayerMethods<'a> {}
 
-impl<'a, C> PlayerMethods<'a, C> {
+impl<'a> PlayerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2514,7 +2512,7 @@ impl<'a, C> PlayerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn get(&self, player_id: &str) -> PlayerGetCall<'a, C> {
+    pub fn get(&self, player_id: &str) -> PlayerGetCall<'a> {
         PlayerGetCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
@@ -2532,7 +2530,7 @@ impl<'a, C> PlayerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `collection` - Collection of players being retrieved
-    pub fn list(&self, collection: &str) -> PlayerListCall<'a, C> {
+    pub fn list(&self, collection: &str) -> PlayerListCall<'a> {
         PlayerListCall {
             hub: self.hub,
             _collection: collection.to_string(),
@@ -2578,15 +2576,15 @@ impl<'a, C> PlayerMethods<'a, C> {
 /// let rb = hub.revisions();
 /// # }
 /// ```
-pub struct RevisionMethods<'a, C>
-    where C: 'a {
+pub struct RevisionMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for RevisionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for RevisionMethods<'a> {}
 
-impl<'a, C> RevisionMethods<'a, C> {
+impl<'a> RevisionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2595,7 +2593,7 @@ impl<'a, C> RevisionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `clientRevision` - The revision of the client SDK used by your application. Format: `[PLATFORM_TYPE]:[VERSION_NUMBER]`. Possible values of `PLATFORM_TYPE` are: * `ANDROID` - Client is running the Android SDK. * `IOS` - Client is running the iOS SDK. * `WEB_APP` - Client is running as a Web App.
-    pub fn check(&self, client_revision: &str) -> RevisionCheckCall<'a, C> {
+    pub fn check(&self, client_revision: &str) -> RevisionCheckCall<'a> {
         RevisionCheckCall {
             hub: self.hub,
             _client_revision: client_revision.to_string(),
@@ -2638,15 +2636,15 @@ impl<'a, C> RevisionMethods<'a, C> {
 /// let rb = hub.scores();
 /// # }
 /// ```
-pub struct ScoreMethods<'a, C>
-    where C: 'a {
+pub struct ScoreMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ScoreMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ScoreMethods<'a> {}
 
-impl<'a, C> ScoreMethods<'a, C> {
+impl<'a> ScoreMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2657,7 +2655,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
     /// * `leaderboardId` - The ID of the leaderboard. Can be set to 'ALL' to retrieve data for all leaderboards for this application.
     /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &str) -> ScoreGetCall<'a, C> {
+    pub fn get(&self, player_id: &str, leaderboard_id: &str, time_span: &str) -> ScoreGetCall<'a> {
         ScoreGetCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
@@ -2682,7 +2680,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// * `leaderboardId` - The ID of the leaderboard.
     /// * `collection` - The collection of scores you're requesting.
     /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn list(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListCall<'a, C> {
+    pub fn list(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListCall<'a> {
         ScoreListCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -2706,7 +2704,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// * `leaderboardId` - The ID of the leaderboard.
     /// * `collection` - The collection of scores you're requesting.
     /// * `timeSpan` - The time span for the scores and ranks you're requesting.
-    pub fn list_window(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListWindowCall<'a, C> {
+    pub fn list_window(&self, leaderboard_id: &str, collection: &str, time_span: &str) -> ScoreListWindowCall<'a> {
         ScoreListWindowCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -2731,7 +2729,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
     /// * `score` - The score you're submitting. The submitted score is ignored if it is worse than a previously submitted score, where worse depends on the leaderboard sort order. The meaning of the score value depends on the leaderboard format type. For fixed-point, the score represents the raw value. For time, the score represents elapsed time in milliseconds. For currency, the score represents a value in micro units.
-    pub fn submit(&self, leaderboard_id: &str, score: &str) -> ScoreSubmitCall<'a, C> {
+    pub fn submit(&self, leaderboard_id: &str, score: &str) -> ScoreSubmitCall<'a> {
         ScoreSubmitCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -2751,7 +2749,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn submit_multiple(&self, request: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C> {
+    pub fn submit_multiple(&self, request: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a> {
         ScoreSubmitMultipleCall {
             hub: self.hub,
             _request: request,
@@ -2795,15 +2793,15 @@ impl<'a, C> ScoreMethods<'a, C> {
 /// let rb = hub.snapshots();
 /// # }
 /// ```
-pub struct SnapshotMethods<'a, C>
-    where C: 'a {
+pub struct SnapshotMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SnapshotMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SnapshotMethods<'a> {}
 
-impl<'a, C> SnapshotMethods<'a, C> {
+impl<'a> SnapshotMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2812,7 +2810,7 @@ impl<'a, C> SnapshotMethods<'a, C> {
     /// # Arguments
     ///
     /// * `snapshotId` - The ID of the snapshot.
-    pub fn get(&self, snapshot_id: &str) -> SnapshotGetCall<'a, C> {
+    pub fn get(&self, snapshot_id: &str) -> SnapshotGetCall<'a> {
         SnapshotGetCall {
             hub: self.hub,
             _snapshot_id: snapshot_id.to_string(),
@@ -2830,7 +2828,7 @@ impl<'a, C> SnapshotMethods<'a, C> {
     /// # Arguments
     ///
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn list(&self, player_id: &str) -> SnapshotListCall<'a, C> {
+    pub fn list(&self, player_id: &str) -> SnapshotListCall<'a> {
         SnapshotListCall {
             hub: self.hub,
             _player_id: player_id.to_string(),
@@ -2876,15 +2874,15 @@ impl<'a, C> SnapshotMethods<'a, C> {
 /// let rb = hub.snapshots_extended();
 /// # }
 /// ```
-pub struct SnapshotsExtendedMethods<'a, C>
-    where C: 'a {
+pub struct SnapshotsExtendedMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SnapshotsExtendedMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SnapshotsExtendedMethods<'a> {}
 
-impl<'a, C> SnapshotsExtendedMethods<'a, C> {
+impl<'a> SnapshotsExtendedMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2894,7 +2892,7 @@ impl<'a, C> SnapshotsExtendedMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `snapshotName` - Required. Name of the snapshot.
-    pub fn resolve_snapshot_head(&self, request: ResolveSnapshotHeadRequest, snapshot_name: &str) -> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> {
+    pub fn resolve_snapshot_head(&self, request: ResolveSnapshotHeadRequest, snapshot_name: &str) -> SnapshotsExtendedResolveSnapshotHeadCall<'a> {
         SnapshotsExtendedResolveSnapshotHeadCall {
             hub: self.hub,
             _request: request,
@@ -2938,20 +2936,20 @@ impl<'a, C> SnapshotsExtendedMethods<'a, C> {
 /// let rb = hub.stats();
 /// # }
 /// ```
-pub struct StatMethods<'a, C>
-    where C: 'a {
+pub struct StatMethods<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
 }
 
-impl<'a, C> client::MethodsBuilder for StatMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for StatMethods<'a> {}
 
-impl<'a, C> StatMethods<'a, C> {
+impl<'a> StatMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns engagement and spend statistics in this application for the currently authenticated user.
-    pub fn get(&self) -> StatGetCall<'a, C> {
+    pub fn get(&self) -> StatGetCall<'a> {
         StatGetCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -3004,10 +3002,10 @@ impl<'a, C> StatMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementDefinitionListCall<'a, C>
-    where C: 'a {
+pub struct AchievementDefinitionListCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
@@ -3016,9 +3014,9 @@ pub struct AchievementDefinitionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementDefinitionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementDefinitionListCall<'a> {}
 
-impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementDefinitionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3066,8 +3064,7 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3080,7 +3077,7 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3089,7 +3086,7 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3146,21 +3143,21 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AchievementDefinitionListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> AchievementDefinitionListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> AchievementDefinitionListCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -3170,7 +3167,7 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementDefinitionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementDefinitionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3195,7 +3192,7 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementDefinitionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementDefinitionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3215,7 +3212,7 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementDefinitionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementDefinitionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3260,10 +3257,10 @@ impl<'a, C> AchievementDefinitionListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementIncrementCall<'a, C>
-    where C: 'a {
+pub struct AchievementIncrementCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _achievement_id: String,
     _steps_to_increment: i32,
     _request_id: Option<String>,
@@ -3272,9 +3269,9 @@ pub struct AchievementIncrementCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementIncrementCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementIncrementCall<'a> {}
 
-impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementIncrementCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3339,8 +3336,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3353,7 +3349,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3362,7 +3358,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3422,7 +3418,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementIncrementCall<'a, C> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementIncrementCall<'a> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -3432,14 +3428,14 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn steps_to_increment(mut self, new_value: i32) -> AchievementIncrementCall<'a, C> {
+    pub fn steps_to_increment(mut self, new_value: i32) -> AchievementIncrementCall<'a> {
         self._steps_to_increment = new_value;
         self
     }
     /// A randomly generated numeric ID for each request specified by the caller. This number is used at the server to ensure that the request is handled correctly across retries.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> AchievementIncrementCall<'a, C> {
+    pub fn request_id(mut self, new_value: &str) -> AchievementIncrementCall<'a> {
         self._request_id = Some(new_value.to_string());
         self
     }
@@ -3449,7 +3445,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementIncrementCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementIncrementCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3474,7 +3470,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementIncrementCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementIncrementCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3494,7 +3490,7 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementIncrementCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementIncrementCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3542,10 +3538,10 @@ impl<'a, C> AchievementIncrementCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementListCall<'a, C>
-    where C: 'a {
+pub struct AchievementListCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _player_id: String,
     _state: Option<String>,
     _page_token: Option<String>,
@@ -3556,9 +3552,9 @@ pub struct AchievementListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementListCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementListCall<'a> {}
 
-impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3631,8 +3627,7 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3645,7 +3640,7 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3654,7 +3649,7 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3714,35 +3709,35 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> AchievementListCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> AchievementListCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
     /// Tells the server to return only achievements with the specified state. If this parameter isn't specified, all achievements are returned.
     ///
     /// Sets the *state* query property to the given value.
-    pub fn state(mut self, new_value: &str) -> AchievementListCall<'a, C> {
+    pub fn state(mut self, new_value: &str) -> AchievementListCall<'a> {
         self._state = Some(new_value.to_string());
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AchievementListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AchievementListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of achievement resources to return in the response, used for paging. For any response, the actual number of achievement resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> AchievementListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> AchievementListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> AchievementListCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> AchievementListCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -3752,7 +3747,7 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3777,7 +3772,7 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3797,7 +3792,7 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3841,19 +3836,19 @@ impl<'a, C> AchievementListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementRevealCall<'a, C>
-    where C: 'a {
+pub struct AchievementRevealCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementRevealCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementRevealCall<'a> {}
 
-impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementRevealCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3914,8 +3909,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3928,7 +3922,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3937,7 +3931,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3997,7 +3991,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementRevealCall<'a, C> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementRevealCall<'a> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -4007,7 +4001,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementRevealCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementRevealCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4032,7 +4026,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementRevealCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementRevealCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4052,7 +4046,7 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementRevealCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementRevealCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4096,10 +4090,10 @@ impl<'a, C> AchievementRevealCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementSetStepsAtLeastCall<'a, C>
-    where C: 'a {
+pub struct AchievementSetStepsAtLeastCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _achievement_id: String,
     _steps: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4107,9 +4101,9 @@ pub struct AchievementSetStepsAtLeastCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementSetStepsAtLeastCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementSetStepsAtLeastCall<'a> {}
 
-impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementSetStepsAtLeastCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4171,8 +4165,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4185,7 +4178,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4194,7 +4187,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4254,7 +4247,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementSetStepsAtLeastCall<'a, C> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementSetStepsAtLeastCall<'a> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -4264,7 +4257,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn steps(mut self, new_value: i32) -> AchievementSetStepsAtLeastCall<'a, C> {
+    pub fn steps(mut self, new_value: i32) -> AchievementSetStepsAtLeastCall<'a> {
         self._steps = new_value;
         self
     }
@@ -4274,7 +4267,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementSetStepsAtLeastCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementSetStepsAtLeastCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4299,7 +4292,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementSetStepsAtLeastCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementSetStepsAtLeastCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4319,7 +4312,7 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementSetStepsAtLeastCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementSetStepsAtLeastCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4363,19 +4356,19 @@ impl<'a, C> AchievementSetStepsAtLeastCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementUnlockCall<'a, C>
-    where C: 'a {
+pub struct AchievementUnlockCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementUnlockCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementUnlockCall<'a> {}
 
-impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementUnlockCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4436,8 +4429,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4450,7 +4442,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4459,7 +4451,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4519,7 +4511,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementUnlockCall<'a, C> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementUnlockCall<'a> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -4529,7 +4521,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementUnlockCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementUnlockCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4554,7 +4546,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementUnlockCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementUnlockCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4574,7 +4566,7 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementUnlockCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementUnlockCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4624,19 +4616,19 @@ impl<'a, C> AchievementUnlockCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementUpdateMultipleCall<'a, C>
-    where C: 'a {
+pub struct AchievementUpdateMultipleCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _request: AchievementUpdateMultipleRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementUpdateMultipleCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementUpdateMultipleCall<'a> {}
 
-impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementUpdateMultipleCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4686,8 +4678,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4701,7 +4692,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4712,7 +4703,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4771,7 +4762,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a, C> {
+    pub fn request(mut self, new_value: AchievementUpdateMultipleRequest) -> AchievementUpdateMultipleCall<'a> {
         self._request = new_value;
         self
     }
@@ -4781,7 +4772,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementUpdateMultipleCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementUpdateMultipleCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4806,7 +4797,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementUpdateMultipleCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementUpdateMultipleCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4826,7 +4817,7 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementUpdateMultipleCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementUpdateMultipleCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4872,10 +4863,10 @@ impl<'a, C> AchievementUpdateMultipleCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationGetCall<'a, C>
-    where C: 'a {
+pub struct ApplicationGetCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _application_id: String,
     _platform_type: Option<String>,
     _language: Option<String>,
@@ -4884,9 +4875,9 @@ pub struct ApplicationGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ApplicationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ApplicationGetCall<'a> {}
 
-impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApplicationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4953,8 +4944,7 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4967,7 +4957,7 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4976,7 +4966,7 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5036,21 +5026,21 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> ApplicationGetCall<'a, C> {
+    pub fn application_id(mut self, new_value: &str) -> ApplicationGetCall<'a> {
         self._application_id = new_value.to_string();
         self
     }
     /// Restrict application details returned to the specific platform.
     ///
     /// Sets the *platform type* query property to the given value.
-    pub fn platform_type(mut self, new_value: &str) -> ApplicationGetCall<'a, C> {
+    pub fn platform_type(mut self, new_value: &str) -> ApplicationGetCall<'a> {
         self._platform_type = Some(new_value.to_string());
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ApplicationGetCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ApplicationGetCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -5060,7 +5050,7 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5085,7 +5075,7 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5105,7 +5095,7 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5151,10 +5141,10 @@ impl<'a, C> ApplicationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationGetEndPointCall<'a, C>
-    where C: 'a {
+pub struct ApplicationGetEndPointCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _end_point_type: Option<String>,
     _application_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5162,9 +5152,9 @@ pub struct ApplicationGetEndPointCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ApplicationGetEndPointCall<'a, C> {}
+impl<'a> client::CallBuilder for ApplicationGetEndPointCall<'a> {}
 
-impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApplicationGetEndPointCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5209,8 +5199,7 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5223,7 +5212,7 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5232,7 +5221,7 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5289,14 +5278,14 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Type of endpoint being requested.
     ///
     /// Sets the *end point type* query property to the given value.
-    pub fn end_point_type(mut self, new_value: &str) -> ApplicationGetEndPointCall<'a, C> {
+    pub fn end_point_type(mut self, new_value: &str) -> ApplicationGetEndPointCall<'a> {
         self._end_point_type = Some(new_value.to_string());
         self
     }
     /// The application ID from the Google Play developer console.
     ///
     /// Sets the *application id* query property to the given value.
-    pub fn application_id(mut self, new_value: &str) -> ApplicationGetEndPointCall<'a, C> {
+    pub fn application_id(mut self, new_value: &str) -> ApplicationGetEndPointCall<'a> {
         self._application_id = Some(new_value.to_string());
         self
     }
@@ -5306,7 +5295,7 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationGetEndPointCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationGetEndPointCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5331,7 +5320,7 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationGetEndPointCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationGetEndPointCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5351,7 +5340,7 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationGetEndPointCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationGetEndPointCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5395,18 +5384,18 @@ impl<'a, C> ApplicationGetEndPointCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationPlayedCall<'a, C>
-    where C: 'a {
+pub struct ApplicationPlayedCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ApplicationPlayedCall<'a, C> {}
+impl<'a> client::CallBuilder for ApplicationPlayedCall<'a> {}
 
-impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApplicationPlayedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5444,8 +5433,7 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5458,7 +5446,7 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5467,7 +5455,7 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5517,7 +5505,7 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationPlayedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationPlayedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5542,7 +5530,7 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationPlayedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationPlayedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5562,7 +5550,7 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationPlayedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationPlayedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5606,19 +5594,19 @@ impl<'a, C> ApplicationPlayedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationVerifyCall<'a, C>
-    where C: 'a {
+pub struct ApplicationVerifyCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _application_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ApplicationVerifyCall<'a, C> {}
+impl<'a> client::CallBuilder for ApplicationVerifyCall<'a> {}
 
-impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApplicationVerifyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5679,8 +5667,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5693,7 +5680,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5702,7 +5689,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5762,7 +5749,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> ApplicationVerifyCall<'a, C> {
+    pub fn application_id(mut self, new_value: &str) -> ApplicationVerifyCall<'a> {
         self._application_id = new_value.to_string();
         self
     }
@@ -5772,7 +5759,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationVerifyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationVerifyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5797,7 +5784,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationVerifyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationVerifyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5817,7 +5804,7 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationVerifyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationVerifyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5864,10 +5851,10 @@ impl<'a, C> ApplicationVerifyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventListByPlayerCall<'a, C>
-    where C: 'a {
+pub struct EventListByPlayerCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
@@ -5876,9 +5863,9 @@ pub struct EventListByPlayerCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventListByPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for EventListByPlayerCall<'a> {}
 
-impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventListByPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5926,8 +5913,7 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5940,7 +5926,7 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5949,7 +5935,7 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6006,21 +5992,21 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventListByPlayerCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EventListByPlayerCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of events to return in the response, used for paging. For any response, the actual number of events to return may be less than the specified maxResults.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventListByPlayerCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> EventListByPlayerCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> EventListByPlayerCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> EventListByPlayerCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -6030,7 +6016,7 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListByPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListByPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6055,7 +6041,7 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventListByPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListByPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6075,7 +6061,7 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventListByPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventListByPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6122,10 +6108,10 @@ impl<'a, C> EventListByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventListDefinitionCall<'a, C>
-    where C: 'a {
+pub struct EventListDefinitionCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
@@ -6134,9 +6120,9 @@ pub struct EventListDefinitionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventListDefinitionCall<'a, C> {}
+impl<'a> client::CallBuilder for EventListDefinitionCall<'a> {}
 
-impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventListDefinitionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6184,8 +6170,7 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6198,7 +6183,7 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6207,7 +6192,7 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6264,21 +6249,21 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> EventListDefinitionCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> EventListDefinitionCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of event definitions to return in the response, used for paging. For any response, the actual number of event definitions to return may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> EventListDefinitionCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> EventListDefinitionCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> EventListDefinitionCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> EventListDefinitionCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -6288,7 +6273,7 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListDefinitionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventListDefinitionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6313,7 +6298,7 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventListDefinitionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventListDefinitionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6333,7 +6318,7 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventListDefinitionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventListDefinitionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6384,10 +6369,10 @@ impl<'a, C> EventListDefinitionCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventRecordCall<'a, C>
-    where C: 'a {
+pub struct EventRecordCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _request: EventRecordRequest,
     _language: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6395,9 +6380,9 @@ pub struct EventRecordCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventRecordCall<'a, C> {}
+impl<'a> client::CallBuilder for EventRecordCall<'a> {}
 
-impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventRecordCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6450,8 +6435,7 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6465,7 +6449,7 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6476,7 +6460,7 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6535,14 +6519,14 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EventRecordRequest) -> EventRecordCall<'a, C> {
+    pub fn request(mut self, new_value: EventRecordRequest) -> EventRecordCall<'a> {
         self._request = new_value;
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> EventRecordCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> EventRecordCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -6552,7 +6536,7 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventRecordCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventRecordCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6577,7 +6561,7 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventRecordCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventRecordCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6597,7 +6581,7 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventRecordCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventRecordCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6642,10 +6626,10 @@ impl<'a, C> EventRecordCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardGetCall<'a, C>
-    where C: 'a {
+pub struct LeaderboardGetCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _leaderboard_id: String,
     _language: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6653,9 +6637,9 @@ pub struct LeaderboardGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LeaderboardGetCall<'a, C> {}
+impl<'a> client::CallBuilder for LeaderboardGetCall<'a> {}
 
-impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LeaderboardGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6719,8 +6703,7 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6733,7 +6716,7 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6742,7 +6725,7 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6802,14 +6785,14 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardGetCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> LeaderboardGetCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> LeaderboardGetCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> LeaderboardGetCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -6819,7 +6802,7 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6844,7 +6827,7 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6864,7 +6847,7 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6911,10 +6894,10 @@ impl<'a, C> LeaderboardGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeaderboardListCall<'a, C>
-    where C: 'a {
+pub struct LeaderboardListCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
@@ -6923,9 +6906,9 @@ pub struct LeaderboardListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for LeaderboardListCall<'a, C> {}
+impl<'a> client::CallBuilder for LeaderboardListCall<'a> {}
 
-impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LeaderboardListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6973,8 +6956,7 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6987,7 +6969,7 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6996,7 +6978,7 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7053,21 +7035,21 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LeaderboardListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LeaderboardListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of leaderboards to return in the response. For any response, the actual number of leaderboards returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> LeaderboardListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> LeaderboardListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> LeaderboardListCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> LeaderboardListCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -7077,7 +7059,7 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeaderboardListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7102,7 +7084,7 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LeaderboardListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7122,7 +7104,7 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> LeaderboardListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7166,18 +7148,18 @@ impl<'a, C> LeaderboardListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetagameGetMetagameConfigCall<'a, C>
-    where C: 'a {
+pub struct MetagameGetMetagameConfigCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MetagameGetMetagameConfigCall<'a, C> {}
+impl<'a> client::CallBuilder for MetagameGetMetagameConfigCall<'a> {}
 
-impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MetagameGetMetagameConfigCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7216,8 +7198,7 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7230,7 +7211,7 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7239,7 +7220,7 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7299,7 +7280,7 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetagameGetMetagameConfigCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetagameGetMetagameConfigCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7324,7 +7305,7 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MetagameGetMetagameConfigCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MetagameGetMetagameConfigCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7344,7 +7325,7 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetagameGetMetagameConfigCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MetagameGetMetagameConfigCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7391,10 +7372,10 @@ impl<'a, C> MetagameGetMetagameConfigCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetagameListCategoriesByPlayerCall<'a, C>
-    where C: 'a {
+pub struct MetagameListCategoriesByPlayerCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _player_id: String,
     _collection: String,
     _page_token: Option<String>,
@@ -7405,9 +7386,9 @@ pub struct MetagameListCategoriesByPlayerCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MetagameListCategoriesByPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for MetagameListCategoriesByPlayerCall<'a> {}
 
-impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MetagameListCategoriesByPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7478,8 +7459,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7492,7 +7472,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7501,7 +7481,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7561,7 +7541,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
@@ -7571,28 +7551,28 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a> {
         self._collection = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of category resources to return in the response, used for paging. For any response, the actual number of category resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> MetagameListCategoriesByPlayerCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -7602,7 +7582,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetagameListCategoriesByPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetagameListCategoriesByPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7627,7 +7607,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MetagameListCategoriesByPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MetagameListCategoriesByPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7647,7 +7627,7 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetagameListCategoriesByPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MetagameListCategoriesByPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7692,10 +7672,10 @@ impl<'a, C> MetagameListCategoriesByPlayerCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlayerGetCall<'a, C>
-    where C: 'a {
+pub struct PlayerGetCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _player_id: String,
     _language: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7703,9 +7683,9 @@ pub struct PlayerGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlayerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PlayerGetCall<'a> {}
 
-impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlayerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7769,8 +7749,7 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7783,7 +7762,7 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7792,7 +7771,7 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7852,14 +7831,14 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> PlayerGetCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerGetCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> PlayerGetCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> PlayerGetCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -7869,7 +7848,7 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7894,7 +7873,7 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7914,7 +7893,7 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7961,10 +7940,10 @@ impl<'a, C> PlayerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlayerListCall<'a, C>
-    where C: 'a {
+pub struct PlayerListCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _collection: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -7974,9 +7953,9 @@ pub struct PlayerListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlayerListCall<'a, C> {}
+impl<'a> client::CallBuilder for PlayerListCall<'a> {}
 
-impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlayerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8046,8 +8025,7 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8060,7 +8038,7 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8069,7 +8047,7 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8129,28 +8107,28 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> PlayerListCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> PlayerListCall<'a> {
         self._collection = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PlayerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PlayerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> PlayerListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> PlayerListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> PlayerListCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> PlayerListCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -8160,7 +8138,7 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8185,7 +8163,7 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8205,7 +8183,7 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8249,19 +8227,19 @@ impl<'a, C> PlayerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RevisionCheckCall<'a, C>
-    where C: 'a {
+pub struct RevisionCheckCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _client_revision: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for RevisionCheckCall<'a, C> {}
+impl<'a> client::CallBuilder for RevisionCheckCall<'a> {}
 
-impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RevisionCheckCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8301,8 +8279,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8315,7 +8292,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8324,7 +8301,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8384,7 +8361,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn client_revision(mut self, new_value: &str) -> RevisionCheckCall<'a, C> {
+    pub fn client_revision(mut self, new_value: &str) -> RevisionCheckCall<'a> {
         self._client_revision = new_value.to_string();
         self
     }
@@ -8394,7 +8371,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionCheckCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RevisionCheckCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8419,7 +8396,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RevisionCheckCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RevisionCheckCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8439,7 +8416,7 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionCheckCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> RevisionCheckCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8487,10 +8464,10 @@ impl<'a, C> RevisionCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreGetCall<'a, C>
-    where C: 'a {
+pub struct ScoreGetCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _player_id: String,
     _leaderboard_id: String,
     _time_span: String,
@@ -8503,9 +8480,9 @@ pub struct ScoreGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreGetCall<'a> {}
 
-impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8580,8 +8557,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8594,7 +8570,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8603,7 +8579,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8663,7 +8639,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> ScoreGetCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> ScoreGetCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
@@ -8673,7 +8649,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreGetCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreGetCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -8683,35 +8659,35 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a, C> {
+    pub fn time_span(mut self, new_value: &str) -> ScoreGetCall<'a> {
         self._time_span = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ScoreGetCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ScoreGetCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ScoreGetCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> ScoreGetCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreGetCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ScoreGetCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
     /// The types of ranks to return. If the parameter is omitted, no ranks will be returned.
     ///
     /// Sets the *include rank type* query property to the given value.
-    pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a, C> {
+    pub fn include_rank_type(mut self, new_value: &str) -> ScoreGetCall<'a> {
         self._include_rank_type = Some(new_value.to_string());
         self
     }
@@ -8721,7 +8697,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8746,7 +8722,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8766,7 +8742,7 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8813,10 +8789,10 @@ impl<'a, C> ScoreGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreListCall<'a, C>
-    where C: 'a {
+pub struct ScoreListCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _leaderboard_id: String,
     _collection: String,
     _time_span: String,
@@ -8828,9 +8804,9 @@ pub struct ScoreListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreListCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreListCall<'a> {}
 
-impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8902,8 +8878,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8916,7 +8891,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8925,7 +8900,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8985,7 +8960,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -8995,7 +8970,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> ScoreListCall<'a> {
         self._collection = new_value.to_string();
         self
     }
@@ -9005,28 +8980,28 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a, C> {
+    pub fn time_span(mut self, new_value: &str) -> ScoreListCall<'a> {
         self._time_span = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ScoreListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ScoreListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ScoreListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> ScoreListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreListCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ScoreListCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -9036,7 +9011,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9061,7 +9036,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9081,7 +9056,7 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9130,10 +9105,10 @@ impl<'a, C> ScoreListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreListWindowCall<'a, C>
-    where C: 'a {
+pub struct ScoreListWindowCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _leaderboard_id: String,
     _collection: String,
     _time_span: String,
@@ -9147,9 +9122,9 @@ pub struct ScoreListWindowCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreListWindowCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreListWindowCall<'a> {}
 
-impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreListWindowCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9227,8 +9202,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9241,7 +9215,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9250,7 +9224,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9310,7 +9284,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListWindowCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreListWindowCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -9320,7 +9294,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a, C> {
+    pub fn collection(mut self, new_value: &str) -> ScoreListWindowCall<'a> {
         self._collection = new_value.to_string();
         self
     }
@@ -9330,42 +9304,42 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a, C> {
+    pub fn time_span(mut self, new_value: &str) -> ScoreListWindowCall<'a> {
         self._time_span = new_value.to_string();
         self
     }
     /// True if the top scores should be returned when the player is not in the leaderboard. Defaults to true.
     ///
     /// Sets the *return top if absent* query property to the given value.
-    pub fn return_top_if_absent(mut self, new_value: bool) -> ScoreListWindowCall<'a, C> {
+    pub fn return_top_if_absent(mut self, new_value: bool) -> ScoreListWindowCall<'a> {
         self._return_top_if_absent = Some(new_value);
         self
     }
     /// The preferred number of scores to return above the player's score. More scores may be returned if the player is at the bottom of the leaderboard; fewer may be returned if the player is at the top. Must be less than or equal to maxResults.
     ///
     /// Sets the *results above* query property to the given value.
-    pub fn results_above(mut self, new_value: i32) -> ScoreListWindowCall<'a, C> {
+    pub fn results_above(mut self, new_value: i32) -> ScoreListWindowCall<'a> {
         self._results_above = Some(new_value);
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ScoreListWindowCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of leaderboard scores to return in the response. For any response, the actual number of leaderboard scores returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ScoreListWindowCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> ScoreListWindowCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreListWindowCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ScoreListWindowCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -9375,7 +9349,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreListWindowCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreListWindowCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9400,7 +9374,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreListWindowCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreListWindowCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9420,7 +9394,7 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListWindowCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreListWindowCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9466,10 +9440,10 @@ impl<'a, C> ScoreListWindowCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreSubmitCall<'a, C>
-    where C: 'a {
+pub struct ScoreSubmitCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _leaderboard_id: String,
     _score: String,
     _score_tag: Option<String>,
@@ -9479,9 +9453,9 @@ pub struct ScoreSubmitCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreSubmitCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreSubmitCall<'a> {}
 
-impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreSubmitCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9549,8 +9523,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9563,7 +9536,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9572,7 +9545,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9632,7 +9605,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreSubmitCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreSubmitCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -9642,21 +9615,21 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn score(mut self, new_value: &str) -> ScoreSubmitCall<'a, C> {
+    pub fn score(mut self, new_value: &str) -> ScoreSubmitCall<'a> {
         self._score = new_value.to_string();
         self
     }
     /// Additional information about the score you're submitting. Values must contain no more than 64 URI-safe characters as defined by section 2.3 of RFC 3986.
     ///
     /// Sets the *score tag* query property to the given value.
-    pub fn score_tag(mut self, new_value: &str) -> ScoreSubmitCall<'a, C> {
+    pub fn score_tag(mut self, new_value: &str) -> ScoreSubmitCall<'a> {
         self._score_tag = Some(new_value.to_string());
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreSubmitCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ScoreSubmitCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -9666,7 +9639,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreSubmitCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreSubmitCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9691,7 +9664,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9711,7 +9684,7 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9762,10 +9735,10 @@ impl<'a, C> ScoreSubmitCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreSubmitMultipleCall<'a, C>
-    where C: 'a {
+pub struct ScoreSubmitMultipleCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _request: PlayerScoreSubmissionList,
     _language: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9773,9 +9746,9 @@ pub struct ScoreSubmitMultipleCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreSubmitMultipleCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreSubmitMultipleCall<'a> {}
 
-impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreSubmitMultipleCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9828,8 +9801,7 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9843,7 +9815,7 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9854,7 +9826,7 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9913,14 +9885,14 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a, C> {
+    pub fn request(mut self, new_value: PlayerScoreSubmissionList) -> ScoreSubmitMultipleCall<'a> {
         self._request = new_value;
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -9930,7 +9902,7 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreSubmitMultipleCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreSubmitMultipleCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9955,7 +9927,7 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitMultipleCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitMultipleCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9975,7 +9947,7 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitMultipleCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreSubmitMultipleCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10020,10 +9992,10 @@ impl<'a, C> ScoreSubmitMultipleCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SnapshotGetCall<'a, C>
-    where C: 'a {
+pub struct SnapshotGetCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _snapshot_id: String,
     _language: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10031,9 +10003,9 @@ pub struct SnapshotGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SnapshotGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SnapshotGetCall<'a> {}
 
-impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SnapshotGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10097,8 +10069,7 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10111,7 +10082,7 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10120,7 +10091,7 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10180,14 +10151,14 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn snapshot_id(mut self, new_value: &str) -> SnapshotGetCall<'a, C> {
+    pub fn snapshot_id(mut self, new_value: &str) -> SnapshotGetCall<'a> {
         self._snapshot_id = new_value.to_string();
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> SnapshotGetCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> SnapshotGetCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -10197,7 +10168,7 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SnapshotGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SnapshotGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10222,7 +10193,7 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SnapshotGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SnapshotGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10242,7 +10213,7 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SnapshotGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SnapshotGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10289,10 +10260,10 @@ impl<'a, C> SnapshotGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SnapshotListCall<'a, C>
-    where C: 'a {
+pub struct SnapshotListCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _player_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -10302,9 +10273,9 @@ pub struct SnapshotListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SnapshotListCall<'a, C> {}
+impl<'a> client::CallBuilder for SnapshotListCall<'a> {}
 
-impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SnapshotListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10374,8 +10345,7 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10388,7 +10358,7 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10397,7 +10367,7 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10457,28 +10427,28 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> SnapshotListCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> SnapshotListCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SnapshotListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SnapshotListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of snapshot resources to return in the response, used for paging. For any response, the actual number of snapshot resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> SnapshotListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> SnapshotListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// The preferred language to use for strings returned by this method.
     ///
     /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> SnapshotListCall<'a, C> {
+    pub fn language(mut self, new_value: &str) -> SnapshotListCall<'a> {
         self._language = Some(new_value.to_string());
         self
     }
@@ -10488,7 +10458,7 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SnapshotListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SnapshotListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10513,7 +10483,7 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SnapshotListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SnapshotListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10533,7 +10503,7 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SnapshotListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SnapshotListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10583,10 +10553,10 @@ impl<'a, C> SnapshotListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SnapshotsExtendedResolveSnapshotHeadCall<'a, C>
-    where C: 'a {
+pub struct SnapshotsExtendedResolveSnapshotHeadCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _request: ResolveSnapshotHeadRequest,
     _snapshot_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10594,9 +10564,9 @@ pub struct SnapshotsExtendedResolveSnapshotHeadCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SnapshotsExtendedResolveSnapshotHeadCall<'a, C> {}
+impl<'a> client::CallBuilder for SnapshotsExtendedResolveSnapshotHeadCall<'a> {}
 
-impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SnapshotsExtendedResolveSnapshotHeadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10668,8 +10638,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10683,7 +10652,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10694,7 +10663,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10753,7 +10722,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ResolveSnapshotHeadRequest) -> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> {
+    pub fn request(mut self, new_value: ResolveSnapshotHeadRequest) -> SnapshotsExtendedResolveSnapshotHeadCall<'a> {
         self._request = new_value;
         self
     }
@@ -10763,7 +10732,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn snapshot_name(mut self, new_value: &str) -> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> {
+    pub fn snapshot_name(mut self, new_value: &str) -> SnapshotsExtendedResolveSnapshotHeadCall<'a> {
         self._snapshot_name = new_value.to_string();
         self
     }
@@ -10773,7 +10742,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SnapshotsExtendedResolveSnapshotHeadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10798,7 +10767,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SnapshotsExtendedResolveSnapshotHeadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SnapshotsExtendedResolveSnapshotHeadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10818,7 +10787,7 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SnapshotsExtendedResolveSnapshotHeadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SnapshotsExtendedResolveSnapshotHeadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10862,18 +10831,18 @@ impl<'a, C> SnapshotsExtendedResolveSnapshotHeadCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StatGetCall<'a, C>
-    where C: 'a {
+pub struct StatGetCall<'a>
+    where  {
 
-    hub: &'a Games<C>,
+    hub: &'a Games<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StatGetCall<'a, C> {}
+impl<'a> client::CallBuilder for StatGetCall<'a> {}
 
-impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StatGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10912,8 +10881,7 @@ impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10926,7 +10894,7 @@ impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10935,7 +10903,7 @@ impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10995,7 +10963,7 @@ impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11020,7 +10988,7 @@ impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> StatGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StatGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11040,7 +11008,7 @@ impl<'a, C> StatGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StatGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StatGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -4,10 +4,10 @@
 [package]
 
 name = "google-verifiedaccess1-cli"
-version = "2.0.0+20210302"
+version = "2.0.3+20210302"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with verifiedaccess (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/verifiedaccess1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/verifiedaccess1-cli"
 homepage = "https://developers.google.com/chrome/verified-access"
 documentation = "http://byron.github.io/google-apis-rs/google_verifiedaccess1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-verifiedaccess1]
 path = "../verifiedaccess1"
-version = "2.0.0+20210302"
+version = "2.0.3+20210302"

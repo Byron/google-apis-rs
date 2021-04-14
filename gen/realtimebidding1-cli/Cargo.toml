@@ -4,10 +4,10 @@
 [package]
 
 name = "google-realtimebidding1-cli"
-version = "2.0.0+20210331"
+version = "2.0.3+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Real-time Bidding (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/realtimebidding1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1-cli"
 homepage = "https://developers.google.com/authorized-buyers/apis/realtimebidding/reference/rest/"
 documentation = "http://byron.github.io/google-apis-rs/google_realtimebidding1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-realtimebidding1]
 path = "../realtimebidding1"
-version = "2.0.0+20210331"
+version = "2.0.3+20210331"

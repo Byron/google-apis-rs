@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -81,38 +80,37 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct MyBusinessAccountManagement<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct MyBusinessAccountManagement<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for MyBusinessAccountManagement<C> {}
+impl<'a, > client::Hub for MyBusinessAccountManagement<> {}
 
-impl<'a, C> MyBusinessAccountManagement<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > MyBusinessAccountManagement<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusinessAccountManagement<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> MyBusinessAccountManagement<> {
         MyBusinessAccountManagement {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://mybusinessaccountmanagement.googleapis.com/".to_string(),
             _root_url: "https://mybusinessaccountmanagement.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a, C> {
+    pub fn accounts(&'a self) -> AccountMethods<'a> {
         AccountMethods { hub: &self }
     }
-    pub fn locations(&'a self) -> LocationMethods<'a, C> {
+    pub fn locations(&'a self) -> LocationMethods<'a> {
         LocationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -504,15 +502,15 @@ impl client::RequestValue for TransferLocationRequest {}
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a, C>
-    where C: 'a {
+pub struct AccountMethods<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AccountMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
 
-impl<'a, C> AccountMethods<'a, C> {
+impl<'a> AccountMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -522,7 +520,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the account this admin is created for. `accounts/{account_id}`.
-    pub fn admins_create(&self, request: Admin, parent: &str) -> AccountAdminCreateCall<'a, C> {
+    pub fn admins_create(&self, request: Admin, parent: &str) -> AccountAdminCreateCall<'a> {
         AccountAdminCreateCall {
             hub: self.hub,
             _request: request,
@@ -539,7 +537,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the admin to remove from the account. `accounts/{account_id}/admins/{admin_id}`.
-    pub fn admins_delete(&self, name: &str) -> AccountAdminDeleteCall<'a, C> {
+    pub fn admins_delete(&self, name: &str) -> AccountAdminDeleteCall<'a> {
         AccountAdminDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -555,7 +553,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the account from which to retrieve a list of admins. `accounts/{account_id}/admins`.
-    pub fn admins_list(&self, parent: &str) -> AccountAdminListCall<'a, C> {
+    pub fn admins_list(&self, parent: &str) -> AccountAdminListCall<'a> {
         AccountAdminListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -572,7 +570,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The resource name. For account admins, this is in the form: `accounts/{account_id}/admins/{admin_id}` For location admins, this is in the form: `locations/{location_id}/admins/{admin_id}` This field will be ignored if set during admin creation.
-    pub fn admins_patch(&self, request: Admin, name: &str) -> AccountAdminPatchCall<'a, C> {
+    pub fn admins_patch(&self, request: Admin, name: &str) -> AccountAdminPatchCall<'a> {
         AccountAdminPatchCall {
             hub: self.hub,
             _request: request,
@@ -591,7 +589,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the invitation that is being accepted. `accounts/{account_id}/invitations/{invitation_id}`
-    pub fn invitations_accept(&self, request: AcceptInvitationRequest, name: &str) -> AccountInvitationAcceptCall<'a, C> {
+    pub fn invitations_accept(&self, request: AcceptInvitationRequest, name: &str) -> AccountInvitationAcceptCall<'a> {
         AccountInvitationAcceptCall {
             hub: self.hub,
             _request: request,
@@ -609,7 +607,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the account invitation that is being declined. `accounts/{account_id}/invitations/{invitation_id}`
-    pub fn invitations_decline(&self, request: DeclineInvitationRequest, name: &str) -> AccountInvitationDeclineCall<'a, C> {
+    pub fn invitations_decline(&self, request: DeclineInvitationRequest, name: &str) -> AccountInvitationDeclineCall<'a> {
         AccountInvitationDeclineCall {
             hub: self.hub,
             _request: request,
@@ -626,7 +624,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the account from which the list of invitations is being retrieved. `accounts/{account_id}/invitations`
-    pub fn invitations_list(&self, parent: &str) -> AccountInvitationListCall<'a, C> {
+    pub fn invitations_list(&self, parent: &str) -> AccountInvitationListCall<'a> {
         AccountInvitationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -643,7 +641,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Account) -> AccountCreateCall<'a, C> {
+    pub fn create(&self, request: Account) -> AccountCreateCall<'a> {
         AccountCreateCall {
             hub: self.hub,
             _request: request,
@@ -659,7 +657,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the account to fetch.
-    pub fn get(&self, name: &str) -> AccountGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> AccountGetCall<'a> {
         AccountGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -671,7 +669,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all of the accounts for the authenticated user. This includes all accounts that the user owns, as well as any accounts for which the user has management rights.
-    pub fn list(&self) -> AccountListCall<'a, C> {
+    pub fn list(&self) -> AccountListCall<'a> {
         AccountListCall {
             hub: self.hub,
             _parent_account: Default::default(),
@@ -691,7 +689,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The resource name, in the format `accounts/{account_id}`.
-    pub fn patch(&self, request: Account, name: &str) -> AccountPatchCall<'a, C> {
+    pub fn patch(&self, request: Account, name: &str) -> AccountPatchCall<'a> {
         AccountPatchCall {
             hub: self.hub,
             _request: request,
@@ -736,15 +734,15 @@ impl<'a, C> AccountMethods<'a, C> {
 /// let rb = hub.locations();
 /// # }
 /// ```
-pub struct LocationMethods<'a, C>
-    where C: 'a {
+pub struct LocationMethods<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LocationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LocationMethods<'a> {}
 
-impl<'a, C> LocationMethods<'a, C> {
+impl<'a> LocationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -754,7 +752,7 @@ impl<'a, C> LocationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the location this admin is created for. `locations/{location_id}/admins`.
-    pub fn admins_create(&self, request: Admin, parent: &str) -> LocationAdminCreateCall<'a, C> {
+    pub fn admins_create(&self, request: Admin, parent: &str) -> LocationAdminCreateCall<'a> {
         LocationAdminCreateCall {
             hub: self.hub,
             _request: request,
@@ -771,7 +769,7 @@ impl<'a, C> LocationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The resource name of the admin to remove from the location.
-    pub fn admins_delete(&self, name: &str) -> LocationAdminDeleteCall<'a, C> {
+    pub fn admins_delete(&self, name: &str) -> LocationAdminDeleteCall<'a> {
         LocationAdminDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -787,7 +785,7 @@ impl<'a, C> LocationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the location to list admins of. `locations/{location_id}/admins`.
-    pub fn admins_list(&self, parent: &str) -> LocationAdminListCall<'a, C> {
+    pub fn admins_list(&self, parent: &str) -> LocationAdminListCall<'a> {
         LocationAdminListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -804,7 +802,7 @@ impl<'a, C> LocationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Immutable. The resource name. For account admins, this is in the form: `accounts/{account_id}/admins/{admin_id}` For location admins, this is in the form: `locations/{location_id}/admins/{admin_id}` This field will be ignored if set during admin creation.
-    pub fn admins_patch(&self, request: Admin, name: &str) -> LocationAdminPatchCall<'a, C> {
+    pub fn admins_patch(&self, request: Admin, name: &str) -> LocationAdminPatchCall<'a> {
         LocationAdminPatchCall {
             hub: self.hub,
             _request: request,
@@ -823,7 +821,7 @@ impl<'a, C> LocationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `locationsId` - No description provided.
-    pub fn transfer_location(&self, request: TransferLocationRequest, locations_id: &str) -> LocationTransferLocationCall<'a, C> {
+    pub fn transfer_location(&self, request: TransferLocationRequest, locations_id: &str) -> LocationTransferLocationCall<'a> {
         LocationTransferLocationCall {
             hub: self.hub,
             _request: request,
@@ -880,19 +878,19 @@ impl<'a, C> LocationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountAdminCreateCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: Admin,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountAdminCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountAdminCreateCall<'a> {}
 
-impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountAdminCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -976,7 +974,7 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -987,7 +985,7 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1046,7 +1044,7 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> AccountAdminCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Admin) -> AccountAdminCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1056,7 +1054,7 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountAdminCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountAdminCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1066,7 +1064,7 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1091,7 +1089,7 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1132,18 +1130,18 @@ impl<'a, C> AccountAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountAdminDeleteCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountAdminDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountAdminDeleteCall<'a> {}
 
-impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountAdminDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1215,7 +1213,7 @@ impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1224,7 +1222,7 @@ impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1284,7 +1282,7 @@ impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountAdminDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountAdminDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1294,7 +1292,7 @@ impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1319,7 +1317,7 @@ impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1360,18 +1358,18 @@ impl<'a, C> AccountAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminListCall<'a, C>
-    where C: 'a {
+pub struct AccountAdminListCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountAdminListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountAdminListCall<'a> {}
 
-impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountAdminListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1443,7 +1441,7 @@ impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1452,7 +1450,7 @@ impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1512,7 +1510,7 @@ impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountAdminListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountAdminListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1522,7 +1520,7 @@ impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1547,7 +1545,7 @@ impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1595,10 +1593,10 @@ impl<'a, C> AccountAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountAdminPatchCall<'a, C>
-    where C: 'a {
+pub struct AccountAdminPatchCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: Admin,
     _name: String,
     _update_mask: Option<String>,
@@ -1606,9 +1604,9 @@ pub struct AccountAdminPatchCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountAdminPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountAdminPatchCall<'a> {}
 
-impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountAdminPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1695,7 +1693,7 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1706,7 +1704,7 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1765,7 +1763,7 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> AccountAdminPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Admin) -> AccountAdminPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -1775,14 +1773,14 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountAdminPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountAdminPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields that should be updated. The only editable field is role.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountAdminPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountAdminPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -1792,7 +1790,7 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountAdminPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1817,7 +1815,7 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountAdminPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1864,19 +1862,19 @@ impl<'a, C> AccountAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInvitationAcceptCall<'a, C>
-    where C: 'a {
+pub struct AccountInvitationAcceptCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: AcceptInvitationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountInvitationAcceptCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountInvitationAcceptCall<'a> {}
 
-impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountInvitationAcceptCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1960,7 +1958,7 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1971,7 +1969,7 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2030,7 +2028,7 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AcceptInvitationRequest) -> AccountInvitationAcceptCall<'a, C> {
+    pub fn request(mut self, new_value: AcceptInvitationRequest) -> AccountInvitationAcceptCall<'a> {
         self._request = new_value;
         self
     }
@@ -2040,7 +2038,7 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountInvitationAcceptCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountInvitationAcceptCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2050,7 +2048,7 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationAcceptCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationAcceptCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2075,7 +2073,7 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationAcceptCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationAcceptCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2122,19 +2120,19 @@ impl<'a, C> AccountInvitationAcceptCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInvitationDeclineCall<'a, C>
-    where C: 'a {
+pub struct AccountInvitationDeclineCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: DeclineInvitationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountInvitationDeclineCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountInvitationDeclineCall<'a> {}
 
-impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountInvitationDeclineCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2218,7 +2216,7 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2229,7 +2227,7 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2288,7 +2286,7 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DeclineInvitationRequest) -> AccountInvitationDeclineCall<'a, C> {
+    pub fn request(mut self, new_value: DeclineInvitationRequest) -> AccountInvitationDeclineCall<'a> {
         self._request = new_value;
         self
     }
@@ -2298,7 +2296,7 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountInvitationDeclineCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountInvitationDeclineCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2308,7 +2306,7 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationDeclineCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationDeclineCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2333,7 +2331,7 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationDeclineCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationDeclineCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2375,19 +2373,19 @@ impl<'a, C> AccountInvitationDeclineCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountInvitationListCall<'a, C>
-    where C: 'a {
+pub struct AccountInvitationListCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _parent: String,
     _filter: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountInvitationListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountInvitationListCall<'a> {}
 
-impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountInvitationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2462,7 +2460,7 @@ impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2471,7 +2469,7 @@ impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2531,14 +2529,14 @@ impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountInvitationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountInvitationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Filtering the response is supported via the Invitation.target_type field.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountInvitationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AccountInvitationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2548,7 +2546,7 @@ impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountInvitationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2573,7 +2571,7 @@ impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountInvitationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2620,18 +2618,18 @@ impl<'a, C> AccountInvitationListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountCreateCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: Account,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountCreateCall<'a> {}
 
-impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2689,7 +2687,7 @@ impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2700,7 +2698,7 @@ impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2759,7 +2757,7 @@ impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Account) -> AccountCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2769,7 +2767,7 @@ impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2794,7 +2792,7 @@ impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2835,18 +2833,18 @@ impl<'a, C> AccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a, C>
-    where C: 'a {
+pub struct AccountGetCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountGetCall<'a> {}
 
-impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2918,7 +2916,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2927,7 +2925,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2987,7 +2985,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2997,7 +2995,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3022,7 +3020,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3067,10 +3065,10 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a, C>
-    where C: 'a {
+pub struct AccountListCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _parent_account: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3079,9 +3077,9 @@ pub struct AccountListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountListCall<'a> {}
 
-impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3139,7 +3137,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3148,7 +3146,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3205,28 +3203,28 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Optional. The resource name of the account for which the list of directly accessible accounts is to be retrieved. This only makes sense for Organizations and User Groups. If empty, will return `ListAccounts` for the authenticated user. `accounts/{account_id}`.
     ///
     /// Sets the *parent account* query property to the given value.
-    pub fn parent_account(mut self, new_value: &str) -> AccountListCall<'a, C> {
+    pub fn parent_account(mut self, new_value: &str) -> AccountListCall<'a> {
         self._parent_account = Some(new_value.to_string());
         self
     }
     /// Optional. If specified, the next page of accounts is retrieved. The `pageToken` is returned when a call to `accounts.list` returns more results than can fit into the requested page size.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. How many accounts to fetch per page. The minimum supported page_size is 2. The default and maximum is 20.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. A filter constraining the accounts to return. The response includes only entries that match the filter. If `filter` is empty, then no constraints are applied and all accounts (paginated) are retrieved for the requested account. For example, a request with the filter `type=USER_GROUP` will only return user groups. The `type` field is the only supported filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AccountListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AccountListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3236,7 +3234,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3261,7 +3259,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3310,10 +3308,10 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPatchCall<'a, C>
-    where C: 'a {
+pub struct AccountPatchCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: Account,
     _name: String,
     _validate_only: Option<bool>,
@@ -3322,9 +3320,9 @@ pub struct AccountPatchCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AccountPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPatchCall<'a> {}
 
-impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3414,7 +3412,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3425,7 +3423,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3484,7 +3482,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Account) -> AccountPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -3494,21 +3492,21 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. If true, the request is validated without actually updating the account.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> AccountPatchCall<'a, C> {
+    pub fn validate_only(mut self, new_value: bool) -> AccountPatchCall<'a> {
         self._validate_only = Some(new_value);
         self
     }
     /// Required. The specific fields that should be updated. The only editable field is `accountName`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3518,7 +3516,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3543,7 +3541,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3590,19 +3588,19 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationAdminCreateCall<'a, C>
-    where C: 'a {
+pub struct LocationAdminCreateCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: Admin,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for LocationAdminCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for LocationAdminCreateCall<'a> {}
 
-impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LocationAdminCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3686,7 +3684,7 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3697,7 +3695,7 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3756,7 +3754,7 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> LocationAdminCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Admin) -> LocationAdminCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3766,7 +3764,7 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> LocationAdminCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> LocationAdminCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3776,7 +3774,7 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3801,7 +3799,7 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3842,18 +3840,18 @@ impl<'a, C> LocationAdminCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationAdminDeleteCall<'a, C>
-    where C: 'a {
+pub struct LocationAdminDeleteCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for LocationAdminDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for LocationAdminDeleteCall<'a> {}
 
-impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LocationAdminDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3925,7 +3923,7 @@ impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3934,7 +3932,7 @@ impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3994,7 +3992,7 @@ impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationAdminDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> LocationAdminDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4004,7 +4002,7 @@ impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4029,7 +4027,7 @@ impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4070,18 +4068,18 @@ impl<'a, C> LocationAdminDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationAdminListCall<'a, C>
-    where C: 'a {
+pub struct LocationAdminListCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for LocationAdminListCall<'a, C> {}
+impl<'a> client::CallBuilder for LocationAdminListCall<'a> {}
 
-impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LocationAdminListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4153,7 +4151,7 @@ impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4162,7 +4160,7 @@ impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4222,7 +4220,7 @@ impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> LocationAdminListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> LocationAdminListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4232,7 +4230,7 @@ impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4257,7 +4255,7 @@ impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4305,10 +4303,10 @@ impl<'a, C> LocationAdminListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationAdminPatchCall<'a, C>
-    where C: 'a {
+pub struct LocationAdminPatchCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: Admin,
     _name: String,
     _update_mask: Option<String>,
@@ -4316,9 +4314,9 @@ pub struct LocationAdminPatchCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for LocationAdminPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for LocationAdminPatchCall<'a> {}
 
-impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LocationAdminPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4405,7 +4403,7 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4416,7 +4414,7 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4475,7 +4473,7 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Admin) -> LocationAdminPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Admin) -> LocationAdminPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4485,14 +4483,14 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> LocationAdminPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> LocationAdminPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The specific fields that should be updated. The only editable field is role.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> LocationAdminPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> LocationAdminPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4502,7 +4500,7 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationAdminPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4527,7 +4525,7 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationAdminPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4574,19 +4572,19 @@ impl<'a, C> LocationAdminPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LocationTransferLocationCall<'a, C>
-    where C: 'a {
+pub struct LocationTransferLocationCall<'a>
+    where  {
 
-    hub: &'a MyBusinessAccountManagement<C>,
+    hub: &'a MyBusinessAccountManagement<>,
     _request: TransferLocationRequest,
     _locations_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for LocationTransferLocationCall<'a, C> {}
+impl<'a> client::CallBuilder for LocationTransferLocationCall<'a> {}
 
-impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LocationTransferLocationCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4666,7 +4664,7 @@ impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4677,7 +4675,7 @@ impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4736,7 +4734,7 @@ impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TransferLocationRequest) -> LocationTransferLocationCall<'a, C> {
+    pub fn request(mut self, new_value: TransferLocationRequest) -> LocationTransferLocationCall<'a> {
         self._request = new_value;
         self
     }
@@ -4745,7 +4743,7 @@ impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn locations_id(mut self, new_value: &str) -> LocationTransferLocationCall<'a, C> {
+    pub fn locations_id(mut self, new_value: &str) -> LocationTransferLocationCall<'a> {
         self._locations_id = new_value.to_string();
         self
     }
@@ -4755,7 +4753,7 @@ impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationTransferLocationCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LocationTransferLocationCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4780,7 +4778,7 @@ impl<'a, C> LocationTransferLocationCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> LocationTransferLocationCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LocationTransferLocationCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

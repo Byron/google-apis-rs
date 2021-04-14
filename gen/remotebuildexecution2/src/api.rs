@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -102,47 +101,46 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct RemoteBuildExecution<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct RemoteBuildExecution<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for RemoteBuildExecution<C> {}
+impl<'a, > client::Hub for RemoteBuildExecution<> {}
 
-impl<'a, C> RemoteBuildExecution<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > RemoteBuildExecution<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> RemoteBuildExecution<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> RemoteBuildExecution<> {
         RemoteBuildExecution {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://remotebuildexecution.googleapis.com/".to_string(),
             _root_url: "https://remotebuildexecution.googleapis.com/".to_string(),
         }
     }
 
-    pub fn action_results(&'a self) -> ActionResultMethods<'a, C> {
+    pub fn action_results(&'a self) -> ActionResultMethods<'a> {
         ActionResultMethods { hub: &self }
     }
-    pub fn actions(&'a self) -> ActionMethods<'a, C> {
+    pub fn actions(&'a self) -> ActionMethods<'a> {
         ActionMethods { hub: &self }
     }
-    pub fn blobs(&'a self) -> BlobMethods<'a, C> {
+    pub fn blobs(&'a self) -> BlobMethods<'a> {
         BlobMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -916,15 +914,15 @@ impl client::Part for GoogleRpcStatus {}
 /// let rb = hub.action_results();
 /// # }
 /// ```
-pub struct ActionResultMethods<'a, C>
-    where C: 'a {
+pub struct ActionResultMethods<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ActionResultMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ActionResultMethods<'a> {}
 
-impl<'a, C> ActionResultMethods<'a, C> {
+impl<'a> ActionResultMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -935,7 +933,7 @@ impl<'a, C> ActionResultMethods<'a, C> {
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
     /// * `hash` - The hash. In the case of SHA-256, it will always be a lowercase hex string exactly 64 characters long.
     /// * `sizeBytes` - The size of the blob, in bytes.
-    pub fn get(&self, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultGetCall<'a, C> {
+    pub fn get(&self, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultGetCall<'a> {
         ActionResultGetCall {
             hub: self.hub,
             _instance_name: instance_name.to_string(),
@@ -960,7 +958,7 @@ impl<'a, C> ActionResultMethods<'a, C> {
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
     /// * `hash` - The hash. In the case of SHA-256, it will always be a lowercase hex string exactly 64 characters long.
     /// * `sizeBytes` - The size of the blob, in bytes.
-    pub fn update(&self, request: BuildBazelRemoteExecutionV2ActionResult, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultUpdateCall<'a, C> {
+    pub fn update(&self, request: BuildBazelRemoteExecutionV2ActionResult, instance_name: &str, hash: &str, size_bytes: &str) -> ActionResultUpdateCall<'a> {
         ActionResultUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1007,15 +1005,15 @@ impl<'a, C> ActionResultMethods<'a, C> {
 /// let rb = hub.actions();
 /// # }
 /// ```
-pub struct ActionMethods<'a, C>
-    where C: 'a {
+pub struct ActionMethods<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ActionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ActionMethods<'a> {}
 
-impl<'a, C> ActionMethods<'a, C> {
+impl<'a> ActionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1025,7 +1023,7 @@ impl<'a, C> ActionMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn execute(&self, request: BuildBazelRemoteExecutionV2ExecuteRequest, instance_name: &str) -> ActionExecuteCall<'a, C> {
+    pub fn execute(&self, request: BuildBazelRemoteExecutionV2ExecuteRequest, instance_name: &str) -> ActionExecuteCall<'a> {
         ActionExecuteCall {
             hub: self.hub,
             _request: request,
@@ -1069,15 +1067,15 @@ impl<'a, C> ActionMethods<'a, C> {
 /// let rb = hub.blobs();
 /// # }
 /// ```
-pub struct BlobMethods<'a, C>
-    where C: 'a {
+pub struct BlobMethods<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
 }
 
-impl<'a, C> client::MethodsBuilder for BlobMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for BlobMethods<'a> {}
 
-impl<'a, C> BlobMethods<'a, C> {
+impl<'a> BlobMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1087,7 +1085,7 @@ impl<'a, C> BlobMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn batch_read(&self, request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest, instance_name: &str) -> BlobBatchReadCall<'a, C> {
+    pub fn batch_read(&self, request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest, instance_name: &str) -> BlobBatchReadCall<'a> {
         BlobBatchReadCall {
             hub: self.hub,
             _request: request,
@@ -1106,7 +1104,7 @@ impl<'a, C> BlobMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn batch_update(&self, request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest, instance_name: &str) -> BlobBatchUpdateCall<'a, C> {
+    pub fn batch_update(&self, request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest, instance_name: &str) -> BlobBatchUpdateCall<'a> {
         BlobBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1125,7 +1123,7 @@ impl<'a, C> BlobMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn find_missing(&self, request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest, instance_name: &str) -> BlobFindMissingCall<'a, C> {
+    pub fn find_missing(&self, request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest, instance_name: &str) -> BlobFindMissingCall<'a> {
         BlobFindMissingCall {
             hub: self.hub,
             _request: request,
@@ -1145,7 +1143,7 @@ impl<'a, C> BlobMethods<'a, C> {
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
     /// * `hash` - The hash. In the case of SHA-256, it will always be a lowercase hex string exactly 64 characters long.
     /// * `sizeBytes` - The size of the blob, in bytes.
-    pub fn get_tree(&self, instance_name: &str, hash: &str, size_bytes: &str) -> BlobGetTreeCall<'a, C> {
+    pub fn get_tree(&self, instance_name: &str, hash: &str, size_bytes: &str) -> BlobGetTreeCall<'a> {
         BlobGetTreeCall {
             hub: self.hub,
             _instance_name: instance_name.to_string(),
@@ -1192,15 +1190,15 @@ impl<'a, C> BlobMethods<'a, C> {
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1210,7 +1208,7 @@ impl<'a, C> OperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the Operation returned by Execute.
-    pub fn wait_execution(&self, request: BuildBazelRemoteExecutionV2WaitExecutionRequest, name: &str) -> OperationWaitExecutionCall<'a, C> {
+    pub fn wait_execution(&self, request: BuildBazelRemoteExecutionV2WaitExecutionRequest, name: &str) -> OperationWaitExecutionCall<'a> {
         OperationWaitExecutionCall {
             hub: self.hub,
             _request: request,
@@ -1254,15 +1252,15 @@ impl<'a, C> OperationMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1271,7 +1269,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `instanceName` - The instance of the execution system to operate against. A server may support multiple instances of the execution system (with their own workers, storage, caches, etc.). The server MAY require use of this field to select between them in an implementation-defined fashion, otherwise it can be omitted.
-    pub fn get_capabilities(&self, instance_name: &str) -> MethodGetCapabilityCall<'a, C> {
+    pub fn get_capabilities(&self, instance_name: &str) -> MethodGetCapabilityCall<'a> {
         MethodGetCapabilityCall {
             hub: self.hub,
             _instance_name: instance_name.to_string(),
@@ -1325,10 +1323,10 @@ impl<'a, C> MethodMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActionResultGetCall<'a, C>
-    where C: 'a {
+pub struct ActionResultGetCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _instance_name: String,
     _hash: String,
     _size_bytes: String,
@@ -1340,9 +1338,9 @@ pub struct ActionResultGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActionResultGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ActionResultGetCall<'a> {}
 
-impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActionResultGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1420,8 +1418,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1434,7 +1431,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1443,7 +1440,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1503,7 +1500,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> ActionResultGetCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> ActionResultGetCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -1513,7 +1510,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hash(mut self, new_value: &str) -> ActionResultGetCall<'a, C> {
+    pub fn hash(mut self, new_value: &str) -> ActionResultGetCall<'a> {
         self._hash = new_value.to_string();
         self
     }
@@ -1523,21 +1520,21 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn size_bytes(mut self, new_value: &str) -> ActionResultGetCall<'a, C> {
+    pub fn size_bytes(mut self, new_value: &str) -> ActionResultGetCall<'a> {
         self._size_bytes = new_value.to_string();
         self
     }
     /// A hint to the server to request inlining stdout in the ActionResult message.
     ///
     /// Sets the *inline stdout* query property to the given value.
-    pub fn inline_stdout(mut self, new_value: bool) -> ActionResultGetCall<'a, C> {
+    pub fn inline_stdout(mut self, new_value: bool) -> ActionResultGetCall<'a> {
         self._inline_stdout = Some(new_value);
         self
     }
     /// A hint to the server to request inlining stderr in the ActionResult message.
     ///
     /// Sets the *inline stderr* query property to the given value.
-    pub fn inline_stderr(mut self, new_value: bool) -> ActionResultGetCall<'a, C> {
+    pub fn inline_stderr(mut self, new_value: bool) -> ActionResultGetCall<'a> {
         self._inline_stderr = Some(new_value);
         self
     }
@@ -1545,7 +1542,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Append the given value to the *inline output files* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_inline_output_files(mut self, new_value: &str) -> ActionResultGetCall<'a, C> {
+    pub fn add_inline_output_files(mut self, new_value: &str) -> ActionResultGetCall<'a> {
         self._inline_output_files.push(new_value.to_string());
         self
     }
@@ -1555,7 +1552,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1580,7 +1577,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActionResultGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActionResultGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1600,7 +1597,7 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActionResultGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActionResultGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1651,10 +1648,10 @@ impl<'a, C> ActionResultGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActionResultUpdateCall<'a, C>
-    where C: 'a {
+pub struct ActionResultUpdateCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _request: BuildBazelRemoteExecutionV2ActionResult,
     _instance_name: String,
     _hash: String,
@@ -1665,9 +1662,9 @@ pub struct ActionResultUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActionResultUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ActionResultUpdateCall<'a> {}
 
-impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActionResultUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1748,8 +1745,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1763,7 +1759,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1774,7 +1770,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1833,7 +1829,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ActionResult) -> ActionResultUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ActionResult) -> ActionResultUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1843,7 +1839,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> ActionResultUpdateCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> ActionResultUpdateCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -1853,7 +1849,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hash(mut self, new_value: &str) -> ActionResultUpdateCall<'a, C> {
+    pub fn hash(mut self, new_value: &str) -> ActionResultUpdateCall<'a> {
         self._hash = new_value.to_string();
         self
     }
@@ -1863,14 +1859,14 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn size_bytes(mut self, new_value: &str) -> ActionResultUpdateCall<'a, C> {
+    pub fn size_bytes(mut self, new_value: &str) -> ActionResultUpdateCall<'a> {
         self._size_bytes = new_value.to_string();
         self
     }
     /// The priority (relative importance) of this content in the overall cache. Generally, a lower value means a longer retention time or other advantage, but the interpretation of a given value is server-dependent. A priority of 0 means a *default* value, decided by the server. The particular semantics of this field is up to the server. In particular, every server will have their own supported range of priorities, and will decide how these map into retention/eviction policy.
     ///
     /// Sets the *results cache policy.priority* query property to the given value.
-    pub fn results_cache_policy_priority(mut self, new_value: i32) -> ActionResultUpdateCall<'a, C> {
+    pub fn results_cache_policy_priority(mut self, new_value: i32) -> ActionResultUpdateCall<'a> {
         self._results_cache_policy_priority = Some(new_value);
         self
     }
@@ -1880,7 +1876,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionResultUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1905,7 +1901,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActionResultUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActionResultUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1925,7 +1921,7 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActionResultUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActionResultUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1975,10 +1971,10 @@ impl<'a, C> ActionResultUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ActionExecuteCall<'a, C>
-    where C: 'a {
+pub struct ActionExecuteCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _request: BuildBazelRemoteExecutionV2ExecuteRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1986,9 +1982,9 @@ pub struct ActionExecuteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ActionExecuteCall<'a, C> {}
+impl<'a> client::CallBuilder for ActionExecuteCall<'a> {}
 
-impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ActionExecuteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2064,8 +2060,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2079,7 +2074,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2090,7 +2085,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2149,7 +2144,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ExecuteRequest) -> ActionExecuteCall<'a, C> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2ExecuteRequest) -> ActionExecuteCall<'a> {
         self._request = new_value;
         self
     }
@@ -2159,7 +2154,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> ActionExecuteCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> ActionExecuteCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -2169,7 +2164,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionExecuteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ActionExecuteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2194,7 +2189,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ActionExecuteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ActionExecuteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2214,7 +2209,7 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActionExecuteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActionExecuteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2264,10 +2259,10 @@ impl<'a, C> ActionExecuteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobBatchReadCall<'a, C>
-    where C: 'a {
+pub struct BlobBatchReadCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _request: BuildBazelRemoteExecutionV2BatchReadBlobsRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2275,9 +2270,9 @@ pub struct BlobBatchReadCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BlobBatchReadCall<'a, C> {}
+impl<'a> client::CallBuilder for BlobBatchReadCall<'a> {}
 
-impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BlobBatchReadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2353,8 +2348,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2368,7 +2362,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2379,7 +2373,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2438,7 +2432,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchReadBlobsRequest) -> BlobBatchReadCall<'a, C> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchReadBlobsRequest) -> BlobBatchReadCall<'a> {
         self._request = new_value;
         self
     }
@@ -2448,7 +2442,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobBatchReadCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobBatchReadCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -2458,7 +2452,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchReadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchReadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2483,7 +2477,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchReadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchReadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2503,7 +2497,7 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobBatchReadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BlobBatchReadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2553,10 +2547,10 @@ impl<'a, C> BlobBatchReadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct BlobBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _request: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2564,9 +2558,9 @@ pub struct BlobBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BlobBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for BlobBatchUpdateCall<'a> {}
 
-impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BlobBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2642,8 +2636,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2657,7 +2650,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2668,7 +2661,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2727,7 +2720,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest) -> BlobBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2BatchUpdateBlobsRequest) -> BlobBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2737,7 +2730,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobBatchUpdateCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobBatchUpdateCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -2747,7 +2740,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2772,7 +2765,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2792,7 +2785,7 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BlobBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2842,10 +2835,10 @@ impl<'a, C> BlobBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobFindMissingCall<'a, C>
-    where C: 'a {
+pub struct BlobFindMissingCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _request: BuildBazelRemoteExecutionV2FindMissingBlobsRequest,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2853,9 +2846,9 @@ pub struct BlobFindMissingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BlobFindMissingCall<'a, C> {}
+impl<'a> client::CallBuilder for BlobFindMissingCall<'a> {}
 
-impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BlobFindMissingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2931,8 +2924,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2946,7 +2938,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2957,7 +2949,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3016,7 +3008,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2FindMissingBlobsRequest) -> BlobFindMissingCall<'a, C> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2FindMissingBlobsRequest) -> BlobFindMissingCall<'a> {
         self._request = new_value;
         self
     }
@@ -3026,7 +3018,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobFindMissingCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobFindMissingCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -3036,7 +3028,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobFindMissingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobFindMissingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3061,7 +3053,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobFindMissingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobFindMissingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3081,7 +3073,7 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobFindMissingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BlobFindMissingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3127,10 +3119,10 @@ impl<'a, C> BlobFindMissingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BlobGetTreeCall<'a, C>
-    where C: 'a {
+pub struct BlobGetTreeCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _instance_name: String,
     _hash: String,
     _size_bytes: String,
@@ -3141,9 +3133,9 @@ pub struct BlobGetTreeCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BlobGetTreeCall<'a, C> {}
+impl<'a> client::CallBuilder for BlobGetTreeCall<'a> {}
 
-impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BlobGetTreeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3216,8 +3208,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3230,7 +3221,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3239,7 +3230,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3299,7 +3290,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> BlobGetTreeCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -3309,7 +3300,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hash(mut self, new_value: &str) -> BlobGetTreeCall<'a, C> {
+    pub fn hash(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
         self._hash = new_value.to_string();
         self
     }
@@ -3319,21 +3310,21 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn size_bytes(mut self, new_value: &str) -> BlobGetTreeCall<'a, C> {
+    pub fn size_bytes(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
         self._size_bytes = new_value.to_string();
         self
     }
     /// A page token, which must be a value received in a previous GetTreeResponse. If present, the server will use that token as an offset, returning only that page and the ones that succeed it.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BlobGetTreeCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> BlobGetTreeCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// A maximum page size to request. If present, the server will request no more than this many items. Regardless of whether a page size is specified, the server may place its own limit on the number of items to be returned and require the client to retrieve more items using a subsequent request.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BlobGetTreeCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> BlobGetTreeCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3343,7 +3334,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobGetTreeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BlobGetTreeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3368,7 +3359,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BlobGetTreeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BlobGetTreeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3388,7 +3379,7 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BlobGetTreeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BlobGetTreeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3438,10 +3429,10 @@ impl<'a, C> BlobGetTreeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationWaitExecutionCall<'a, C>
-    where C: 'a {
+pub struct OperationWaitExecutionCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _request: BuildBazelRemoteExecutionV2WaitExecutionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3449,9 +3440,9 @@ pub struct OperationWaitExecutionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationWaitExecutionCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationWaitExecutionCall<'a> {}
 
-impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationWaitExecutionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3527,8 +3518,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3542,7 +3532,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3553,7 +3543,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3612,7 +3602,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2WaitExecutionRequest) -> OperationWaitExecutionCall<'a, C> {
+    pub fn request(mut self, new_value: BuildBazelRemoteExecutionV2WaitExecutionRequest) -> OperationWaitExecutionCall<'a> {
         self._request = new_value;
         self
     }
@@ -3622,7 +3612,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationWaitExecutionCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationWaitExecutionCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3632,7 +3622,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationWaitExecutionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationWaitExecutionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3657,7 +3647,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationWaitExecutionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationWaitExecutionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3677,7 +3667,7 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationWaitExecutionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationWaitExecutionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3721,19 +3711,19 @@ impl<'a, C> OperationWaitExecutionCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetCapabilityCall<'a, C>
-    where C: 'a {
+pub struct MethodGetCapabilityCall<'a>
+    where  {
 
-    hub: &'a RemoteBuildExecution<C>,
+    hub: &'a RemoteBuildExecution<>,
     _instance_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodGetCapabilityCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetCapabilityCall<'a> {}
 
-impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetCapabilityCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3798,8 +3788,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3812,7 +3801,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3821,7 +3810,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3881,7 +3870,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn instance_name(mut self, new_value: &str) -> MethodGetCapabilityCall<'a, C> {
+    pub fn instance_name(mut self, new_value: &str) -> MethodGetCapabilityCall<'a> {
         self._instance_name = new_value.to_string();
         self
     }
@@ -3891,7 +3880,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetCapabilityCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetCapabilityCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3916,7 +3905,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetCapabilityCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetCapabilityCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3936,7 +3925,7 @@ impl<'a, C> MethodGetCapabilityCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetCapabilityCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetCapabilityCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

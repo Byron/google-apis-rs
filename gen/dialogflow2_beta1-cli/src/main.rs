@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Dialogflow<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Dialogflow,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -19894,7 +19893,7 @@ async fn main() {
     
     let mut app = App::new("dialogflow2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210329")
+           .version("2.0.3+20210329")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_beta1_cli")
            .arg(Arg::with_name("url")

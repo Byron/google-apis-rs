@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-videointelligence1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/videointelligence1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/videointelligence1-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud Video Intelligence* API at revision *20210325*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud Video Intelligence* API at revision *20210325*. The CLI is at version *2.0.3*.
 
 ```bash
 videointelligence1 [options]

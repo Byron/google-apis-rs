@@ -4,12 +4,12 @@
 [package]
 
 name = "google-analyticsreporting4"
-version = "2.0.0+20210310"
+version = "2.0.3+20210310"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AnalyticsReporting (protocol v4)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analyticsreporting4"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsreporting4"
 homepage = "https://developers.google.com/analytics/devguides/reporting/core/v4/"
-documentation = "https://docs.rs/google-analyticsreporting4/2.0.0+20210310"
+documentation = "https://docs.rs/google-analyticsreporting4/2.0.3+20210310"
 license = "MIT"
 keywords = ["analyticsreporting", "google", "protocol", "web", "api"]
 autobins = false

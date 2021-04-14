@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -84,44 +83,43 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct HangoutsChat<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct HangoutsChat<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for HangoutsChat<C> {}
+impl<'a, > client::Hub for HangoutsChat<> {}
 
-impl<'a, C> HangoutsChat<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > HangoutsChat<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> HangoutsChat<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> HangoutsChat<> {
         HangoutsChat {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://chat.googleapis.com/".to_string(),
             _root_url: "https://chat.googleapis.com/".to_string(),
         }
     }
 
-    pub fn dms(&'a self) -> DmMethods<'a, C> {
+    pub fn dms(&'a self) -> DmMethods<'a> {
         DmMethods { hub: &self }
     }
-    pub fn media(&'a self) -> MediaMethods<'a, C> {
+    pub fn media(&'a self) -> MediaMethods<'a> {
         MediaMethods { hub: &self }
     }
-    pub fn rooms(&'a self) -> RoomMethods<'a, C> {
+    pub fn rooms(&'a self) -> RoomMethods<'a> {
         RoomMethods { hub: &self }
     }
-    pub fn spaces(&'a self) -> SpaceMethods<'a, C> {
+    pub fn spaces(&'a self) -> SpaceMethods<'a> {
         SpaceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -857,15 +855,15 @@ impl client::Part for WidgetMarkup {}
 /// let rb = hub.dms();
 /// # }
 /// ```
-pub struct DmMethods<'a, C>
-    where C: 'a {
+pub struct DmMethods<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DmMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DmMethods<'a> {}
 
-impl<'a, C> DmMethods<'a, C> {
+impl<'a> DmMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -875,7 +873,7 @@ impl<'a, C> DmMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn conversations_messages(&self, request: Message, parent: &str) -> DmConversationMessageCall<'a, C> {
+    pub fn conversations_messages(&self, request: Message, parent: &str) -> DmConversationMessageCall<'a> {
         DmConversationMessageCall {
             hub: self.hub,
             _request: request,
@@ -894,7 +892,7 @@ impl<'a, C> DmMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn messages(&self, request: Message, parent: &str) -> DmMessageCall<'a, C> {
+    pub fn messages(&self, request: Message, parent: &str) -> DmMessageCall<'a> {
         DmMessageCall {
             hub: self.hub,
             _request: request,
@@ -913,7 +911,7 @@ impl<'a, C> DmMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn webhooks(&self, request: Message, parent: &str) -> DmWebhookCall<'a, C> {
+    pub fn webhooks(&self, request: Message, parent: &str) -> DmWebhookCall<'a> {
         DmWebhookCall {
             hub: self.hub,
             _request: request,
@@ -957,15 +955,15 @@ impl<'a, C> DmMethods<'a, C> {
 /// let rb = hub.media();
 /// # }
 /// ```
-pub struct MediaMethods<'a, C>
-    where C: 'a {
+pub struct MediaMethods<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MediaMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MediaMethods<'a> {}
 
-impl<'a, C> MediaMethods<'a, C> {
+impl<'a> MediaMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -974,7 +972,7 @@ impl<'a, C> MediaMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Name of the media that is being downloaded. See ReadRequest.resource_name.
-    pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C> {
+    pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a> {
         MediaDownloadCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -1016,15 +1014,15 @@ impl<'a, C> MediaMethods<'a, C> {
 /// let rb = hub.rooms();
 /// # }
 /// ```
-pub struct RoomMethods<'a, C>
-    where C: 'a {
+pub struct RoomMethods<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
 }
 
-impl<'a, C> client::MethodsBuilder for RoomMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for RoomMethods<'a> {}
 
-impl<'a, C> RoomMethods<'a, C> {
+impl<'a> RoomMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1034,7 +1032,7 @@ impl<'a, C> RoomMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn conversations_messages(&self, request: Message, parent: &str) -> RoomConversationMessageCall<'a, C> {
+    pub fn conversations_messages(&self, request: Message, parent: &str) -> RoomConversationMessageCall<'a> {
         RoomConversationMessageCall {
             hub: self.hub,
             _request: request,
@@ -1053,7 +1051,7 @@ impl<'a, C> RoomMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn messages(&self, request: Message, parent: &str) -> RoomMessageCall<'a, C> {
+    pub fn messages(&self, request: Message, parent: &str) -> RoomMessageCall<'a> {
         RoomMessageCall {
             hub: self.hub,
             _request: request,
@@ -1072,7 +1070,7 @@ impl<'a, C> RoomMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn webhooks(&self, request: Message, parent: &str) -> RoomWebhookCall<'a, C> {
+    pub fn webhooks(&self, request: Message, parent: &str) -> RoomWebhookCall<'a> {
         RoomWebhookCall {
             hub: self.hub,
             _request: request,
@@ -1116,15 +1114,15 @@ impl<'a, C> RoomMethods<'a, C> {
 /// let rb = hub.spaces();
 /// # }
 /// ```
-pub struct SpaceMethods<'a, C>
-    where C: 'a {
+pub struct SpaceMethods<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SpaceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SpaceMethods<'a> {}
 
-impl<'a, C> SpaceMethods<'a, C> {
+impl<'a> SpaceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1133,7 +1131,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the membership to be retrieved, in the form "spaces/*/members/*". Example: spaces/AAAAMpdlehY/members/105115627578887013105
-    pub fn members_get(&self, name: &str) -> SpaceMemberGetCall<'a, C> {
+    pub fn members_get(&self, name: &str) -> SpaceMemberGetCall<'a> {
         SpaceMemberGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1149,7 +1147,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The resource name of the space for which membership list is to be fetched, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn members_list(&self, parent: &str) -> SpaceMemberListCall<'a, C> {
+    pub fn members_list(&self, parent: &str) -> SpaceMemberListCall<'a> {
         SpaceMemberListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1167,7 +1165,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Resource name of the attachment, in the form "spaces/*/messages/*/attachments/*".
-    pub fn messages_attachments_get(&self, name: &str) -> SpaceMessageAttachmentGetCall<'a, C> {
+    pub fn messages_attachments_get(&self, name: &str) -> SpaceMessageAttachmentGetCall<'a> {
         SpaceMessageAttachmentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1184,7 +1182,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn messages_create(&self, request: Message, parent: &str) -> SpaceMessageCreateCall<'a, C> {
+    pub fn messages_create(&self, request: Message, parent: &str) -> SpaceMessageCreateCall<'a> {
         SpaceMessageCreateCall {
             hub: self.hub,
             _request: request,
@@ -1202,7 +1200,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the message to be deleted, in the form "spaces/*/messages/*" Example: spaces/AAAAMpdlehY/messages/UMxbHmzDlr4.UMxbHmzDlr4
-    pub fn messages_delete(&self, name: &str) -> SpaceMessageDeleteCall<'a, C> {
+    pub fn messages_delete(&self, name: &str) -> SpaceMessageDeleteCall<'a> {
         SpaceMessageDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1218,7 +1216,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the message to be retrieved, in the form "spaces/*/messages/*". Example: spaces/AAAAMpdlehY/messages/UMxbHmzDlr4.UMxbHmzDlr4
-    pub fn messages_get(&self, name: &str) -> SpaceMessageGetCall<'a, C> {
+    pub fn messages_get(&self, name: &str) -> SpaceMessageGetCall<'a> {
         SpaceMessageGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1235,7 +1233,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - No description provided.
-    pub fn messages_update(&self, request: Message, name: &str) -> SpaceMessageUpdateCall<'a, C> {
+    pub fn messages_update(&self, request: Message, name: &str) -> SpaceMessageUpdateCall<'a> {
         SpaceMessageUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1253,7 +1251,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the space, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn get(&self, name: &str) -> SpaceGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> SpaceGetCall<'a> {
         SpaceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1265,7 +1263,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists spaces the caller is a member of.
-    pub fn list(&self) -> SpaceListCall<'a, C> {
+    pub fn list(&self) -> SpaceListCall<'a> {
         SpaceListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1283,7 +1281,7 @@ impl<'a, C> SpaceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Space resource name, in the form "spaces/*". Example: spaces/AAAAMpdlehY
-    pub fn webhooks(&self, request: Message, parent: &str) -> SpaceWebhookCall<'a, C> {
+    pub fn webhooks(&self, request: Message, parent: &str) -> SpaceWebhookCall<'a> {
         SpaceWebhookCall {
             hub: self.hub,
             _request: request,
@@ -1342,10 +1340,10 @@ impl<'a, C> SpaceMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DmConversationMessageCall<'a, C>
-    where C: 'a {
+pub struct DmConversationMessageCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -1353,9 +1351,9 @@ pub struct DmConversationMessageCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DmConversationMessageCall<'a, C> {}
+impl<'a> client::CallBuilder for DmConversationMessageCall<'a> {}
 
-impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DmConversationMessageCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1442,7 +1440,7 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1453,7 +1451,7 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1512,7 +1510,7 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> DmConversationMessageCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> DmConversationMessageCall<'a> {
         self._request = new_value;
         self
     }
@@ -1522,14 +1520,14 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DmConversationMessageCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> DmConversationMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> DmConversationMessageCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> DmConversationMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -1539,7 +1537,7 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DmConversationMessageCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DmConversationMessageCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1564,7 +1562,7 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DmConversationMessageCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DmConversationMessageCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1612,10 +1610,10 @@ impl<'a, C> DmConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DmMessageCall<'a, C>
-    where C: 'a {
+pub struct DmMessageCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -1623,9 +1621,9 @@ pub struct DmMessageCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DmMessageCall<'a, C> {}
+impl<'a> client::CallBuilder for DmMessageCall<'a> {}
 
-impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DmMessageCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1712,7 +1710,7 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1723,7 +1721,7 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1782,7 +1780,7 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> DmMessageCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> DmMessageCall<'a> {
         self._request = new_value;
         self
     }
@@ -1792,14 +1790,14 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DmMessageCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> DmMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> DmMessageCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> DmMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -1809,7 +1807,7 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DmMessageCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DmMessageCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1834,7 +1832,7 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DmMessageCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DmMessageCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1882,10 +1880,10 @@ impl<'a, C> DmMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DmWebhookCall<'a, C>
-    where C: 'a {
+pub struct DmWebhookCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -1893,9 +1891,9 @@ pub struct DmWebhookCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DmWebhookCall<'a, C> {}
+impl<'a> client::CallBuilder for DmWebhookCall<'a> {}
 
-impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DmWebhookCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1982,7 +1980,7 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1993,7 +1991,7 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2052,7 +2050,7 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> DmWebhookCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> DmWebhookCall<'a> {
         self._request = new_value;
         self
     }
@@ -2062,14 +2060,14 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> DmWebhookCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> DmWebhookCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> DmWebhookCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> DmWebhookCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -2079,7 +2077,7 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DmWebhookCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DmWebhookCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2104,7 +2102,7 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DmWebhookCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DmWebhookCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2150,18 +2148,18 @@ impl<'a, C> DmWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaDownloadCall<'a, C>
-    where C: 'a {
+pub struct MediaDownloadCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MediaDownloadCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaDownloadCall<'a> {}
 
-impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaDownloadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2249,7 +2247,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2258,7 +2256,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2318,7 +2316,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> MediaDownloadCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> MediaDownloadCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -2328,7 +2326,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2353,7 +2351,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2401,10 +2399,10 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoomConversationMessageCall<'a, C>
-    where C: 'a {
+pub struct RoomConversationMessageCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -2412,9 +2410,9 @@ pub struct RoomConversationMessageCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for RoomConversationMessageCall<'a, C> {}
+impl<'a> client::CallBuilder for RoomConversationMessageCall<'a> {}
 
-impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RoomConversationMessageCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2501,7 +2499,7 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2512,7 +2510,7 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2571,7 +2569,7 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> RoomConversationMessageCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> RoomConversationMessageCall<'a> {
         self._request = new_value;
         self
     }
@@ -2581,14 +2579,14 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> RoomConversationMessageCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> RoomConversationMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> RoomConversationMessageCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> RoomConversationMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -2598,7 +2596,7 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoomConversationMessageCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoomConversationMessageCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2623,7 +2621,7 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RoomConversationMessageCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RoomConversationMessageCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2671,10 +2669,10 @@ impl<'a, C> RoomConversationMessageCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoomMessageCall<'a, C>
-    where C: 'a {
+pub struct RoomMessageCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -2682,9 +2680,9 @@ pub struct RoomMessageCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for RoomMessageCall<'a, C> {}
+impl<'a> client::CallBuilder for RoomMessageCall<'a> {}
 
-impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RoomMessageCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2771,7 +2769,7 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2782,7 +2780,7 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2841,7 +2839,7 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> RoomMessageCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> RoomMessageCall<'a> {
         self._request = new_value;
         self
     }
@@ -2851,14 +2849,14 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> RoomMessageCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> RoomMessageCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> RoomMessageCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> RoomMessageCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -2868,7 +2866,7 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoomMessageCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoomMessageCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2893,7 +2891,7 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RoomMessageCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RoomMessageCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2941,10 +2939,10 @@ impl<'a, C> RoomMessageCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct RoomWebhookCall<'a, C>
-    where C: 'a {
+pub struct RoomWebhookCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -2952,9 +2950,9 @@ pub struct RoomWebhookCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for RoomWebhookCall<'a, C> {}
+impl<'a> client::CallBuilder for RoomWebhookCall<'a> {}
 
-impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> RoomWebhookCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3041,7 +3039,7 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3052,7 +3050,7 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3111,7 +3109,7 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> RoomWebhookCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> RoomWebhookCall<'a> {
         self._request = new_value;
         self
     }
@@ -3121,14 +3119,14 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> RoomWebhookCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> RoomWebhookCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> RoomWebhookCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> RoomWebhookCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -3138,7 +3136,7 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoomWebhookCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> RoomWebhookCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3163,7 +3161,7 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> RoomWebhookCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> RoomWebhookCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3204,18 +3202,18 @@ impl<'a, C> RoomWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMemberGetCall<'a, C>
-    where C: 'a {
+pub struct SpaceMemberGetCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMemberGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMemberGetCall<'a> {}
 
-impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMemberGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3287,7 +3285,7 @@ impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3296,7 +3294,7 @@ impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3356,7 +3354,7 @@ impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SpaceMemberGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SpaceMemberGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3366,7 +3364,7 @@ impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMemberGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMemberGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3391,7 +3389,7 @@ impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMemberGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMemberGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3434,10 +3432,10 @@ impl<'a, C> SpaceMemberGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMemberListCall<'a, C>
-    where C: 'a {
+pub struct SpaceMemberListCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3445,9 +3443,9 @@ pub struct SpaceMemberListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMemberListCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMemberListCall<'a> {}
 
-impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMemberListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3525,7 +3523,7 @@ impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3534,7 +3532,7 @@ impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3594,21 +3592,21 @@ impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SpaceMemberListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SpaceMemberListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A token identifying a page of results the server should return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SpaceMemberListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SpaceMemberListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The value is capped at 1000. Server may return fewer results than requested. If unspecified, server will default to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SpaceMemberListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SpaceMemberListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3618,7 +3616,7 @@ impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMemberListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMemberListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3643,7 +3641,7 @@ impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMemberListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMemberListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3684,18 +3682,18 @@ impl<'a, C> SpaceMemberListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMessageAttachmentGetCall<'a, C>
-    where C: 'a {
+pub struct SpaceMessageAttachmentGetCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMessageAttachmentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMessageAttachmentGetCall<'a> {}
 
-impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMessageAttachmentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3767,7 +3765,7 @@ impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3776,7 +3774,7 @@ impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3836,7 +3834,7 @@ impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SpaceMessageAttachmentGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SpaceMessageAttachmentGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3846,7 +3844,7 @@ impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageAttachmentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageAttachmentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3871,7 +3869,7 @@ impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageAttachmentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageAttachmentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3919,10 +3917,10 @@ impl<'a, C> SpaceMessageAttachmentGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMessageCreateCall<'a, C>
-    where C: 'a {
+pub struct SpaceMessageCreateCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -3930,9 +3928,9 @@ pub struct SpaceMessageCreateCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMessageCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMessageCreateCall<'a> {}
 
-impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMessageCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4019,7 +4017,7 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4030,7 +4028,7 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4089,7 +4087,7 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> SpaceMessageCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> SpaceMessageCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4099,14 +4097,14 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SpaceMessageCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SpaceMessageCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> SpaceMessageCreateCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> SpaceMessageCreateCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -4116,7 +4114,7 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4141,7 +4139,7 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4182,18 +4180,18 @@ impl<'a, C> SpaceMessageCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMessageDeleteCall<'a, C>
-    where C: 'a {
+pub struct SpaceMessageDeleteCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMessageDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMessageDeleteCall<'a> {}
 
-impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMessageDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4265,7 +4263,7 @@ impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4274,7 +4272,7 @@ impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4334,7 +4332,7 @@ impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SpaceMessageDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SpaceMessageDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4344,7 +4342,7 @@ impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4369,7 +4367,7 @@ impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4410,18 +4408,18 @@ impl<'a, C> SpaceMessageDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMessageGetCall<'a, C>
-    where C: 'a {
+pub struct SpaceMessageGetCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMessageGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMessageGetCall<'a> {}
 
-impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMessageGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4493,7 +4491,7 @@ impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4502,7 +4500,7 @@ impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4562,7 +4560,7 @@ impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SpaceMessageGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SpaceMessageGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4572,7 +4570,7 @@ impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4597,7 +4595,7 @@ impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4645,10 +4643,10 @@ impl<'a, C> SpaceMessageGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceMessageUpdateCall<'a, C>
-    where C: 'a {
+pub struct SpaceMessageUpdateCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _name: String,
     _update_mask: Option<String>,
@@ -4656,9 +4654,9 @@ pub struct SpaceMessageUpdateCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceMessageUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceMessageUpdateCall<'a> {}
 
-impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceMessageUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4745,7 +4743,7 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4756,7 +4754,7 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4815,7 +4813,7 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> SpaceMessageUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> SpaceMessageUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4824,14 +4822,14 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SpaceMessageUpdateCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SpaceMessageUpdateCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The field paths to be updated, comma separated if there are multiple. Currently supported field paths: * text * cards
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> SpaceMessageUpdateCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> SpaceMessageUpdateCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4841,7 +4839,7 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceMessageUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4866,7 +4864,7 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceMessageUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4907,18 +4905,18 @@ impl<'a, C> SpaceMessageUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceGetCall<'a, C>
-    where C: 'a {
+pub struct SpaceGetCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceGetCall<'a> {}
 
-impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4990,7 +4988,7 @@ impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4999,7 +4997,7 @@ impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5059,7 +5057,7 @@ impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> SpaceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> SpaceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5069,7 +5067,7 @@ impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5094,7 +5092,7 @@ impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5137,19 +5135,19 @@ impl<'a, C> SpaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceListCall<'a, C>
-    where C: 'a {
+pub struct SpaceListCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceListCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceListCall<'a> {}
 
-impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5201,7 +5199,7 @@ impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5210,7 +5208,7 @@ impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5267,14 +5265,14 @@ impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// A token identifying a page of results the server should return.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SpaceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SpaceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. The value is capped at 1000. Server may return fewer results than requested. If unspecified, server will default to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SpaceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SpaceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5284,7 +5282,7 @@ impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5309,7 +5307,7 @@ impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5357,10 +5355,10 @@ impl<'a, C> SpaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SpaceWebhookCall<'a, C>
-    where C: 'a {
+pub struct SpaceWebhookCall<'a>
+    where  {
 
-    hub: &'a HangoutsChat<C>,
+    hub: &'a HangoutsChat<>,
     _request: Message,
     _parent: String,
     _thread_key: Option<String>,
@@ -5368,9 +5366,9 @@ pub struct SpaceWebhookCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for SpaceWebhookCall<'a, C> {}
+impl<'a> client::CallBuilder for SpaceWebhookCall<'a> {}
 
-impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SpaceWebhookCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5457,7 +5455,7 @@ impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5468,7 +5466,7 @@ impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5527,7 +5525,7 @@ impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Message) -> SpaceWebhookCall<'a, C> {
+    pub fn request(mut self, new_value: Message) -> SpaceWebhookCall<'a> {
         self._request = new_value;
         self
     }
@@ -5537,14 +5535,14 @@ impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> SpaceWebhookCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> SpaceWebhookCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Opaque thread identifier string that can be specified to group messages into a single thread. If this is the first message with a given thread identifier, a new thread is created. Subsequent messages with the same thread identifier will be posted into the same thread. This relieves bots and webhooks from having to store the Hangouts Chat thread ID of a thread (created earlier by them) to post further updates to it. Has no effect if thread field, corresponding to an existing thread, is set in message.
     ///
     /// Sets the *thread key* query property to the given value.
-    pub fn thread_key(mut self, new_value: &str) -> SpaceWebhookCall<'a, C> {
+    pub fn thread_key(mut self, new_value: &str) -> SpaceWebhookCall<'a> {
         self._thread_key = Some(new_value.to_string());
         self
     }
@@ -5554,7 +5552,7 @@ impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceWebhookCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SpaceWebhookCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5579,7 +5577,7 @@ impl<'a, C> SpaceWebhookCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SpaceWebhookCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SpaceWebhookCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

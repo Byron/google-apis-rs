@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudtasks2_beta3"
-version = "2.0.0+20210315"
+version = "2.0.3+20210315"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Tasks (protocol v2beta3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta3"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtasks2_beta3"
 homepage = "https://cloud.google.com/tasks/"
-documentation = "https://docs.rs/google-cloudtasks2_beta3/2.0.0+20210315"
+documentation = "https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315"
 license = "MIT"
 keywords = ["cloudtasks", "google", "protocol", "web", "api"]
 autobins = false

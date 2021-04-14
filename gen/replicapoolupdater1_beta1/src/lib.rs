@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *replicapoolupdater* crate version *2.0.0+20161003*, where *20161003* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *replicapoolupdater* crate version *2.0.3+20161003*, where *20161003* is the exact revision of the *replicapoolupdater:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *replicapoolupdater* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/instance-groups/manager/#applying_rolling_updates_using_the_updater_service).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/replicapoolupdater1_beta1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/replicapoolupdater1_beta1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Replicapoolupdater) ... 

@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Safebrowsing<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Safebrowsing,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -877,7 +876,7 @@ async fn main() {
     
     let mut app = App::new("safebrowsing4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210330")
+           .version("2.0.3+20210330")
            .about("Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources. The Safe Browsing APIs are for non-commercial use only. If you need to use APIs to detect malicious URLs for commercial purposes – meaning “for sale or revenue-generating purposes” – please refer to the Web Risk API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli")
            .arg(Arg::with_name("folder")

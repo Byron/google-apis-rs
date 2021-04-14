@@ -1,8 +1,8 @@
-site_name: plusDomains v2.0.0+20190616
+site_name: plusDomains v2.0.3+20190616
 site_url: http://byron.github.io/google-apis-rs/google-plusdomains1-cli
 site_description: A complete library to interact with plusDomains (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/plusdomains1-cli
 
 docs_dir: docs
 site_dir: build_html

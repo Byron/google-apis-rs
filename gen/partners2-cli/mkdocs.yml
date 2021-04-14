@@ -1,8 +1,8 @@
-site_name: Partners v2.0.0+20180925
+site_name: Partners v2.0.3+20180925
 site_url: http://byron.github.io/google-apis-rs/google-partners2-cli
 site_description: A complete library to interact with Partners (protocol v2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/partners2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/partners2-cli
 
 docs_dir: docs
 site_dir: build_html

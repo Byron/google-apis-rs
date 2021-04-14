@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -125,38 +124,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Manager<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Manager<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Manager<C> {}
+impl<'a, > client::Hub for Manager<> {}
 
-impl<'a, C> Manager<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Manager<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Manager<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Manager<> {
         Manager {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/manager/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn deployments(&'a self) -> DeploymentMethods<'a, C> {
+    pub fn deployments(&'a self) -> DeploymentMethods<'a> {
         DeploymentMethods { hub: &self }
     }
-    pub fn templates(&'a self) -> TemplateMethods<'a, C> {
+    pub fn templates(&'a self) -> TemplateMethods<'a> {
         TemplateMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -967,15 +965,15 @@ impl client::ResponseResult for TemplatesListResponse {}
 /// let rb = hub.deployments();
 /// # }
 /// ```
-pub struct DeploymentMethods<'a, C>
-    where C: 'a {
+pub struct DeploymentMethods<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DeploymentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DeploymentMethods<'a> {}
 
-impl<'a, C> DeploymentMethods<'a, C> {
+impl<'a> DeploymentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -986,7 +984,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
     /// * `deploymentName` - No description provided.
-    pub fn delete(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentDeleteCall<'a, C> {
+    pub fn delete(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentDeleteCall<'a> {
         DeploymentDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1007,7 +1005,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
     /// * `deploymentName` - No description provided.
-    pub fn get(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentGetCall<'a, C> {
+    pub fn get(&self, project_id: &str, region: &str, deployment_name: &str) -> DeploymentGetCall<'a> {
         DeploymentGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1028,7 +1026,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
-    pub fn insert(&self, request: Deployment, project_id: &str, region: &str) -> DeploymentInsertCall<'a, C> {
+    pub fn insert(&self, request: Deployment, project_id: &str, region: &str) -> DeploymentInsertCall<'a> {
         DeploymentInsertCall {
             hub: self.hub,
             _request: request,
@@ -1048,7 +1046,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     ///
     /// * `projectId` - No description provided.
     /// * `region` - No description provided.
-    pub fn list(&self, project_id: &str, region: &str) -> DeploymentListCall<'a, C> {
+    pub fn list(&self, project_id: &str, region: &str) -> DeploymentListCall<'a> {
         DeploymentListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1094,15 +1092,15 @@ impl<'a, C> DeploymentMethods<'a, C> {
 /// let rb = hub.templates();
 /// # }
 /// ```
-pub struct TemplateMethods<'a, C>
-    where C: 'a {
+pub struct TemplateMethods<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TemplateMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TemplateMethods<'a> {}
 
-impl<'a, C> TemplateMethods<'a, C> {
+impl<'a> TemplateMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1112,7 +1110,7 @@ impl<'a, C> TemplateMethods<'a, C> {
     ///
     /// * `projectId` - No description provided.
     /// * `templateName` - No description provided.
-    pub fn delete(&self, project_id: &str, template_name: &str) -> TemplateDeleteCall<'a, C> {
+    pub fn delete(&self, project_id: &str, template_name: &str) -> TemplateDeleteCall<'a> {
         TemplateDeleteCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1131,7 +1129,7 @@ impl<'a, C> TemplateMethods<'a, C> {
     ///
     /// * `projectId` - No description provided.
     /// * `templateName` - No description provided.
-    pub fn get(&self, project_id: &str, template_name: &str) -> TemplateGetCall<'a, C> {
+    pub fn get(&self, project_id: &str, template_name: &str) -> TemplateGetCall<'a> {
         TemplateGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1150,7 +1148,7 @@ impl<'a, C> TemplateMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - No description provided.
-    pub fn insert(&self, request: Template, project_id: &str) -> TemplateInsertCall<'a, C> {
+    pub fn insert(&self, request: Template, project_id: &str) -> TemplateInsertCall<'a> {
         TemplateInsertCall {
             hub: self.hub,
             _request: request,
@@ -1168,7 +1166,7 @@ impl<'a, C> TemplateMethods<'a, C> {
     /// # Arguments
     ///
     /// * `projectId` - No description provided.
-    pub fn list(&self, project_id: &str) -> TemplateListCall<'a, C> {
+    pub fn list(&self, project_id: &str) -> TemplateListCall<'a> {
         TemplateListCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1221,10 +1219,10 @@ impl<'a, C> TemplateMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeleteCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDeleteCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _project_id: String,
     _region: String,
     _deployment_name: String,
@@ -1233,9 +1231,9 @@ pub struct DeploymentDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDeleteCall<'a> {}
 
-impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1297,8 +1295,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1311,7 +1308,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1320,7 +1317,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1369,7 +1366,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentDeleteCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1378,7 +1375,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C> {
+    pub fn region(mut self, new_value: &str) -> DeploymentDeleteCall<'a> {
         self._region = new_value.to_string();
         self
     }
@@ -1387,7 +1384,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment_name(mut self, new_value: &str) -> DeploymentDeleteCall<'a, C> {
+    pub fn deployment_name(mut self, new_value: &str) -> DeploymentDeleteCall<'a> {
         self._deployment_name = new_value.to_string();
         self
     }
@@ -1397,7 +1394,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1418,7 +1415,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1438,7 +1435,7 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1482,10 +1479,10 @@ impl<'a, C> DeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentGetCall<'a, C>
-    where C: 'a {
+pub struct DeploymentGetCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _project_id: String,
     _region: String,
     _deployment_name: String,
@@ -1494,9 +1491,9 @@ pub struct DeploymentGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentGetCall<'a> {}
 
-impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1559,8 +1556,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1573,7 +1569,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1582,7 +1578,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1641,7 +1637,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentGetCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1650,7 +1646,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
+    pub fn region(mut self, new_value: &str) -> DeploymentGetCall<'a> {
         self._region = new_value.to_string();
         self
     }
@@ -1659,7 +1655,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn deployment_name(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
+    pub fn deployment_name(mut self, new_value: &str) -> DeploymentGetCall<'a> {
         self._deployment_name = new_value.to_string();
         self
     }
@@ -1669,7 +1665,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1690,7 +1686,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1710,7 +1706,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1760,10 +1756,10 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentInsertCall<'a, C>
-    where C: 'a {
+pub struct DeploymentInsertCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _request: Deployment,
     _project_id: String,
     _region: String,
@@ -1772,9 +1768,9 @@ pub struct DeploymentInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentInsertCall<'a> {}
 
-impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1847,8 +1843,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1862,7 +1857,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1873,7 +1868,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1932,7 +1927,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Deployment) -> DeploymentInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Deployment) -> DeploymentInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -1941,7 +1936,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentInsertCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentInsertCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -1950,7 +1945,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentInsertCall<'a, C> {
+    pub fn region(mut self, new_value: &str) -> DeploymentInsertCall<'a> {
         self._region = new_value.to_string();
         self
     }
@@ -1960,7 +1955,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1981,7 +1976,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2001,7 +1996,7 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2047,10 +2042,10 @@ impl<'a, C> DeploymentInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentListCall<'a, C>
-    where C: 'a {
+pub struct DeploymentListCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _project_id: String,
     _region: String,
     _page_token: Option<String>,
@@ -2060,9 +2055,9 @@ pub struct DeploymentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentListCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentListCall<'a> {}
 
-impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2130,8 +2125,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2144,7 +2138,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2153,7 +2147,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2212,7 +2206,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> DeploymentListCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> DeploymentListCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2221,21 +2215,21 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn region(mut self, new_value: &str) -> DeploymentListCall<'a, C> {
+    pub fn region(mut self, new_value: &str) -> DeploymentListCall<'a> {
         self._region = new_value.to_string();
         self
     }
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> DeploymentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> DeploymentListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -2245,7 +2239,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2266,7 +2260,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2286,7 +2280,7 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2330,10 +2324,10 @@ impl<'a, C> DeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateDeleteCall<'a, C>
-    where C: 'a {
+pub struct TemplateDeleteCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _project_id: String,
     _template_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2341,9 +2335,9 @@ pub struct TemplateDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TemplateDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TemplateDeleteCall<'a> {}
 
-impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TemplateDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2404,8 +2398,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2418,7 +2411,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2427,7 +2420,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2476,7 +2469,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateDeleteCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateDeleteCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2485,7 +2478,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> TemplateDeleteCall<'a, C> {
+    pub fn template_name(mut self, new_value: &str) -> TemplateDeleteCall<'a> {
         self._template_name = new_value.to_string();
         self
     }
@@ -2495,7 +2488,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2516,7 +2509,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2536,7 +2529,7 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2580,10 +2573,10 @@ impl<'a, C> TemplateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateGetCall<'a, C>
-    where C: 'a {
+pub struct TemplateGetCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _project_id: String,
     _template_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2591,9 +2584,9 @@ pub struct TemplateGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TemplateGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TemplateGetCall<'a> {}
 
-impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TemplateGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2655,8 +2648,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2669,7 +2661,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2678,7 +2670,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2737,7 +2729,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateGetCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2746,7 +2738,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn template_name(mut self, new_value: &str) -> TemplateGetCall<'a, C> {
+    pub fn template_name(mut self, new_value: &str) -> TemplateGetCall<'a> {
         self._template_name = new_value.to_string();
         self
     }
@@ -2756,7 +2748,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2777,7 +2769,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2797,7 +2789,7 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2847,10 +2839,10 @@ impl<'a, C> TemplateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateInsertCall<'a, C>
-    where C: 'a {
+pub struct TemplateInsertCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _request: Template,
     _project_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2858,9 +2850,9 @@ pub struct TemplateInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TemplateInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for TemplateInsertCall<'a> {}
 
-impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TemplateInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2932,8 +2924,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2947,7 +2938,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2958,7 +2949,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3017,7 +3008,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Template) -> TemplateInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Template) -> TemplateInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -3026,7 +3017,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateInsertCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateInsertCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -3036,7 +3027,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3057,7 +3048,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3077,7 +3068,7 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3123,10 +3114,10 @@ impl<'a, C> TemplateInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TemplateListCall<'a, C>
-    where C: 'a {
+pub struct TemplateListCall<'a>
+    where  {
 
-    hub: &'a Manager<C>,
+    hub: &'a Manager<>,
     _project_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -3135,9 +3126,9 @@ pub struct TemplateListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TemplateListCall<'a, C> {}
+impl<'a> client::CallBuilder for TemplateListCall<'a> {}
 
-impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TemplateListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3204,8 +3195,7 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3218,7 +3208,7 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3227,7 +3217,7 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3286,21 +3276,21 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> TemplateListCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> TemplateListCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
     /// Specifies a nextPageToken returned by a previous list request. This token can be used to request the next page of results from a previous list request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TemplateListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum count of results to be returned. Acceptable values are 0 to 100, inclusive. (Default: 50)
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> TemplateListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> TemplateListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -3310,7 +3300,7 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TemplateListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3331,7 +3321,7 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TemplateListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3351,7 +3341,7 @@ impl<'a, C> TemplateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TemplateListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Cloud Messaging* crate version *2.0.0+20210329*, where *20210329* is the exact revision of the *fcm:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Firebase Cloud Messaging* crate version *2.0.3+20210329*, where *20210329* is the exact revision of the *fcm:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Firebase Cloud Messaging* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/cloud-messaging).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/fcm1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/fcm1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](FirebaseCloudMessaging) ... 

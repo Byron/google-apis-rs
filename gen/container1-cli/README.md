@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-container1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/container1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/container1-cli).
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20210314*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Container* API at revision *20210314*. The CLI is at version *2.0.3*.
 
 ```bash
 container1 [options]

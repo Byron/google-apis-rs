@@ -1,8 +1,8 @@
-site_name: Shopping Content v2.0.0+20210325
+site_name: Shopping Content v2.0.3+20210325
 site_url: http://byron.github.io/google-apis-rs/google-content2-cli
 site_description: A complete library to interact with Shopping Content (protocol v2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/content2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/content2-cli
 
 docs_dir: docs
 site_dir: build_html

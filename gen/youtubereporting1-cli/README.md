@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-youtubereporting1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/youtubereporting1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/youtubereporting1-cli).
 
 # Usage
 
-This documentation was generated from the *YouTube Reporting* API at revision *20210329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *YouTube Reporting* API at revision *20210329*. The CLI is at version *2.0.3*.
 
 ```bash
 youtubereporting1 [options]

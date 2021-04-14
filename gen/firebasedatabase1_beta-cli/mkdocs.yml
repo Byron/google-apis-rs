@@ -1,8 +1,8 @@
-site_name: Firebase Realtime Database v2.0.0+20210329
+site_name: Firebase Realtime Database v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-firebasedatabase1_beta-cli
 site_description: A complete library to interact with Firebase Realtime Database (protocol v1beta)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedatabase1_beta-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebasedatabase1_beta-cli
 
 docs_dir: docs
 site_dir: build_html

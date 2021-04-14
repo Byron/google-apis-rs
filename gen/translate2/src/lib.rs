@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Translate* crate version *2.0.0+20170525*, where *20170525* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Translate* crate version *2.0.3+20170525*, where *20170525* is the exact revision of the *translate:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Translate* *v2* API can be found at the
 //! [official documentation site](https://code.google.com/apis/language/translate/v2/getting_started.html).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/translate2).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/translate2).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Translate) ... 

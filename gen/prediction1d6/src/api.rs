@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -121,38 +120,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Prediction<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Prediction<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Prediction<C> {}
+impl<'a, > client::Hub for Prediction<> {}
 
-impl<'a, C> Prediction<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Prediction<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Prediction<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Prediction<> {
         Prediction {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/prediction/v1.6/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn hostedmodels(&'a self) -> HostedmodelMethods<'a, C> {
+    pub fn hostedmodels(&'a self) -> HostedmodelMethods<'a> {
         HostedmodelMethods { hub: &self }
     }
-    pub fn trainedmodels(&'a self) -> TrainedmodelMethods<'a, C> {
+    pub fn trainedmodels(&'a self) -> TrainedmodelMethods<'a> {
         TrainedmodelMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -680,15 +678,15 @@ impl client::Part for OutputOutputMulti {}
 /// let rb = hub.hostedmodels();
 /// # }
 /// ```
-pub struct HostedmodelMethods<'a, C>
-    where C: 'a {
+pub struct HostedmodelMethods<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
 }
 
-impl<'a, C> client::MethodsBuilder for HostedmodelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for HostedmodelMethods<'a> {}
 
-impl<'a, C> HostedmodelMethods<'a, C> {
+impl<'a> HostedmodelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -699,7 +697,7 @@ impl<'a, C> HostedmodelMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
     /// * `hostedModelName` - The name of a hosted model.
-    pub fn predict(&self, request: Input, project: &str, hosted_model_name: &str) -> HostedmodelPredictCall<'a, C> {
+    pub fn predict(&self, request: Input, project: &str, hosted_model_name: &str) -> HostedmodelPredictCall<'a> {
         HostedmodelPredictCall {
             hub: self.hub,
             _request: request,
@@ -744,15 +742,15 @@ impl<'a, C> HostedmodelMethods<'a, C> {
 /// let rb = hub.trainedmodels();
 /// # }
 /// ```
-pub struct TrainedmodelMethods<'a, C>
-    where C: 'a {
+pub struct TrainedmodelMethods<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TrainedmodelMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TrainedmodelMethods<'a> {}
 
-impl<'a, C> TrainedmodelMethods<'a, C> {
+impl<'a> TrainedmodelMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -762,7 +760,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     ///
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn analyze(&self, project: &str, id: &str) -> TrainedmodelAnalyzeCall<'a, C> {
+    pub fn analyze(&self, project: &str, id: &str) -> TrainedmodelAnalyzeCall<'a> {
         TrainedmodelAnalyzeCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -781,7 +779,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     ///
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn delete(&self, project: &str, id: &str) -> TrainedmodelDeleteCall<'a, C> {
+    pub fn delete(&self, project: &str, id: &str) -> TrainedmodelDeleteCall<'a> {
         TrainedmodelDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -800,7 +798,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     ///
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn get(&self, project: &str, id: &str) -> TrainedmodelGetCall<'a, C> {
+    pub fn get(&self, project: &str, id: &str) -> TrainedmodelGetCall<'a> {
         TrainedmodelGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -819,7 +817,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
-    pub fn insert(&self, request: Insert, project: &str) -> TrainedmodelInsertCall<'a, C> {
+    pub fn insert(&self, request: Insert, project: &str) -> TrainedmodelInsertCall<'a> {
         TrainedmodelInsertCall {
             hub: self.hub,
             _request: request,
@@ -837,7 +835,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     /// # Arguments
     ///
     /// * `project` - The project associated with the model.
-    pub fn list(&self, project: &str) -> TrainedmodelListCall<'a, C> {
+    pub fn list(&self, project: &str) -> TrainedmodelListCall<'a> {
         TrainedmodelListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -858,7 +856,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn predict(&self, request: Input, project: &str, id: &str) -> TrainedmodelPredictCall<'a, C> {
+    pub fn predict(&self, request: Input, project: &str, id: &str) -> TrainedmodelPredictCall<'a> {
         TrainedmodelPredictCall {
             hub: self.hub,
             _request: request,
@@ -879,7 +877,7 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `project` - The project associated with the model.
     /// * `id` - The unique name for the predictive model.
-    pub fn update(&self, request: Update, project: &str, id: &str) -> TrainedmodelUpdateCall<'a, C> {
+    pub fn update(&self, request: Update, project: &str, id: &str) -> TrainedmodelUpdateCall<'a> {
         TrainedmodelUpdateCall {
             hub: self.hub,
             _request: request,
@@ -938,10 +936,10 @@ impl<'a, C> TrainedmodelMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct HostedmodelPredictCall<'a, C>
-    where C: 'a {
+pub struct HostedmodelPredictCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _request: Input,
     _project: String,
     _hosted_model_name: String,
@@ -950,9 +948,9 @@ pub struct HostedmodelPredictCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for HostedmodelPredictCall<'a, C> {}
+impl<'a> client::CallBuilder for HostedmodelPredictCall<'a> {}
 
-impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> HostedmodelPredictCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1025,8 +1023,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1040,7 +1037,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1051,7 +1048,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1110,7 +1107,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Input) -> HostedmodelPredictCall<'a, C> {
+    pub fn request(mut self, new_value: Input) -> HostedmodelPredictCall<'a> {
         self._request = new_value;
         self
     }
@@ -1120,7 +1117,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> HostedmodelPredictCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1130,7 +1127,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hosted_model_name(mut self, new_value: &str) -> HostedmodelPredictCall<'a, C> {
+    pub fn hosted_model_name(mut self, new_value: &str) -> HostedmodelPredictCall<'a> {
         self._hosted_model_name = new_value.to_string();
         self
     }
@@ -1140,7 +1137,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> HostedmodelPredictCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> HostedmodelPredictCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1161,7 +1158,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> HostedmodelPredictCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> HostedmodelPredictCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1181,7 +1178,7 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> HostedmodelPredictCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> HostedmodelPredictCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1225,10 +1222,10 @@ impl<'a, C> HostedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelAnalyzeCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelAnalyzeCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _project: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1236,9 +1233,9 @@ pub struct TrainedmodelAnalyzeCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelAnalyzeCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelAnalyzeCall<'a> {}
 
-impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelAnalyzeCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1300,8 +1297,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1314,7 +1310,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1323,7 +1319,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1383,7 +1379,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1393,7 +1389,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelAnalyzeCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -1403,7 +1399,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelAnalyzeCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelAnalyzeCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1424,7 +1420,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelAnalyzeCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelAnalyzeCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1444,7 +1440,7 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelAnalyzeCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelAnalyzeCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1488,10 +1484,10 @@ impl<'a, C> TrainedmodelAnalyzeCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelDeleteCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelDeleteCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _project: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1499,9 +1495,9 @@ pub struct TrainedmodelDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelDeleteCall<'a> {}
 
-impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1562,8 +1558,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1576,7 +1571,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1585,7 +1580,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1635,7 +1630,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1645,7 +1640,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelDeleteCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -1655,7 +1650,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1676,7 +1671,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1696,7 +1691,7 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1740,10 +1735,10 @@ impl<'a, C> TrainedmodelDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelGetCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelGetCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _project: String,
     _id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1751,9 +1746,9 @@ pub struct TrainedmodelGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelGetCall<'a> {}
 
-impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1815,8 +1810,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1829,7 +1823,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1838,7 +1832,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1898,7 +1892,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelGetCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1908,7 +1902,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelGetCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelGetCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -1918,7 +1912,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1939,7 +1933,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1959,7 +1953,7 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2009,10 +2003,10 @@ impl<'a, C> TrainedmodelGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelInsertCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelInsertCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _request: Insert,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2020,9 +2014,9 @@ pub struct TrainedmodelInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelInsertCall<'a> {}
 
-impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2094,8 +2088,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2109,7 +2102,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2120,7 +2113,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2179,7 +2172,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Insert) -> TrainedmodelInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Insert) -> TrainedmodelInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -2189,7 +2182,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelInsertCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelInsertCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2199,7 +2192,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2220,7 +2213,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2240,7 +2233,7 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2286,10 +2279,10 @@ impl<'a, C> TrainedmodelInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelListCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelListCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -2298,9 +2291,9 @@ pub struct TrainedmodelListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelListCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelListCall<'a> {}
 
-impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2367,8 +2360,7 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2381,7 +2373,7 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2390,7 +2382,7 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2450,21 +2442,21 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelListCall<'a> {
         self._project = new_value.to_string();
         self
     }
     /// Pagination token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TrainedmodelListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TrainedmodelListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of results to return.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> TrainedmodelListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> TrainedmodelListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -2474,7 +2466,7 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2495,7 +2487,7 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2515,7 +2507,7 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2565,10 +2557,10 @@ impl<'a, C> TrainedmodelListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelPredictCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelPredictCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _request: Input,
     _project: String,
     _id: String,
@@ -2577,9 +2569,9 @@ pub struct TrainedmodelPredictCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelPredictCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelPredictCall<'a> {}
 
-impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelPredictCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2652,8 +2644,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2667,7 +2658,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2678,7 +2669,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2737,7 +2728,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Input) -> TrainedmodelPredictCall<'a, C> {
+    pub fn request(mut self, new_value: Input) -> TrainedmodelPredictCall<'a> {
         self._request = new_value;
         self
     }
@@ -2747,7 +2738,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelPredictCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2757,7 +2748,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelPredictCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelPredictCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -2767,7 +2758,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelPredictCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelPredictCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2788,7 +2779,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelPredictCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelPredictCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2808,7 +2799,7 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelPredictCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelPredictCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2858,10 +2849,10 @@ impl<'a, C> TrainedmodelPredictCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TrainedmodelUpdateCall<'a, C>
-    where C: 'a {
+pub struct TrainedmodelUpdateCall<'a>
+    where  {
 
-    hub: &'a Prediction<C>,
+    hub: &'a Prediction<>,
     _request: Update,
     _project: String,
     _id: String,
@@ -2870,9 +2861,9 @@ pub struct TrainedmodelUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TrainedmodelUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for TrainedmodelUpdateCall<'a> {}
 
-impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TrainedmodelUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2945,8 +2936,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2960,7 +2950,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2971,7 +2961,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3030,7 +3020,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Update) -> TrainedmodelUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Update) -> TrainedmodelUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3040,7 +3030,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -3050,7 +3040,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> TrainedmodelUpdateCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -3060,7 +3050,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TrainedmodelUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3081,7 +3071,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TrainedmodelUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3101,7 +3091,7 @@ impl<'a, C> TrainedmodelUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TrainedmodelUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-mybusiness4-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/mybusiness4-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/mybusiness4-cli).
 
 # Usage
 
-This documentation was generated from the *My Business* API at revision *0*. The CLI is at version *2.0.0*.
+This documentation was generated from the *My Business* API at revision *0*. The CLI is at version *2.0.3*.
 
 ```bash
 mybusiness4 [options]

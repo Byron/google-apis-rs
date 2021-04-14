@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-tagmanager1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/tagmanager1-cli).
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20210330*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Tag Manager* API at revision *20210330*. The CLI is at version *2.0.3*.
 
 ```bash
 tagmanager1 [options]

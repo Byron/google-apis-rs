@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -123,38 +122,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Area120Tables<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Area120Tables<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Area120Tables<C> {}
+impl<'a, > client::Hub for Area120Tables<> {}
 
-impl<'a, C> Area120Tables<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Area120Tables<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Area120Tables<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Area120Tables<> {
         Area120Tables {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://area120tables.googleapis.com/".to_string(),
             _root_url: "https://area120tables.googleapis.com/".to_string(),
         }
     }
 
-    pub fn tables(&'a self) -> TableMethods<'a, C> {
+    pub fn tables(&'a self) -> TableMethods<'a> {
         TableMethods { hub: &self }
     }
-    pub fn workspaces(&'a self) -> WorkspaceMethods<'a, C> {
+    pub fn workspaces(&'a self) -> WorkspaceMethods<'a> {
         WorkspaceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -592,15 +590,15 @@ impl client::ResponseResult for Workspace {}
 /// let rb = hub.tables();
 /// # }
 /// ```
-pub struct TableMethods<'a, C>
-    where C: 'a {
+pub struct TableMethods<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TableMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TableMethods<'a> {}
 
-impl<'a, C> TableMethods<'a, C> {
+impl<'a> TableMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -610,7 +608,7 @@ impl<'a, C> TableMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent table where the rows will be created. Format: tables/{table}
-    pub fn rows_batch_create(&self, request: BatchCreateRowsRequest, parent: &str) -> TableRowBatchCreateCall<'a, C> {
+    pub fn rows_batch_create(&self, request: BatchCreateRowsRequest, parent: &str) -> TableRowBatchCreateCall<'a> {
         TableRowBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -629,7 +627,7 @@ impl<'a, C> TableMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent table shared by all rows being deleted. Format: tables/{table}
-    pub fn rows_batch_delete(&self, request: BatchDeleteRowsRequest, parent: &str) -> TableRowBatchDeleteCall<'a, C> {
+    pub fn rows_batch_delete(&self, request: BatchDeleteRowsRequest, parent: &str) -> TableRowBatchDeleteCall<'a> {
         TableRowBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -648,7 +646,7 @@ impl<'a, C> TableMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent table shared by all rows being updated. Format: tables/{table}
-    pub fn rows_batch_update(&self, request: BatchUpdateRowsRequest, parent: &str) -> TableRowBatchUpdateCall<'a, C> {
+    pub fn rows_batch_update(&self, request: BatchUpdateRowsRequest, parent: &str) -> TableRowBatchUpdateCall<'a> {
         TableRowBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -667,7 +665,7 @@ impl<'a, C> TableMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent table where this row will be created. Format: tables/{table}
-    pub fn rows_create(&self, request: Row, parent: &str) -> TableRowCreateCall<'a, C> {
+    pub fn rows_create(&self, request: Row, parent: &str) -> TableRowCreateCall<'a> {
         TableRowCreateCall {
             hub: self.hub,
             _request: request,
@@ -686,7 +684,7 @@ impl<'a, C> TableMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the row to delete. Format: tables/{table}/rows/{row}
-    pub fn rows_delete(&self, name: &str) -> TableRowDeleteCall<'a, C> {
+    pub fn rows_delete(&self, name: &str) -> TableRowDeleteCall<'a> {
         TableRowDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -703,7 +701,7 @@ impl<'a, C> TableMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the row to retrieve. Format: tables/{table}/rows/{row}
-    pub fn rows_get(&self, name: &str) -> TableRowGetCall<'a, C> {
+    pub fn rows_get(&self, name: &str) -> TableRowGetCall<'a> {
         TableRowGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -721,7 +719,7 @@ impl<'a, C> TableMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent table. Format: tables/{table}
-    pub fn rows_list(&self, parent: &str) -> TableRowListCall<'a, C> {
+    pub fn rows_list(&self, parent: &str) -> TableRowListCall<'a> {
         TableRowListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -743,7 +741,7 @@ impl<'a, C> TableMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the row. Row names have the form `tables/{table}/rows/{row}`. The name is ignored when creating a row.
-    pub fn rows_patch(&self, request: Row, name: &str) -> TableRowPatchCall<'a, C> {
+    pub fn rows_patch(&self, request: Row, name: &str) -> TableRowPatchCall<'a> {
         TableRowPatchCall {
             hub: self.hub,
             _request: request,
@@ -763,7 +761,7 @@ impl<'a, C> TableMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the table to retrieve. Format: tables/{table}
-    pub fn get(&self, name: &str) -> TableGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> TableGetCall<'a> {
         TableGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -776,7 +774,7 @@ impl<'a, C> TableMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists tables for the user.
-    pub fn list(&self) -> TableListCall<'a, C> {
+    pub fn list(&self) -> TableListCall<'a> {
         TableListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -820,15 +818,15 @@ impl<'a, C> TableMethods<'a, C> {
 /// let rb = hub.workspaces();
 /// # }
 /// ```
-pub struct WorkspaceMethods<'a, C>
-    where C: 'a {
+pub struct WorkspaceMethods<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
 }
 
-impl<'a, C> client::MethodsBuilder for WorkspaceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for WorkspaceMethods<'a> {}
 
-impl<'a, C> WorkspaceMethods<'a, C> {
+impl<'a> WorkspaceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -837,7 +835,7 @@ impl<'a, C> WorkspaceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the workspace to retrieve. Format: workspaces/{workspace}
-    pub fn get(&self, name: &str) -> WorkspaceGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> WorkspaceGetCall<'a> {
         WorkspaceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -850,7 +848,7 @@ impl<'a, C> WorkspaceMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists workspaces for the user.
-    pub fn list(&self) -> WorkspaceListCall<'a, C> {
+    pub fn list(&self) -> WorkspaceListCall<'a> {
         WorkspaceListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -908,10 +906,10 @@ impl<'a, C> WorkspaceMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowBatchCreateCall<'a, C>
-    where C: 'a {
+pub struct TableRowBatchCreateCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _request: BatchCreateRowsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -919,9 +917,9 @@ pub struct TableRowBatchCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowBatchCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowBatchCreateCall<'a> {}
 
-impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowBatchCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -997,8 +995,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1012,7 +1009,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1023,7 +1020,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1082,7 +1079,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchCreateRowsRequest) -> TableRowBatchCreateCall<'a, C> {
+    pub fn request(mut self, new_value: BatchCreateRowsRequest) -> TableRowBatchCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1092,7 +1089,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> TableRowBatchCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TableRowBatchCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1102,7 +1099,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowBatchCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowBatchCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1127,7 +1124,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowBatchCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowBatchCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1147,7 +1144,7 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowBatchCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowBatchCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1197,10 +1194,10 @@ impl<'a, C> TableRowBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowBatchDeleteCall<'a, C>
-    where C: 'a {
+pub struct TableRowBatchDeleteCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _request: BatchDeleteRowsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1208,9 +1205,9 @@ pub struct TableRowBatchDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowBatchDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowBatchDeleteCall<'a> {}
 
-impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowBatchDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1286,8 +1283,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1301,7 +1297,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1312,7 +1308,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1371,7 +1367,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteRowsRequest) -> TableRowBatchDeleteCall<'a, C> {
+    pub fn request(mut self, new_value: BatchDeleteRowsRequest) -> TableRowBatchDeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -1381,7 +1377,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> TableRowBatchDeleteCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TableRowBatchDeleteCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1391,7 +1387,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowBatchDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowBatchDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1416,7 +1412,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowBatchDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowBatchDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1436,7 +1432,7 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowBatchDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowBatchDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1486,10 +1482,10 @@ impl<'a, C> TableRowBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct TableRowBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _request: BatchUpdateRowsRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1497,9 +1493,9 @@ pub struct TableRowBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowBatchUpdateCall<'a> {}
 
-impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1575,8 +1571,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1590,7 +1585,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1601,7 +1596,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1660,7 +1655,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUpdateRowsRequest) -> TableRowBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUpdateRowsRequest) -> TableRowBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1670,7 +1665,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> TableRowBatchUpdateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TableRowBatchUpdateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1680,7 +1675,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1705,7 +1700,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1725,7 +1720,7 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1776,10 +1771,10 @@ impl<'a, C> TableRowBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowCreateCall<'a, C>
-    where C: 'a {
+pub struct TableRowCreateCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _request: Row,
     _parent: String,
     _view: Option<String>,
@@ -1788,9 +1783,9 @@ pub struct TableRowCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowCreateCall<'a> {}
 
-impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1869,8 +1864,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1884,7 +1878,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1895,7 +1889,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1954,7 +1948,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Row) -> TableRowCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Row) -> TableRowCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1964,14 +1958,14 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> TableRowCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TableRowCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowCreateCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> TableRowCreateCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -1981,7 +1975,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2006,7 +2000,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2026,7 +2020,7 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2070,19 +2064,19 @@ impl<'a, C> TableRowCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowDeleteCall<'a, C>
-    where C: 'a {
+pub struct TableRowDeleteCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowDeleteCall<'a> {}
 
-impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2147,8 +2141,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2161,7 +2154,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2170,7 +2163,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2230,7 +2223,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TableRowDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TableRowDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2240,7 +2233,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2265,7 +2258,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2285,7 +2278,7 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2330,10 +2323,10 @@ impl<'a, C> TableRowDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowGetCall<'a, C>
-    where C: 'a {
+pub struct TableRowGetCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _name: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2341,9 +2334,9 @@ pub struct TableRowGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowGetCall<'a> {}
 
-impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2411,8 +2404,7 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2425,7 +2417,7 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2434,7 +2426,7 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2494,14 +2486,14 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TableRowGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TableRowGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowGetCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> TableRowGetCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -2511,7 +2503,7 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2536,7 +2528,7 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2556,7 +2548,7 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2604,10 +2596,10 @@ impl<'a, C> TableRowGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowListCall<'a, C>
-    where C: 'a {
+pub struct TableRowListCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _parent: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -2618,9 +2610,9 @@ pub struct TableRowListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowListCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowListCall<'a> {}
 
-impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2697,8 +2689,7 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2711,7 +2702,7 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2720,7 +2711,7 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2780,35 +2771,35 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> TableRowListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TableRowListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> TableRowListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// A page token, received from a previous `ListRows` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListRows` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TableRowListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TableRowListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of rows to return. The service may return fewer than this value. If unspecified, at most 50 rows are returned. The maximum value is 1,000; values above 1,000 are coerced to 1,000.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TableRowListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> TableRowListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filter to only include resources matching the requirements. For more information, see [Filtering list results](https://support.google.com/area120-tables/answer/10503371).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> TableRowListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> TableRowListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2818,7 +2809,7 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2843,7 +2834,7 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2863,7 +2854,7 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2915,10 +2906,10 @@ impl<'a, C> TableRowListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableRowPatchCall<'a, C>
-    where C: 'a {
+pub struct TableRowPatchCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _request: Row,
     _name: String,
     _view: Option<String>,
@@ -2928,9 +2919,9 @@ pub struct TableRowPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableRowPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for TableRowPatchCall<'a> {}
 
-impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableRowPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3012,8 +3003,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3027,7 +3017,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3038,7 +3028,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3097,7 +3087,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Row) -> TableRowPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Row) -> TableRowPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -3107,21 +3097,21 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TableRowPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TableRowPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Optional. Column key to use for values in the row. Defaults to user entered name.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> TableRowPatchCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> TableRowPatchCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The list of fields to update.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> TableRowPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> TableRowPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3131,7 +3121,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableRowPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3156,7 +3146,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableRowPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableRowPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3176,7 +3166,7 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRowPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3220,19 +3210,19 @@ impl<'a, C> TableRowPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableGetCall<'a, C>
-    where C: 'a {
+pub struct TableGetCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TableGetCall<'a> {}
 
-impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3297,8 +3287,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3311,7 +3300,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3320,7 +3309,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3380,7 +3369,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> TableGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> TableGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3390,7 +3379,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3415,7 +3404,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3435,7 +3424,7 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3481,10 +3470,10 @@ impl<'a, C> TableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TableListCall<'a, C>
-    where C: 'a {
+pub struct TableListCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3492,9 +3481,9 @@ pub struct TableListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TableListCall<'a, C> {}
+impl<'a> client::CallBuilder for TableListCall<'a> {}
 
-impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TableListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3539,8 +3528,7 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3553,7 +3541,7 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3562,7 +3550,7 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3619,14 +3607,14 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// A page token, received from a previous `ListTables` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListTables` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TableListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of tables to return. The service may return fewer than this value. If unspecified, at most 20 tables are returned. The maximum value is 100; values above 100 are coerced to 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> TableListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> TableListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3636,7 +3624,7 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TableListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3661,7 +3649,7 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3681,7 +3669,7 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TableListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3725,19 +3713,19 @@ impl<'a, C> TableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WorkspaceGetCall<'a, C>
-    where C: 'a {
+pub struct WorkspaceGetCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WorkspaceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for WorkspaceGetCall<'a> {}
 
-impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WorkspaceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3802,8 +3790,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3816,7 +3803,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3825,7 +3812,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3885,7 +3872,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> WorkspaceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> WorkspaceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3895,7 +3882,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WorkspaceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WorkspaceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3920,7 +3907,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WorkspaceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WorkspaceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3940,7 +3927,7 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WorkspaceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WorkspaceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3986,10 +3973,10 @@ impl<'a, C> WorkspaceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct WorkspaceListCall<'a, C>
-    where C: 'a {
+pub struct WorkspaceListCall<'a>
+    where  {
 
-    hub: &'a Area120Tables<C>,
+    hub: &'a Area120Tables<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3997,9 +3984,9 @@ pub struct WorkspaceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for WorkspaceListCall<'a, C> {}
+impl<'a> client::CallBuilder for WorkspaceListCall<'a> {}
 
-impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> WorkspaceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4044,8 +4031,7 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4058,7 +4044,7 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4067,7 +4053,7 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4124,14 +4110,14 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// A page token, received from a previous `ListWorkspaces` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListWorkspaces` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> WorkspaceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> WorkspaceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of workspaces to return. The service may return fewer than this value. If unspecified, at most 10 workspaces are returned. The maximum value is 25; values above 25 are coerced to 25.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> WorkspaceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> WorkspaceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4141,7 +4127,7 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WorkspaceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> WorkspaceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4166,7 +4152,7 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> WorkspaceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> WorkspaceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4186,7 +4172,7 @@ impl<'a, C> WorkspaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> WorkspaceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> WorkspaceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

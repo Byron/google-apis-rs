@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-workflowexecutions1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/workflowexecutions1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/workflowexecutions1-cli).
 
 # Usage
 
-This documentation was generated from the *Workflow Executions* API at revision *20210316*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Workflow Executions* API at revision *20210316*. The CLI is at version *2.0.3*.
 
 ```bash
 workflowexecutions1 [options]

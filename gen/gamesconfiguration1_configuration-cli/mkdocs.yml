@@ -1,8 +1,8 @@
-site_name: Games Configuration v2.0.0+20210325
+site_name: Games Configuration v2.0.3+20210325
 site_url: http://byron.github.io/google-apis-rs/google-gamesconfiguration1_configuration-cli
 site_description: A complete library to interact with Games Configuration (protocol v1configuration)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/gamesconfiguration1_configuration-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/gamesconfiguration1_configuration-cli
 
 docs_dir: docs
 site_dir: build_html

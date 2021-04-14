@@ -1,8 +1,8 @@
-site_name: Cloud Memorystore for Memcached v2.0.0+20210324
+site_name: Cloud Memorystore for Memcached v2.0.3+20210324
 site_url: http://byron.github.io/google-apis-rs/google-memcache1_beta2-cli
 site_description: A complete library to interact with Cloud Memorystore for Memcached (protocol v1beta2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/memcache1_beta2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/memcache1_beta2-cli
 
 docs_dir: docs
 site_dir: build_html

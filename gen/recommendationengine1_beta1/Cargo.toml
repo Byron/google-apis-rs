@@ -4,12 +4,12 @@
 [package]
 
 name = "google-recommendationengine1_beta1"
-version = "2.0.0+20210319"
+version = "2.0.3+20210319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Recommendations AI (protocol v1beta1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/recommendationengine1_beta1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/recommendationengine1_beta1"
 homepage = "https://cloud.google.com/recommendations-ai/docs"
-documentation = "https://docs.rs/google-recommendationengine1_beta1/2.0.0+20210319"
+documentation = "https://docs.rs/google-recommendationengine1_beta1/2.0.3+20210319"
 license = "MIT"
 keywords = ["recommendationengine", "google", "protocol", "web", "api"]
 autobins = false

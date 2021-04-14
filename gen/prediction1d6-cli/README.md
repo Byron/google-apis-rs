@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-prediction1d6-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/prediction1d6-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/prediction1d6-cli).
 
 # Usage
 
-This documentation was generated from the *prediction* API at revision *20160511*. The CLI is at version *2.0.0*.
+This documentation was generated from the *prediction* API at revision *20160511*. The CLI is at version *2.0.3*.
 
 ```bash
 prediction1d6 [options]

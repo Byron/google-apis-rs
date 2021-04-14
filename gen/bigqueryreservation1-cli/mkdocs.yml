@@ -1,8 +1,8 @@
-site_name: BigQuery Reservation v2.0.0+20210324
+site_name: BigQuery Reservation v2.0.3+20210324
 site_url: http://byron.github.io/google-apis-rs/google-bigqueryreservation1-cli
 site_description: A complete library to interact with BigQuery Reservation (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/bigqueryreservation1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigqueryreservation1-cli
 
 docs_dir: docs
 site_dir: build_html

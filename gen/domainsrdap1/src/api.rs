@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -77,50 +76,49 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct DomainsRDAP<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct DomainsRDAP<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for DomainsRDAP<C> {}
+impl<'a, > client::Hub for DomainsRDAP<> {}
 
-impl<'a, C> DomainsRDAP<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > DomainsRDAP<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DomainsRDAP<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> DomainsRDAP<> {
         DomainsRDAP {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://domainsrdap.googleapis.com/".to_string(),
             _root_url: "https://domainsrdap.googleapis.com/".to_string(),
         }
     }
 
-    pub fn autnum(&'a self) -> AutnumMethods<'a, C> {
+    pub fn autnum(&'a self) -> AutnumMethods<'a> {
         AutnumMethods { hub: &self }
     }
-    pub fn domain(&'a self) -> DomainMethods<'a, C> {
+    pub fn domain(&'a self) -> DomainMethods<'a> {
         DomainMethods { hub: &self }
     }
-    pub fn entity(&'a self) -> EntityMethods<'a, C> {
+    pub fn entity(&'a self) -> EntityMethods<'a> {
         EntityMethods { hub: &self }
     }
-    pub fn ip(&'a self) -> IpMethods<'a, C> {
+    pub fn ip(&'a self) -> IpMethods<'a> {
         IpMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
-    pub fn nameserver(&'a self) -> NameserverMethods<'a, C> {
+    pub fn nameserver(&'a self) -> NameserverMethods<'a> {
         NameserverMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -293,15 +291,15 @@ impl client::ResponseResult for RdapResponse {}
 /// let rb = hub.autnum();
 /// # }
 /// ```
-pub struct AutnumMethods<'a, C>
-    where C: 'a {
+pub struct AutnumMethods<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AutnumMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AutnumMethods<'a> {}
 
-impl<'a, C> AutnumMethods<'a, C> {
+impl<'a> AutnumMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -310,7 +308,7 @@ impl<'a, C> AutnumMethods<'a, C> {
     /// # Arguments
     ///
     /// * `autnumId` - No description provided.
-    pub fn get(&self, autnum_id: &str) -> AutnumGetCall<'a, C> {
+    pub fn get(&self, autnum_id: &str) -> AutnumGetCall<'a> {
         AutnumGetCall {
             hub: self.hub,
             _autnum_id: autnum_id.to_string(),
@@ -352,15 +350,15 @@ impl<'a, C> AutnumMethods<'a, C> {
 /// let rb = hub.domain();
 /// # }
 /// ```
-pub struct DomainMethods<'a, C>
-    where C: 'a {
+pub struct DomainMethods<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DomainMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DomainMethods<'a> {}
 
-impl<'a, C> DomainMethods<'a, C> {
+impl<'a> DomainMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -369,7 +367,7 @@ impl<'a, C> DomainMethods<'a, C> {
     /// # Arguments
     ///
     /// * `domainName` - Full domain name to look up. Example: "example.com"
-    pub fn get(&self, domain_name: &str) -> DomainGetCall<'a, C> {
+    pub fn get(&self, domain_name: &str) -> DomainGetCall<'a> {
         DomainGetCall {
             hub: self.hub,
             _domain_name: domain_name.to_string(),
@@ -411,15 +409,15 @@ impl<'a, C> DomainMethods<'a, C> {
 /// let rb = hub.entity();
 /// # }
 /// ```
-pub struct EntityMethods<'a, C>
-    where C: 'a {
+pub struct EntityMethods<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
 }
 
-impl<'a, C> client::MethodsBuilder for EntityMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for EntityMethods<'a> {}
 
-impl<'a, C> EntityMethods<'a, C> {
+impl<'a> EntityMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -428,7 +426,7 @@ impl<'a, C> EntityMethods<'a, C> {
     /// # Arguments
     ///
     /// * `entityId` - No description provided.
-    pub fn get(&self, entity_id: &str) -> EntityGetCall<'a, C> {
+    pub fn get(&self, entity_id: &str) -> EntityGetCall<'a> {
         EntityGetCall {
             hub: self.hub,
             _entity_id: entity_id.to_string(),
@@ -470,15 +468,15 @@ impl<'a, C> EntityMethods<'a, C> {
 /// let rb = hub.ip();
 /// # }
 /// ```
-pub struct IpMethods<'a, C>
-    where C: 'a {
+pub struct IpMethods<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
 }
 
-impl<'a, C> client::MethodsBuilder for IpMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for IpMethods<'a> {}
 
-impl<'a, C> IpMethods<'a, C> {
+impl<'a> IpMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -488,7 +486,7 @@ impl<'a, C> IpMethods<'a, C> {
     ///
     /// * `ipId` - No description provided.
     /// * `ipId1` - No description provided.
-    pub fn get(&self, ip_id: &str, ip_id1: &str) -> IpGetCall<'a, C> {
+    pub fn get(&self, ip_id: &str, ip_id1: &str) -> IpGetCall<'a> {
         IpGetCall {
             hub: self.hub,
             _ip_id: ip_id.to_string(),
@@ -531,15 +529,15 @@ impl<'a, C> IpMethods<'a, C> {
 /// let rb = hub.nameserver();
 /// # }
 /// ```
-pub struct NameserverMethods<'a, C>
-    where C: 'a {
+pub struct NameserverMethods<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
 }
 
-impl<'a, C> client::MethodsBuilder for NameserverMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for NameserverMethods<'a> {}
 
-impl<'a, C> NameserverMethods<'a, C> {
+impl<'a> NameserverMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -548,7 +546,7 @@ impl<'a, C> NameserverMethods<'a, C> {
     /// # Arguments
     ///
     /// * `nameserverId` - No description provided.
-    pub fn get(&self, nameserver_id: &str) -> NameserverGetCall<'a, C> {
+    pub fn get(&self, nameserver_id: &str) -> NameserverGetCall<'a> {
         NameserverGetCall {
             hub: self.hub,
             _nameserver_id: nameserver_id.to_string(),
@@ -590,20 +588,20 @@ impl<'a, C> NameserverMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_domains(&self) -> MethodGetDomainCall<'a, C> {
+    pub fn get_domains(&self) -> MethodGetDomainCall<'a> {
         MethodGetDomainCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -614,7 +612,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_entities(&self) -> MethodGetEntityCall<'a, C> {
+    pub fn get_entities(&self) -> MethodGetEntityCall<'a> {
         MethodGetEntityCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -625,7 +623,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get help information for the RDAP API, including links to documentation.
-    pub fn get_help(&self) -> MethodGetHelpCall<'a, C> {
+    pub fn get_help(&self) -> MethodGetHelpCall<'a> {
         MethodGetHelpCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -636,7 +634,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_ip(&self) -> MethodGetIpCall<'a, C> {
+    pub fn get_ip(&self) -> MethodGetIpCall<'a> {
         MethodGetIpCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -647,7 +645,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// The RDAP API recognizes this command from the RDAP specification but does not support it. The response is a formatted 501 error.
-    pub fn get_nameservers(&self) -> MethodGetNameserverCall<'a, C> {
+    pub fn get_nameservers(&self) -> MethodGetNameserverCall<'a> {
         MethodGetNameserverCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -696,18 +694,18 @@ impl<'a, C> MethodMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutnumGetCall<'a, C>
-    where C: 'a {
+pub struct AutnumGetCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _autnum_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AutnumGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AutnumGetCall<'a> {}
 
-impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutnumGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -775,7 +773,7 @@ impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -784,7 +782,7 @@ impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -843,7 +841,7 @@ impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn autnum_id(mut self, new_value: &str) -> AutnumGetCall<'a, C> {
+    pub fn autnum_id(mut self, new_value: &str) -> AutnumGetCall<'a> {
         self._autnum_id = new_value.to_string();
         self
     }
@@ -853,7 +851,7 @@ impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutnumGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutnumGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -878,7 +876,7 @@ impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AutnumGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutnumGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -919,18 +917,18 @@ impl<'a, C> AutnumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DomainGetCall<'a, C>
-    where C: 'a {
+pub struct DomainGetCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _domain_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for DomainGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DomainGetCall<'a> {}
 
-impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DomainGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1002,7 +1000,7 @@ impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1011,7 +1009,7 @@ impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1071,7 +1069,7 @@ impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn domain_name(mut self, new_value: &str) -> DomainGetCall<'a, C> {
+    pub fn domain_name(mut self, new_value: &str) -> DomainGetCall<'a> {
         self._domain_name = new_value.to_string();
         self
     }
@@ -1081,7 +1079,7 @@ impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DomainGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1106,7 +1104,7 @@ impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DomainGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DomainGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1147,18 +1145,18 @@ impl<'a, C> DomainGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EntityGetCall<'a, C>
-    where C: 'a {
+pub struct EntityGetCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _entity_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for EntityGetCall<'a, C> {}
+impl<'a> client::CallBuilder for EntityGetCall<'a> {}
 
-impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EntityGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1226,7 +1224,7 @@ impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1235,7 +1233,7 @@ impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1294,7 +1292,7 @@ impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn entity_id(mut self, new_value: &str) -> EntityGetCall<'a, C> {
+    pub fn entity_id(mut self, new_value: &str) -> EntityGetCall<'a> {
         self._entity_id = new_value.to_string();
         self
     }
@@ -1304,7 +1302,7 @@ impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntityGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EntityGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1329,7 +1327,7 @@ impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EntityGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EntityGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1370,19 +1368,19 @@ impl<'a, C> EntityGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct IpGetCall<'a, C>
-    where C: 'a {
+pub struct IpGetCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _ip_id: String,
     _ip_id1: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for IpGetCall<'a, C> {}
+impl<'a> client::CallBuilder for IpGetCall<'a> {}
 
-impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> IpGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1451,7 +1449,7 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1460,7 +1458,7 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1519,7 +1517,7 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ip_id(mut self, new_value: &str) -> IpGetCall<'a, C> {
+    pub fn ip_id(mut self, new_value: &str) -> IpGetCall<'a> {
         self._ip_id = new_value.to_string();
         self
     }
@@ -1528,7 +1526,7 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn ip_id1(mut self, new_value: &str) -> IpGetCall<'a, C> {
+    pub fn ip_id1(mut self, new_value: &str) -> IpGetCall<'a> {
         self._ip_id1 = new_value.to_string();
         self
     }
@@ -1538,7 +1536,7 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> IpGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> IpGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1563,7 +1561,7 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> IpGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> IpGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1604,18 +1602,18 @@ impl<'a, C> IpGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Http
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NameserverGetCall<'a, C>
-    where C: 'a {
+pub struct NameserverGetCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _nameserver_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for NameserverGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NameserverGetCall<'a> {}
 
-impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NameserverGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1683,7 +1681,7 @@ impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1692,7 +1690,7 @@ impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1751,7 +1749,7 @@ impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn nameserver_id(mut self, new_value: &str) -> NameserverGetCall<'a, C> {
+    pub fn nameserver_id(mut self, new_value: &str) -> NameserverGetCall<'a> {
         self._nameserver_id = new_value.to_string();
         self
     }
@@ -1761,7 +1759,7 @@ impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NameserverGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NameserverGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1786,7 +1784,7 @@ impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NameserverGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NameserverGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1827,17 +1825,17 @@ impl<'a, C> NameserverGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetDomainCall<'a, C>
-    where C: 'a {
+pub struct MethodGetDomainCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodGetDomainCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetDomainCall<'a> {}
 
-impl<'a, C> MethodGetDomainCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetDomainCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1883,7 +1881,7 @@ impl<'a, C> MethodGetDomainCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1892,7 +1890,7 @@ impl<'a, C> MethodGetDomainCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1952,7 +1950,7 @@ impl<'a, C> MethodGetDomainCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetDomainCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetDomainCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1977,7 +1975,7 @@ impl<'a, C> MethodGetDomainCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetDomainCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetDomainCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2018,17 +2016,17 @@ impl<'a, C> MethodGetDomainCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetEntityCall<'a, C>
-    where C: 'a {
+pub struct MethodGetEntityCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodGetEntityCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetEntityCall<'a> {}
 
-impl<'a, C> MethodGetEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetEntityCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2074,7 +2072,7 @@ impl<'a, C> MethodGetEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2083,7 +2081,7 @@ impl<'a, C> MethodGetEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2143,7 +2141,7 @@ impl<'a, C> MethodGetEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEntityCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEntityCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2168,7 +2166,7 @@ impl<'a, C> MethodGetEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEntityCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEntityCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2209,17 +2207,17 @@ impl<'a, C> MethodGetEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetHelpCall<'a, C>
-    where C: 'a {
+pub struct MethodGetHelpCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodGetHelpCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetHelpCall<'a> {}
 
-impl<'a, C> MethodGetHelpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetHelpCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2265,7 +2263,7 @@ impl<'a, C> MethodGetHelpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2274,7 +2272,7 @@ impl<'a, C> MethodGetHelpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2334,7 +2332,7 @@ impl<'a, C> MethodGetHelpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetHelpCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetHelpCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2359,7 +2357,7 @@ impl<'a, C> MethodGetHelpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetHelpCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetHelpCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2400,17 +2398,17 @@ impl<'a, C> MethodGetHelpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetIpCall<'a, C>
-    where C: 'a {
+pub struct MethodGetIpCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodGetIpCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetIpCall<'a> {}
 
-impl<'a, C> MethodGetIpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetIpCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2456,7 +2454,7 @@ impl<'a, C> MethodGetIpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2465,7 +2463,7 @@ impl<'a, C> MethodGetIpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2525,7 +2523,7 @@ impl<'a, C> MethodGetIpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIpCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetIpCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2550,7 +2548,7 @@ impl<'a, C> MethodGetIpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIpCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetIpCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2591,17 +2589,17 @@ impl<'a, C> MethodGetIpCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetNameserverCall<'a, C>
-    where C: 'a {
+pub struct MethodGetNameserverCall<'a>
+    where  {
 
-    hub: &'a DomainsRDAP<C>,
+    hub: &'a DomainsRDAP<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodGetNameserverCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetNameserverCall<'a> {}
 
-impl<'a, C> MethodGetNameserverCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetNameserverCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2647,7 +2645,7 @@ impl<'a, C> MethodGetNameserverCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2656,7 +2654,7 @@ impl<'a, C> MethodGetNameserverCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2716,7 +2714,7 @@ impl<'a, C> MethodGetNameserverCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetNameserverCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetNameserverCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2741,7 +2739,7 @@ impl<'a, C> MethodGetNameserverCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetNameserverCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetNameserverCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Security Token* crate version *2.0.0+20210326*, where *20210326* is the exact revision of the *sts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Cloud Security Token* crate version *2.0.3+20210326*, where *20210326* is the exact revision of the *sts:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Cloud Security Token* *v1* API can be found at the
 //! [official documentation site](http://cloud.google.com/iam/docs/workload-identity-federation).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/sts1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/sts1).
 //! # Features
 //! 
 //! Use the following functionality with ease from the central [hub](CloudSecurityToken) ... 

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -117,41 +116,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GoogleAnalyticsAdmin<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct GoogleAnalyticsAdmin<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for GoogleAnalyticsAdmin<C> {}
+impl<'a, > client::Hub for GoogleAnalyticsAdmin<> {}
 
-impl<'a, C> GoogleAnalyticsAdmin<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > GoogleAnalyticsAdmin<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GoogleAnalyticsAdmin<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GoogleAnalyticsAdmin<> {
         GoogleAnalyticsAdmin {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://analyticsadmin.googleapis.com/".to_string(),
             _root_url: "https://analyticsadmin.googleapis.com/".to_string(),
         }
     }
 
-    pub fn account_summaries(&'a self) -> AccountSummaryMethods<'a, C> {
+    pub fn account_summaries(&'a self) -> AccountSummaryMethods<'a> {
         AccountSummaryMethods { hub: &self }
     }
-    pub fn accounts(&'a self) -> AccountMethods<'a, C> {
+    pub fn accounts(&'a self) -> AccountMethods<'a> {
         AccountMethods { hub: &self }
     }
-    pub fn properties(&'a self) -> PropertyMethods<'a, C> {
+    pub fn properties(&'a self) -> PropertyMethods<'a> {
         PropertyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1275,20 +1273,20 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 /// let rb = hub.account_summaries();
 /// # }
 /// ```
-pub struct AccountSummaryMethods<'a, C>
-    where C: 'a {
+pub struct AccountSummaryMethods<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AccountSummaryMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AccountSummaryMethods<'a> {}
 
-impl<'a, C> AccountSummaryMethods<'a, C> {
+impl<'a> AccountSummaryMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns summaries of all accounts accessible by the caller.
-    pub fn list(&self) -> AccountSummaryListCall<'a, C> {
+    pub fn list(&self) -> AccountSummaryListCall<'a> {
         AccountSummaryListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1332,15 +1330,15 @@ impl<'a, C> AccountSummaryMethods<'a, C> {
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a, C>
-    where C: 'a {
+pub struct AccountMethods<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AccountMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
 
-impl<'a, C> AccountMethods<'a, C> {
+impl<'a> AccountMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1350,7 +1348,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> AccountUserLinkAuditCall<'a, C> {
+    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> AccountUserLinkAuditCall<'a> {
         AccountUserLinkAuditCall {
             hub: self.hub,
             _request: request,
@@ -1369,7 +1367,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. This field is required. The parent field in the CreateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> AccountUserLinkBatchCreateCall<'a, C> {
+    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> AccountUserLinkBatchCreateCall<'a> {
         AccountUserLinkBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -1388,7 +1386,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all values for user link names to delete must match this field. Example format: accounts/1234
-    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> AccountUserLinkBatchDeleteCall<'a, C> {
+    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> AccountUserLinkBatchDeleteCall<'a> {
         AccountUserLinkBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -1406,7 +1404,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all provided values for the 'names' field must match this field. Example format: accounts/1234
-    pub fn user_links_batch_get(&self, parent: &str) -> AccountUserLinkBatchGetCall<'a, C> {
+    pub fn user_links_batch_get(&self, parent: &str) -> AccountUserLinkBatchGetCall<'a> {
         AccountUserLinkBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1425,7 +1423,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent field in the UpdateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> AccountUserLinkBatchUpdateCall<'a, C> {
+    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> AccountUserLinkBatchUpdateCall<'a> {
         AccountUserLinkBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1444,7 +1442,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> AccountUserLinkCreateCall<'a, C> {
+    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> AccountUserLinkCreateCall<'a> {
         AccountUserLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -1463,7 +1461,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_delete(&self, name: &str) -> AccountUserLinkDeleteCall<'a, C> {
+    pub fn user_links_delete(&self, name: &str) -> AccountUserLinkDeleteCall<'a> {
         AccountUserLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1480,7 +1478,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_get(&self, name: &str) -> AccountUserLinkGetCall<'a, C> {
+    pub fn user_links_get(&self, name: &str) -> AccountUserLinkGetCall<'a> {
         AccountUserLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1497,7 +1495,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_list(&self, parent: &str) -> AccountUserLinkListCall<'a, C> {
+    pub fn user_links_list(&self, parent: &str) -> AccountUserLinkListCall<'a> {
         AccountUserLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1517,7 +1515,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Example format: properties/1234/userLinks/5678
-    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> AccountUserLinkPatchCall<'a, C> {
+    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> AccountUserLinkPatchCall<'a> {
         AccountUserLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -1535,7 +1533,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Account to soft-delete. Format: accounts/{account} Example: "accounts/100"
-    pub fn delete(&self, name: &str) -> AccountDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> AccountDeleteCall<'a> {
         AccountDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1552,7 +1550,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the account to lookup. Format: accounts/{account} Example: "accounts/100"
-    pub fn get(&self, name: &str) -> AccountGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> AccountGetCall<'a> {
         AccountGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1569,7 +1567,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the settings to lookup. Format: accounts/{account}/dataSharingSettings Example: "accounts/1000/dataSharingSettings"
-    pub fn get_data_sharing_settings(&self, name: &str) -> AccountGetDataSharingSettingCall<'a, C> {
+    pub fn get_data_sharing_settings(&self, name: &str) -> AccountGetDataSharingSettingCall<'a> {
         AccountGetDataSharingSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1582,7 +1580,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all accounts accessible by the caller. Note that these accounts might not currently have GA4 properties. Soft-deleted (ie: "trashed") accounts are excluded by default. Returns an empty list if no relevant accounts are found.
-    pub fn list(&self) -> AccountListCall<'a, C> {
+    pub fn list(&self) -> AccountListCall<'a> {
         AccountListCall {
             hub: self.hub,
             _show_deleted: Default::default(),
@@ -1602,7 +1600,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this account. Format: accounts/{account} Example: "accounts/100"
-    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaAccount, name: &str) -> AccountPatchCall<'a, C> {
+    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaAccount, name: &str) -> AccountPatchCall<'a> {
         AccountPatchCall {
             hub: self.hub,
             _request: request,
@@ -1621,7 +1619,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn provision_account_ticket(&self, request: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a, C> {
+    pub fn provision_account_ticket(&self, request: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a> {
         AccountProvisionAccountTicketCall {
             hub: self.hub,
             _request: request,
@@ -1639,7 +1637,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `account` - Required. The account resource for which to return change history resources.
-    pub fn search_change_history_events(&self, request: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest, account: &str) -> AccountSearchChangeHistoryEventCall<'a, C> {
+    pub fn search_change_history_events(&self, request: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest, account: &str) -> AccountSearchChangeHistoryEventCall<'a> {
         AccountSearchChangeHistoryEventCall {
             hub: self.hub,
             _request: request,
@@ -1683,15 +1681,15 @@ impl<'a, C> AccountMethods<'a, C> {
 /// let rb = hub.properties();
 /// # }
 /// ```
-pub struct PropertyMethods<'a, C>
-    where C: 'a {
+pub struct PropertyMethods<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PropertyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PropertyMethods<'a> {}
 
-impl<'a, C> PropertyMethods<'a, C> {
+impl<'a> PropertyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1701,7 +1699,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this android app data stream will be created. Format: properties/123
-    pub fn android_app_data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaAndroidAppDataStream, parent: &str) -> PropertyAndroidAppDataStreamCreateCall<'a, C> {
+    pub fn android_app_data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaAndroidAppDataStream, parent: &str) -> PropertyAndroidAppDataStreamCreateCall<'a> {
         PropertyAndroidAppDataStreamCreateCall {
             hub: self.hub,
             _request: request,
@@ -1719,7 +1717,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the android app data stream to delete. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: "properties/123/androidAppDataStreams/456"
-    pub fn android_app_data_streams_delete(&self, name: &str) -> PropertyAndroidAppDataStreamDeleteCall<'a, C> {
+    pub fn android_app_data_streams_delete(&self, name: &str) -> PropertyAndroidAppDataStreamDeleteCall<'a> {
         PropertyAndroidAppDataStreamDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1736,7 +1734,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the android app data stream to lookup. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: "properties/123/androidAppDataStreams/456"
-    pub fn android_app_data_streams_get(&self, name: &str) -> PropertyAndroidAppDataStreamGetCall<'a, C> {
+    pub fn android_app_data_streams_get(&self, name: &str) -> PropertyAndroidAppDataStreamGetCall<'a> {
         PropertyAndroidAppDataStreamGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1753,7 +1751,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent property. For example, to limit results to app streams under the property with Id 123: "properties/123"
-    pub fn android_app_data_streams_list(&self, parent: &str) -> PropertyAndroidAppDataStreamListCall<'a, C> {
+    pub fn android_app_data_streams_list(&self, parent: &str) -> PropertyAndroidAppDataStreamListCall<'a> {
         PropertyAndroidAppDataStreamListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1773,7 +1771,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this Data Stream. Format: properties/{property_id}/androidAppDataStreams/{stream_id} Example: "properties/1000/androidAppDataStreams/2000"
-    pub fn android_app_data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaAndroidAppDataStream, name: &str) -> PropertyAndroidAppDataStreamPatchCall<'a, C> {
+    pub fn android_app_data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaAndroidAppDataStream, name: &str) -> PropertyAndroidAppDataStreamPatchCall<'a> {
         PropertyAndroidAppDataStreamPatchCall {
             hub: self.hub,
             _request: request,
@@ -1793,7 +1791,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Format: properties/{property_id} Example: properties/1234
-    pub fn firebase_links_create(&self, request: GoogleAnalyticsAdminV1alphaFirebaseLink, parent: &str) -> PropertyFirebaseLinkCreateCall<'a, C> {
+    pub fn firebase_links_create(&self, request: GoogleAnalyticsAdminV1alphaFirebaseLink, parent: &str) -> PropertyFirebaseLinkCreateCall<'a> {
         PropertyFirebaseLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -1811,7 +1809,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Format: properties/{property_id}/firebaseLinks/{firebase_link_id} Example: properties/1234/firebaseLinks/5678
-    pub fn firebase_links_delete(&self, name: &str) -> PropertyFirebaseLinkDeleteCall<'a, C> {
+    pub fn firebase_links_delete(&self, name: &str) -> PropertyFirebaseLinkDeleteCall<'a> {
         PropertyFirebaseLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1828,7 +1826,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. Format: properties/{property_id} Example: properties/1234
-    pub fn firebase_links_list(&self, parent: &str) -> PropertyFirebaseLinkListCall<'a, C> {
+    pub fn firebase_links_list(&self, parent: &str) -> PropertyFirebaseLinkListCall<'a> {
         PropertyFirebaseLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1848,7 +1846,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Example format: properties/1234/firebaseLinks/5678
-    pub fn firebase_links_patch(&self, request: GoogleAnalyticsAdminV1alphaFirebaseLink, name: &str) -> PropertyFirebaseLinkPatchCall<'a, C> {
+    pub fn firebase_links_patch(&self, request: GoogleAnalyticsAdminV1alphaFirebaseLink, name: &str) -> PropertyFirebaseLinkPatchCall<'a> {
         PropertyFirebaseLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -1868,7 +1866,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: properties/1234
-    pub fn google_ads_links_create(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, parent: &str) -> PropertyGoogleAdsLinkCreateCall<'a, C> {
+    pub fn google_ads_links_create(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, parent: &str) -> PropertyGoogleAdsLinkCreateCall<'a> {
         PropertyGoogleAdsLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -1886,7 +1884,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: properties/1234/googleAdsLinks/5678
-    pub fn google_ads_links_delete(&self, name: &str) -> PropertyGoogleAdsLinkDeleteCall<'a, C> {
+    pub fn google_ads_links_delete(&self, name: &str) -> PropertyGoogleAdsLinkDeleteCall<'a> {
         PropertyGoogleAdsLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1903,7 +1901,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: properties/1234
-    pub fn google_ads_links_list(&self, parent: &str) -> PropertyGoogleAdsLinkListCall<'a, C> {
+    pub fn google_ads_links_list(&self, parent: &str) -> PropertyGoogleAdsLinkListCall<'a> {
         PropertyGoogleAdsLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1923,7 +1921,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Format: properties/{propertyId}/googleAdsLinks/{googleAdsLinkId} Note: googleAdsLinkId is not the Google Ads customer ID.
-    pub fn google_ads_links_patch(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, name: &str) -> PropertyGoogleAdsLinkPatchCall<'a, C> {
+    pub fn google_ads_links_patch(&self, request: GoogleAnalyticsAdminV1alphaGoogleAdsLink, name: &str) -> PropertyGoogleAdsLinkPatchCall<'a> {
         PropertyGoogleAdsLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -1943,7 +1941,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this ios app data stream will be created. Format: properties/123
-    pub fn ios_app_data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaIosAppDataStream, parent: &str) -> PropertyIosAppDataStreamCreateCall<'a, C> {
+    pub fn ios_app_data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaIosAppDataStream, parent: &str) -> PropertyIosAppDataStreamCreateCall<'a> {
         PropertyIosAppDataStreamCreateCall {
             hub: self.hub,
             _request: request,
@@ -1961,7 +1959,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the iOS app data stream to delete. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: "properties/123/iosAppDataStreams/456"
-    pub fn ios_app_data_streams_delete(&self, name: &str) -> PropertyIosAppDataStreamDeleteCall<'a, C> {
+    pub fn ios_app_data_streams_delete(&self, name: &str) -> PropertyIosAppDataStreamDeleteCall<'a> {
         PropertyIosAppDataStreamDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1978,7 +1976,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the iOS app data stream to lookup. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: "properties/123/iosAppDataStreams/456"
-    pub fn ios_app_data_streams_get(&self, name: &str) -> PropertyIosAppDataStreamGetCall<'a, C> {
+    pub fn ios_app_data_streams_get(&self, name: &str) -> PropertyIosAppDataStreamGetCall<'a> {
         PropertyIosAppDataStreamGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1995,7 +1993,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent property. For example, to list results of app streams under the property with Id 123: "properties/123"
-    pub fn ios_app_data_streams_list(&self, parent: &str) -> PropertyIosAppDataStreamListCall<'a, C> {
+    pub fn ios_app_data_streams_list(&self, parent: &str) -> PropertyIosAppDataStreamListCall<'a> {
         PropertyIosAppDataStreamListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2015,7 +2013,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this Data Stream. Format: properties/{property_id}/iosAppDataStreams/{stream_id} Example: "properties/1000/iosAppDataStreams/2000"
-    pub fn ios_app_data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaIosAppDataStream, name: &str) -> PropertyIosAppDataStreamPatchCall<'a, C> {
+    pub fn ios_app_data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaIosAppDataStream, name: &str) -> PropertyIosAppDataStreamPatchCall<'a> {
         PropertyIosAppDataStreamPatchCall {
             hub: self.hub,
             _request: request,
@@ -2035,7 +2033,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> PropertyUserLinkAuditCall<'a, C> {
+    pub fn user_links_audit(&self, request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest, parent: &str) -> PropertyUserLinkAuditCall<'a> {
         PropertyUserLinkAuditCall {
             hub: self.hub,
             _request: request,
@@ -2054,7 +2052,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. This field is required. The parent field in the CreateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchCreateCall<'a, C> {
+    pub fn user_links_batch_create(&self, request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchCreateCall<'a> {
         PropertyUserLinkBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -2073,7 +2071,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all values for user link names to delete must match this field. Example format: accounts/1234
-    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> PropertyUserLinkBatchDeleteCall<'a, C> {
+    pub fn user_links_batch_delete(&self, request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest, parent: &str) -> PropertyUserLinkBatchDeleteCall<'a> {
         PropertyUserLinkBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -2091,7 +2089,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent of all provided values for the 'names' field must match this field. Example format: accounts/1234
-    pub fn user_links_batch_get(&self, parent: &str) -> PropertyUserLinkBatchGetCall<'a, C> {
+    pub fn user_links_batch_get(&self, parent: &str) -> PropertyUserLinkBatchGetCall<'a> {
         PropertyUserLinkBatchGetCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2110,7 +2108,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The account or property that all user links in the request are for. The parent field in the UpdateUserLinkRequest messages must either be empty or match this field. Example format: accounts/1234
-    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchUpdateCall<'a, C> {
+    pub fn user_links_batch_update(&self, request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest, parent: &str) -> PropertyUserLinkBatchUpdateCall<'a> {
         PropertyUserLinkBatchUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2129,7 +2127,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> PropertyUserLinkCreateCall<'a, C> {
+    pub fn user_links_create(&self, request: GoogleAnalyticsAdminV1alphaUserLink, parent: &str) -> PropertyUserLinkCreateCall<'a> {
         PropertyUserLinkCreateCall {
             hub: self.hub,
             _request: request,
@@ -2148,7 +2146,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_delete(&self, name: &str) -> PropertyUserLinkDeleteCall<'a, C> {
+    pub fn user_links_delete(&self, name: &str) -> PropertyUserLinkDeleteCall<'a> {
         PropertyUserLinkDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2165,7 +2163,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Example format: accounts/1234/userLinks/5678
-    pub fn user_links_get(&self, name: &str) -> PropertyUserLinkGetCall<'a, C> {
+    pub fn user_links_get(&self, name: &str) -> PropertyUserLinkGetCall<'a> {
         PropertyUserLinkGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2182,7 +2180,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. Example format: accounts/1234
-    pub fn user_links_list(&self, parent: &str) -> PropertyUserLinkListCall<'a, C> {
+    pub fn user_links_list(&self, parent: &str) -> PropertyUserLinkListCall<'a> {
         PropertyUserLinkListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2202,7 +2200,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Example format: properties/1234/userLinks/5678
-    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> PropertyUserLinkPatchCall<'a, C> {
+    pub fn user_links_patch(&self, request: GoogleAnalyticsAdminV1alphaUserLink, name: &str) -> PropertyUserLinkPatchCall<'a> {
         PropertyUserLinkPatchCall {
             hub: self.hub,
             _request: request,
@@ -2221,7 +2219,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource where this web data stream will be created. Format: properties/123
-    pub fn web_data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaWebDataStream, parent: &str) -> PropertyWebDataStreamCreateCall<'a, C> {
+    pub fn web_data_streams_create(&self, request: GoogleAnalyticsAdminV1alphaWebDataStream, parent: &str) -> PropertyWebDataStreamCreateCall<'a> {
         PropertyWebDataStreamCreateCall {
             hub: self.hub,
             _request: request,
@@ -2239,7 +2237,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the web data stream to delete. Format: properties/{property_id}/webDataStreams/{stream_id} Example: "properties/123/webDataStreams/456"
-    pub fn web_data_streams_delete(&self, name: &str) -> PropertyWebDataStreamDeleteCall<'a, C> {
+    pub fn web_data_streams_delete(&self, name: &str) -> PropertyWebDataStreamDeleteCall<'a> {
         PropertyWebDataStreamDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2256,7 +2254,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the web data stream to lookup. Format: properties/{property_id}/webDataStreams/{stream_id} Example: "properties/123/webDataStreams/456"
-    pub fn web_data_streams_get(&self, name: &str) -> PropertyWebDataStreamGetCall<'a, C> {
+    pub fn web_data_streams_get(&self, name: &str) -> PropertyWebDataStreamGetCall<'a> {
         PropertyWebDataStreamGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2273,7 +2271,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the settings to lookup. Format: properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings Example: "properties/1000/webDataStreams/2000/enhancedMeasurementSettings"
-    pub fn web_data_streams_get_enhanced_measurement_settings(&self, name: &str) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> {
+    pub fn web_data_streams_get_enhanced_measurement_settings(&self, name: &str) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a> {
         PropertyWebDataStreamGetEnhancedMeasurementSettingCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2290,7 +2288,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the site tag to lookup. Note that site tags are singletons and do not have unique IDs. Format: properties/{property_id}/webDataStreams/{stream_id}/globalSiteTag Example: "properties/123/webDataStreams/456/globalSiteTag"
-    pub fn web_data_streams_get_global_site_tag(&self, name: &str) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> {
+    pub fn web_data_streams_get_global_site_tag(&self, name: &str) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a> {
         PropertyWebDataStreamGetGlobalSiteTagCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2307,7 +2305,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent property. For example, to list results of web streams under the property with Id 123: "properties/123"
-    pub fn web_data_streams_list(&self, parent: &str) -> PropertyWebDataStreamListCall<'a, C> {
+    pub fn web_data_streams_list(&self, parent: &str) -> PropertyWebDataStreamListCall<'a> {
         PropertyWebDataStreamListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2327,7 +2325,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this Data Stream. Format: properties/{property_id}/webDataStreams/{stream_id} Example: "properties/1000/webDataStreams/2000"
-    pub fn web_data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaWebDataStream, name: &str) -> PropertyWebDataStreamPatchCall<'a, C> {
+    pub fn web_data_streams_patch(&self, request: GoogleAnalyticsAdminV1alphaWebDataStream, name: &str) -> PropertyWebDataStreamPatchCall<'a> {
         PropertyWebDataStreamPatchCall {
             hub: self.hub,
             _request: request,
@@ -2347,7 +2345,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this Data Stream. Format: properties/{property_id}/webDataStreams/{stream_id}/enhancedMeasurementSettings Example: "properties/1000/webDataStreams/2000/enhancedMeasurementSettings"
-    pub fn web_data_streams_update_enhanced_measurement_settings(&self, request: GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings, name: &str) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> {
+    pub fn web_data_streams_update_enhanced_measurement_settings(&self, request: GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings, name: &str) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {
         PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall {
             hub: self.hub,
             _request: request,
@@ -2366,7 +2364,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a, C> {
+    pub fn create(&self, request: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a> {
         PropertyCreateCall {
             hub: self.hub,
             _request: request,
@@ -2383,7 +2381,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the Property to soft-delete. Format: properties/{property_id} Example: "properties/1000"
-    pub fn delete(&self, name: &str) -> PropertyDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> PropertyDeleteCall<'a> {
         PropertyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2400,7 +2398,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the property to lookup. Format: properties/{property_id} Example: "properties/1000"
-    pub fn get(&self, name: &str) -> PropertyGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> PropertyGetCall<'a> {
         PropertyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2413,7 +2411,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns child Properties under the specified parent Account. Only "GA4" properties will be returned. Properties will be excluded if the caller does not have access. Soft-deleted (ie: "trashed") properties are excluded by default. Returns an empty list if no relevant properties are found.
-    pub fn list(&self) -> PropertyListCall<'a, C> {
+    pub fn list(&self) -> PropertyListCall<'a> {
         PropertyListCall {
             hub: self.hub,
             _show_deleted: Default::default(),
@@ -2434,7 +2432,7 @@ impl<'a, C> PropertyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of this property. Format: properties/{property_id} Example: "properties/1000"
-    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaProperty, name: &str) -> PropertyPatchCall<'a, C> {
+    pub fn patch(&self, request: GoogleAnalyticsAdminV1alphaProperty, name: &str) -> PropertyPatchCall<'a> {
         PropertyPatchCall {
             hub: self.hub,
             _request: request,
@@ -2489,10 +2487,10 @@ impl<'a, C> PropertyMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountSummaryListCall<'a, C>
-    where C: 'a {
+pub struct AccountSummaryListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2500,9 +2498,9 @@ pub struct AccountSummaryListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountSummaryListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountSummaryListCall<'a> {}
 
-impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountSummaryListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2547,8 +2545,7 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2561,7 +2558,7 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2570,7 +2567,7 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2627,14 +2624,14 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// A page token, received from a previous `ListAccountSummaries` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAccountSummaries` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountSummaryListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AccountSummaryListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of AccountSummary resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountSummaryListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AccountSummaryListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2644,7 +2641,7 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSummaryListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSummaryListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2669,7 +2666,7 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountSummaryListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountSummaryListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2689,7 +2686,7 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountSummaryListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountSummaryListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2739,10 +2736,10 @@ impl<'a, C> AccountSummaryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkAuditCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkAuditCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2750,9 +2747,9 @@ pub struct AccountUserLinkAuditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkAuditCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkAuditCall<'a> {}
 
-impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkAuditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2828,8 +2825,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2843,7 +2839,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2854,7 +2850,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2913,7 +2909,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> AccountUserLinkAuditCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> AccountUserLinkAuditCall<'a> {
         self._request = new_value;
         self
     }
@@ -2923,7 +2919,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkAuditCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkAuditCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2933,7 +2929,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkAuditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkAuditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2958,7 +2954,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkAuditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkAuditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2978,7 +2974,7 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkAuditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkAuditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3028,10 +3024,10 @@ impl<'a, C> AccountUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkBatchCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3039,9 +3035,9 @@ pub struct AccountUserLinkBatchCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkBatchCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkBatchCreateCall<'a> {}
 
-impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkBatchCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3117,8 +3113,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3132,7 +3127,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3143,7 +3138,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3202,7 +3197,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> AccountUserLinkBatchCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> AccountUserLinkBatchCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3212,7 +3207,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3222,7 +3217,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3247,7 +3242,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3267,7 +3262,7 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3317,10 +3312,10 @@ impl<'a, C> AccountUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkBatchDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3328,9 +3323,9 @@ pub struct AccountUserLinkBatchDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkBatchDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkBatchDeleteCall<'a> {}
 
-impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkBatchDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3406,8 +3401,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3421,7 +3415,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3432,7 +3426,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3491,7 +3485,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> AccountUserLinkBatchDeleteCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> AccountUserLinkBatchDeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -3501,7 +3495,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchDeleteCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchDeleteCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3511,7 +3505,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3536,7 +3530,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3556,7 +3550,7 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3601,10 +3595,10 @@ impl<'a, C> AccountUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchGetCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkBatchGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3612,9 +3606,9 @@ pub struct AccountUserLinkBatchGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkBatchGetCall<'a> {}
 
-impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3684,8 +3678,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3698,7 +3691,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3707,7 +3700,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3767,7 +3760,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3775,7 +3768,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a, C> {
+    pub fn add_names(mut self, new_value: &str) -> AccountUserLinkBatchGetCall<'a> {
         self._names.push(new_value.to_string());
         self
     }
@@ -3785,7 +3778,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3810,7 +3803,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3830,7 +3823,7 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3880,10 +3873,10 @@ impl<'a, C> AccountUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3891,9 +3884,9 @@ pub struct AccountUserLinkBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkBatchUpdateCall<'a> {}
 
-impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3969,8 +3962,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3984,7 +3976,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3995,7 +3987,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4054,7 +4046,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> AccountUserLinkBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> AccountUserLinkBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4064,7 +4056,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchUpdateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkBatchUpdateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4074,7 +4066,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4099,7 +4091,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4119,7 +4111,7 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4170,10 +4162,10 @@ impl<'a, C> AccountUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _parent: String,
     _notify_new_user: Option<bool>,
@@ -4182,9 +4174,9 @@ pub struct AccountUserLinkCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkCreateCall<'a> {}
 
-impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4263,8 +4255,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4278,7 +4269,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4289,7 +4280,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4348,7 +4339,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4358,14 +4349,14 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If set, then email the new user notifying them that they've been granted permissions to the resource.
     ///
     /// Sets the *notify new user* query property to the given value.
-    pub fn notify_new_user(mut self, new_value: bool) -> AccountUserLinkCreateCall<'a, C> {
+    pub fn notify_new_user(mut self, new_value: bool) -> AccountUserLinkCreateCall<'a> {
         self._notify_new_user = Some(new_value);
         self
     }
@@ -4375,7 +4366,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4400,7 +4391,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4420,7 +4411,7 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4464,19 +4455,19 @@ impl<'a, C> AccountUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkDeleteCall<'a> {}
 
-impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4541,8 +4532,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4555,7 +4545,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4564,7 +4554,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4624,7 +4614,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUserLinkDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountUserLinkDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4634,7 +4624,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4659,7 +4649,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4679,7 +4669,7 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4723,19 +4713,19 @@ impl<'a, C> AccountUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkGetCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkGetCall<'a> {}
 
-impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4800,8 +4790,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4814,7 +4803,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4823,7 +4812,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4883,7 +4872,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUserLinkGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountUserLinkGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4893,7 +4882,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4918,7 +4907,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4938,7 +4927,7 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4984,10 +4973,10 @@ impl<'a, C> AccountUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkListCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4996,9 +4985,9 @@ pub struct AccountUserLinkListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkListCall<'a> {}
 
-impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5069,8 +5058,7 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5083,7 +5071,7 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5092,7 +5080,7 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5152,21 +5140,21 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountUserLinkListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> AccountUserLinkListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListUserLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListUserLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountUserLinkListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AccountUserLinkListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of user links to return. The service may return fewer than this value. If unspecified, at most 200 user links will be returned. The maximum value is 500; values above 500 will be coerced to 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountUserLinkListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AccountUserLinkListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5176,7 +5164,7 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5201,7 +5189,7 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5221,7 +5209,7 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5271,10 +5259,10 @@ impl<'a, C> AccountUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUserLinkPatchCall<'a, C>
-    where C: 'a {
+pub struct AccountUserLinkPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5282,9 +5270,9 @@ pub struct AccountUserLinkPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUserLinkPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUserLinkPatchCall<'a> {}
 
-impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUserLinkPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5360,8 +5348,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5375,7 +5362,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5386,7 +5373,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5445,7 +5432,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> AccountUserLinkPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5455,7 +5442,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountUserLinkPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountUserLinkPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5465,7 +5452,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUserLinkPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5490,7 +5477,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUserLinkPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5510,7 +5497,7 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUserLinkPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5554,19 +5541,19 @@ impl<'a, C> AccountUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountDeleteCall<'a> {}
 
-impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5631,8 +5618,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5645,7 +5631,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5654,7 +5640,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5714,7 +5700,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5724,7 +5710,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5749,7 +5735,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5769,7 +5755,7 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5813,19 +5799,19 @@ impl<'a, C> AccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a, C>
-    where C: 'a {
+pub struct AccountGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountGetCall<'a> {}
 
-impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5890,8 +5876,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5904,7 +5889,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5913,7 +5898,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5973,7 +5958,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5983,7 +5968,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6008,7 +5993,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6028,7 +6013,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6072,19 +6057,19 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetDataSharingSettingCall<'a, C>
-    where C: 'a {
+pub struct AccountGetDataSharingSettingCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountGetDataSharingSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountGetDataSharingSettingCall<'a> {}
 
-impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountGetDataSharingSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6149,8 +6134,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6163,7 +6147,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6172,7 +6156,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6232,7 +6216,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountGetDataSharingSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountGetDataSharingSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6242,7 +6226,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetDataSharingSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetDataSharingSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6267,7 +6251,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetDataSharingSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetDataSharingSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6287,7 +6271,7 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetDataSharingSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetDataSharingSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6334,10 +6318,10 @@ impl<'a, C> AccountGetDataSharingSettingCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a, C>
-    where C: 'a {
+pub struct AccountListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _show_deleted: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6346,9 +6330,9 @@ pub struct AccountListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountListCall<'a> {}
 
-impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6396,8 +6380,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6410,7 +6393,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6419,7 +6402,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6476,21 +6459,21 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Whether to include soft-deleted (ie: "trashed") Accounts in the results. Accounts can be inspected to determine whether they are deleted or not.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> AccountListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> AccountListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// A page token, received from a previous `ListAccounts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAccounts` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AccountListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AccountListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -6500,7 +6483,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6525,7 +6508,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6545,7 +6528,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6596,10 +6579,10 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPatchCall<'a, C>
-    where C: 'a {
+pub struct AccountPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaAccount,
     _name: String,
     _update_mask: Option<String>,
@@ -6608,9 +6591,9 @@ pub struct AccountPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPatchCall<'a> {}
 
-impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6689,8 +6672,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6704,7 +6686,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6715,7 +6697,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6774,7 +6756,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAccount) -> AccountPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAccount) -> AccountPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -6784,14 +6766,14 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> AccountPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccountPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AccountPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6801,7 +6783,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6826,7 +6808,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6846,7 +6828,7 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6896,19 +6878,19 @@ impl<'a, C> AccountPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountProvisionAccountTicketCall<'a, C>
-    where C: 'a {
+pub struct AccountProvisionAccountTicketCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountProvisionAccountTicketCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountProvisionAccountTicketCall<'a> {}
 
-impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountProvisionAccountTicketCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6958,8 +6940,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6973,7 +6954,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6984,7 +6965,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7043,7 +7024,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProvisionAccountTicketRequest) -> AccountProvisionAccountTicketCall<'a> {
         self._request = new_value;
         self
     }
@@ -7053,7 +7034,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProvisionAccountTicketCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountProvisionAccountTicketCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7078,7 +7059,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProvisionAccountTicketCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProvisionAccountTicketCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7098,7 +7079,7 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProvisionAccountTicketCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProvisionAccountTicketCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7148,10 +7129,10 @@ impl<'a, C> AccountProvisionAccountTicketCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountSearchChangeHistoryEventCall<'a, C>
-    where C: 'a {
+pub struct AccountSearchChangeHistoryEventCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest,
     _account: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7159,9 +7140,9 @@ pub struct AccountSearchChangeHistoryEventCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountSearchChangeHistoryEventCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountSearchChangeHistoryEventCall<'a> {}
 
-impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountSearchChangeHistoryEventCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7237,8 +7218,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7252,7 +7232,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7263,7 +7243,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7322,7 +7302,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest) -> AccountSearchChangeHistoryEventCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaSearchChangeHistoryEventsRequest) -> AccountSearchChangeHistoryEventCall<'a> {
         self._request = new_value;
         self
     }
@@ -7332,7 +7312,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountSearchChangeHistoryEventCall<'a, C> {
+    pub fn account(mut self, new_value: &str) -> AccountSearchChangeHistoryEventCall<'a> {
         self._account = new_value.to_string();
         self
     }
@@ -7342,7 +7322,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSearchChangeHistoryEventCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountSearchChangeHistoryEventCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7367,7 +7347,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountSearchChangeHistoryEventCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountSearchChangeHistoryEventCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7387,7 +7367,7 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountSearchChangeHistoryEventCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountSearchChangeHistoryEventCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7437,10 +7417,10 @@ impl<'a, C> AccountSearchChangeHistoryEventCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyAndroidAppDataStreamCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyAndroidAppDataStreamCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaAndroidAppDataStream,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7448,9 +7428,9 @@ pub struct PropertyAndroidAppDataStreamCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyAndroidAppDataStreamCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyAndroidAppDataStreamCreateCall<'a> {}
 
-impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyAndroidAppDataStreamCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7526,8 +7506,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7541,7 +7520,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7552,7 +7531,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7611,7 +7590,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAndroidAppDataStream) -> PropertyAndroidAppDataStreamCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAndroidAppDataStream) -> PropertyAndroidAppDataStreamCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -7621,7 +7600,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyAndroidAppDataStreamCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyAndroidAppDataStreamCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -7631,7 +7610,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7656,7 +7635,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7676,7 +7655,7 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7720,19 +7699,19 @@ impl<'a, C> PropertyAndroidAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyAndroidAppDataStreamDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyAndroidAppDataStreamDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyAndroidAppDataStreamDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyAndroidAppDataStreamDeleteCall<'a> {}
 
-impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyAndroidAppDataStreamDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7797,8 +7776,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7811,7 +7789,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7820,7 +7798,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7880,7 +7858,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyAndroidAppDataStreamDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyAndroidAppDataStreamDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7890,7 +7868,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7915,7 +7893,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7935,7 +7913,7 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7979,19 +7957,19 @@ impl<'a, C> PropertyAndroidAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyAndroidAppDataStreamGetCall<'a, C>
-    where C: 'a {
+pub struct PropertyAndroidAppDataStreamGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyAndroidAppDataStreamGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyAndroidAppDataStreamGetCall<'a> {}
 
-impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyAndroidAppDataStreamGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8056,8 +8034,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8070,7 +8047,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8079,7 +8056,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8139,7 +8116,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyAndroidAppDataStreamGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyAndroidAppDataStreamGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8149,7 +8126,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8174,7 +8151,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8194,7 +8171,7 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8240,10 +8217,10 @@ impl<'a, C> PropertyAndroidAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyAndroidAppDataStreamListCall<'a, C>
-    where C: 'a {
+pub struct PropertyAndroidAppDataStreamListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8252,9 +8229,9 @@ pub struct PropertyAndroidAppDataStreamListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyAndroidAppDataStreamListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyAndroidAppDataStreamListCall<'a> {}
 
-impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyAndroidAppDataStreamListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8325,8 +8302,7 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8339,7 +8315,7 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8348,7 +8324,7 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8408,21 +8384,21 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyAndroidAppDataStreamListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyAndroidAppDataStreamListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAndroidAppDataStreams` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyAndroidAppDataStreamListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyAndroidAppDataStreamListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyAndroidAppDataStreamListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyAndroidAppDataStreamListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8432,7 +8408,7 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8457,7 +8433,7 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8477,7 +8453,7 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8528,10 +8504,10 @@ impl<'a, C> PropertyAndroidAppDataStreamListCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyAndroidAppDataStreamPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyAndroidAppDataStreamPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaAndroidAppDataStream,
     _name: String,
     _update_mask: Option<String>,
@@ -8540,9 +8516,9 @@ pub struct PropertyAndroidAppDataStreamPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyAndroidAppDataStreamPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyAndroidAppDataStreamPatchCall<'a> {}
 
-impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyAndroidAppDataStreamPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8621,8 +8597,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8636,7 +8611,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8647,7 +8622,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8706,7 +8681,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAndroidAppDataStream) -> PropertyAndroidAppDataStreamPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAndroidAppDataStream) -> PropertyAndroidAppDataStreamPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -8716,14 +8691,14 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyAndroidAppDataStreamPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyAndroidAppDataStreamPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyAndroidAppDataStreamPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyAndroidAppDataStreamPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -8733,7 +8708,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyAndroidAppDataStreamPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8758,7 +8733,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyAndroidAppDataStreamPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8778,7 +8753,7 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyAndroidAppDataStreamPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8828,10 +8803,10 @@ impl<'a, C> PropertyAndroidAppDataStreamPatchCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyFirebaseLinkCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaFirebaseLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8839,9 +8814,9 @@ pub struct PropertyFirebaseLinkCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyFirebaseLinkCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyFirebaseLinkCreateCall<'a> {}
 
-impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyFirebaseLinkCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8917,8 +8892,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8932,7 +8906,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8943,7 +8917,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9002,7 +8976,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaFirebaseLink) -> PropertyFirebaseLinkCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaFirebaseLink) -> PropertyFirebaseLinkCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -9012,7 +8986,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -9022,7 +8996,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9047,7 +9021,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9067,7 +9041,7 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9111,19 +9085,19 @@ impl<'a, C> PropertyFirebaseLinkCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyFirebaseLinkDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyFirebaseLinkDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyFirebaseLinkDeleteCall<'a> {}
 
-impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyFirebaseLinkDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9188,8 +9162,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9202,7 +9175,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9211,7 +9184,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9271,7 +9244,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyFirebaseLinkDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyFirebaseLinkDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9281,7 +9254,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9306,7 +9279,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9326,7 +9299,7 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9372,10 +9345,10 @@ impl<'a, C> PropertyFirebaseLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkListCall<'a, C>
-    where C: 'a {
+pub struct PropertyFirebaseLinkListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9384,9 +9357,9 @@ pub struct PropertyFirebaseLinkListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyFirebaseLinkListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyFirebaseLinkListCall<'a> {}
 
-impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyFirebaseLinkListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9457,8 +9430,7 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9471,7 +9443,7 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9480,7 +9452,7 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9540,21 +9512,21 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListFirebaseLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProperties` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyFirebaseLinkListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyFirebaseLinkListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyFirebaseLinkListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -9564,7 +9536,7 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9589,7 +9561,7 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9609,7 +9581,7 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9660,10 +9632,10 @@ impl<'a, C> PropertyFirebaseLinkListCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyFirebaseLinkPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyFirebaseLinkPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaFirebaseLink,
     _name: String,
     _update_mask: Option<String>,
@@ -9672,9 +9644,9 @@ pub struct PropertyFirebaseLinkPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyFirebaseLinkPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyFirebaseLinkPatchCall<'a> {}
 
-impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyFirebaseLinkPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9753,8 +9725,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9768,7 +9739,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9779,7 +9750,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9838,7 +9809,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaFirebaseLink) -> PropertyFirebaseLinkPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaFirebaseLink) -> PropertyFirebaseLinkPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -9848,14 +9819,14 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyFirebaseLinkPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyFirebaseLinkPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyFirebaseLinkPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyFirebaseLinkPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -9865,7 +9836,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyFirebaseLinkPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9890,7 +9861,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyFirebaseLinkPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9910,7 +9881,7 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyFirebaseLinkPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9960,10 +9931,10 @@ impl<'a, C> PropertyFirebaseLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyGoogleAdsLinkCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaGoogleAdsLink,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9971,9 +9942,9 @@ pub struct PropertyGoogleAdsLinkCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyGoogleAdsLinkCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyGoogleAdsLinkCreateCall<'a> {}
 
-impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyGoogleAdsLinkCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10049,8 +10020,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10064,7 +10034,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10075,7 +10045,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10134,7 +10104,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10144,7 +10114,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -10154,7 +10124,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10179,7 +10149,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10199,7 +10169,7 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10243,19 +10213,19 @@ impl<'a, C> PropertyGoogleAdsLinkCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyGoogleAdsLinkDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyGoogleAdsLinkDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyGoogleAdsLinkDeleteCall<'a> {}
 
-impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyGoogleAdsLinkDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10320,8 +10290,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10334,7 +10303,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10343,7 +10312,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10403,7 +10372,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10413,7 +10382,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10438,7 +10407,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10458,7 +10427,7 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10504,10 +10473,10 @@ impl<'a, C> PropertyGoogleAdsLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkListCall<'a, C>
-    where C: 'a {
+pub struct PropertyGoogleAdsLinkListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10516,9 +10485,9 @@ pub struct PropertyGoogleAdsLinkListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyGoogleAdsLinkListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyGoogleAdsLinkListCall<'a> {}
 
-impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyGoogleAdsLinkListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10589,8 +10558,7 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10603,7 +10571,7 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10612,7 +10580,7 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10672,21 +10640,21 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListGoogleAdsLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListGoogleAdsLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyGoogleAdsLinkListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200 (higher values will be coerced to the maximum).
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyGoogleAdsLinkListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyGoogleAdsLinkListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -10696,7 +10664,7 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10721,7 +10689,7 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10741,7 +10709,7 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10792,10 +10760,10 @@ impl<'a, C> PropertyGoogleAdsLinkListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGoogleAdsLinkPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyGoogleAdsLinkPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaGoogleAdsLink,
     _name: String,
     _update_mask: Option<String>,
@@ -10804,9 +10772,9 @@ pub struct PropertyGoogleAdsLinkPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyGoogleAdsLinkPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyGoogleAdsLinkPatchCall<'a> {}
 
-impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyGoogleAdsLinkPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10885,8 +10853,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10900,7 +10867,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10911,7 +10878,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10970,7 +10937,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaGoogleAdsLink) -> PropertyGoogleAdsLinkPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -10980,14 +10947,14 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyGoogleAdsLinkPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -10997,7 +10964,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGoogleAdsLinkPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11022,7 +10989,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGoogleAdsLinkPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11042,7 +11009,7 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGoogleAdsLinkPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11092,10 +11059,10 @@ impl<'a, C> PropertyGoogleAdsLinkPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyIosAppDataStreamCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyIosAppDataStreamCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaIosAppDataStream,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11103,9 +11070,9 @@ pub struct PropertyIosAppDataStreamCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyIosAppDataStreamCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyIosAppDataStreamCreateCall<'a> {}
 
-impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyIosAppDataStreamCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11181,8 +11148,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11196,7 +11162,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11207,7 +11173,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11266,7 +11232,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaIosAppDataStream) -> PropertyIosAppDataStreamCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaIosAppDataStream) -> PropertyIosAppDataStreamCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -11276,7 +11242,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyIosAppDataStreamCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyIosAppDataStreamCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -11286,7 +11252,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11311,7 +11277,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11331,7 +11297,7 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11375,19 +11341,19 @@ impl<'a, C> PropertyIosAppDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyIosAppDataStreamDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyIosAppDataStreamDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyIosAppDataStreamDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyIosAppDataStreamDeleteCall<'a> {}
 
-impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyIosAppDataStreamDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11452,8 +11418,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11466,7 +11431,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11475,7 +11440,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11535,7 +11500,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyIosAppDataStreamDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyIosAppDataStreamDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11545,7 +11510,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11570,7 +11535,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11590,7 +11555,7 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11634,19 +11599,19 @@ impl<'a, C> PropertyIosAppDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyIosAppDataStreamGetCall<'a, C>
-    where C: 'a {
+pub struct PropertyIosAppDataStreamGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyIosAppDataStreamGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyIosAppDataStreamGetCall<'a> {}
 
-impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyIosAppDataStreamGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11711,8 +11676,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11725,7 +11689,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11734,7 +11698,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11794,7 +11758,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyIosAppDataStreamGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyIosAppDataStreamGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11804,7 +11768,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11829,7 +11793,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11849,7 +11813,7 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11895,10 +11859,10 @@ impl<'a, C> PropertyIosAppDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyIosAppDataStreamListCall<'a, C>
-    where C: 'a {
+pub struct PropertyIosAppDataStreamListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -11907,9 +11871,9 @@ pub struct PropertyIosAppDataStreamListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyIosAppDataStreamListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyIosAppDataStreamListCall<'a> {}
 
-impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyIosAppDataStreamListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11980,8 +11944,7 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11994,7 +11957,7 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12003,7 +11966,7 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12063,21 +12026,21 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyIosAppDataStreamListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyIosAppDataStreamListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListIosAppDataStreams` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListIosAppDataStreams` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyIosAppDataStreamListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyIosAppDataStreamListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyIosAppDataStreamListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyIosAppDataStreamListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -12087,7 +12050,7 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12112,7 +12075,7 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12132,7 +12095,7 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12183,10 +12146,10 @@ impl<'a, C> PropertyIosAppDataStreamListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyIosAppDataStreamPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyIosAppDataStreamPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaIosAppDataStream,
     _name: String,
     _update_mask: Option<String>,
@@ -12195,9 +12158,9 @@ pub struct PropertyIosAppDataStreamPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyIosAppDataStreamPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyIosAppDataStreamPatchCall<'a> {}
 
-impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyIosAppDataStreamPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12276,8 +12239,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12291,7 +12253,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12302,7 +12264,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12361,7 +12323,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaIosAppDataStream) -> PropertyIosAppDataStreamPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaIosAppDataStream) -> PropertyIosAppDataStreamPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -12371,14 +12333,14 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyIosAppDataStreamPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyIosAppDataStreamPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyIosAppDataStreamPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyIosAppDataStreamPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12388,7 +12350,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyIosAppDataStreamPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12413,7 +12375,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyIosAppDataStreamPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12433,7 +12395,7 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyIosAppDataStreamPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12483,10 +12445,10 @@ impl<'a, C> PropertyIosAppDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkAuditCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkAuditCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12494,9 +12456,9 @@ pub struct PropertyUserLinkAuditCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkAuditCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkAuditCall<'a> {}
 
-impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkAuditCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12572,8 +12534,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12587,7 +12548,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12598,7 +12559,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12657,7 +12618,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> PropertyUserLinkAuditCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaAuditUserLinksRequest) -> PropertyUserLinkAuditCall<'a> {
         self._request = new_value;
         self
     }
@@ -12667,7 +12628,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkAuditCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkAuditCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -12677,7 +12638,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkAuditCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkAuditCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12702,7 +12663,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkAuditCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkAuditCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12722,7 +12683,7 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkAuditCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkAuditCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12772,10 +12733,10 @@ impl<'a, C> PropertyUserLinkAuditCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkBatchCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12783,9 +12744,9 @@ pub struct PropertyUserLinkBatchCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkBatchCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkBatchCreateCall<'a> {}
 
-impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkBatchCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12861,8 +12822,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12876,7 +12836,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12887,7 +12847,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12946,7 +12906,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> PropertyUserLinkBatchCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchCreateUserLinksRequest) -> PropertyUserLinkBatchCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12956,7 +12916,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -12966,7 +12926,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12991,7 +12951,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13011,7 +12971,7 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13061,10 +13021,10 @@ impl<'a, C> PropertyUserLinkBatchCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkBatchDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13072,9 +13032,9 @@ pub struct PropertyUserLinkBatchDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkBatchDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkBatchDeleteCall<'a> {}
 
-impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkBatchDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13150,8 +13110,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13165,7 +13124,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13176,7 +13135,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13235,7 +13194,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> PropertyUserLinkBatchDeleteCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchDeleteUserLinksRequest) -> PropertyUserLinkBatchDeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -13245,7 +13204,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchDeleteCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchDeleteCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -13255,7 +13214,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13280,7 +13239,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13300,7 +13259,7 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13345,10 +13304,10 @@ impl<'a, C> PropertyUserLinkBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchGetCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkBatchGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _names: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13356,9 +13315,9 @@ pub struct PropertyUserLinkBatchGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkBatchGetCall<'a> {}
 
-impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13428,8 +13387,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13442,7 +13400,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13451,7 +13409,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13511,7 +13469,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -13519,7 +13477,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Append the given value to the *names* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_names(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a, C> {
+    pub fn add_names(mut self, new_value: &str) -> PropertyUserLinkBatchGetCall<'a> {
         self._names.push(new_value.to_string());
         self
     }
@@ -13529,7 +13487,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13554,7 +13512,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13574,7 +13532,7 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13624,10 +13582,10 @@ impl<'a, C> PropertyUserLinkBatchGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkBatchUpdateCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkBatchUpdateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13635,9 +13593,9 @@ pub struct PropertyUserLinkBatchUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkBatchUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkBatchUpdateCall<'a> {}
 
-impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkBatchUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13713,8 +13671,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13728,7 +13685,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13739,7 +13696,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13798,7 +13755,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> PropertyUserLinkBatchUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaBatchUpdateUserLinksRequest) -> PropertyUserLinkBatchUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13808,7 +13765,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchUpdateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkBatchUpdateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -13818,7 +13775,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkBatchUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13843,7 +13800,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkBatchUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13863,7 +13820,7 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkBatchUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13914,10 +13871,10 @@ impl<'a, C> PropertyUserLinkBatchUpdateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _parent: String,
     _notify_new_user: Option<bool>,
@@ -13926,9 +13883,9 @@ pub struct PropertyUserLinkCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkCreateCall<'a> {}
 
-impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14007,8 +13964,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14022,7 +13978,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14033,7 +13989,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14092,7 +14048,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -14102,14 +14058,14 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If set, then email the new user notifying them that they've been granted permissions to the resource.
     ///
     /// Sets the *notify new user* query property to the given value.
-    pub fn notify_new_user(mut self, new_value: bool) -> PropertyUserLinkCreateCall<'a, C> {
+    pub fn notify_new_user(mut self, new_value: bool) -> PropertyUserLinkCreateCall<'a> {
         self._notify_new_user = Some(new_value);
         self
     }
@@ -14119,7 +14075,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14144,7 +14100,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14164,7 +14120,7 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14208,19 +14164,19 @@ impl<'a, C> PropertyUserLinkCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkDeleteCall<'a> {}
 
-impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14285,8 +14241,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14299,7 +14254,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14308,7 +14263,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14368,7 +14323,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUserLinkDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyUserLinkDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -14378,7 +14333,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14403,7 +14358,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14423,7 +14378,7 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14467,19 +14422,19 @@ impl<'a, C> PropertyUserLinkDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkGetCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkGetCall<'a> {}
 
-impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14544,8 +14499,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14558,7 +14512,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14567,7 +14521,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14627,7 +14581,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUserLinkGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyUserLinkGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -14637,7 +14591,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14662,7 +14616,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14682,7 +14636,7 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14728,10 +14682,10 @@ impl<'a, C> PropertyUserLinkGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkListCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -14740,9 +14694,9 @@ pub struct PropertyUserLinkListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkListCall<'a> {}
 
-impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14813,8 +14767,7 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14827,7 +14780,7 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14836,7 +14789,7 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14896,21 +14849,21 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyUserLinkListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListUserLinks` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListUserLinks` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyUserLinkListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyUserLinkListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of user links to return. The service may return fewer than this value. If unspecified, at most 200 user links will be returned. The maximum value is 500; values above 500 will be coerced to 500.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyUserLinkListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyUserLinkListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -14920,7 +14873,7 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14945,7 +14898,7 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14965,7 +14918,7 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15015,10 +14968,10 @@ impl<'a, C> PropertyUserLinkListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyUserLinkPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyUserLinkPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaUserLink,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15026,9 +14979,9 @@ pub struct PropertyUserLinkPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyUserLinkPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyUserLinkPatchCall<'a> {}
 
-impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyUserLinkPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15104,8 +15057,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15119,7 +15071,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15130,7 +15082,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15189,7 +15141,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaUserLink) -> PropertyUserLinkPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -15199,7 +15151,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyUserLinkPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyUserLinkPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -15209,7 +15161,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyUserLinkPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15234,7 +15186,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyUserLinkPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15254,7 +15206,7 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyUserLinkPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15304,10 +15256,10 @@ impl<'a, C> PropertyUserLinkPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaWebDataStream,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15315,9 +15267,9 @@ pub struct PropertyWebDataStreamCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamCreateCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15393,8 +15345,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15408,7 +15359,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15419,7 +15370,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15478,7 +15429,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaWebDataStream) -> PropertyWebDataStreamCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaWebDataStream) -> PropertyWebDataStreamCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15488,7 +15439,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyWebDataStreamCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyWebDataStreamCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -15498,7 +15449,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15523,7 +15474,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15543,7 +15494,7 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15587,19 +15538,19 @@ impl<'a, C> PropertyWebDataStreamCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamDeleteCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15664,8 +15615,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15678,7 +15628,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15687,7 +15637,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15747,7 +15697,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -15757,7 +15707,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15782,7 +15732,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15802,7 +15752,7 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15846,19 +15796,19 @@ impl<'a, C> PropertyWebDataStreamDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamGetCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamGetCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15923,8 +15873,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15937,7 +15886,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15946,7 +15895,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16006,7 +15955,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -16016,7 +15965,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16041,7 +15990,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16061,7 +16010,7 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16105,19 +16054,19 @@ impl<'a, C> PropertyWebDataStreamGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16182,8 +16131,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16196,7 +16144,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16205,7 +16153,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16265,7 +16213,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -16275,7 +16223,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16300,7 +16248,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16320,7 +16268,7 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16364,19 +16312,19 @@ impl<'a, C> PropertyWebDataStreamGetEnhancedMeasurementSettingCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamGetGlobalSiteTagCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamGetGlobalSiteTagCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamGetGlobalSiteTagCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamGetGlobalSiteTagCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16441,8 +16389,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16455,7 +16402,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16464,7 +16411,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16524,7 +16471,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -16534,7 +16481,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16559,7 +16506,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16579,7 +16526,7 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamGetGlobalSiteTagCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16625,10 +16572,10 @@ impl<'a, C> PropertyWebDataStreamGetGlobalSiteTagCall<'a, C> where C: BorrowMut<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamListCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16637,9 +16584,9 @@ pub struct PropertyWebDataStreamListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamListCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16710,8 +16657,7 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16724,7 +16670,7 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16733,7 +16679,7 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16793,21 +16739,21 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> PropertyWebDataStreamListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> PropertyWebDataStreamListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListWebDataStreams` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListWebDataStreams` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyWebDataStreamListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyWebDataStreamListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyWebDataStreamListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyWebDataStreamListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -16817,7 +16763,7 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16842,7 +16788,7 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16862,7 +16808,7 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16913,10 +16859,10 @@ impl<'a, C> PropertyWebDataStreamListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaWebDataStream,
     _name: String,
     _update_mask: Option<String>,
@@ -16925,9 +16871,9 @@ pub struct PropertyWebDataStreamPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamPatchCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17006,8 +16952,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17021,7 +16966,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17032,7 +16977,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17091,7 +17036,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaWebDataStream) -> PropertyWebDataStreamPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaWebDataStream) -> PropertyWebDataStreamPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -17101,14 +17046,14 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyWebDataStreamPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyWebDataStreamPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -17118,7 +17063,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17143,7 +17088,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17163,7 +17108,7 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17214,10 +17159,10 @@ impl<'a, C> PropertyWebDataStreamPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C>
-    where C: 'a {
+pub struct PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings,
     _name: String,
     _update_mask: Option<String>,
@@ -17226,9 +17171,9 @@ pub struct PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {}
 
-impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17307,8 +17252,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17322,7 +17266,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17333,7 +17277,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17392,7 +17336,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaEnhancedMeasurementSettings) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {
         self._request = new_value;
         self
     }
@@ -17402,14 +17346,14 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -17419,7 +17363,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17444,7 +17388,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17464,7 +17408,7 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17514,19 +17458,19 @@ impl<'a, C> PropertyWebDataStreamUpdateEnhancedMeasurementSettingCall<'a, C> whe
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyCreateCall<'a, C>
-    where C: 'a {
+pub struct PropertyCreateCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaProperty,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyCreateCall<'a> {}
 
-impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17576,8 +17520,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17591,7 +17534,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17602,7 +17545,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17661,7 +17604,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -17671,7 +17614,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17696,7 +17639,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17716,7 +17659,7 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17760,19 +17703,19 @@ impl<'a, C> PropertyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyDeleteCall<'a, C>
-    where C: 'a {
+pub struct PropertyDeleteCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyDeleteCall<'a> {}
 
-impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17837,8 +17780,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17851,7 +17793,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17860,7 +17802,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17920,7 +17862,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -17930,7 +17872,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17955,7 +17897,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17975,7 +17917,7 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18019,19 +17961,19 @@ impl<'a, C> PropertyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyGetCall<'a, C>
-    where C: 'a {
+pub struct PropertyGetCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyGetCall<'a> {}
 
-impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18096,8 +18038,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18110,7 +18051,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18119,7 +18060,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18179,7 +18120,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -18189,7 +18130,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18214,7 +18155,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18234,7 +18175,7 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18282,10 +18223,10 @@ impl<'a, C> PropertyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyListCall<'a, C>
-    where C: 'a {
+pub struct PropertyListCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _show_deleted: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18295,9 +18236,9 @@ pub struct PropertyListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyListCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyListCall<'a> {}
 
-impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18348,8 +18289,7 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18362,7 +18302,7 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18371,7 +18311,7 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18428,28 +18368,28 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Whether to include soft-deleted (ie: "trashed") Properties in the results. Properties can be inspected to determine whether they are deleted or not.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> PropertyListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> PropertyListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// A page token, received from a previous `ListProperties` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProperties` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> PropertyListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> PropertyListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of resources to return. The service may return fewer than this value, even if there are additional pages. If unspecified, at most 50 resources will be returned. The maximum value is 200; (higher values will be coerced to the maximum)
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> PropertyListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> PropertyListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Required. An expression for filtering the results of the request. Fields eligible for filtering are: `parent:`(The resource name of the parent account) or `firebase_project:`(The id or number of the linked firebase project). Some examples of filters: ``` | Filter | Description | |-----------------------------|-------------------------------------------| | parent:accounts/123 | The account with account id: 123. | | firebase_project:project-id | The firebase project with id: project-id. | | firebase_project:123 | The firebase project with number: 123. | ```
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> PropertyListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> PropertyListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -18459,7 +18399,7 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18484,7 +18424,7 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18504,7 +18444,7 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18555,10 +18495,10 @@ impl<'a, C> PropertyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PropertyPatchCall<'a, C>
-    where C: 'a {
+pub struct PropertyPatchCall<'a>
+    where  {
 
-    hub: &'a GoogleAnalyticsAdmin<C>,
+    hub: &'a GoogleAnalyticsAdmin<>,
     _request: GoogleAnalyticsAdminV1alphaProperty,
     _name: String,
     _update_mask: Option<String>,
@@ -18567,9 +18507,9 @@ pub struct PropertyPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PropertyPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for PropertyPatchCall<'a> {}
 
-impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PropertyPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18648,8 +18588,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18663,7 +18602,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18674,7 +18613,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18733,7 +18672,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleAnalyticsAdminV1alphaProperty) -> PropertyPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -18743,14 +18682,14 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> PropertyPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> PropertyPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required. The list of fields to be updated. Field names must be in snake case (e.g., "field_to_update"). Omitted fields will not be updated. To replace the entire entity, use one path with the string "*" to match all fields.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> PropertyPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> PropertyPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -18760,7 +18699,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PropertyPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18785,7 +18724,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PropertyPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18805,7 +18744,7 @@ impl<'a, C> PropertyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PropertyPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

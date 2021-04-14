@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct ServiceControl<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct ServiceControl<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for ServiceControl<C> {}
+impl<'a, > client::Hub for ServiceControl<> {}
 
-impl<'a, C> ServiceControl<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > ServiceControl<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ServiceControl<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> ServiceControl<> {
         ServiceControl {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://servicecontrol.googleapis.com/".to_string(),
             _root_url: "https://servicecontrol.googleapis.com/".to_string(),
         }
     }
 
-    pub fn services(&'a self) -> ServiceMethods<'a, C> {
+    pub fn services(&'a self) -> ServiceMethods<'a> {
         ServiceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -503,15 +501,15 @@ impl client::Part for Status {}
 /// let rb = hub.services();
 /// # }
 /// ```
-pub struct ServiceMethods<'a, C>
-    where C: 'a {
+pub struct ServiceMethods<'a>
+    where  {
 
-    hub: &'a ServiceControl<C>,
+    hub: &'a ServiceControl<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ServiceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ServiceMethods<'a> {}
 
-impl<'a, C> ServiceMethods<'a, C> {
+impl<'a> ServiceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -521,7 +519,7 @@ impl<'a, C> ServiceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `serviceName` - The service name as specified in its service configuration. For example, `"pubsub.googleapis.com"`. See [google.api.Service](https://cloud.google.com/service-management/reference/rpc/google.api#google.api.Service) for the definition of a service name.
-    pub fn check(&self, request: CheckRequest, service_name: &str) -> ServiceCheckCall<'a, C> {
+    pub fn check(&self, request: CheckRequest, service_name: &str) -> ServiceCheckCall<'a> {
         ServiceCheckCall {
             hub: self.hub,
             _request: request,
@@ -540,7 +538,7 @@ impl<'a, C> ServiceMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `serviceName` - The service name as specified in its service configuration. For example, `"pubsub.googleapis.com"`. See [google.api.Service](https://cloud.google.com/service-management/reference/rpc/google.api#google.api.Service) for the definition of a service name.
-    pub fn report(&self, request: ReportRequest, service_name: &str) -> ServiceReportCall<'a, C> {
+    pub fn report(&self, request: ReportRequest, service_name: &str) -> ServiceReportCall<'a> {
         ServiceReportCall {
             hub: self.hub,
             _request: request,
@@ -598,10 +596,10 @@ impl<'a, C> ServiceMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ServiceCheckCall<'a, C>
-    where C: 'a {
+pub struct ServiceCheckCall<'a>
+    where  {
 
-    hub: &'a ServiceControl<C>,
+    hub: &'a ServiceControl<>,
     _request: CheckRequest,
     _service_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -609,9 +607,9 @@ pub struct ServiceCheckCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ServiceCheckCall<'a, C> {}
+impl<'a> client::CallBuilder for ServiceCheckCall<'a> {}
 
-impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ServiceCheckCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -683,8 +681,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -698,7 +695,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -709,7 +706,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -768,7 +765,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CheckRequest) -> ServiceCheckCall<'a, C> {
+    pub fn request(mut self, new_value: CheckRequest) -> ServiceCheckCall<'a> {
         self._request = new_value;
         self
     }
@@ -778,7 +775,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn service_name(mut self, new_value: &str) -> ServiceCheckCall<'a, C> {
+    pub fn service_name(mut self, new_value: &str) -> ServiceCheckCall<'a> {
         self._service_name = new_value.to_string();
         self
     }
@@ -788,7 +785,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceCheckCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceCheckCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -813,7 +810,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceCheckCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ServiceCheckCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -833,7 +830,7 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceCheckCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceCheckCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -883,10 +880,10 @@ impl<'a, C> ServiceCheckCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ServiceReportCall<'a, C>
-    where C: 'a {
+pub struct ServiceReportCall<'a>
+    where  {
 
-    hub: &'a ServiceControl<C>,
+    hub: &'a ServiceControl<>,
     _request: ReportRequest,
     _service_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -894,9 +891,9 @@ pub struct ServiceReportCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ServiceReportCall<'a, C> {}
+impl<'a> client::CallBuilder for ServiceReportCall<'a> {}
 
-impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ServiceReportCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -968,8 +965,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -983,7 +979,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -994,7 +990,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1053,7 +1049,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReportRequest) -> ServiceReportCall<'a, C> {
+    pub fn request(mut self, new_value: ReportRequest) -> ServiceReportCall<'a> {
         self._request = new_value;
         self
     }
@@ -1063,7 +1059,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn service_name(mut self, new_value: &str) -> ServiceReportCall<'a, C> {
+    pub fn service_name(mut self, new_value: &str) -> ServiceReportCall<'a> {
         self._service_name = new_value.to_string();
         self
     }
@@ -1073,7 +1069,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceReportCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ServiceReportCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1098,7 +1094,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ServiceReportCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ServiceReportCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1118,7 +1114,7 @@ impl<'a, C> ServiceReportCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceReportCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ServiceReportCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

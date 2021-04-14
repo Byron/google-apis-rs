@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -132,35 +131,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct TagManager<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct TagManager<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for TagManager<C> {}
+impl<'a, > client::Hub for TagManager<> {}
 
-impl<'a, C> TagManager<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > TagManager<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> TagManager<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> TagManager<> {
         TagManager {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://tagmanager.googleapis.com/".to_string(),
             _root_url: "https://tagmanager.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a, C> {
+    pub fn accounts(&'a self) -> AccountMethods<'a> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1215,15 +1213,15 @@ impl client::ResponseResult for Variable {}
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a, C>
-    where C: 'a {
+pub struct AccountMethods<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AccountMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
 
-impl<'a, C> AccountMethods<'a, C> {
+impl<'a> AccountMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1234,7 +1232,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_environments_create(&self, request: Environment, account_id: &str, container_id: &str) -> AccountContainerEnvironmentCreateCall<'a, C> {
+    pub fn containers_environments_create(&self, request: Environment, account_id: &str, container_id: &str) -> AccountContainerEnvironmentCreateCall<'a> {
         AccountContainerEnvironmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1255,7 +1253,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_environments_delete(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentDeleteCall<'a, C> {
+    pub fn containers_environments_delete(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
         AccountContainerEnvironmentDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1276,7 +1274,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_environments_get(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentGetCall<'a, C> {
+    pub fn containers_environments_get(&self, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentGetCall<'a> {
         AccountContainerEnvironmentGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1296,7 +1294,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_environments_list(&self, account_id: &str, container_id: &str) -> AccountContainerEnvironmentListCall<'a, C> {
+    pub fn containers_environments_list(&self, account_id: &str, container_id: &str) -> AccountContainerEnvironmentListCall<'a> {
         AccountContainerEnvironmentListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1317,7 +1315,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn containers_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
         AccountContainerEnvironmentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1340,7 +1338,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_entities_list(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderEntityListCall<'a, C> {
+    pub fn containers_folders_entities_list(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderEntityListCall<'a> {
         AccountContainerFolderEntityListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1361,7 +1359,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_folders_create(&self, request: Folder, account_id: &str, container_id: &str) -> AccountContainerFolderCreateCall<'a, C> {
+    pub fn containers_folders_create(&self, request: Folder, account_id: &str, container_id: &str) -> AccountContainerFolderCreateCall<'a> {
         AccountContainerFolderCreateCall {
             hub: self.hub,
             _request: request,
@@ -1382,7 +1380,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_delete(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderDeleteCall<'a, C> {
+    pub fn containers_folders_delete(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderDeleteCall<'a> {
         AccountContainerFolderDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1403,7 +1401,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_get(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderGetCall<'a, C> {
+    pub fn containers_folders_get(&self, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderGetCall<'a> {
         AccountContainerFolderGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1423,7 +1421,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_folders_list(&self, account_id: &str, container_id: &str) -> AccountContainerFolderListCall<'a, C> {
+    pub fn containers_folders_list(&self, account_id: &str, container_id: &str) -> AccountContainerFolderListCall<'a> {
         AccountContainerFolderListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1444,7 +1442,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn containers_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerFolderUpdateCall<'a> {
         AccountContainerFolderUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1468,7 +1466,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `folderId` - The GTM Folder ID.
-    pub fn containers_move_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn containers_move_folders_update(&self, request: Folder, account_id: &str, container_id: &str, folder_id: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         AccountContainerMoveFolderUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1494,7 +1492,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `environmentId` - The GTM Environment ID.
-    pub fn containers_reauthorize_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {
+    pub fn containers_reauthorize_environments_update(&self, request: Environment, account_id: &str, container_id: &str, environment_id: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
         AccountContainerReauthorizeEnvironmentUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1516,7 +1514,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_tags_create(&self, request: Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a, C> {
+    pub fn containers_tags_create(&self, request: Tag, account_id: &str, container_id: &str) -> AccountContainerTagCreateCall<'a> {
         AccountContainerTagCreateCall {
             hub: self.hub,
             _request: request,
@@ -1537,7 +1535,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a, C> {
+    pub fn containers_tags_delete(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagDeleteCall<'a> {
         AccountContainerTagDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1558,7 +1556,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a, C> {
+    pub fn containers_tags_get(&self, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagGetCall<'a> {
         AccountContainerTagGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1578,7 +1576,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a, C> {
+    pub fn containers_tags_list(&self, account_id: &str, container_id: &str) -> AccountContainerTagListCall<'a> {
         AccountContainerTagListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1599,7 +1597,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `tagId` - The GTM Tag ID.
-    pub fn containers_tags_update(&self, request: Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn containers_tags_update(&self, request: Tag, account_id: &str, container_id: &str, tag_id: &str) -> AccountContainerTagUpdateCall<'a> {
         AccountContainerTagUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1622,7 +1620,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_triggers_create(&self, request: Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a, C> {
+    pub fn containers_triggers_create(&self, request: Trigger, account_id: &str, container_id: &str) -> AccountContainerTriggerCreateCall<'a> {
         AccountContainerTriggerCreateCall {
             hub: self.hub,
             _request: request,
@@ -1643,7 +1641,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a, C> {
+    pub fn containers_triggers_delete(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerDeleteCall<'a> {
         AccountContainerTriggerDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1664,7 +1662,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a, C> {
+    pub fn containers_triggers_get(&self, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerGetCall<'a> {
         AccountContainerTriggerGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1684,7 +1682,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a, C> {
+    pub fn containers_triggers_list(&self, account_id: &str, container_id: &str) -> AccountContainerTriggerListCall<'a> {
         AccountContainerTriggerListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1705,7 +1703,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `triggerId` - The GTM Trigger ID.
-    pub fn containers_triggers_update(&self, request: Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn containers_triggers_update(&self, request: Trigger, account_id: &str, container_id: &str, trigger_id: &str) -> AccountContainerTriggerUpdateCall<'a> {
         AccountContainerTriggerUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1728,7 +1726,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_variables_create(&self, request: Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a, C> {
+    pub fn containers_variables_create(&self, request: Variable, account_id: &str, container_id: &str) -> AccountContainerVariableCreateCall<'a> {
         AccountContainerVariableCreateCall {
             hub: self.hub,
             _request: request,
@@ -1749,7 +1747,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a, C> {
+    pub fn containers_variables_delete(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableDeleteCall<'a> {
         AccountContainerVariableDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1770,7 +1768,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a, C> {
+    pub fn containers_variables_get(&self, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableGetCall<'a> {
         AccountContainerVariableGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1790,7 +1788,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a, C> {
+    pub fn containers_variables_list(&self, account_id: &str, container_id: &str) -> AccountContainerVariableListCall<'a> {
         AccountContainerVariableListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1811,7 +1809,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `variableId` - The GTM Variable ID.
-    pub fn containers_variables_update(&self, request: Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn containers_variables_update(&self, request: Variable, account_id: &str, container_id: &str, variable_id: &str) -> AccountContainerVariableUpdateCall<'a> {
         AccountContainerVariableUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1834,7 +1832,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_versions_create(&self, request: CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a, C> {
+    pub fn containers_versions_create(&self, request: CreateContainerVersionRequestVersionOptions, account_id: &str, container_id: &str) -> AccountContainerVersionCreateCall<'a> {
         AccountContainerVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1855,7 +1853,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a, C> {
+    pub fn containers_versions_delete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionDeleteCall<'a> {
         AccountContainerVersionDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1876,7 +1874,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID. Specify published to retrieve the currently published version.
-    pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a, C> {
+    pub fn containers_versions_get(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionGetCall<'a> {
         AccountContainerVersionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1896,7 +1894,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a, C> {
+    pub fn containers_versions_list(&self, account_id: &str, container_id: &str) -> AccountContainerVersionListCall<'a> {
         AccountContainerVersionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1918,7 +1916,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a, C> {
+    pub fn containers_versions_publish(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionPublishCall<'a> {
         AccountContainerVersionPublishCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1940,7 +1938,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a, C> {
+    pub fn containers_versions_restore(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionRestoreCall<'a> {
         AccountContainerVersionRestoreCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1961,7 +1959,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a, C> {
+    pub fn containers_versions_undelete(&self, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUndeleteCall<'a> {
         AccountContainerVersionUndeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -1983,7 +1981,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
     /// * `containerVersionId` - The GTM Container Version ID.
-    pub fn containers_versions_update(&self, request: ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn containers_versions_update(&self, request: ContainerVersion, account_id: &str, container_id: &str, container_version_id: &str) -> AccountContainerVersionUpdateCall<'a> {
         AccountContainerVersionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2005,7 +2003,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_create(&self, request: Container, account_id: &str) -> AccountContainerCreateCall<'a, C> {
+    pub fn containers_create(&self, request: Container, account_id: &str) -> AccountContainerCreateCall<'a> {
         AccountContainerCreateCall {
             hub: self.hub,
             _request: request,
@@ -2024,7 +2022,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a, C> {
+    pub fn containers_delete(&self, account_id: &str, container_id: &str) -> AccountContainerDeleteCall<'a> {
         AccountContainerDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2043,7 +2041,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a, C> {
+    pub fn containers_get(&self, account_id: &str, container_id: &str) -> AccountContainerGetCall<'a> {
         AccountContainerGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2061,7 +2059,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a, C> {
+    pub fn containers_list(&self, account_id: &str) -> AccountContainerListCall<'a> {
         AccountContainerListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2080,7 +2078,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `containerId` - The GTM Container ID.
-    pub fn containers_update(&self, request: Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a, C> {
+    pub fn containers_update(&self, request: Container, account_id: &str, container_id: &str) -> AccountContainerUpdateCall<'a> {
         AccountContainerUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2101,7 +2099,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn permissions_create(&self, request: UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a, C> {
+    pub fn permissions_create(&self, request: UserAccess, account_id: &str) -> AccountPermissionCreateCall<'a> {
         AccountPermissionCreateCall {
             hub: self.hub,
             _request: request,
@@ -2120,7 +2118,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a, C> {
+    pub fn permissions_delete(&self, account_id: &str, permission_id: &str) -> AccountPermissionDeleteCall<'a> {
         AccountPermissionDeleteCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2139,7 +2137,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a, C> {
+    pub fn permissions_get(&self, account_id: &str, permission_id: &str) -> AccountPermissionGetCall<'a> {
         AccountPermissionGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2157,7 +2155,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a, C> {
+    pub fn permissions_list(&self, account_id: &str) -> AccountPermissionListCall<'a> {
         AccountPermissionListCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2176,7 +2174,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
     /// * `permissionId` - The GTM User ID.
-    pub fn permissions_update(&self, request: UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a, C> {
+    pub fn permissions_update(&self, request: UserAccess, account_id: &str, permission_id: &str) -> AccountPermissionUpdateCall<'a> {
         AccountPermissionUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2195,7 +2193,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `accountId` - The GTM Account ID.
-    pub fn get(&self, account_id: &str) -> AccountGetCall<'a, C> {
+    pub fn get(&self, account_id: &str) -> AccountGetCall<'a> {
         AccountGetCall {
             hub: self.hub,
             _account_id: account_id.to_string(),
@@ -2208,7 +2206,7 @@ impl<'a, C> AccountMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all GTM Accounts that a user has access to.
-    pub fn list(&self) -> AccountListCall<'a, C> {
+    pub fn list(&self) -> AccountListCall<'a> {
         AccountListCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -2225,7 +2223,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `accountId` - The GTM Account ID.
-    pub fn update(&self, request: Account, account_id: &str) -> AccountUpdateCall<'a, C> {
+    pub fn update(&self, request: Account, account_id: &str) -> AccountUpdateCall<'a> {
         AccountUpdateCall {
             hub: self.hub,
             _request: request,
@@ -2284,10 +2282,10 @@ impl<'a, C> AccountMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerEnvironmentCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Environment,
     _account_id: String,
     _container_id: String,
@@ -2296,9 +2294,9 @@ pub struct AccountContainerEnvironmentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerEnvironmentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerEnvironmentCreateCall<'a> {}
 
-impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerEnvironmentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2371,8 +2369,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2386,7 +2383,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2397,7 +2394,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2456,7 +2453,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2466,7 +2463,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2476,7 +2473,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentCreateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -2486,7 +2483,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2511,7 +2508,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2531,7 +2528,7 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2575,10 +2572,10 @@ impl<'a, C> AccountContainerEnvironmentCreateCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerEnvironmentDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _environment_id: String,
@@ -2587,9 +2584,9 @@ pub struct AccountContainerEnvironmentDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerEnvironmentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerEnvironmentDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerEnvironmentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2651,8 +2648,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2665,7 +2661,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2674,7 +2670,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2724,7 +2720,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -2734,7 +2730,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -2744,7 +2740,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a, C> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentDeleteCall<'a> {
         self._environment_id = new_value.to_string();
         self
     }
@@ -2754,7 +2750,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2779,7 +2775,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2799,7 +2795,7 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2843,10 +2839,10 @@ impl<'a, C> AccountContainerEnvironmentDeleteCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerEnvironmentGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _environment_id: String,
@@ -2855,9 +2851,9 @@ pub struct AccountContainerEnvironmentGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerEnvironmentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerEnvironmentGetCall<'a> {}
 
-impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerEnvironmentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2920,8 +2916,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2934,7 +2929,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2943,7 +2938,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3003,7 +2998,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3013,7 +3008,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3023,7 +3018,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a, C> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentGetCall<'a> {
         self._environment_id = new_value.to_string();
         self
     }
@@ -3033,7 +3028,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3058,7 +3053,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3078,7 +3073,7 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3122,10 +3117,10 @@ impl<'a, C> AccountContainerEnvironmentGetCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerEnvironmentListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3133,9 +3128,9 @@ pub struct AccountContainerEnvironmentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerEnvironmentListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerEnvironmentListCall<'a> {}
 
-impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerEnvironmentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3197,8 +3192,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3211,7 +3205,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3220,7 +3214,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3280,7 +3274,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3290,7 +3284,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3300,7 +3294,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3325,7 +3319,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3345,7 +3339,7 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3396,10 +3390,10 @@ impl<'a, C> AccountContainerEnvironmentListCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerEnvironmentUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerEnvironmentUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Environment,
     _account_id: String,
     _container_id: String,
@@ -3410,9 +3404,9 @@ pub struct AccountContainerEnvironmentUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerEnvironmentUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerEnvironmentUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerEnvironmentUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3489,8 +3483,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3504,7 +3497,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3515,7 +3508,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3574,7 +3567,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerEnvironmentUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3584,7 +3577,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3594,7 +3587,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3604,14 +3597,14 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
         self._environment_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the environment in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerEnvironmentUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -3621,7 +3614,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerEnvironmentUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3646,7 +3639,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerEnvironmentUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3666,7 +3659,7 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerEnvironmentUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3710,10 +3703,10 @@ impl<'a, C> AccountContainerEnvironmentUpdateCall<'a, C> where C: BorrowMut<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderEntityListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerFolderEntityListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -3722,9 +3715,9 @@ pub struct AccountContainerFolderEntityListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerFolderEntityListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerFolderEntityListCall<'a> {}
 
-impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerFolderEntityListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3787,8 +3780,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3801,7 +3793,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3810,7 +3802,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3870,7 +3862,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3880,7 +3872,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -3890,7 +3882,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a, C> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderEntityListCall<'a> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -3900,7 +3892,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderEntityListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderEntityListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3925,7 +3917,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderEntityListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderEntityListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3945,7 +3937,7 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderEntityListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderEntityListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3995,10 +3987,10 @@ impl<'a, C> AccountContainerFolderEntityListCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerFolderCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Folder,
     _account_id: String,
     _container_id: String,
@@ -4007,9 +3999,9 @@ pub struct AccountContainerFolderCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerFolderCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerFolderCreateCall<'a> {}
 
-impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerFolderCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4082,8 +4074,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4097,7 +4088,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4108,7 +4099,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4167,7 +4158,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4177,7 +4168,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4187,7 +4178,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderCreateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4197,7 +4188,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4222,7 +4213,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4242,7 +4233,7 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4286,10 +4277,10 @@ impl<'a, C> AccountContainerFolderCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerFolderDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -4298,9 +4289,9 @@ pub struct AccountContainerFolderDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerFolderDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerFolderDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerFolderDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4362,8 +4353,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4376,7 +4366,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4385,7 +4375,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4435,7 +4425,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4445,7 +4435,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4455,7 +4445,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a, C> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderDeleteCall<'a> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -4465,7 +4455,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4490,7 +4480,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4510,7 +4500,7 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4554,10 +4544,10 @@ impl<'a, C> AccountContainerFolderDeleteCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerFolderGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _folder_id: String,
@@ -4566,9 +4556,9 @@ pub struct AccountContainerFolderGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerFolderGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerFolderGetCall<'a> {}
 
-impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerFolderGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4631,8 +4621,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4645,7 +4634,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4654,7 +4643,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4714,7 +4703,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -4724,7 +4713,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -4734,7 +4723,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a, C> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderGetCall<'a> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -4744,7 +4733,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4769,7 +4758,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4789,7 +4778,7 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4833,10 +4822,10 @@ impl<'a, C> AccountContainerFolderGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerFolderListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4844,9 +4833,9 @@ pub struct AccountContainerFolderListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerFolderListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerFolderListCall<'a> {}
 
-impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerFolderListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4908,8 +4897,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4922,7 +4910,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4931,7 +4919,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4991,7 +4979,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5001,7 +4989,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5011,7 +4999,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5036,7 +5024,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5056,7 +5044,7 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5107,10 +5095,10 @@ impl<'a, C> AccountContainerFolderListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerFolderUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerFolderUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Folder,
     _account_id: String,
     _container_id: String,
@@ -5121,9 +5109,9 @@ pub struct AccountContainerFolderUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerFolderUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerFolderUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerFolderUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5200,8 +5188,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5215,7 +5202,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5226,7 +5213,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5285,7 +5272,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Folder) -> AccountContainerFolderUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5295,7 +5282,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5305,7 +5292,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5315,14 +5302,14 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
         self._folder_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the folder in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerFolderUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -5332,7 +5319,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerFolderUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5357,7 +5344,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerFolderUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5377,7 +5364,7 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerFolderUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5430,10 +5417,10 @@ impl<'a, C> AccountContainerFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerMoveFolderUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerMoveFolderUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Folder,
     _account_id: String,
     _container_id: String,
@@ -5446,9 +5433,9 @@ pub struct AccountContainerMoveFolderUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerMoveFolderUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerMoveFolderUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerMoveFolderUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5536,8 +5523,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5551,7 +5537,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5562,7 +5548,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5611,7 +5597,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Folder) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Folder) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5621,7 +5607,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5631,7 +5617,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5641,7 +5627,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn folder_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn folder_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._folder_id = new_value.to_string();
         self
     }
@@ -5649,7 +5635,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Append the given value to the *variable id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_variable_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn add_variable_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._variable_id.push(new_value.to_string());
         self
     }
@@ -5657,7 +5643,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Append the given value to the *trigger id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_trigger_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn add_trigger_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._trigger_id.push(new_value.to_string());
         self
     }
@@ -5665,7 +5651,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Append the given value to the *tag id* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_tag_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn add_tag_id(mut self, new_value: &str) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._tag_id.push(new_value.to_string());
         self
     }
@@ -5675,7 +5661,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerMoveFolderUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerMoveFolderUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5700,7 +5686,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMoveFolderUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerMoveFolderUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5720,7 +5706,7 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerMoveFolderUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerMoveFolderUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5770,10 +5756,10 @@ impl<'a, C> AccountContainerMoveFolderUpdateCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Environment,
     _account_id: String,
     _container_id: String,
@@ -5783,9 +5769,9 @@ pub struct AccountContainerReauthorizeEnvironmentUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerReauthorizeEnvironmentUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5859,8 +5845,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5874,7 +5859,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5885,7 +5870,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5944,7 +5929,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Environment) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Environment) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5954,7 +5939,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -5964,7 +5949,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -5974,7 +5959,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {
+    pub fn environment_id(mut self, new_value: &str) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
         self._environment_id = new_value.to_string();
         self
     }
@@ -5984,7 +5969,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6009,7 +5994,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6029,7 +6014,7 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerReauthorizeEnvironmentUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6079,10 +6064,10 @@ impl<'a, C> AccountContainerReauthorizeEnvironmentUpdateCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTagCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Tag,
     _account_id: String,
     _container_id: String,
@@ -6091,9 +6076,9 @@ pub struct AccountContainerTagCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTagCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTagCreateCall<'a> {}
 
-impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTagCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6166,8 +6151,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6181,7 +6165,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6192,7 +6176,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6251,7 +6235,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Tag) -> AccountContainerTagCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Tag) -> AccountContainerTagCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6261,7 +6245,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6271,7 +6255,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagCreateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6281,7 +6265,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6306,7 +6290,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6326,7 +6310,7 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6370,10 +6354,10 @@ impl<'a, C> AccountContainerTagCreateCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTagDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _tag_id: String,
@@ -6382,9 +6366,9 @@ pub struct AccountContainerTagDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTagDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTagDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTagDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6446,8 +6430,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6460,7 +6443,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6469,7 +6452,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6519,7 +6502,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6529,7 +6512,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6539,7 +6522,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a, C> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagDeleteCall<'a> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -6549,7 +6532,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6574,7 +6557,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6594,7 +6577,7 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6638,10 +6621,10 @@ impl<'a, C> AccountContainerTagDeleteCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTagGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _tag_id: String,
@@ -6650,9 +6633,9 @@ pub struct AccountContainerTagGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTagGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTagGetCall<'a> {}
 
-impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTagGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6715,8 +6698,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6729,7 +6711,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6738,7 +6720,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6798,7 +6780,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -6808,7 +6790,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -6818,7 +6800,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a, C> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagGetCall<'a> {
         self._tag_id = new_value.to_string();
         self
     }
@@ -6828,7 +6810,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6853,7 +6835,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6873,7 +6855,7 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6917,10 +6899,10 @@ impl<'a, C> AccountContainerTagGetCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTagListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6928,9 +6910,9 @@ pub struct AccountContainerTagListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTagListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTagListCall<'a> {}
 
-impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTagListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6992,8 +6974,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7006,7 +6987,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7015,7 +6996,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7075,7 +7056,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7085,7 +7066,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7095,7 +7076,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7120,7 +7101,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7140,7 +7121,7 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7191,10 +7172,10 @@ impl<'a, C> AccountContainerTagListCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTagUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTagUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Tag,
     _account_id: String,
     _container_id: String,
@@ -7205,9 +7186,9 @@ pub struct AccountContainerTagUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTagUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTagUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTagUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7284,8 +7265,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7299,7 +7279,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7310,7 +7290,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7369,7 +7349,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Tag) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Tag) -> AccountContainerTagUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -7379,7 +7359,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7389,7 +7369,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7399,14 +7379,14 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn tag_id(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
         self._tag_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the tag in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTagUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -7416,7 +7396,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTagUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7441,7 +7421,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTagUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7461,7 +7441,7 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTagUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7511,10 +7491,10 @@ impl<'a, C> AccountContainerTagUpdateCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTriggerCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Trigger,
     _account_id: String,
     _container_id: String,
@@ -7523,9 +7503,9 @@ pub struct AccountContainerTriggerCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTriggerCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTriggerCreateCall<'a> {}
 
-impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTriggerCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7598,8 +7578,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7613,7 +7592,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7624,7 +7603,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7683,7 +7662,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -7693,7 +7672,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7703,7 +7682,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerCreateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7713,7 +7692,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7738,7 +7717,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7758,7 +7737,7 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7802,10 +7781,10 @@ impl<'a, C> AccountContainerTriggerCreateCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTriggerDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _trigger_id: String,
@@ -7814,9 +7793,9 @@ pub struct AccountContainerTriggerDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTriggerDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTriggerDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTriggerDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7878,8 +7857,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7892,7 +7870,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7901,7 +7879,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7951,7 +7929,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -7961,7 +7939,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -7971,7 +7949,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerDeleteCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -7981,7 +7959,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8006,7 +7984,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8026,7 +8004,7 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8070,10 +8048,10 @@ impl<'a, C> AccountContainerTriggerDeleteCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTriggerGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _trigger_id: String,
@@ -8082,9 +8060,9 @@ pub struct AccountContainerTriggerGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTriggerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTriggerGetCall<'a> {}
 
-impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTriggerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8147,8 +8125,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8161,7 +8138,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8170,7 +8147,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8230,7 +8207,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8240,7 +8217,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8250,7 +8227,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerGetCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
@@ -8260,7 +8237,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8285,7 +8262,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8305,7 +8282,7 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8349,10 +8326,10 @@ impl<'a, C> AccountContainerTriggerGetCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTriggerListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8360,9 +8337,9 @@ pub struct AccountContainerTriggerListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTriggerListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTriggerListCall<'a> {}
 
-impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTriggerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8424,8 +8401,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8438,7 +8414,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8447,7 +8423,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8507,7 +8483,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8517,7 +8493,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8527,7 +8503,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8552,7 +8528,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8572,7 +8548,7 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8623,10 +8599,10 @@ impl<'a, C> AccountContainerTriggerListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerTriggerUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerTriggerUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Trigger,
     _account_id: String,
     _container_id: String,
@@ -8637,9 +8613,9 @@ pub struct AccountContainerTriggerUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerTriggerUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerTriggerUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerTriggerUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8716,8 +8692,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8731,7 +8706,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8742,7 +8717,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8801,7 +8776,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Trigger) -> AccountContainerTriggerUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8811,7 +8786,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -8821,7 +8796,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -8831,14 +8806,14 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn trigger_id(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
         self._trigger_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the trigger in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerTriggerUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -8848,7 +8823,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerTriggerUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8873,7 +8848,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerTriggerUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8893,7 +8868,7 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerTriggerUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8943,10 +8918,10 @@ impl<'a, C> AccountContainerTriggerUpdateCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVariableCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Variable,
     _account_id: String,
     _container_id: String,
@@ -8955,9 +8930,9 @@ pub struct AccountContainerVariableCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVariableCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVariableCreateCall<'a> {}
 
-impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVariableCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9030,8 +9005,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9045,7 +9019,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9056,7 +9030,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9115,7 +9089,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -9125,7 +9099,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9135,7 +9109,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableCreateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9145,7 +9119,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9170,7 +9144,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9190,7 +9164,7 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9234,10 +9208,10 @@ impl<'a, C> AccountContainerVariableCreateCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVariableDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _variable_id: String,
@@ -9246,9 +9220,9 @@ pub struct AccountContainerVariableDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVariableDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVariableDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVariableDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9310,8 +9284,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9324,7 +9297,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9333,7 +9306,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9383,7 +9356,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9393,7 +9366,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9403,7 +9376,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a, C> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableDeleteCall<'a> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -9413,7 +9386,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9438,7 +9411,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9458,7 +9431,7 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9502,10 +9475,10 @@ impl<'a, C> AccountContainerVariableDeleteCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVariableGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _variable_id: String,
@@ -9514,9 +9487,9 @@ pub struct AccountContainerVariableGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVariableGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVariableGetCall<'a> {}
 
-impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVariableGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9579,8 +9552,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9593,7 +9565,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9602,7 +9574,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9662,7 +9634,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9672,7 +9644,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9682,7 +9654,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a, C> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableGetCall<'a> {
         self._variable_id = new_value.to_string();
         self
     }
@@ -9692,7 +9664,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9717,7 +9689,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9737,7 +9709,7 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9781,10 +9753,10 @@ impl<'a, C> AccountContainerVariableGetCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVariableListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9792,9 +9764,9 @@ pub struct AccountContainerVariableListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVariableListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVariableListCall<'a> {}
 
-impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVariableListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9856,8 +9828,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9870,7 +9841,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9879,7 +9850,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9939,7 +9910,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -9949,7 +9920,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -9959,7 +9930,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9984,7 +9955,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10004,7 +9975,7 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10055,10 +10026,10 @@ impl<'a, C> AccountContainerVariableListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVariableUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVariableUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Variable,
     _account_id: String,
     _container_id: String,
@@ -10069,9 +10040,9 @@ pub struct AccountContainerVariableUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVariableUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVariableUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVariableUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10148,8 +10119,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10163,7 +10133,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10174,7 +10144,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10233,7 +10203,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Variable) -> AccountContainerVariableUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10243,7 +10213,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10253,7 +10223,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10263,14 +10233,14 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn variable_id(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
         self._variable_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the variable in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVariableUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -10280,7 +10250,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVariableUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10305,7 +10275,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVariableUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10325,7 +10295,7 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVariableUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10375,10 +10345,10 @@ impl<'a, C> AccountContainerVariableUpdateCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: CreateContainerVersionRequestVersionOptions,
     _account_id: String,
     _container_id: String,
@@ -10387,9 +10357,9 @@ pub struct AccountContainerVersionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionCreateCall<'a> {}
 
-impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10462,8 +10432,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10477,7 +10446,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10488,7 +10457,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10547,7 +10516,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateContainerVersionRequestVersionOptions) -> AccountContainerVersionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10557,7 +10526,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10567,7 +10536,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionCreateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10577,7 +10546,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10602,7 +10571,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10622,7 +10591,7 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10666,10 +10635,10 @@ impl<'a, C> AccountContainerVersionCreateCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -10678,9 +10647,9 @@ pub struct AccountContainerVersionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10742,8 +10711,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10756,7 +10724,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10765,7 +10733,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10815,7 +10783,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -10825,7 +10793,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -10835,7 +10803,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a, C> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionDeleteCall<'a> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -10845,7 +10813,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10870,7 +10838,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10890,7 +10858,7 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10934,10 +10902,10 @@ impl<'a, C> AccountContainerVersionDeleteCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -10946,9 +10914,9 @@ pub struct AccountContainerVersionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionGetCall<'a> {}
 
-impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11011,8 +10979,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11025,7 +10992,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11034,7 +11001,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11094,7 +11061,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11104,7 +11071,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11114,7 +11081,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a, C> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionGetCall<'a> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -11124,7 +11091,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11149,7 +11116,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11169,7 +11136,7 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11215,10 +11182,10 @@ impl<'a, C> AccountContainerVersionGetCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _include_deleted: Option<bool>,
@@ -11228,9 +11195,9 @@ pub struct AccountContainerVersionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionListCall<'a> {}
 
-impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11298,8 +11265,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11312,7 +11278,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11321,7 +11287,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11381,7 +11347,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11391,21 +11357,21 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionListCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
     /// Also retrieve deleted (archived) versions when true.
     ///
     /// Sets the *include deleted* query property to the given value.
-    pub fn include_deleted(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, C> {
+    pub fn include_deleted(mut self, new_value: bool) -> AccountContainerVersionListCall<'a> {
         self._include_deleted = Some(new_value);
         self
     }
     /// Retrieve headers only when true.
     ///
     /// Sets the *headers* query property to the given value.
-    pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a, C> {
+    pub fn headers(mut self, new_value: bool) -> AccountContainerVersionListCall<'a> {
         self._headers = Some(new_value);
         self
     }
@@ -11415,7 +11381,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11440,7 +11406,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11460,7 +11426,7 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11505,10 +11471,10 @@ impl<'a, C> AccountContainerVersionListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionPublishCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionPublishCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -11518,9 +11484,9 @@ pub struct AccountContainerVersionPublishCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionPublishCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionPublishCall<'a> {}
 
-impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionPublishCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11586,8 +11552,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11600,7 +11565,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11609,7 +11574,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11669,7 +11634,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11679,7 +11644,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11689,14 +11654,14 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
         self._container_version_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionPublishCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -11706,7 +11671,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionPublishCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionPublishCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11731,7 +11696,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionPublishCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11751,7 +11716,7 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionPublishCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11795,10 +11760,10 @@ impl<'a, C> AccountContainerVersionPublishCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionRestoreCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionRestoreCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -11807,9 +11772,9 @@ pub struct AccountContainerVersionRestoreCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionRestoreCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionRestoreCall<'a> {}
 
-impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionRestoreCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11872,8 +11837,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11886,7 +11850,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11895,7 +11859,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11955,7 +11919,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -11965,7 +11929,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -11975,7 +11939,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a, C> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionRestoreCall<'a> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -11985,7 +11949,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionRestoreCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionRestoreCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12010,7 +11974,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionRestoreCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12030,7 +11994,7 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionRestoreCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12074,10 +12038,10 @@ impl<'a, C> AccountContainerVersionRestoreCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionUndeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionUndeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _container_version_id: String,
@@ -12086,9 +12050,9 @@ pub struct AccountContainerVersionUndeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionUndeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionUndeleteCall<'a> {}
 
-impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionUndeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12151,8 +12115,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12165,7 +12128,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12174,7 +12137,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12234,7 +12197,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12244,7 +12207,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12254,7 +12217,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a, C> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUndeleteCall<'a> {
         self._container_version_id = new_value.to_string();
         self
     }
@@ -12264,7 +12227,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUndeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUndeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12289,7 +12252,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUndeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12309,7 +12272,7 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUndeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12360,10 +12323,10 @@ impl<'a, C> AccountContainerVersionUndeleteCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerVersionUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerVersionUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: ContainerVersion,
     _account_id: String,
     _container_id: String,
@@ -12374,9 +12337,9 @@ pub struct AccountContainerVersionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerVersionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerVersionUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerVersionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12453,8 +12416,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12468,7 +12430,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12479,7 +12441,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12538,7 +12500,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ContainerVersion) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: ContainerVersion) -> AccountContainerVersionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12548,7 +12510,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12558,7 +12520,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -12568,14 +12530,14 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn container_version_id(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
         self._container_version_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the container version in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerVersionUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -12585,7 +12547,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerVersionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12610,7 +12572,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerVersionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12630,7 +12592,7 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerVersionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12680,10 +12642,10 @@ impl<'a, C> AccountContainerVersionUpdateCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Container,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12691,9 +12653,9 @@ pub struct AccountContainerCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerCreateCall<'a> {}
 
-impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12765,8 +12727,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12780,7 +12741,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12791,7 +12752,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12850,7 +12811,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Container) -> AccountContainerCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Container) -> AccountContainerCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -12860,7 +12821,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -12870,7 +12831,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12895,7 +12856,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12915,7 +12876,7 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12959,10 +12920,10 @@ impl<'a, C> AccountContainerCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12970,9 +12931,9 @@ pub struct AccountContainerDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerDeleteCall<'a> {}
 
-impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13033,8 +12994,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13047,7 +13007,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13056,7 +13016,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13106,7 +13066,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13116,7 +13076,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerDeleteCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13126,7 +13086,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13151,7 +13111,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13171,7 +13131,7 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13215,10 +13175,10 @@ impl<'a, C> AccountContainerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerGetCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _container_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13226,9 +13186,9 @@ pub struct AccountContainerGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerGetCall<'a> {}
 
-impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13290,8 +13250,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13304,7 +13263,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13313,7 +13272,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13373,7 +13332,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13383,7 +13342,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerGetCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
@@ -13393,7 +13352,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13418,7 +13377,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13438,7 +13397,7 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13482,19 +13441,19 @@ impl<'a, C> AccountContainerGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerListCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerListCall<'a> {}
 
-impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13555,8 +13514,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13569,7 +13527,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13578,7 +13536,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13638,7 +13596,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13648,7 +13606,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13673,7 +13631,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13693,7 +13651,7 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13744,10 +13702,10 @@ impl<'a, C> AccountContainerListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountContainerUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountContainerUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Container,
     _account_id: String,
     _container_id: String,
@@ -13757,9 +13715,9 @@ pub struct AccountContainerUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountContainerUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountContainerUpdateCall<'a> {}
 
-impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountContainerUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13835,8 +13793,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13850,7 +13807,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13861,7 +13818,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13920,7 +13877,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Container) -> AccountContainerUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Container) -> AccountContainerUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -13930,7 +13887,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -13940,14 +13897,14 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C> {
+    pub fn container_id(mut self, new_value: &str) -> AccountContainerUpdateCall<'a> {
         self._container_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the container in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountContainerUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -13957,7 +13914,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountContainerUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13982,7 +13939,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountContainerUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14002,7 +13959,7 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountContainerUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14052,10 +14009,10 @@ impl<'a, C> AccountContainerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountPermissionCreateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: UserAccess,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14063,9 +14020,9 @@ pub struct AccountPermissionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountPermissionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPermissionCreateCall<'a> {}
 
-impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPermissionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14137,8 +14094,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14152,7 +14108,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14163,7 +14119,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14222,7 +14178,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -14232,7 +14188,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionCreateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14242,7 +14198,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14267,7 +14223,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14287,7 +14243,7 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14331,10 +14287,10 @@ impl<'a, C> AccountPermissionCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionDeleteCall<'a, C>
-    where C: 'a {
+pub struct AccountPermissionDeleteCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14342,9 +14298,9 @@ pub struct AccountPermissionDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountPermissionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPermissionDeleteCall<'a> {}
 
-impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPermissionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14405,8 +14361,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14419,7 +14374,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14428,7 +14383,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14478,7 +14433,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14488,7 +14443,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a, C> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionDeleteCall<'a> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14498,7 +14453,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14523,7 +14478,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14543,7 +14498,7 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14587,10 +14542,10 @@ impl<'a, C> AccountPermissionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionGetCall<'a, C>
-    where C: 'a {
+pub struct AccountPermissionGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _permission_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14598,9 +14553,9 @@ pub struct AccountPermissionGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountPermissionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPermissionGetCall<'a> {}
 
-impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPermissionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14662,8 +14617,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14676,7 +14630,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14685,7 +14639,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14745,7 +14699,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -14755,7 +14709,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a, C> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionGetCall<'a> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -14765,7 +14719,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14790,7 +14744,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14810,7 +14764,7 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14854,19 +14808,19 @@ impl<'a, C> AccountPermissionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionListCall<'a, C>
-    where C: 'a {
+pub struct AccountPermissionListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountPermissionListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPermissionListCall<'a> {}
 
-impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPermissionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14927,8 +14881,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14941,7 +14894,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14950,7 +14903,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15010,7 +14963,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionListCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15020,7 +14973,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15045,7 +14998,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15065,7 +15018,7 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15115,10 +15068,10 @@ impl<'a, C> AccountPermissionListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountPermissionUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountPermissionUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: UserAccess,
     _account_id: String,
     _permission_id: String,
@@ -15127,9 +15080,9 @@ pub struct AccountPermissionUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountPermissionUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountPermissionUpdateCall<'a> {}
 
-impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountPermissionUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15202,8 +15155,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15217,7 +15169,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15228,7 +15180,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15287,7 +15239,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: UserAccess) -> AccountPermissionUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15297,7 +15249,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15307,7 +15259,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a, C> {
+    pub fn permission_id(mut self, new_value: &str) -> AccountPermissionUpdateCall<'a> {
         self._permission_id = new_value.to_string();
         self
     }
@@ -15317,7 +15269,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountPermissionUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15342,7 +15294,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountPermissionUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15362,7 +15314,7 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountPermissionUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15406,19 +15358,19 @@ impl<'a, C> AccountPermissionUpdateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountGetCall<'a, C>
-    where C: 'a {
+pub struct AccountGetCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _account_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountGetCall<'a> {}
 
-impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15479,8 +15431,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15493,7 +15444,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15502,7 +15453,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15562,7 +15513,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountGetCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -15572,7 +15523,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15597,7 +15548,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15617,7 +15568,7 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15661,18 +15612,18 @@ impl<'a, C> AccountGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountListCall<'a, C>
-    where C: 'a {
+pub struct AccountListCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountListCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountListCall<'a> {}
 
-impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15711,8 +15662,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15725,7 +15675,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15734,7 +15684,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15794,7 +15744,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15819,7 +15769,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15839,7 +15789,7 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15890,10 +15840,10 @@ impl<'a, C> AccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AccountUpdateCall<'a, C>
-    where C: 'a {
+pub struct AccountUpdateCall<'a>
+    where  {
 
-    hub: &'a TagManager<C>,
+    hub: &'a TagManager<>,
     _request: Account,
     _account_id: String,
     _fingerprint: Option<String>,
@@ -15902,9 +15852,9 @@ pub struct AccountUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountUpdateCall<'a> {}
 
-impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15979,8 +15929,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15994,7 +15943,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16005,7 +15954,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16064,7 +16013,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Account) -> AccountUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -16074,14 +16023,14 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> AccountUpdateCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
     /// When provided, this fingerprint must match the fingerprint of the account in storage.
     ///
     /// Sets the *fingerprint* query property to the given value.
-    pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a, C> {
+    pub fn fingerprint(mut self, new_value: &str) -> AccountUpdateCall<'a> {
         self._fingerprint = Some(new_value.to_string());
         self
     }
@@ -16091,7 +16040,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16116,7 +16065,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16136,7 +16085,7 @@ impl<'a, C> AccountUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

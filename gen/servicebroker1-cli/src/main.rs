@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::ServiceBroker<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::ServiceBroker,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -455,7 +454,7 @@ async fn main() {
     
     let mut app = App::new("servicebroker1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20190624")
+           .version("2.0.3+20190624")
            .about("The Google Cloud Platform Service Broker API provides Google hosted
            implementation of the Open Service Broker API
            (https://www.openservicebrokerapi.org/).

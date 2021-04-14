@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Playable Locations* crate version *2.0.0+20200707*, where *20200707* is the exact revision of the *playablelocations:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Playable Locations* crate version *2.0.3+20200707*, where *20200707* is the exact revision of the *playablelocations:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Playable Locations* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/maps/contact-sales/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/playablelocations3).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/playablelocations3).
 //! # Features
 //! 
 //! Use the following functionality with ease from the central [hub](PlayableLocations) ... 

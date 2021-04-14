@@ -4,10 +4,10 @@
 [package]
 
 name = "google-datafusion1_beta1-cli"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Data Fusion (protocol v1beta1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/datafusion1_beta1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datafusion1_beta1-cli"
 homepage = "https://cloud.google.com/data-fusion/docs"
 documentation = "http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-datafusion1_beta1]
 path = "../datafusion1_beta1"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"

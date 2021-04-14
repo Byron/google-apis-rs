@@ -4,10 +4,10 @@
 [package]
 
 name = "google-policytroubleshooter1-cli"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Policy Troubleshooter (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/policytroubleshooter1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/policytroubleshooter1-cli"
 homepage = "https://cloud.google.com/iam/"
 documentation = "http://byron.github.io/google-apis-rs/google_policytroubleshooter1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-policytroubleshooter1]
 path = "../policytroubleshooter1"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"

@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudIdentity<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::CloudIdentity,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -3389,7 +3388,7 @@ async fn main() {
     
     let mut app = App::new("cloudidentity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210310")
+           .version("2.0.3+20210310")
            .about("API for provisioning and managing identity resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudidentity1_cli")
            .arg(Arg::with_name("url")

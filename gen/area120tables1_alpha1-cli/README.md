@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-area120tables1_alpha1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/area120tables1_alpha1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/area120tables1_alpha1-cli).
 
 # Usage
 
-This documentation was generated from the *Area120 Tables* API at revision *20210330*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Area120 Tables* API at revision *20210330*. The CLI is at version *2.0.3*.
 
 ```bash
 area120tables1-alpha1 [options]

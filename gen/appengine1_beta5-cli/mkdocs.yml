@@ -1,8 +1,8 @@
-site_name: appengine v2.0.0+20181005
+site_name: appengine v2.0.3+20181005
 site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta5-cli
 site_description: A complete library to interact with appengine (protocol v1beta5)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/appengine1_beta5-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/appengine1_beta5-cli
 
 docs_dir: docs
 site_dir: build_html

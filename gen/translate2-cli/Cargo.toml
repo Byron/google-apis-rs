@@ -4,10 +4,10 @@
 [package]
 
 name = "google-translate2-cli"
-version = "2.0.0+20170525"
+version = "2.0.3+20170525"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Translate (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/translate2-cli"
 homepage = "https://code.google.com/apis/language/translate/v2/getting_started.html"
 documentation = "http://byron.github.io/google-apis-rs/google_translate2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-translate2]
 path = "../translate2"
-version = "2.0.0+20170525"
+version = "2.0.3+20170525"

@@ -1,8 +1,8 @@
-site_name: Cloud Tasks v2.0.0+20210315
+site_name: Cloud Tasks v2.0.3+20210315
 site_url: http://byron.github.io/google-apis-rs/google-cloudtasks2-cli
 site_description: A complete library to interact with Cloud Tasks (protocol v2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtasks2-cli
 
 docs_dir: docs
 site_dir: build_html

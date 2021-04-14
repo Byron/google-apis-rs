@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,35 +104,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct IAMCredentials<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct IAMCredentials<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for IAMCredentials<C> {}
+impl<'a, > client::Hub for IAMCredentials<> {}
 
-impl<'a, C> IAMCredentials<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > IAMCredentials<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> IAMCredentials<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> IAMCredentials<> {
         IAMCredentials {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://iamcredentials.googleapis.com/".to_string(),
             _root_url: "https://iamcredentials.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -365,15 +363,15 @@ impl client::ResponseResult for SignJwtResponse {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a IAMCredentials<C>,
+    hub: &'a IAMCredentials<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -383,7 +381,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the service account for which the credentials are requested, in the following format: `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard character is required; replacing it with a project ID is invalid.
-    pub fn service_accounts_generate_access_token(&self, request: GenerateAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C> {
+    pub fn service_accounts_generate_access_token(&self, request: GenerateAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a> {
         ProjectServiceAccountGenerateAccessTokenCall {
             hub: self.hub,
             _request: request,
@@ -402,7 +400,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the service account for which the credentials are requested, in the following format: `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard character is required; replacing it with a project ID is invalid.
-    pub fn service_accounts_generate_id_token(&self, request: GenerateIdTokenRequest, name: &str) -> ProjectServiceAccountGenerateIdTokenCall<'a, C> {
+    pub fn service_accounts_generate_id_token(&self, request: GenerateIdTokenRequest, name: &str) -> ProjectServiceAccountGenerateIdTokenCall<'a> {
         ProjectServiceAccountGenerateIdTokenCall {
             hub: self.hub,
             _request: request,
@@ -421,7 +419,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the service account for which the credentials are requested, in the following format: `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard character is required; replacing it with a project ID is invalid.
-    pub fn service_accounts_sign_blob(&self, request: SignBlobRequest, name: &str) -> ProjectServiceAccountSignBlobCall<'a, C> {
+    pub fn service_accounts_sign_blob(&self, request: SignBlobRequest, name: &str) -> ProjectServiceAccountSignBlobCall<'a> {
         ProjectServiceAccountSignBlobCall {
             hub: self.hub,
             _request: request,
@@ -440,7 +438,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the service account for which the credentials are requested, in the following format: `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard character is required; replacing it with a project ID is invalid.
-    pub fn service_accounts_sign_jwt(&self, request: SignJwtRequest, name: &str) -> ProjectServiceAccountSignJwtCall<'a, C> {
+    pub fn service_accounts_sign_jwt(&self, request: SignJwtRequest, name: &str) -> ProjectServiceAccountSignJwtCall<'a> {
         ProjectServiceAccountSignJwtCall {
             hub: self.hub,
             _request: request,
@@ -498,10 +496,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceAccountGenerateAccessTokenCall<'a, C>
-    where C: 'a {
+pub struct ProjectServiceAccountGenerateAccessTokenCall<'a>
+    where  {
 
-    hub: &'a IAMCredentials<C>,
+    hub: &'a IAMCredentials<>,
     _request: GenerateAccessTokenRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -509,9 +507,9 @@ pub struct ProjectServiceAccountGenerateAccessTokenCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectServiceAccountGenerateAccessTokenCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectServiceAccountGenerateAccessTokenCall<'a> {}
 
-impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectServiceAccountGenerateAccessTokenCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -587,8 +585,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -602,7 +599,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -613,7 +610,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -672,7 +669,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateAccessTokenRequest) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C> {
+    pub fn request(mut self, new_value: GenerateAccessTokenRequest) -> ProjectServiceAccountGenerateAccessTokenCall<'a> {
         self._request = new_value;
         self
     }
@@ -682,7 +679,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -692,7 +689,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountGenerateAccessTokenCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -717,7 +714,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -737,7 +734,7 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateAccessTokenCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -787,10 +784,10 @@ impl<'a, C> ProjectServiceAccountGenerateAccessTokenCall<'a, C> where C: BorrowM
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceAccountGenerateIdTokenCall<'a, C>
-    where C: 'a {
+pub struct ProjectServiceAccountGenerateIdTokenCall<'a>
+    where  {
 
-    hub: &'a IAMCredentials<C>,
+    hub: &'a IAMCredentials<>,
     _request: GenerateIdTokenRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -798,9 +795,9 @@ pub struct ProjectServiceAccountGenerateIdTokenCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectServiceAccountGenerateIdTokenCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectServiceAccountGenerateIdTokenCall<'a> {}
 
-impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectServiceAccountGenerateIdTokenCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -876,8 +873,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -891,7 +887,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -902,7 +898,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -961,7 +957,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateIdTokenRequest) -> ProjectServiceAccountGenerateIdTokenCall<'a, C> {
+    pub fn request(mut self, new_value: GenerateIdTokenRequest) -> ProjectServiceAccountGenerateIdTokenCall<'a> {
         self._request = new_value;
         self
     }
@@ -971,7 +967,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateIdTokenCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountGenerateIdTokenCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -981,7 +977,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountGenerateIdTokenCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountGenerateIdTokenCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1006,7 +1002,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateIdTokenCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGenerateIdTokenCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1026,7 +1022,7 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateIdTokenCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountGenerateIdTokenCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1076,10 +1072,10 @@ impl<'a, C> ProjectServiceAccountGenerateIdTokenCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceAccountSignBlobCall<'a, C>
-    where C: 'a {
+pub struct ProjectServiceAccountSignBlobCall<'a>
+    where  {
 
-    hub: &'a IAMCredentials<C>,
+    hub: &'a IAMCredentials<>,
     _request: SignBlobRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1087,9 +1083,9 @@ pub struct ProjectServiceAccountSignBlobCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectServiceAccountSignBlobCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectServiceAccountSignBlobCall<'a> {}
 
-impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectServiceAccountSignBlobCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1165,8 +1161,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1180,7 +1175,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1191,7 +1186,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1250,7 +1245,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SignBlobRequest) -> ProjectServiceAccountSignBlobCall<'a, C> {
+    pub fn request(mut self, new_value: SignBlobRequest) -> ProjectServiceAccountSignBlobCall<'a> {
         self._request = new_value;
         self
     }
@@ -1260,7 +1255,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountSignBlobCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountSignBlobCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1270,7 +1265,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountSignBlobCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountSignBlobCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1295,7 +1290,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignBlobCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignBlobCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1315,7 +1310,7 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountSignBlobCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountSignBlobCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1365,10 +1360,10 @@ impl<'a, C> ProjectServiceAccountSignBlobCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectServiceAccountSignJwtCall<'a, C>
-    where C: 'a {
+pub struct ProjectServiceAccountSignJwtCall<'a>
+    where  {
 
-    hub: &'a IAMCredentials<C>,
+    hub: &'a IAMCredentials<>,
     _request: SignJwtRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1376,9 +1371,9 @@ pub struct ProjectServiceAccountSignJwtCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectServiceAccountSignJwtCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectServiceAccountSignJwtCall<'a> {}
 
-impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectServiceAccountSignJwtCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1454,8 +1449,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1469,7 +1463,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1480,7 +1474,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1539,7 +1533,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SignJwtRequest) -> ProjectServiceAccountSignJwtCall<'a, C> {
+    pub fn request(mut self, new_value: SignJwtRequest) -> ProjectServiceAccountSignJwtCall<'a> {
         self._request = new_value;
         self
     }
@@ -1549,7 +1543,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountSignJwtCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectServiceAccountSignJwtCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1559,7 +1553,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountSignJwtCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectServiceAccountSignJwtCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1584,7 +1578,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignJwtCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignJwtCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1604,7 +1598,7 @@ impl<'a, C> ProjectServiceAccountSignJwtCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountSignJwtCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectServiceAccountSignJwtCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

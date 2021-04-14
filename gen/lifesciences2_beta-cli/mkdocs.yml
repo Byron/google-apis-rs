@@ -1,8 +1,8 @@
-site_name: Cloud Life Sciences v2.0.0+20210319
+site_name: Cloud Life Sciences v2.0.3+20210319
 site_url: http://byron.github.io/google-apis-rs/google-lifesciences2_beta-cli
 site_description: A complete library to interact with Cloud Life Sciences (protocol v2beta)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/lifesciences2_beta-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/lifesciences2_beta-cli
 
 docs_dir: docs
 site_dir: build_html

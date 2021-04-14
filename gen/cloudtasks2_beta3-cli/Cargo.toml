@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudtasks2_beta3-cli"
-version = "2.0.0+20210315"
+version = "2.0.3+20210315"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Tasks (protocol v2beta3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta3-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtasks2_beta3-cli"
 homepage = "https://cloud.google.com/tasks/"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudtasks2_beta3_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudtasks2_beta3]
 path = "../cloudtasks2_beta3"
-version = "2.0.0+20210315"
+version = "2.0.3+20210315"

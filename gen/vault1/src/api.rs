@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,38 +105,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Vault<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Vault<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Vault<C> {}
+impl<'a, > client::Hub for Vault<> {}
 
-impl<'a, C> Vault<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Vault<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Vault<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Vault<> {
         Vault {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://vault.googleapis.com/".to_string(),
             _root_url: "https://vault.googleapis.com/".to_string(),
         }
     }
 
-    pub fn matters(&'a self) -> MatterMethods<'a, C> {
+    pub fn matters(&'a self) -> MatterMethods<'a> {
         MatterMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1352,15 +1350,15 @@ impl client::Part for VoiceOptions {}
 /// let rb = hub.matters();
 /// # }
 /// ```
-pub struct MatterMethods<'a, C>
-    where C: 'a {
+pub struct MatterMethods<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MatterMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MatterMethods<'a> {}
 
-impl<'a, C> MatterMethods<'a, C> {
+impl<'a> MatterMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1370,7 +1368,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn exports_create(&self, request: Export, matter_id: &str) -> MatterExportCreateCall<'a, C> {
+    pub fn exports_create(&self, request: Export, matter_id: &str) -> MatterExportCreateCall<'a> {
         MatterExportCreateCall {
             hub: self.hub,
             _request: request,
@@ -1389,7 +1387,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID.
     /// * `exportId` - The export ID.
-    pub fn exports_delete(&self, matter_id: &str, export_id: &str) -> MatterExportDeleteCall<'a, C> {
+    pub fn exports_delete(&self, matter_id: &str, export_id: &str) -> MatterExportDeleteCall<'a> {
         MatterExportDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1408,7 +1406,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID.
     /// * `exportId` - The export ID.
-    pub fn exports_get(&self, matter_id: &str, export_id: &str) -> MatterExportGetCall<'a, C> {
+    pub fn exports_get(&self, matter_id: &str, export_id: &str) -> MatterExportGetCall<'a> {
         MatterExportGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1426,7 +1424,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn exports_list(&self, matter_id: &str) -> MatterExportListCall<'a, C> {
+    pub fn exports_list(&self, matter_id: &str) -> MatterExportListCall<'a> {
         MatterExportListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1447,7 +1445,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_accounts_create(&self, request: HeldAccount, matter_id: &str, hold_id: &str) -> MatterHoldAccountCreateCall<'a, C> {
+    pub fn holds_accounts_create(&self, request: HeldAccount, matter_id: &str, hold_id: &str) -> MatterHoldAccountCreateCall<'a> {
         MatterHoldAccountCreateCall {
             hub: self.hub,
             _request: request,
@@ -1468,7 +1466,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
     /// * `accountId` - The ID of the account to remove from the hold.
-    pub fn holds_accounts_delete(&self, matter_id: &str, hold_id: &str, account_id: &str) -> MatterHoldAccountDeleteCall<'a, C> {
+    pub fn holds_accounts_delete(&self, matter_id: &str, hold_id: &str, account_id: &str) -> MatterHoldAccountDeleteCall<'a> {
         MatterHoldAccountDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1488,7 +1486,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_accounts_list(&self, matter_id: &str, hold_id: &str) -> MatterHoldAccountListCall<'a, C> {
+    pub fn holds_accounts_list(&self, matter_id: &str, hold_id: &str) -> MatterHoldAccountListCall<'a> {
         MatterHoldAccountListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1508,7 +1506,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_add_held_accounts(&self, request: AddHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldAddHeldAccountCall<'a, C> {
+    pub fn holds_add_held_accounts(&self, request: AddHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldAddHeldAccountCall<'a> {
         MatterHoldAddHeldAccountCall {
             hub: self.hub,
             _request: request,
@@ -1528,7 +1526,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn holds_create(&self, request: Hold, matter_id: &str) -> MatterHoldCreateCall<'a, C> {
+    pub fn holds_create(&self, request: Hold, matter_id: &str) -> MatterHoldCreateCall<'a> {
         MatterHoldCreateCall {
             hub: self.hub,
             _request: request,
@@ -1547,7 +1545,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_delete(&self, matter_id: &str, hold_id: &str) -> MatterHoldDeleteCall<'a, C> {
+    pub fn holds_delete(&self, matter_id: &str, hold_id: &str) -> MatterHoldDeleteCall<'a> {
         MatterHoldDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1566,7 +1564,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_get(&self, matter_id: &str, hold_id: &str) -> MatterHoldGetCall<'a, C> {
+    pub fn holds_get(&self, matter_id: &str, hold_id: &str) -> MatterHoldGetCall<'a> {
         MatterHoldGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1585,7 +1583,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn holds_list(&self, matter_id: &str) -> MatterHoldListCall<'a, C> {
+    pub fn holds_list(&self, matter_id: &str) -> MatterHoldListCall<'a> {
         MatterHoldListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1607,7 +1605,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The hold ID.
-    pub fn holds_remove_held_accounts(&self, request: RemoveHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldRemoveHeldAccountCall<'a, C> {
+    pub fn holds_remove_held_accounts(&self, request: RemoveHeldAccountsRequest, matter_id: &str, hold_id: &str) -> MatterHoldRemoveHeldAccountCall<'a> {
         MatterHoldRemoveHeldAccountCall {
             hub: self.hub,
             _request: request,
@@ -1628,7 +1626,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
     /// * `holdId` - The ID of the hold.
-    pub fn holds_update(&self, request: Hold, matter_id: &str, hold_id: &str) -> MatterHoldUpdateCall<'a, C> {
+    pub fn holds_update(&self, request: Hold, matter_id: &str, hold_id: &str) -> MatterHoldUpdateCall<'a> {
         MatterHoldUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1648,7 +1646,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID of the parent matter for which the saved query is to be created.
-    pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a, C> {
+    pub fn saved_queries_create(&self, request: SavedQuery, matter_id: &str) -> MatterSavedQueryCreateCall<'a> {
         MatterSavedQueryCreateCall {
             hub: self.hub,
             _request: request,
@@ -1667,7 +1665,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID of the parent matter for which the saved query is to be deleted.
     /// * `savedQueryId` - ID of the saved query to be deleted.
-    pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a, C> {
+    pub fn saved_queries_delete(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryDeleteCall<'a> {
         MatterSavedQueryDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1686,7 +1684,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `matterId` - The matter ID of the parent matter for which the saved query is to be retrieved.
     /// * `savedQueryId` - ID of the saved query to be retrieved.
-    pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a, C> {
+    pub fn saved_queries_get(&self, matter_id: &str, saved_query_id: &str) -> MatterSavedQueryGetCall<'a> {
         MatterSavedQueryGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1704,7 +1702,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID of the parent matter for which the saved queries are to be retrieved.
-    pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a, C> {
+    pub fn saved_queries_list(&self, matter_id: &str) -> MatterSavedQueryListCall<'a> {
         MatterSavedQueryListCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1724,7 +1722,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn add_permissions(&self, request: AddMatterPermissionsRequest, matter_id: &str) -> MatterAddPermissionCall<'a, C> {
+    pub fn add_permissions(&self, request: AddMatterPermissionsRequest, matter_id: &str) -> MatterAddPermissionCall<'a> {
         MatterAddPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1743,7 +1741,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn close(&self, request: CloseMatterRequest, matter_id: &str) -> MatterCloseCall<'a, C> {
+    pub fn close(&self, request: CloseMatterRequest, matter_id: &str) -> MatterCloseCall<'a> {
         MatterCloseCall {
             hub: self.hub,
             _request: request,
@@ -1762,7 +1760,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn count(&self, request: CountArtifactsRequest, matter_id: &str) -> MatterCountCall<'a, C> {
+    pub fn count(&self, request: CountArtifactsRequest, matter_id: &str) -> MatterCountCall<'a> {
         MatterCountCall {
             hub: self.hub,
             _request: request,
@@ -1780,7 +1778,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Matter) -> MatterCreateCall<'a, C> {
+    pub fn create(&self, request: Matter) -> MatterCreateCall<'a> {
         MatterCreateCall {
             hub: self.hub,
             _request: request,
@@ -1797,7 +1795,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID
-    pub fn delete(&self, matter_id: &str) -> MatterDeleteCall<'a, C> {
+    pub fn delete(&self, matter_id: &str) -> MatterDeleteCall<'a> {
         MatterDeleteCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1814,7 +1812,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// # Arguments
     ///
     /// * `matterId` - The matter ID.
-    pub fn get(&self, matter_id: &str) -> MatterGetCall<'a, C> {
+    pub fn get(&self, matter_id: &str) -> MatterGetCall<'a> {
         MatterGetCall {
             hub: self.hub,
             _matter_id: matter_id.to_string(),
@@ -1828,7 +1826,7 @@ impl<'a, C> MatterMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists matters the user has access to.
-    pub fn list(&self) -> MatterListCall<'a, C> {
+    pub fn list(&self) -> MatterListCall<'a> {
         MatterListCall {
             hub: self.hub,
             _view: Default::default(),
@@ -1849,7 +1847,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn remove_permissions(&self, request: RemoveMatterPermissionsRequest, matter_id: &str) -> MatterRemovePermissionCall<'a, C> {
+    pub fn remove_permissions(&self, request: RemoveMatterPermissionsRequest, matter_id: &str) -> MatterRemovePermissionCall<'a> {
         MatterRemovePermissionCall {
             hub: self.hub,
             _request: request,
@@ -1868,7 +1866,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn reopen(&self, request: ReopenMatterRequest, matter_id: &str) -> MatterReopenCall<'a, C> {
+    pub fn reopen(&self, request: ReopenMatterRequest, matter_id: &str) -> MatterReopenCall<'a> {
         MatterReopenCall {
             hub: self.hub,
             _request: request,
@@ -1887,7 +1885,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn undelete(&self, request: UndeleteMatterRequest, matter_id: &str) -> MatterUndeleteCall<'a, C> {
+    pub fn undelete(&self, request: UndeleteMatterRequest, matter_id: &str) -> MatterUndeleteCall<'a> {
         MatterUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -1906,7 +1904,7 @@ impl<'a, C> MatterMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `matterId` - The matter ID.
-    pub fn update(&self, request: Matter, matter_id: &str) -> MatterUpdateCall<'a, C> {
+    pub fn update(&self, request: Matter, matter_id: &str) -> MatterUpdateCall<'a> {
         MatterUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1950,15 +1948,15 @@ impl<'a, C> MatterMethods<'a, C> {
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1968,7 +1966,7 @@ impl<'a, C> OperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a, C> {
+    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a> {
         OperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1985,7 +1983,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a> {
         OperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2001,7 +1999,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2018,7 +2016,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation's parent resource.
-    pub fn list(&self, name: &str) -> OperationListCall<'a, C> {
+    pub fn list(&self, name: &str) -> OperationListCall<'a> {
         OperationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2077,10 +2075,10 @@ impl<'a, C> OperationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportCreateCall<'a, C>
-    where C: 'a {
+pub struct MatterExportCreateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: Export,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2088,9 +2086,9 @@ pub struct MatterExportCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterExportCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterExportCreateCall<'a> {}
 
-impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterExportCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2162,8 +2160,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2177,7 +2174,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2188,7 +2185,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2247,7 +2244,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Export) -> MatterExportCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Export) -> MatterExportCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2257,7 +2254,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportCreateCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportCreateCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -2267,7 +2264,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2292,7 +2289,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2312,7 +2309,7 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2356,10 +2353,10 @@ impl<'a, C> MatterExportCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportDeleteCall<'a, C>
-    where C: 'a {
+pub struct MatterExportDeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _export_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2367,9 +2364,9 @@ pub struct MatterExportDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterExportDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterExportDeleteCall<'a> {}
 
-impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterExportDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2431,8 +2428,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2445,7 +2441,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2454,7 +2450,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2514,7 +2510,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -2524,7 +2520,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn export_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a, C> {
+    pub fn export_id(mut self, new_value: &str) -> MatterExportDeleteCall<'a> {
         self._export_id = new_value.to_string();
         self
     }
@@ -2534,7 +2530,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2559,7 +2555,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2579,7 +2575,7 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2623,10 +2619,10 @@ impl<'a, C> MatterExportDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportGetCall<'a, C>
-    where C: 'a {
+pub struct MatterExportGetCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _export_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2634,9 +2630,9 @@ pub struct MatterExportGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterExportGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterExportGetCall<'a> {}
 
-impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterExportGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2698,8 +2694,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2712,7 +2707,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2721,7 +2716,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2781,7 +2776,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportGetCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportGetCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -2791,7 +2786,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn export_id(mut self, new_value: &str) -> MatterExportGetCall<'a, C> {
+    pub fn export_id(mut self, new_value: &str) -> MatterExportGetCall<'a> {
         self._export_id = new_value.to_string();
         self
     }
@@ -2801,7 +2796,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2826,7 +2821,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2846,7 +2841,7 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2892,10 +2887,10 @@ impl<'a, C> MatterExportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterExportListCall<'a, C>
-    where C: 'a {
+pub struct MatterExportListCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2904,9 +2899,9 @@ pub struct MatterExportListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterExportListCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterExportListCall<'a> {}
 
-impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterExportListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2973,8 +2968,7 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2987,7 +2981,7 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2996,7 +2990,7 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3056,21 +3050,21 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterExportListCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterExportListCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
     /// The pagination token as returned in the response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterExportListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MatterExportListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The number of exports to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterExportListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MatterExportListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3080,7 +3074,7 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterExportListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3105,7 +3099,7 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterExportListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterExportListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3125,7 +3119,7 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterExportListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3175,10 +3169,10 @@ impl<'a, C> MatterExportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAccountCreateCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldAccountCreateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: HeldAccount,
     _matter_id: String,
     _hold_id: String,
@@ -3187,9 +3181,9 @@ pub struct MatterHoldAccountCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldAccountCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldAccountCreateCall<'a> {}
 
-impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldAccountCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3262,8 +3256,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3277,7 +3270,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3288,7 +3281,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3347,7 +3340,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: HeldAccount) -> MatterHoldAccountCreateCall<'a, C> {
+    pub fn request(mut self, new_value: HeldAccount) -> MatterHoldAccountCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3357,7 +3350,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -3367,7 +3360,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountCreateCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -3377,7 +3370,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3402,7 +3395,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3422,7 +3415,7 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3466,10 +3459,10 @@ impl<'a, C> MatterHoldAccountCreateCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAccountDeleteCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldAccountDeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _hold_id: String,
     _account_id: String,
@@ -3478,9 +3471,9 @@ pub struct MatterHoldAccountDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldAccountDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldAccountDeleteCall<'a> {}
 
-impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldAccountDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3543,8 +3536,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3557,7 +3549,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3566,7 +3558,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3626,7 +3618,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -3636,7 +3628,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -3646,7 +3638,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a, C> {
+    pub fn account_id(mut self, new_value: &str) -> MatterHoldAccountDeleteCall<'a> {
         self._account_id = new_value.to_string();
         self
     }
@@ -3656,7 +3648,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3681,7 +3673,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3701,7 +3693,7 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3745,10 +3737,10 @@ impl<'a, C> MatterHoldAccountDeleteCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAccountListCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldAccountListCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _hold_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3756,9 +3748,9 @@ pub struct MatterHoldAccountListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldAccountListCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldAccountListCall<'a> {}
 
-impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldAccountListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3820,8 +3812,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3834,7 +3825,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3843,7 +3834,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3903,7 +3894,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -3913,7 +3904,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAccountListCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -3923,7 +3914,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAccountListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3948,7 +3939,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAccountListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3968,7 +3959,7 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAccountListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4018,10 +4009,10 @@ impl<'a, C> MatterHoldAccountListCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldAddHeldAccountCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldAddHeldAccountCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: AddHeldAccountsRequest,
     _matter_id: String,
     _hold_id: String,
@@ -4030,9 +4021,9 @@ pub struct MatterHoldAddHeldAccountCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldAddHeldAccountCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldAddHeldAccountCall<'a> {}
 
-impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldAddHeldAccountCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4105,8 +4096,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4120,7 +4110,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4131,7 +4121,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4190,7 +4180,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddHeldAccountsRequest) -> MatterHoldAddHeldAccountCall<'a, C> {
+    pub fn request(mut self, new_value: AddHeldAccountsRequest) -> MatterHoldAddHeldAccountCall<'a> {
         self._request = new_value;
         self
     }
@@ -4200,7 +4190,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4210,7 +4200,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldAddHeldAccountCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -4220,7 +4210,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAddHeldAccountCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldAddHeldAccountCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4245,7 +4235,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAddHeldAccountCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldAddHeldAccountCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4265,7 +4255,7 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAddHeldAccountCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldAddHeldAccountCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4315,10 +4305,10 @@ impl<'a, C> MatterHoldAddHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldCreateCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldCreateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: Hold,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4326,9 +4316,9 @@ pub struct MatterHoldCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldCreateCall<'a> {}
 
-impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4400,8 +4390,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4415,7 +4404,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4426,7 +4415,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4485,7 +4474,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Hold) -> MatterHoldCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Hold) -> MatterHoldCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4495,7 +4484,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldCreateCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldCreateCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4505,7 +4494,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4530,7 +4519,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4550,7 +4539,7 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4594,10 +4583,10 @@ impl<'a, C> MatterHoldCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldDeleteCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldDeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _hold_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4605,9 +4594,9 @@ pub struct MatterHoldDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldDeleteCall<'a> {}
 
-impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4669,8 +4658,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4683,7 +4671,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4692,7 +4680,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4752,7 +4740,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -4762,7 +4750,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldDeleteCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -4772,7 +4760,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4797,7 +4785,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4817,7 +4805,7 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4862,10 +4850,10 @@ impl<'a, C> MatterHoldDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldGetCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldGetCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _hold_id: String,
     _view: Option<String>,
@@ -4874,9 +4862,9 @@ pub struct MatterHoldGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldGetCall<'a> {}
 
-impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4941,8 +4929,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4955,7 +4942,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4964,7 +4951,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5024,7 +5011,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldGetCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -5034,14 +5021,14 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldGetCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
     /// Specifies which parts of the Hold to return.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterHoldGetCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> MatterHoldGetCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -5051,7 +5038,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5076,7 +5063,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5096,7 +5083,7 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5143,10 +5130,10 @@ impl<'a, C> MatterHoldGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldListCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldListCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _view: Option<String>,
     _page_token: Option<String>,
@@ -5156,9 +5143,9 @@ pub struct MatterHoldListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldListCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldListCall<'a> {}
 
-impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5228,8 +5215,7 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5242,7 +5228,7 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5251,7 +5237,7 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5311,28 +5297,28 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldListCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldListCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
     /// Specifies which parts of the Hold to return.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterHoldListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> MatterHoldListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// The pagination token as returned in the response. An empty token means start from the beginning.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterHoldListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MatterHoldListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The number of holds to return in the response, between 0 and 100 inclusive. Leaving this empty, or as 0, is the same as page_size = 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterHoldListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MatterHoldListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5342,7 +5328,7 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5367,7 +5353,7 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5387,7 +5373,7 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5437,10 +5423,10 @@ impl<'a, C> MatterHoldListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldRemoveHeldAccountCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldRemoveHeldAccountCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: RemoveHeldAccountsRequest,
     _matter_id: String,
     _hold_id: String,
@@ -5449,9 +5435,9 @@ pub struct MatterHoldRemoveHeldAccountCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldRemoveHeldAccountCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldRemoveHeldAccountCall<'a> {}
 
-impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldRemoveHeldAccountCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5524,8 +5510,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5539,7 +5524,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5550,7 +5535,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5609,7 +5594,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveHeldAccountsRequest) -> MatterHoldRemoveHeldAccountCall<'a, C> {
+    pub fn request(mut self, new_value: RemoveHeldAccountsRequest) -> MatterHoldRemoveHeldAccountCall<'a> {
         self._request = new_value;
         self
     }
@@ -5619,7 +5604,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -5629,7 +5614,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldRemoveHeldAccountCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -5639,7 +5624,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldRemoveHeldAccountCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldRemoveHeldAccountCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5664,7 +5649,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldRemoveHeldAccountCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldRemoveHeldAccountCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5684,7 +5669,7 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldRemoveHeldAccountCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldRemoveHeldAccountCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5734,10 +5719,10 @@ impl<'a, C> MatterHoldRemoveHeldAccountCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterHoldUpdateCall<'a, C>
-    where C: 'a {
+pub struct MatterHoldUpdateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: Hold,
     _matter_id: String,
     _hold_id: String,
@@ -5746,9 +5731,9 @@ pub struct MatterHoldUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterHoldUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterHoldUpdateCall<'a> {}
 
-impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterHoldUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5821,8 +5806,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5836,7 +5820,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5847,7 +5831,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5906,7 +5890,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Hold) -> MatterHoldUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Hold) -> MatterHoldUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5916,7 +5900,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -5926,7 +5910,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn hold_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a, C> {
+    pub fn hold_id(mut self, new_value: &str) -> MatterHoldUpdateCall<'a> {
         self._hold_id = new_value.to_string();
         self
     }
@@ -5936,7 +5920,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterHoldUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5961,7 +5945,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterHoldUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5981,7 +5965,7 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterHoldUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6031,10 +6015,10 @@ impl<'a, C> MatterHoldUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryCreateCall<'a, C>
-    where C: 'a {
+pub struct MatterSavedQueryCreateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: SavedQuery,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6042,9 +6026,9 @@ pub struct MatterSavedQueryCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterSavedQueryCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterSavedQueryCreateCall<'a> {}
 
-impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterSavedQueryCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6116,8 +6100,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6131,7 +6114,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6142,7 +6125,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6201,7 +6184,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SavedQuery) -> MatterSavedQueryCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SavedQuery) -> MatterSavedQueryCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6211,7 +6194,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryCreateCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryCreateCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -6221,7 +6204,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6246,7 +6229,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6266,7 +6249,7 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6310,10 +6293,10 @@ impl<'a, C> MatterSavedQueryCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryDeleteCall<'a, C>
-    where C: 'a {
+pub struct MatterSavedQueryDeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _saved_query_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6321,9 +6304,9 @@ pub struct MatterSavedQueryDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterSavedQueryDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterSavedQueryDeleteCall<'a> {}
 
-impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterSavedQueryDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6385,8 +6368,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6399,7 +6381,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6408,7 +6390,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6468,7 +6450,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -6478,7 +6460,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a, C> {
+    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryDeleteCall<'a> {
         self._saved_query_id = new_value.to_string();
         self
     }
@@ -6488,7 +6470,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6513,7 +6495,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6533,7 +6515,7 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6577,10 +6559,10 @@ impl<'a, C> MatterSavedQueryDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryGetCall<'a, C>
-    where C: 'a {
+pub struct MatterSavedQueryGetCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _saved_query_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6588,9 +6570,9 @@ pub struct MatterSavedQueryGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterSavedQueryGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterSavedQueryGetCall<'a> {}
 
-impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterSavedQueryGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6652,8 +6634,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6666,7 +6647,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6675,7 +6656,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6735,7 +6716,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -6745,7 +6726,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a, C> {
+    pub fn saved_query_id(mut self, new_value: &str) -> MatterSavedQueryGetCall<'a> {
         self._saved_query_id = new_value.to_string();
         self
     }
@@ -6755,7 +6736,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6780,7 +6761,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6800,7 +6781,7 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6846,10 +6827,10 @@ impl<'a, C> MatterSavedQueryGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterSavedQueryListCall<'a, C>
-    where C: 'a {
+pub struct MatterSavedQueryListCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6858,9 +6839,9 @@ pub struct MatterSavedQueryListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterSavedQueryListCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterSavedQueryListCall<'a> {}
 
-impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterSavedQueryListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6927,8 +6908,7 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6941,7 +6921,7 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6950,7 +6930,7 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7010,21 +6990,21 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryListCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterSavedQueryListCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
     /// The pagination token as returned in the previous response. An empty token means start from the beginning.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterSavedQueryListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MatterSavedQueryListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of saved queries to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterSavedQueryListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MatterSavedQueryListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7034,7 +7014,7 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterSavedQueryListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7059,7 +7039,7 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterSavedQueryListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7079,7 +7059,7 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterSavedQueryListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7129,10 +7109,10 @@ impl<'a, C> MatterSavedQueryListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterAddPermissionCall<'a, C>
-    where C: 'a {
+pub struct MatterAddPermissionCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: AddMatterPermissionsRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7140,9 +7120,9 @@ pub struct MatterAddPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterAddPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterAddPermissionCall<'a> {}
 
-impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterAddPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7214,8 +7194,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7229,7 +7208,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7240,7 +7219,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7299,7 +7278,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddMatterPermissionsRequest) -> MatterAddPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: AddMatterPermissionsRequest) -> MatterAddPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -7309,7 +7288,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterAddPermissionCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterAddPermissionCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -7319,7 +7298,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterAddPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterAddPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7344,7 +7323,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterAddPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterAddPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7364,7 +7343,7 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterAddPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterAddPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7414,10 +7393,10 @@ impl<'a, C> MatterAddPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterCloseCall<'a, C>
-    where C: 'a {
+pub struct MatterCloseCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: CloseMatterRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7425,9 +7404,9 @@ pub struct MatterCloseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterCloseCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterCloseCall<'a> {}
 
-impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterCloseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7499,8 +7478,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7514,7 +7492,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7525,7 +7503,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7584,7 +7562,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CloseMatterRequest) -> MatterCloseCall<'a, C> {
+    pub fn request(mut self, new_value: CloseMatterRequest) -> MatterCloseCall<'a> {
         self._request = new_value;
         self
     }
@@ -7594,7 +7572,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterCloseCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterCloseCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -7604,7 +7582,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCloseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCloseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7629,7 +7607,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterCloseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterCloseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7649,7 +7627,7 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCloseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCloseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7699,10 +7677,10 @@ impl<'a, C> MatterCloseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterCountCall<'a, C>
-    where C: 'a {
+pub struct MatterCountCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: CountArtifactsRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7710,9 +7688,9 @@ pub struct MatterCountCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterCountCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterCountCall<'a> {}
 
-impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterCountCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7784,8 +7762,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7799,7 +7776,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7810,7 +7787,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7869,7 +7846,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CountArtifactsRequest) -> MatterCountCall<'a, C> {
+    pub fn request(mut self, new_value: CountArtifactsRequest) -> MatterCountCall<'a> {
         self._request = new_value;
         self
     }
@@ -7879,7 +7856,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterCountCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterCountCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -7889,7 +7866,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCountCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCountCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7914,7 +7891,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterCountCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterCountCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7934,7 +7911,7 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCountCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCountCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7984,19 +7961,19 @@ impl<'a, C> MatterCountCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterCreateCall<'a, C>
-    where C: 'a {
+pub struct MatterCreateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: Matter,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterCreateCall<'a> {}
 
-impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8046,8 +8023,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8061,7 +8037,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8072,7 +8048,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8131,7 +8107,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Matter) -> MatterCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Matter) -> MatterCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8141,7 +8117,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8166,7 +8142,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8186,7 +8162,7 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8230,19 +8206,19 @@ impl<'a, C> MatterCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterDeleteCall<'a, C>
-    where C: 'a {
+pub struct MatterDeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterDeleteCall<'a> {}
 
-impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8303,8 +8279,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8317,7 +8292,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8326,7 +8301,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8386,7 +8361,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterDeleteCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterDeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -8396,7 +8371,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8421,7 +8396,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8441,7 +8416,7 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8486,10 +8461,10 @@ impl<'a, C> MatterDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterGetCall<'a, C>
-    where C: 'a {
+pub struct MatterGetCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _matter_id: String,
     _view: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8497,9 +8472,9 @@ pub struct MatterGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterGetCall<'a> {}
 
-impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8563,8 +8538,7 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8577,7 +8551,7 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8586,7 +8560,7 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8646,14 +8620,14 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterGetCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterGetCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
     /// Specifies which parts of the Matter to return in the response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterGetCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> MatterGetCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -8663,7 +8637,7 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8688,7 +8662,7 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8708,7 +8682,7 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8756,10 +8730,10 @@ impl<'a, C> MatterGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterListCall<'a, C>
-    where C: 'a {
+pub struct MatterListCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _view: Option<String>,
     _state: Option<String>,
     _page_token: Option<String>,
@@ -8769,9 +8743,9 @@ pub struct MatterListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterListCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterListCall<'a> {}
 
-impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8822,8 +8796,7 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8836,7 +8809,7 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8845,7 +8818,7 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8902,28 +8875,28 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Specifies which parts of the matter to return in response.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> MatterListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> MatterListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// If set, list only matters with that specific state. The default is listing matters of all states.
     ///
     /// Sets the *state* query property to the given value.
-    pub fn state(mut self, new_value: &str) -> MatterListCall<'a, C> {
+    pub fn state(mut self, new_value: &str) -> MatterListCall<'a> {
         self._state = Some(new_value.to_string());
         self
     }
     /// The pagination token as returned in the response.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MatterListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MatterListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The number of matters to return in the response. Default and maximum are 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MatterListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MatterListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -8933,7 +8906,7 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8958,7 +8931,7 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8978,7 +8951,7 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9028,10 +9001,10 @@ impl<'a, C> MatterListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterRemovePermissionCall<'a, C>
-    where C: 'a {
+pub struct MatterRemovePermissionCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: RemoveMatterPermissionsRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9039,9 +9012,9 @@ pub struct MatterRemovePermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterRemovePermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterRemovePermissionCall<'a> {}
 
-impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterRemovePermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9113,8 +9086,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9128,7 +9100,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9139,7 +9111,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9198,7 +9170,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveMatterPermissionsRequest) -> MatterRemovePermissionCall<'a, C> {
+    pub fn request(mut self, new_value: RemoveMatterPermissionsRequest) -> MatterRemovePermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -9208,7 +9180,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterRemovePermissionCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterRemovePermissionCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9218,7 +9190,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterRemovePermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterRemovePermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9243,7 +9215,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterRemovePermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterRemovePermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9263,7 +9235,7 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterRemovePermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterRemovePermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9313,10 +9285,10 @@ impl<'a, C> MatterRemovePermissionCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterReopenCall<'a, C>
-    where C: 'a {
+pub struct MatterReopenCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: ReopenMatterRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9324,9 +9296,9 @@ pub struct MatterReopenCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterReopenCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterReopenCall<'a> {}
 
-impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterReopenCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9398,8 +9370,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9413,7 +9384,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9424,7 +9395,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9483,7 +9454,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReopenMatterRequest) -> MatterReopenCall<'a, C> {
+    pub fn request(mut self, new_value: ReopenMatterRequest) -> MatterReopenCall<'a> {
         self._request = new_value;
         self
     }
@@ -9493,7 +9464,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterReopenCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterReopenCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9503,7 +9474,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterReopenCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterReopenCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9528,7 +9499,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterReopenCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterReopenCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9548,7 +9519,7 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterReopenCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterReopenCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9598,10 +9569,10 @@ impl<'a, C> MatterReopenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterUndeleteCall<'a, C>
-    where C: 'a {
+pub struct MatterUndeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: UndeleteMatterRequest,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9609,9 +9580,9 @@ pub struct MatterUndeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterUndeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterUndeleteCall<'a> {}
 
-impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterUndeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9683,8 +9654,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9698,7 +9668,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9709,7 +9679,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9768,7 +9738,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteMatterRequest) -> MatterUndeleteCall<'a, C> {
+    pub fn request(mut self, new_value: UndeleteMatterRequest) -> MatterUndeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -9778,7 +9748,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterUndeleteCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterUndeleteCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -9788,7 +9758,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUndeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUndeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9813,7 +9783,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterUndeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterUndeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9833,7 +9803,7 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterUndeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterUndeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9883,10 +9853,10 @@ impl<'a, C> MatterUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MatterUpdateCall<'a, C>
-    where C: 'a {
+pub struct MatterUpdateCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: Matter,
     _matter_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9894,9 +9864,9 @@ pub struct MatterUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MatterUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for MatterUpdateCall<'a> {}
 
-impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MatterUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9968,8 +9938,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9983,7 +9952,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9994,7 +9963,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10053,7 +10022,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Matter) -> MatterUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Matter) -> MatterUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10063,7 +10032,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn matter_id(mut self, new_value: &str) -> MatterUpdateCall<'a, C> {
+    pub fn matter_id(mut self, new_value: &str) -> MatterUpdateCall<'a> {
         self._matter_id = new_value.to_string();
         self
     }
@@ -10073,7 +10042,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MatterUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10098,7 +10067,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MatterUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MatterUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10118,7 +10087,7 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MatterUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MatterUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10168,19 +10137,19 @@ impl<'a, C> MatterUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationCancelCall<'a, C>
-    where C: 'a {
+pub struct OperationCancelCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _request: CancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationCancelCall<'a> {}
 
-impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10264,7 +10233,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -10275,7 +10244,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10334,7 +10303,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a, C> {
+    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -10344,7 +10313,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10354,7 +10323,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10379,7 +10348,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10420,18 +10389,18 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationDeleteCall<'a, C>
-    where C: 'a {
+pub struct OperationDeleteCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationDeleteCall<'a> {}
 
-impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10503,7 +10472,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -10512,7 +10481,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10572,7 +10541,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10582,7 +10551,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10607,7 +10576,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10648,19 +10617,19 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C>
-    where C: 'a {
+pub struct OperationGetCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationGetCall<'a> {}
 
-impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10725,8 +10694,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10739,7 +10707,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10748,7 +10716,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10808,7 +10776,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10818,7 +10786,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10843,7 +10811,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10863,7 +10831,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10910,10 +10878,10 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a, C>
-    where C: 'a {
+pub struct OperationListCall<'a>
+    where  {
 
-    hub: &'a Vault<C>,
+    hub: &'a Vault<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10922,9 +10890,9 @@ pub struct OperationListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationListCall<'a> {}
 
-impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11005,7 +10973,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -11014,7 +10982,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11074,28 +11042,28 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -11105,7 +11073,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11130,7 +11098,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

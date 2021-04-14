@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -77,35 +76,34 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct Discovery<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Discovery<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Discovery<C> {}
+impl<'a, > client::Hub for Discovery<> {}
 
-impl<'a, C> Discovery<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Discovery<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Discovery<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Discovery<> {
         Discovery {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/discovery/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn apis(&'a self) -> ApiMethods<'a, C> {
+    pub fn apis(&'a self) -> ApiMethods<'a> {
         ApiMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -660,15 +658,15 @@ impl client::Part for RestMethodResponse {}
 /// let rb = hub.apis();
 /// # }
 /// ```
-pub struct ApiMethods<'a, C>
-    where C: 'a {
+pub struct ApiMethods<'a>
+    where  {
 
-    hub: &'a Discovery<C>,
+    hub: &'a Discovery<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ApiMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ApiMethods<'a> {}
 
-impl<'a, C> ApiMethods<'a, C> {
+impl<'a> ApiMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -678,7 +676,7 @@ impl<'a, C> ApiMethods<'a, C> {
     ///
     /// * `api` - The name of the API.
     /// * `version` - The version of the API.
-    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a, C> {
+    pub fn get_rest(&self, api: &str, version: &str) -> ApiGetRestCall<'a> {
         ApiGetRestCall {
             hub: self.hub,
             _api: api.to_string(),
@@ -691,7 +689,7 @@ impl<'a, C> ApiMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieve the list of APIs supported at this endpoint.
-    pub fn list(&self) -> ApiListCall<'a, C> {
+    pub fn list(&self) -> ApiListCall<'a> {
         ApiListCall {
             hub: self.hub,
             _preferred: Default::default(),
@@ -742,19 +740,19 @@ impl<'a, C> ApiMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApiGetRestCall<'a, C>
-    where C: 'a {
+pub struct ApiGetRestCall<'a>
+    where  {
 
-    hub: &'a Discovery<C>,
+    hub: &'a Discovery<>,
     _api: String,
     _version: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ApiGetRestCall<'a, C> {}
+impl<'a> client::CallBuilder for ApiGetRestCall<'a> {}
 
-impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApiGetRestCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -814,7 +812,7 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -823,7 +821,7 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -883,7 +881,7 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a, C> {
+    pub fn api(mut self, new_value: &str) -> ApiGetRestCall<'a> {
         self._api = new_value.to_string();
         self
     }
@@ -893,7 +891,7 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a, C> {
+    pub fn version(mut self, new_value: &str) -> ApiGetRestCall<'a> {
         self._version = new_value.to_string();
         self
     }
@@ -903,7 +901,7 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiGetRestCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiGetRestCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -924,7 +922,7 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApiGetRestCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -967,19 +965,19 @@ impl<'a, C> ApiGetRestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApiListCall<'a, C>
-    where C: 'a {
+pub struct ApiListCall<'a>
+    where  {
 
-    hub: &'a Discovery<C>,
+    hub: &'a Discovery<>,
     _preferred: Option<bool>,
     _name: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ApiListCall<'a, C> {}
+impl<'a> client::CallBuilder for ApiListCall<'a> {}
 
-impl<'a, C> ApiListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApiListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1022,7 +1020,7 @@ impl<'a, C> ApiListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1031,7 +1029,7 @@ impl<'a, C> ApiListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1088,14 +1086,14 @@ impl<'a, C> ApiListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Return only the preferred version of an API.
     ///
     /// Sets the *preferred* query property to the given value.
-    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a, C> {
+    pub fn preferred(mut self, new_value: bool) -> ApiListCall<'a> {
         self._preferred = Some(new_value);
         self
     }
     /// Only include APIs with the given name.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> ApiListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ApiListCall<'a> {
         self._name = Some(new_value.to_string());
         self
     }
@@ -1105,7 +1103,7 @@ impl<'a, C> ApiListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApiListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1126,7 +1124,7 @@ impl<'a, C> ApiListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApiListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

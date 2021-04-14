@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Taskqueue<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Taskqueue,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -992,7 +991,7 @@ async fn main() {
     
     let mut app = App::new("taskqueue1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20160428")
+           .version("2.0.3+20160428")
            .about("Accesses a Google App Engine Pull Task Queue over REST.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli")
            .arg(Arg::with_name("url")

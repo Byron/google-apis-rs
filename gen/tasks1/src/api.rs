@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -113,38 +112,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct TasksHub<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct TasksHub<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for TasksHub<C> {}
+impl<'a, > client::Hub for TasksHub<> {}
 
-impl<'a, C> TasksHub<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > TasksHub<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> TasksHub<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> TasksHub<> {
         TasksHub {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://tasks.googleapis.com/".to_string(),
             _root_url: "https://tasks.googleapis.com/".to_string(),
         }
     }
 
-    pub fn tasklists(&'a self) -> TasklistMethods<'a, C> {
+    pub fn tasklists(&'a self) -> TasklistMethods<'a> {
         TasklistMethods { hub: &self }
     }
-    pub fn tasks(&'a self) -> TaskMethods<'a, C> {
+    pub fn tasks(&'a self) -> TaskMethods<'a> {
         TaskMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -366,15 +364,15 @@ impl client::Part for TaskLinks {}
 /// let rb = hub.tasklists();
 /// # }
 /// ```
-pub struct TasklistMethods<'a, C>
-    where C: 'a {
+pub struct TasklistMethods<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TasklistMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TasklistMethods<'a> {}
 
-impl<'a, C> TasklistMethods<'a, C> {
+impl<'a> TasklistMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -383,7 +381,7 @@ impl<'a, C> TasklistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a, C> {
+    pub fn delete(&self, tasklist: &str) -> TasklistDeleteCall<'a> {
         TasklistDeleteCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -400,7 +398,7 @@ impl<'a, C> TasklistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a, C> {
+    pub fn get(&self, tasklist: &str) -> TasklistGetCall<'a> {
         TasklistGetCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -417,7 +415,7 @@ impl<'a, C> TasklistMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn insert(&self, request: TaskList) -> TasklistInsertCall<'a, C> {
+    pub fn insert(&self, request: TaskList) -> TasklistInsertCall<'a> {
         TasklistInsertCall {
             hub: self.hub,
             _request: request,
@@ -430,7 +428,7 @@ impl<'a, C> TasklistMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns all the authenticated user's task lists.
-    pub fn list(&self) -> TasklistListCall<'a, C> {
+    pub fn list(&self) -> TasklistListCall<'a> {
         TasklistListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -449,7 +447,7 @@ impl<'a, C> TasklistMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn patch(&self, request: TaskList, tasklist: &str) -> TasklistPatchCall<'a, C> {
+    pub fn patch(&self, request: TaskList, tasklist: &str) -> TasklistPatchCall<'a> {
         TasklistPatchCall {
             hub: self.hub,
             _request: request,
@@ -468,7 +466,7 @@ impl<'a, C> TasklistMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn update(&self, request: TaskList, tasklist: &str) -> TasklistUpdateCall<'a, C> {
+    pub fn update(&self, request: TaskList, tasklist: &str) -> TasklistUpdateCall<'a> {
         TasklistUpdateCall {
             hub: self.hub,
             _request: request,
@@ -512,15 +510,15 @@ impl<'a, C> TasklistMethods<'a, C> {
 /// let rb = hub.tasks();
 /// # }
 /// ```
-pub struct TaskMethods<'a, C>
-    where C: 'a {
+pub struct TaskMethods<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TaskMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TaskMethods<'a> {}
 
-impl<'a, C> TaskMethods<'a, C> {
+impl<'a> TaskMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -529,7 +527,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a, C> {
+    pub fn clear(&self, tasklist: &str) -> TaskClearCall<'a> {
         TaskClearCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -547,7 +545,7 @@ impl<'a, C> TaskMethods<'a, C> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a, C> {
+    pub fn delete(&self, tasklist: &str, task: &str) -> TaskDeleteCall<'a> {
         TaskDeleteCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -566,7 +564,7 @@ impl<'a, C> TaskMethods<'a, C> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a, C> {
+    pub fn get(&self, tasklist: &str, task: &str) -> TaskGetCall<'a> {
         TaskGetCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -585,7 +583,7 @@ impl<'a, C> TaskMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
-    pub fn insert(&self, request: Task, tasklist: &str) -> TaskInsertCall<'a, C> {
+    pub fn insert(&self, request: Task, tasklist: &str) -> TaskInsertCall<'a> {
         TaskInsertCall {
             hub: self.hub,
             _request: request,
@@ -605,7 +603,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// # Arguments
     ///
     /// * `tasklist` - Task list identifier.
-    pub fn list(&self, tasklist: &str) -> TaskListCall<'a, C> {
+    pub fn list(&self, tasklist: &str) -> TaskListCall<'a> {
         TaskListCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -633,7 +631,7 @@ impl<'a, C> TaskMethods<'a, C> {
     ///
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a, C> {
+    pub fn move_(&self, tasklist: &str, task: &str) -> TaskMoveCall<'a> {
         TaskMoveCall {
             hub: self.hub,
             _tasklist: tasklist.to_string(),
@@ -655,7 +653,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn patch(&self, request: Task, tasklist: &str, task: &str) -> TaskPatchCall<'a, C> {
+    pub fn patch(&self, request: Task, tasklist: &str, task: &str) -> TaskPatchCall<'a> {
         TaskPatchCall {
             hub: self.hub,
             _request: request,
@@ -676,7 +674,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `tasklist` - Task list identifier.
     /// * `task` - Task identifier.
-    pub fn update(&self, request: Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a, C> {
+    pub fn update(&self, request: Task, tasklist: &str, task: &str) -> TaskUpdateCall<'a> {
         TaskUpdateCall {
             hub: self.hub,
             _request: request,
@@ -729,19 +727,19 @@ impl<'a, C> TaskMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistDeleteCall<'a, C>
-    where C: 'a {
+pub struct TasklistDeleteCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TasklistDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TasklistDeleteCall<'a> {}
 
-impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TasklistDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -801,8 +799,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -815,7 +812,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -824,7 +821,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -874,7 +871,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistDeleteCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -884,7 +881,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -909,7 +906,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -929,7 +926,7 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -973,19 +970,19 @@ impl<'a, C> TasklistDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistGetCall<'a, C>
-    where C: 'a {
+pub struct TasklistGetCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TasklistGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TasklistGetCall<'a> {}
 
-impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TasklistGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1046,8 +1043,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1060,7 +1056,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1069,7 +1065,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1129,7 +1125,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistGetCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1139,7 +1135,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1164,7 +1160,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1184,7 +1180,7 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1234,19 +1230,19 @@ impl<'a, C> TasklistGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistInsertCall<'a, C>
-    where C: 'a {
+pub struct TasklistInsertCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _request: TaskList,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TasklistInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for TasklistInsertCall<'a> {}
 
-impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TasklistInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1296,8 +1292,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1311,7 +1306,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1322,7 +1317,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1381,7 +1376,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TaskList) -> TasklistInsertCall<'a, C> {
+    pub fn request(mut self, new_value: TaskList) -> TasklistInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -1391,7 +1386,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1416,7 +1411,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1436,7 +1431,7 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1482,10 +1477,10 @@ impl<'a, C> TasklistInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistListCall<'a, C>
-    where C: 'a {
+pub struct TasklistListCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1493,9 +1488,9 @@ pub struct TasklistListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TasklistListCall<'a, C> {}
+impl<'a> client::CallBuilder for TasklistListCall<'a> {}
 
-impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TasklistListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1540,8 +1535,7 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1554,7 +1548,7 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1563,7 +1557,7 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1620,14 +1614,14 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Token specifying the result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TasklistListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> TasklistListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> TasklistListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -1637,7 +1631,7 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1662,7 +1656,7 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1682,7 +1676,7 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1732,10 +1726,10 @@ impl<'a, C> TasklistListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistPatchCall<'a, C>
-    where C: 'a {
+pub struct TasklistPatchCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _request: TaskList,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1743,9 +1737,9 @@ pub struct TasklistPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TasklistPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for TasklistPatchCall<'a> {}
 
-impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TasklistPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1817,8 +1811,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1832,7 +1825,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1843,7 +1836,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1902,7 +1895,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TaskList) -> TasklistPatchCall<'a, C> {
+    pub fn request(mut self, new_value: TaskList) -> TasklistPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -1912,7 +1905,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistPatchCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -1922,7 +1915,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1947,7 +1940,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1967,7 +1960,7 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2017,10 +2010,10 @@ impl<'a, C> TasklistPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TasklistUpdateCall<'a, C>
-    where C: 'a {
+pub struct TasklistUpdateCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _request: TaskList,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2028,9 +2021,9 @@ pub struct TasklistUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TasklistUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for TasklistUpdateCall<'a> {}
 
-impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TasklistUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2102,8 +2095,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2117,7 +2109,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2128,7 +2120,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2187,7 +2179,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TaskList) -> TasklistUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: TaskList) -> TasklistUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2197,7 +2189,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TasklistUpdateCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2207,7 +2199,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TasklistUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2232,7 +2224,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TasklistUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2252,7 +2244,7 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TasklistUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2296,19 +2288,19 @@ impl<'a, C> TasklistUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskClearCall<'a, C>
-    where C: 'a {
+pub struct TaskClearCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskClearCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskClearCall<'a> {}
 
-impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskClearCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2368,8 +2360,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2382,7 +2373,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2391,7 +2382,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2441,7 +2432,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskClearCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2451,7 +2442,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskClearCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskClearCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2476,7 +2467,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskClearCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2496,7 +2487,7 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskClearCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskClearCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2540,10 +2531,10 @@ impl<'a, C> TaskClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a, C>
-    where C: 'a {
+pub struct TaskDeleteCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _task: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2551,9 +2542,9 @@ pub struct TaskDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskDeleteCall<'a> {}
 
-impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2614,8 +2605,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2628,7 +2618,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2637,7 +2627,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2687,7 +2677,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskDeleteCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2697,7 +2687,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -2707,7 +2697,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2732,7 +2722,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2752,7 +2742,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2796,10 +2786,10 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskGetCall<'a, C>
-    where C: 'a {
+pub struct TaskGetCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _task: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2807,9 +2797,9 @@ pub struct TaskGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskGetCall<'a> {}
 
-impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2871,8 +2861,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2885,7 +2874,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2894,7 +2883,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2954,7 +2943,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskGetCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -2964,7 +2953,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -2974,7 +2963,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2999,7 +2988,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3019,7 +3008,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3071,10 +3060,10 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskInsertCall<'a, C>
-    where C: 'a {
+pub struct TaskInsertCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _request: Task,
     _tasklist: String,
     _previous: Option<String>,
@@ -3084,9 +3073,9 @@ pub struct TaskInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskInsertCall<'a> {}
 
-impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3164,8 +3153,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3179,7 +3167,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3190,7 +3178,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3249,7 +3237,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -3259,21 +3247,21 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskInsertCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
     /// Previous sibling task identifier. If the task is created at the first position among its siblings, this parameter is omitted. Optional.
     ///
     /// Sets the *previous* query property to the given value.
-    pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a, C> {
+    pub fn previous(mut self, new_value: &str) -> TaskInsertCall<'a> {
         self._previous = Some(new_value.to_string());
         self
     }
     /// Parent task identifier. If the task is created at the top level, this parameter is omitted. Optional.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TaskInsertCall<'a> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -3283,7 +3271,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3308,7 +3296,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3328,7 +3316,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3382,10 +3370,10 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskListCall<'a, C>
-    where C: 'a {
+pub struct TaskListCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _updated_min: Option<String>,
     _show_hidden: Option<bool>,
@@ -3402,9 +3390,9 @@ pub struct TaskListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskListCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskListCall<'a> {}
 
-impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3495,8 +3483,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3509,7 +3496,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3518,7 +3505,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3578,77 +3565,77 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskListCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
     /// Lower bound for a task's last modification time (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by last modification time.
     ///
     /// Sets the *updated min* query property to the given value.
-    pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn updated_min(mut self, new_value: &str) -> TaskListCall<'a> {
         self._updated_min = Some(new_value.to_string());
         self
     }
     /// Flag indicating whether hidden tasks are returned in the result. Optional. The default is False.
     ///
     /// Sets the *show hidden* query property to the given value.
-    pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a, C> {
+    pub fn show_hidden(mut self, new_value: bool) -> TaskListCall<'a> {
         self._show_hidden = Some(new_value);
         self
     }
     /// Flag indicating whether deleted tasks are returned in the result. Optional. The default is False.
     ///
     /// Sets the *show deleted* query property to the given value.
-    pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a, C> {
+    pub fn show_deleted(mut self, new_value: bool) -> TaskListCall<'a> {
         self._show_deleted = Some(new_value);
         self
     }
     /// Flag indicating whether completed tasks are returned in the result. Optional. The default is True. Note that showHidden must also be True to show tasks completed in first party clients, such as the web UI and Google's mobile apps.
     ///
     /// Sets the *show completed* query property to the given value.
-    pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a, C> {
+    pub fn show_completed(mut self, new_value: bool) -> TaskListCall<'a> {
         self._show_completed = Some(new_value);
         self
     }
     /// Token specifying the result page to return. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TaskListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     /// Lower bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
     ///
     /// Sets the *due min* query property to the given value.
-    pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn due_min(mut self, new_value: &str) -> TaskListCall<'a> {
         self._due_min = Some(new_value.to_string());
         self
     }
     /// Upper bound for a task's due date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by due date.
     ///
     /// Sets the *due max* query property to the given value.
-    pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn due_max(mut self, new_value: &str) -> TaskListCall<'a> {
         self._due_max = Some(new_value.to_string());
         self
     }
     /// Lower bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
     ///
     /// Sets the *completed min* query property to the given value.
-    pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn completed_min(mut self, new_value: &str) -> TaskListCall<'a> {
         self._completed_min = Some(new_value.to_string());
         self
     }
     /// Upper bound for a task's completion date (as a RFC 3339 timestamp) to filter by. Optional. The default is not to filter by completion date.
     ///
     /// Sets the *completed max* query property to the given value.
-    pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn completed_max(mut self, new_value: &str) -> TaskListCall<'a> {
         self._completed_max = Some(new_value.to_string());
         self
     }
@@ -3658,7 +3645,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3683,7 +3670,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3703,7 +3690,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3749,10 +3736,10 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskMoveCall<'a, C>
-    where C: 'a {
+pub struct TaskMoveCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _tasklist: String,
     _task: String,
     _previous: Option<String>,
@@ -3762,9 +3749,9 @@ pub struct TaskMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskMoveCall<'a> {}
 
-impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3832,8 +3819,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3846,7 +3832,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3855,7 +3841,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3915,7 +3901,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskMoveCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -3925,21 +3911,21 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskMoveCall<'a> {
         self._task = new_value.to_string();
         self
     }
     /// New previous sibling task identifier. If the task is moved to the first position among its siblings, this parameter is omitted. Optional.
     ///
     /// Sets the *previous* query property to the given value.
-    pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
+    pub fn previous(mut self, new_value: &str) -> TaskMoveCall<'a> {
         self._previous = Some(new_value.to_string());
         self
     }
     /// New parent task identifier. If the task is moved to the top level, this parameter is omitted. Optional.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> TaskMoveCall<'a> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -3949,7 +3935,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3974,7 +3960,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3994,7 +3980,7 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4044,10 +4030,10 @@ impl<'a, C> TaskMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskPatchCall<'a, C>
-    where C: 'a {
+pub struct TaskPatchCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _request: Task,
     _tasklist: String,
     _task: String,
@@ -4056,9 +4042,9 @@ pub struct TaskPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskPatchCall<'a> {}
 
-impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4131,8 +4117,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4146,7 +4131,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4157,7 +4142,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4216,7 +4201,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4226,7 +4211,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskPatchCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -4236,7 +4221,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -4246,7 +4231,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4271,7 +4256,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4291,7 +4276,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4341,10 +4326,10 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskUpdateCall<'a, C>
-    where C: 'a {
+pub struct TaskUpdateCall<'a>
+    where  {
 
-    hub: &'a TasksHub<C>,
+    hub: &'a TasksHub<>,
     _request: Task,
     _tasklist: String,
     _task: String,
@@ -4353,9 +4338,9 @@ pub struct TaskUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskUpdateCall<'a> {}
 
-impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4428,8 +4413,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4443,7 +4427,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4454,7 +4438,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4513,7 +4497,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4523,7 +4507,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a, C> {
+    pub fn tasklist(mut self, new_value: &str) -> TaskUpdateCall<'a> {
         self._tasklist = new_value.to_string();
         self
     }
@@ -4533,7 +4517,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -4543,7 +4527,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4568,7 +4552,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4588,7 +4572,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

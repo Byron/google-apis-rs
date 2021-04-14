@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,35 +104,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct PolicyTroubleshooter<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct PolicyTroubleshooter<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for PolicyTroubleshooter<C> {}
+impl<'a, > client::Hub for PolicyTroubleshooter<> {}
 
-impl<'a, C> PolicyTroubleshooter<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > PolicyTroubleshooter<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PolicyTroubleshooter<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PolicyTroubleshooter<> {
         PolicyTroubleshooter {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://policytroubleshooter.googleapis.com/".to_string(),
             _root_url: "https://policytroubleshooter.googleapis.com/".to_string(),
         }
     }
 
-    pub fn iam(&'a self) -> IamMethods<'a, C> {
+    pub fn iam(&'a self) -> IamMethods<'a> {
         IamMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -408,15 +406,15 @@ impl client::Part for GoogleTypeExpr {}
 /// let rb = hub.iam();
 /// # }
 /// ```
-pub struct IamMethods<'a, C>
-    where C: 'a {
+pub struct IamMethods<'a>
+    where  {
 
-    hub: &'a PolicyTroubleshooter<C>,
+    hub: &'a PolicyTroubleshooter<>,
 }
 
-impl<'a, C> client::MethodsBuilder for IamMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for IamMethods<'a> {}
 
-impl<'a, C> IamMethods<'a, C> {
+impl<'a> IamMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -425,7 +423,7 @@ impl<'a, C> IamMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn troubleshoot(&self, request: GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyRequest) -> IamTroubleshootCall<'a, C> {
+    pub fn troubleshoot(&self, request: GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyRequest) -> IamTroubleshootCall<'a> {
         IamTroubleshootCall {
             hub: self.hub,
             _request: request,
@@ -482,19 +480,19 @@ impl<'a, C> IamMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct IamTroubleshootCall<'a, C>
-    where C: 'a {
+pub struct IamTroubleshootCall<'a>
+    where  {
 
-    hub: &'a PolicyTroubleshooter<C>,
+    hub: &'a PolicyTroubleshooter<>,
     _request: GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for IamTroubleshootCall<'a, C> {}
+impl<'a> client::CallBuilder for IamTroubleshootCall<'a> {}
 
-impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> IamTroubleshootCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -544,8 +542,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -559,7 +556,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -570,7 +567,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -629,7 +626,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyRequest) -> IamTroubleshootCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPolicytroubleshooterV1TroubleshootIamPolicyRequest) -> IamTroubleshootCall<'a> {
         self._request = new_value;
         self
     }
@@ -639,7 +636,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> IamTroubleshootCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> IamTroubleshootCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -664,7 +661,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> IamTroubleshootCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> IamTroubleshootCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -684,7 +681,7 @@ impl<'a, C> IamTroubleshootCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> IamTroubleshootCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> IamTroubleshootCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

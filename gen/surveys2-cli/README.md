@@ -18,11 +18,11 @@ Install the command-line interface with cargo using:
 cargo install google-surveys2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/surveys2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/surveys2-cli).
 
 # Usage
 
-This documentation was generated from the *Surveys* API at revision *20180508*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Surveys* API at revision *20180508*. The CLI is at version *2.0.3*.
 
 ```bash
 surveys2 [options]

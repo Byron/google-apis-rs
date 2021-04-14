@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::DLP<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::DLP,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -10712,7 +10711,7 @@ async fn main() {
     
     let mut app = App::new("dlp2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210326")
+           .version("2.0.3+20210326")
            .about("Provides methods for detection, risk analysis, and de-identification of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_cli")
            .arg(Arg::with_name("url")

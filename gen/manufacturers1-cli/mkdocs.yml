@@ -1,8 +1,8 @@
-site_name: Manufacturer Center v2.0.0+20210325
+site_name: Manufacturer Center v2.0.3+20210325
 site_url: http://byron.github.io/google-apis-rs/google-manufacturers1-cli
 site_description: A complete library to interact with Manufacturer Center (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/manufacturers1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/manufacturers1-cli
 
 docs_dir: docs
 site_dir: build_html

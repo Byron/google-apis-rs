@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,35 +105,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AppState<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AppState<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AppState<C> {}
+impl<'a, > client::Hub for AppState<> {}
 
-impl<'a, C> AppState<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AppState<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AppState<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AppState<> {
         AppState {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/appstate/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn states(&'a self) -> StateMethods<'a, C> {
+    pub fn states(&'a self) -> StateMethods<'a> {
         StateMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -291,15 +289,15 @@ impl client::ResponseResult for WriteResult {}
 /// let rb = hub.states();
 /// # }
 /// ```
-pub struct StateMethods<'a, C>
-    where C: 'a {
+pub struct StateMethods<'a>
+    where  {
 
-    hub: &'a AppState<C>,
+    hub: &'a AppState<>,
 }
 
-impl<'a, C> client::MethodsBuilder for StateMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for StateMethods<'a> {}
 
-impl<'a, C> StateMethods<'a, C> {
+impl<'a> StateMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -308,7 +306,7 @@ impl<'a, C> StateMethods<'a, C> {
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn clear(&self, state_key: i32) -> StateClearCall<'a, C> {
+    pub fn clear(&self, state_key: i32) -> StateClearCall<'a> {
         StateClearCall {
             hub: self.hub,
             _state_key: state_key,
@@ -326,7 +324,7 @@ impl<'a, C> StateMethods<'a, C> {
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a, C> {
+    pub fn delete(&self, state_key: i32) -> StateDeleteCall<'a> {
         StateDeleteCall {
             hub: self.hub,
             _state_key: state_key,
@@ -343,7 +341,7 @@ impl<'a, C> StateMethods<'a, C> {
     /// # Arguments
     ///
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn get(&self, state_key: i32) -> StateGetCall<'a, C> {
+    pub fn get(&self, state_key: i32) -> StateGetCall<'a> {
         StateGetCall {
             hub: self.hub,
             _state_key: state_key,
@@ -356,7 +354,7 @@ impl<'a, C> StateMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the states keys, and optionally the state data.
-    pub fn list(&self) -> StateListCall<'a, C> {
+    pub fn list(&self) -> StateListCall<'a> {
         StateListCall {
             hub: self.hub,
             _include_data: Default::default(),
@@ -374,7 +372,7 @@ impl<'a, C> StateMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `stateKey` - The key for the data to be retrieved.
-    pub fn update(&self, request: UpdateRequest, state_key: i32) -> StateUpdateCall<'a, C> {
+    pub fn update(&self, request: UpdateRequest, state_key: i32) -> StateUpdateCall<'a> {
         StateUpdateCall {
             hub: self.hub,
             _request: request,
@@ -428,10 +426,10 @@ impl<'a, C> StateMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateClearCall<'a, C>
-    where C: 'a {
+pub struct StateClearCall<'a>
+    where  {
 
-    hub: &'a AppState<C>,
+    hub: &'a AppState<>,
     _state_key: i32,
     _current_data_version: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -439,9 +437,9 @@ pub struct StateClearCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StateClearCall<'a, C> {}
+impl<'a> client::CallBuilder for StateClearCall<'a> {}
 
-impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StateClearCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -505,8 +503,7 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -519,7 +516,7 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -528,7 +525,7 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -588,14 +585,14 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a, C> {
+    pub fn state_key(mut self, new_value: i32) -> StateClearCall<'a> {
         self._state_key = new_value;
         self
     }
     /// The version of the data to be cleared. Version strings are returned by the server.
     ///
     /// Sets the *current data version* query property to the given value.
-    pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a, C> {
+    pub fn current_data_version(mut self, new_value: &str) -> StateClearCall<'a> {
         self._current_data_version = Some(new_value.to_string());
         self
     }
@@ -605,7 +602,7 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateClearCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateClearCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -626,7 +623,7 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateClearCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StateClearCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -646,7 +643,7 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StateClearCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StateClearCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -690,19 +687,19 @@ impl<'a, C> StateClearCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateDeleteCall<'a, C>
-    where C: 'a {
+pub struct StateDeleteCall<'a>
+    where  {
 
-    hub: &'a AppState<C>,
+    hub: &'a AppState<>,
     _state_key: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StateDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for StateDeleteCall<'a> {}
 
-impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StateDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -762,8 +759,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -776,7 +772,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -785,7 +781,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -835,7 +831,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a, C> {
+    pub fn state_key(mut self, new_value: i32) -> StateDeleteCall<'a> {
         self._state_key = new_value;
         self
     }
@@ -845,7 +841,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -866,7 +862,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StateDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -886,7 +882,7 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StateDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StateDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -930,19 +926,19 @@ impl<'a, C> StateDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateGetCall<'a, C>
-    where C: 'a {
+pub struct StateGetCall<'a>
+    where  {
 
-    hub: &'a AppState<C>,
+    hub: &'a AppState<>,
     _state_key: i32,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StateGetCall<'a, C> {}
+impl<'a> client::CallBuilder for StateGetCall<'a> {}
 
-impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StateGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1003,8 +999,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1017,7 +1012,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1026,7 +1021,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1086,7 +1081,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a, C> {
+    pub fn state_key(mut self, new_value: i32) -> StateGetCall<'a> {
         self._state_key = new_value;
         self
     }
@@ -1096,7 +1091,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1117,7 +1112,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StateGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1137,7 +1132,7 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StateGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StateGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1182,19 +1177,19 @@ impl<'a, C> StateGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateListCall<'a, C>
-    where C: 'a {
+pub struct StateListCall<'a>
+    where  {
 
-    hub: &'a AppState<C>,
+    hub: &'a AppState<>,
     _include_data: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StateListCall<'a, C> {}
+impl<'a> client::CallBuilder for StateListCall<'a> {}
 
-impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StateListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1236,8 +1231,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1250,7 +1244,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1259,7 +1253,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1316,7 +1310,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Whether to include the full data in addition to the version number
     ///
     /// Sets the *include data* query property to the given value.
-    pub fn include_data(mut self, new_value: bool) -> StateListCall<'a, C> {
+    pub fn include_data(mut self, new_value: bool) -> StateListCall<'a> {
         self._include_data = Some(new_value);
         self
     }
@@ -1326,7 +1320,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1347,7 +1341,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StateListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1367,7 +1361,7 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StateListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StateListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1418,10 +1412,10 @@ impl<'a, C> StateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StateUpdateCall<'a, C>
-    where C: 'a {
+pub struct StateUpdateCall<'a>
+    where  {
 
-    hub: &'a AppState<C>,
+    hub: &'a AppState<>,
     _request: UpdateRequest,
     _state_key: i32,
     _current_state_version: Option<String>,
@@ -1430,9 +1424,9 @@ pub struct StateUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StateUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for StateUpdateCall<'a> {}
 
-impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StateUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1507,8 +1501,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1522,7 +1515,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1533,7 +1526,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1592,7 +1585,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateRequest) -> StateUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateRequest) -> StateUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1602,14 +1595,14 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a, C> {
+    pub fn state_key(mut self, new_value: i32) -> StateUpdateCall<'a> {
         self._state_key = new_value;
         self
     }
     /// The version of the app state your application is attempting to update. If this does not match the current version, this method will return a conflict error. If there is no data stored on the server for this key, the update will succeed irrespective of the value of this parameter.
     ///
     /// Sets the *current state version* query property to the given value.
-    pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a, C> {
+    pub fn current_state_version(mut self, new_value: &str) -> StateUpdateCall<'a> {
         self._current_state_version = Some(new_value.to_string());
         self
     }
@@ -1619,7 +1612,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StateUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1640,7 +1633,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
-    pub fn param<T>(mut self, name: T, value: T) -> StateUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StateUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1660,7 +1653,7 @@ impl<'a, C> StateUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StateUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StateUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

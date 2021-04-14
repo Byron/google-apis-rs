@@ -4,10 +4,10 @@
 [package]
 
 name = "google-calendar3-cli"
-version = "2.0.0+20210327"
+version = "2.0.3+20210327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with calendar (protocol v3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/calendar3-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/calendar3-cli"
 homepage = "https://developers.google.com/google-apps/calendar/firstapp"
 documentation = "http://byron.github.io/google-apis-rs/google_calendar3_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-calendar3]
 path = "../calendar3"
-version = "2.0.0+20210327"
+version = "2.0.3+20210327"

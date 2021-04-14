@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-sheets4-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/sheets4-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/sheets4-cli).
 
 # Usage
 
-This documentation was generated from the *Sheets* API at revision *20210322*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Sheets* API at revision *20210322*. The CLI is at version *2.0.3*.
 
 ```bash
 sheets4 [options]

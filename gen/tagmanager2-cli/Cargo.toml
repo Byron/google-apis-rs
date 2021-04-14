@@ -4,10 +4,10 @@
 [package]
 
 name = "google-tagmanager2-cli"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tagmanager2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/tagmanager2-cli"
 homepage = "https://developers.google.com/tag-manager"
 documentation = "http://byron.github.io/google-apis-rs/google_tagmanager2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-tagmanager2]
 path = "../tagmanager2"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"

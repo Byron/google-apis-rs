@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -122,41 +121,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct PhotosLibrary<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct PhotosLibrary<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for PhotosLibrary<C> {}
+impl<'a, > client::Hub for PhotosLibrary<> {}
 
-impl<'a, C> PhotosLibrary<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > PhotosLibrary<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PhotosLibrary<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PhotosLibrary<> {
         PhotosLibrary {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://photoslibrary.googleapis.com/".to_string(),
             _root_url: "https://photoslibrary.googleapis.com/".to_string(),
         }
     }
 
-    pub fn albums(&'a self) -> AlbumMethods<'a, C> {
+    pub fn albums(&'a self) -> AlbumMethods<'a> {
         AlbumMethods { hub: &self }
     }
-    pub fn media_items(&'a self) -> MediaItemMethods<'a, C> {
+    pub fn media_items(&'a self) -> MediaItemMethods<'a> {
         MediaItemMethods { hub: &self }
     }
-    pub fn shared_albums(&'a self) -> SharedAlbumMethods<'a, C> {
+    pub fn shared_albums(&'a self) -> SharedAlbumMethods<'a> {
         SharedAlbumMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1222,15 +1220,15 @@ impl client::Part for Video {}
 /// let rb = hub.albums();
 /// # }
 /// ```
-pub struct AlbumMethods<'a, C>
-    where C: 'a {
+pub struct AlbumMethods<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AlbumMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AlbumMethods<'a> {}
 
-impl<'a, C> AlbumMethods<'a, C> {
+impl<'a> AlbumMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1240,7 +1238,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the album where the enrichment is to be added.
-    pub fn add_enrichment(&self, request: AddEnrichmentToAlbumRequest, album_id: &str) -> AlbumAddEnrichmentCall<'a, C> {
+    pub fn add_enrichment(&self, request: AddEnrichmentToAlbumRequest, album_id: &str) -> AlbumAddEnrichmentCall<'a> {
         AlbumAddEnrichmentCall {
             hub: self.hub,
             _request: request,
@@ -1259,7 +1257,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the Album that the media items are added to.
-    pub fn batch_add_media_items(&self, request: BatchAddMediaItemsToAlbumRequest, album_id: &str) -> AlbumBatchAddMediaItemCall<'a, C> {
+    pub fn batch_add_media_items(&self, request: BatchAddMediaItemsToAlbumRequest, album_id: &str) -> AlbumBatchAddMediaItemCall<'a> {
         AlbumBatchAddMediaItemCall {
             hub: self.hub,
             _request: request,
@@ -1278,7 +1276,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the Album that the media items are to be removed from.
-    pub fn batch_remove_media_items(&self, request: BatchRemoveMediaItemsFromAlbumRequest, album_id: &str) -> AlbumBatchRemoveMediaItemCall<'a, C> {
+    pub fn batch_remove_media_items(&self, request: BatchRemoveMediaItemsFromAlbumRequest, album_id: &str) -> AlbumBatchRemoveMediaItemCall<'a> {
         AlbumBatchRemoveMediaItemCall {
             hub: self.hub,
             _request: request,
@@ -1296,7 +1294,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: CreateAlbumRequest) -> AlbumCreateCall<'a, C> {
+    pub fn create(&self, request: CreateAlbumRequest) -> AlbumCreateCall<'a> {
         AlbumCreateCall {
             hub: self.hub,
             _request: request,
@@ -1313,7 +1311,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     /// # Arguments
     ///
     /// * `albumId` - Required. Identifier of the album to be requested.
-    pub fn get(&self, album_id: &str) -> AlbumGetCall<'a, C> {
+    pub fn get(&self, album_id: &str) -> AlbumGetCall<'a> {
         AlbumGetCall {
             hub: self.hub,
             _album_id: album_id.to_string(),
@@ -1326,7 +1324,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all albums shown to a user in the Albums tab of the Google Photos app.
-    pub fn list(&self) -> AlbumListCall<'a, C> {
+    pub fn list(&self) -> AlbumListCall<'a> {
         AlbumListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1346,7 +1344,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `id` - Identifier for the album. This is a persistent identifier that can be used between sessions to identify this album.
-    pub fn patch(&self, request: Album, id: &str) -> AlbumPatchCall<'a, C> {
+    pub fn patch(&self, request: Album, id: &str) -> AlbumPatchCall<'a> {
         AlbumPatchCall {
             hub: self.hub,
             _request: request,
@@ -1366,7 +1364,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the album to be shared. This `albumId` must belong to an album created by the developer.
-    pub fn share(&self, request: ShareAlbumRequest, album_id: &str) -> AlbumShareCall<'a, C> {
+    pub fn share(&self, request: ShareAlbumRequest, album_id: &str) -> AlbumShareCall<'a> {
         AlbumShareCall {
             hub: self.hub,
             _request: request,
@@ -1385,7 +1383,7 @@ impl<'a, C> AlbumMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `albumId` - Required. Identifier of the album to be unshared. This album id must belong to an album created by the developer.
-    pub fn unshare(&self, request: UnshareAlbumRequest, album_id: &str) -> AlbumUnshareCall<'a, C> {
+    pub fn unshare(&self, request: UnshareAlbumRequest, album_id: &str) -> AlbumUnshareCall<'a> {
         AlbumUnshareCall {
             hub: self.hub,
             _request: request,
@@ -1429,15 +1427,15 @@ impl<'a, C> AlbumMethods<'a, C> {
 /// let rb = hub.media_items();
 /// # }
 /// ```
-pub struct MediaItemMethods<'a, C>
-    where C: 'a {
+pub struct MediaItemMethods<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MediaItemMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MediaItemMethods<'a> {}
 
-impl<'a, C> MediaItemMethods<'a, C> {
+impl<'a> MediaItemMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1446,7 +1444,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_create(&self, request: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a, C> {
+    pub fn batch_create(&self, request: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a> {
         MediaItemBatchCreateCall {
             hub: self.hub,
             _request: request,
@@ -1459,7 +1457,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the list of media items for the specified media item identifiers. Items are returned in the same order as the supplied identifiers.
-    pub fn batch_get(&self) -> MediaItemBatchGetCall<'a, C> {
+    pub fn batch_get(&self) -> MediaItemBatchGetCall<'a> {
         MediaItemBatchGetCall {
             hub: self.hub,
             _media_item_ids: Default::default(),
@@ -1476,7 +1474,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `mediaItemId` - Required. Identifier of the media item to be requested.
-    pub fn get(&self, media_item_id: &str) -> MediaItemGetCall<'a, C> {
+    pub fn get(&self, media_item_id: &str) -> MediaItemGetCall<'a> {
         MediaItemGetCall {
             hub: self.hub,
             _media_item_id: media_item_id.to_string(),
@@ -1489,7 +1487,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// List all media items from a user's Google Photos library.
-    pub fn list(&self) -> MediaItemListCall<'a, C> {
+    pub fn list(&self) -> MediaItemListCall<'a> {
         MediaItemListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1508,7 +1506,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `id` - Identifier for the media item. This is a persistent identifier that can be used between sessions to identify this media item.
-    pub fn patch(&self, request: MediaItem, id: &str) -> MediaItemPatchCall<'a, C> {
+    pub fn patch(&self, request: MediaItem, id: &str) -> MediaItemPatchCall<'a> {
         MediaItemPatchCall {
             hub: self.hub,
             _request: request,
@@ -1527,7 +1525,7 @@ impl<'a, C> MediaItemMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn search(&self, request: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, C> {
+    pub fn search(&self, request: SearchMediaItemsRequest) -> MediaItemSearchCall<'a> {
         MediaItemSearchCall {
             hub: self.hub,
             _request: request,
@@ -1570,15 +1568,15 @@ impl<'a, C> MediaItemMethods<'a, C> {
 /// let rb = hub.shared_albums();
 /// # }
 /// ```
-pub struct SharedAlbumMethods<'a, C>
-    where C: 'a {
+pub struct SharedAlbumMethods<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
 }
 
-impl<'a, C> client::MethodsBuilder for SharedAlbumMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for SharedAlbumMethods<'a> {}
 
-impl<'a, C> SharedAlbumMethods<'a, C> {
+impl<'a> SharedAlbumMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1587,7 +1585,7 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
     /// # Arguments
     ///
     /// * `shareToken` - Required. Share token of the album to be requested.
-    pub fn get(&self, share_token: &str) -> SharedAlbumGetCall<'a, C> {
+    pub fn get(&self, share_token: &str) -> SharedAlbumGetCall<'a> {
         SharedAlbumGetCall {
             hub: self.hub,
             _share_token: share_token.to_string(),
@@ -1604,7 +1602,7 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn join(&self, request: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, C> {
+    pub fn join(&self, request: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a> {
         SharedAlbumJoinCall {
             hub: self.hub,
             _request: request,
@@ -1621,7 +1619,7 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn leave(&self, request: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a, C> {
+    pub fn leave(&self, request: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a> {
         SharedAlbumLeaveCall {
             hub: self.hub,
             _request: request,
@@ -1634,7 +1632,7 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all shared albums available in the Sharing tab of the user's Google Photos app.
-    pub fn list(&self) -> SharedAlbumListCall<'a, C> {
+    pub fn list(&self) -> SharedAlbumListCall<'a> {
         SharedAlbumListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1693,10 +1691,10 @@ impl<'a, C> SharedAlbumMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumAddEnrichmentCall<'a, C>
-    where C: 'a {
+pub struct AlbumAddEnrichmentCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: AddEnrichmentToAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1704,9 +1702,9 @@ pub struct AlbumAddEnrichmentCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumAddEnrichmentCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumAddEnrichmentCall<'a> {}
 
-impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumAddEnrichmentCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1782,8 +1780,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1797,7 +1794,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1808,7 +1805,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1867,7 +1864,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddEnrichmentToAlbumRequest) -> AlbumAddEnrichmentCall<'a, C> {
+    pub fn request(mut self, new_value: AddEnrichmentToAlbumRequest) -> AlbumAddEnrichmentCall<'a> {
         self._request = new_value;
         self
     }
@@ -1877,7 +1874,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumAddEnrichmentCall<'a, C> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumAddEnrichmentCall<'a> {
         self._album_id = new_value.to_string();
         self
     }
@@ -1887,7 +1884,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumAddEnrichmentCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumAddEnrichmentCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1912,7 +1909,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumAddEnrichmentCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumAddEnrichmentCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1932,7 +1929,7 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumAddEnrichmentCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumAddEnrichmentCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1982,10 +1979,10 @@ impl<'a, C> AlbumAddEnrichmentCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumBatchAddMediaItemCall<'a, C>
-    where C: 'a {
+pub struct AlbumBatchAddMediaItemCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: BatchAddMediaItemsToAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1993,9 +1990,9 @@ pub struct AlbumBatchAddMediaItemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumBatchAddMediaItemCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumBatchAddMediaItemCall<'a> {}
 
-impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumBatchAddMediaItemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2071,8 +2068,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2086,7 +2082,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2097,7 +2093,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2156,7 +2152,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchAddMediaItemsToAlbumRequest) -> AlbumBatchAddMediaItemCall<'a, C> {
+    pub fn request(mut self, new_value: BatchAddMediaItemsToAlbumRequest) -> AlbumBatchAddMediaItemCall<'a> {
         self._request = new_value;
         self
     }
@@ -2166,7 +2162,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumBatchAddMediaItemCall<'a, C> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumBatchAddMediaItemCall<'a> {
         self._album_id = new_value.to_string();
         self
     }
@@ -2176,7 +2172,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchAddMediaItemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchAddMediaItemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2201,7 +2197,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchAddMediaItemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchAddMediaItemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2221,7 +2217,7 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumBatchAddMediaItemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumBatchAddMediaItemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2271,10 +2267,10 @@ impl<'a, C> AlbumBatchAddMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumBatchRemoveMediaItemCall<'a, C>
-    where C: 'a {
+pub struct AlbumBatchRemoveMediaItemCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: BatchRemoveMediaItemsFromAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2282,9 +2278,9 @@ pub struct AlbumBatchRemoveMediaItemCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumBatchRemoveMediaItemCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumBatchRemoveMediaItemCall<'a> {}
 
-impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumBatchRemoveMediaItemCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2360,8 +2356,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2375,7 +2370,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2386,7 +2381,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2445,7 +2440,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchRemoveMediaItemsFromAlbumRequest) -> AlbumBatchRemoveMediaItemCall<'a, C> {
+    pub fn request(mut self, new_value: BatchRemoveMediaItemsFromAlbumRequest) -> AlbumBatchRemoveMediaItemCall<'a> {
         self._request = new_value;
         self
     }
@@ -2455,7 +2450,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumBatchRemoveMediaItemCall<'a, C> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumBatchRemoveMediaItemCall<'a> {
         self._album_id = new_value.to_string();
         self
     }
@@ -2465,7 +2460,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchRemoveMediaItemCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumBatchRemoveMediaItemCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2490,7 +2485,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchRemoveMediaItemCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumBatchRemoveMediaItemCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2510,7 +2505,7 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumBatchRemoveMediaItemCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumBatchRemoveMediaItemCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2560,19 +2555,19 @@ impl<'a, C> AlbumBatchRemoveMediaItemCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumCreateCall<'a, C>
-    where C: 'a {
+pub struct AlbumCreateCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: CreateAlbumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumCreateCall<'a> {}
 
-impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2622,8 +2617,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2637,7 +2631,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2648,7 +2642,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2707,7 +2701,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAlbumRequest) -> AlbumCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateAlbumRequest) -> AlbumCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2717,7 +2711,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2742,7 +2736,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2762,7 +2756,7 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2806,19 +2800,19 @@ impl<'a, C> AlbumCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumGetCall<'a, C>
-    where C: 'a {
+pub struct AlbumGetCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumGetCall<'a> {}
 
-impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2883,8 +2877,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2897,7 +2890,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2906,7 +2899,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2966,7 +2959,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumGetCall<'a, C> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumGetCall<'a> {
         self._album_id = new_value.to_string();
         self
     }
@@ -2976,7 +2969,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3001,7 +2994,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3021,7 +3014,7 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3068,10 +3061,10 @@ impl<'a, C> AlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumListCall<'a, C>
-    where C: 'a {
+pub struct AlbumListCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _exclude_non_app_created_data: Option<bool>,
@@ -3080,9 +3073,9 @@ pub struct AlbumListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumListCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumListCall<'a> {}
 
-impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3130,8 +3123,7 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3144,7 +3136,7 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3153,7 +3145,7 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3210,21 +3202,21 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listAlbums` request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AlbumListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AlbumListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of albums to return in the response. Fewer albums might be returned than the specified number. The default `pageSize` is 20, the maximum is 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AlbumListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// If set, the results exclude media items that were not created by this app. Defaults to false (all albums are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.
     ///
     /// Sets the *exclude non app created data* query property to the given value.
-    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> AlbumListCall<'a, C> {
+    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> AlbumListCall<'a> {
         self._exclude_non_app_created_data = Some(new_value);
         self
     }
@@ -3234,7 +3226,7 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3259,7 +3251,7 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3279,7 +3271,7 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3330,10 +3322,10 @@ impl<'a, C> AlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumPatchCall<'a, C>
-    where C: 'a {
+pub struct AlbumPatchCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: Album,
     _id: String,
     _update_mask: Option<String>,
@@ -3342,9 +3334,9 @@ pub struct AlbumPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumPatchCall<'a> {}
 
-impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3423,8 +3415,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3438,7 +3429,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3449,7 +3440,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3508,7 +3499,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Album) -> AlbumPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Album) -> AlbumPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -3518,14 +3509,14 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> AlbumPatchCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> AlbumPatchCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// Required. Indicate what fields in the provided album to update. The only valid values are `title` and `cover_photo_media_item_id`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AlbumPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> AlbumPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3535,7 +3526,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3560,7 +3551,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3580,7 +3571,7 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3630,10 +3621,10 @@ impl<'a, C> AlbumPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumShareCall<'a, C>
-    where C: 'a {
+pub struct AlbumShareCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: ShareAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3641,9 +3632,9 @@ pub struct AlbumShareCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumShareCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumShareCall<'a> {}
 
-impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumShareCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3719,8 +3710,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3734,7 +3724,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3745,7 +3735,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3804,7 +3794,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ShareAlbumRequest) -> AlbumShareCall<'a, C> {
+    pub fn request(mut self, new_value: ShareAlbumRequest) -> AlbumShareCall<'a> {
         self._request = new_value;
         self
     }
@@ -3814,7 +3804,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumShareCall<'a, C> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumShareCall<'a> {
         self._album_id = new_value.to_string();
         self
     }
@@ -3824,7 +3814,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumShareCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumShareCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3849,7 +3839,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumShareCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumShareCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3869,7 +3859,7 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumShareCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumShareCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3919,10 +3909,10 @@ impl<'a, C> AlbumShareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlbumUnshareCall<'a, C>
-    where C: 'a {
+pub struct AlbumUnshareCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: UnshareAlbumRequest,
     _album_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3930,9 +3920,9 @@ pub struct AlbumUnshareCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlbumUnshareCall<'a, C> {}
+impl<'a> client::CallBuilder for AlbumUnshareCall<'a> {}
 
-impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlbumUnshareCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4008,8 +3998,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4023,7 +4012,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4034,7 +4023,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4093,7 +4082,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UnshareAlbumRequest) -> AlbumUnshareCall<'a, C> {
+    pub fn request(mut self, new_value: UnshareAlbumRequest) -> AlbumUnshareCall<'a> {
         self._request = new_value;
         self
     }
@@ -4103,7 +4092,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn album_id(mut self, new_value: &str) -> AlbumUnshareCall<'a, C> {
+    pub fn album_id(mut self, new_value: &str) -> AlbumUnshareCall<'a> {
         self._album_id = new_value.to_string();
         self
     }
@@ -4113,7 +4102,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumUnshareCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlbumUnshareCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4138,7 +4127,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlbumUnshareCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlbumUnshareCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4158,7 +4147,7 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumUnshareCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlbumUnshareCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4208,19 +4197,19 @@ impl<'a, C> AlbumUnshareCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemBatchCreateCall<'a, C>
-    where C: 'a {
+pub struct MediaItemBatchCreateCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: BatchCreateMediaItemsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaItemBatchCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaItemBatchCreateCall<'a> {}
 
-impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaItemBatchCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4270,8 +4259,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4285,7 +4273,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4296,7 +4284,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4355,7 +4343,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a, C> {
+    pub fn request(mut self, new_value: BatchCreateMediaItemsRequest) -> MediaItemBatchCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -4365,7 +4353,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4390,7 +4378,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4410,7 +4398,7 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4455,19 +4443,19 @@ impl<'a, C> MediaItemBatchCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemBatchGetCall<'a, C>
-    where C: 'a {
+pub struct MediaItemBatchGetCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _media_item_ids: Vec<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaItemBatchGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaItemBatchGetCall<'a> {}
 
-impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaItemBatchGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4511,8 +4499,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4525,7 +4512,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4534,7 +4521,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4592,7 +4579,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *media item ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_media_item_ids(mut self, new_value: &str) -> MediaItemBatchGetCall<'a, C> {
+    pub fn add_media_item_ids(mut self, new_value: &str) -> MediaItemBatchGetCall<'a> {
         self._media_item_ids.push(new_value.to_string());
         self
     }
@@ -4602,7 +4589,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemBatchGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4627,7 +4614,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemBatchGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4647,7 +4634,7 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemBatchGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4691,19 +4678,19 @@ impl<'a, C> MediaItemBatchGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemGetCall<'a, C>
-    where C: 'a {
+pub struct MediaItemGetCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _media_item_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaItemGetCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaItemGetCall<'a> {}
 
-impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaItemGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4768,8 +4755,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4782,7 +4768,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4791,7 +4777,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4851,7 +4837,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn media_item_id(mut self, new_value: &str) -> MediaItemGetCall<'a, C> {
+    pub fn media_item_id(mut self, new_value: &str) -> MediaItemGetCall<'a> {
         self._media_item_id = new_value.to_string();
         self
     }
@@ -4861,7 +4847,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4886,7 +4872,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4906,7 +4892,7 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4952,10 +4938,10 @@ impl<'a, C> MediaItemGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemListCall<'a, C>
-    where C: 'a {
+pub struct MediaItemListCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4963,9 +4949,9 @@ pub struct MediaItemListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaItemListCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaItemListCall<'a> {}
 
-impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaItemListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5010,8 +4996,7 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5024,7 +5009,7 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5033,7 +5018,7 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5090,14 +5075,14 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listMediaItems` request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MediaItemListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MediaItemListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of media items to return in the response. Fewer media items might be returned than the specified number. The default `pageSize` is 25, the maximum is 100.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> MediaItemListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> MediaItemListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5107,7 +5092,7 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5132,7 +5117,7 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5152,7 +5137,7 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5203,10 +5188,10 @@ impl<'a, C> MediaItemListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemPatchCall<'a, C>
-    where C: 'a {
+pub struct MediaItemPatchCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: MediaItem,
     _id: String,
     _update_mask: Option<String>,
@@ -5215,9 +5200,9 @@ pub struct MediaItemPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaItemPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaItemPatchCall<'a> {}
 
-impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaItemPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5296,8 +5281,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5311,7 +5295,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5322,7 +5306,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5381,7 +5365,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MediaItem) -> MediaItemPatchCall<'a, C> {
+    pub fn request(mut self, new_value: MediaItem) -> MediaItemPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5391,14 +5375,14 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> MediaItemPatchCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> MediaItemPatchCall<'a> {
         self._id = new_value.to_string();
         self
     }
     /// Required. Indicate what fields in the provided media item to update. The only valid value is `description`.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> MediaItemPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> MediaItemPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5408,7 +5392,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5433,7 +5417,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5453,7 +5437,7 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5503,19 +5487,19 @@ impl<'a, C> MediaItemPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaItemSearchCall<'a, C>
-    where C: 'a {
+pub struct MediaItemSearchCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: SearchMediaItemsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaItemSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaItemSearchCall<'a> {}
 
-impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaItemSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5565,8 +5549,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5580,7 +5563,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5591,7 +5574,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5650,7 +5633,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SearchMediaItemsRequest) -> MediaItemSearchCall<'a, C> {
+    pub fn request(mut self, new_value: SearchMediaItemsRequest) -> MediaItemSearchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5660,7 +5643,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaItemSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5685,7 +5668,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaItemSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaItemSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5705,7 +5688,7 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaItemSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5749,19 +5732,19 @@ impl<'a, C> MediaItemSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumGetCall<'a, C>
-    where C: 'a {
+pub struct SharedAlbumGetCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _share_token: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SharedAlbumGetCall<'a, C> {}
+impl<'a> client::CallBuilder for SharedAlbumGetCall<'a> {}
 
-impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SharedAlbumGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5826,8 +5809,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5840,7 +5822,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5849,7 +5831,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5909,7 +5891,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn share_token(mut self, new_value: &str) -> SharedAlbumGetCall<'a, C> {
+    pub fn share_token(mut self, new_value: &str) -> SharedAlbumGetCall<'a> {
         self._share_token = new_value.to_string();
         self
     }
@@ -5919,7 +5901,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5944,7 +5926,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5964,7 +5946,7 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6014,19 +5996,19 @@ impl<'a, C> SharedAlbumGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumJoinCall<'a, C>
-    where C: 'a {
+pub struct SharedAlbumJoinCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: JoinSharedAlbumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SharedAlbumJoinCall<'a, C> {}
+impl<'a> client::CallBuilder for SharedAlbumJoinCall<'a> {}
 
-impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SharedAlbumJoinCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6076,8 +6058,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6091,7 +6072,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6102,7 +6083,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6161,7 +6142,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a, C> {
+    pub fn request(mut self, new_value: JoinSharedAlbumRequest) -> SharedAlbumJoinCall<'a> {
         self._request = new_value;
         self
     }
@@ -6171,7 +6152,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumJoinCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumJoinCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6196,7 +6177,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumJoinCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumJoinCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6216,7 +6197,7 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumJoinCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumJoinCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6266,19 +6247,19 @@ impl<'a, C> SharedAlbumJoinCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumLeaveCall<'a, C>
-    where C: 'a {
+pub struct SharedAlbumLeaveCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _request: LeaveSharedAlbumRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SharedAlbumLeaveCall<'a, C> {}
+impl<'a> client::CallBuilder for SharedAlbumLeaveCall<'a> {}
 
-impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SharedAlbumLeaveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6328,8 +6309,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6343,7 +6323,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6354,7 +6334,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6413,7 +6393,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a, C> {
+    pub fn request(mut self, new_value: LeaveSharedAlbumRequest) -> SharedAlbumLeaveCall<'a> {
         self._request = new_value;
         self
     }
@@ -6423,7 +6403,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumLeaveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumLeaveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6448,7 +6428,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumLeaveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumLeaveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6468,7 +6448,7 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumLeaveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumLeaveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6515,10 +6495,10 @@ impl<'a, C> SharedAlbumLeaveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct SharedAlbumListCall<'a, C>
-    where C: 'a {
+pub struct SharedAlbumListCall<'a>
+    where  {
 
-    hub: &'a PhotosLibrary<C>,
+    hub: &'a PhotosLibrary<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _exclude_non_app_created_data: Option<bool>,
@@ -6527,9 +6507,9 @@ pub struct SharedAlbumListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for SharedAlbumListCall<'a, C> {}
+impl<'a> client::CallBuilder for SharedAlbumListCall<'a> {}
 
-impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> SharedAlbumListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6577,8 +6557,7 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6591,7 +6570,7 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6600,7 +6579,7 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6657,21 +6636,21 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// A continuation token to get the next page of the results. Adding this to the request returns the rows after the `pageToken`. The `pageToken` should be the value returned in the `nextPageToken` parameter in the response to the `listSharedAlbums` request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SharedAlbumListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> SharedAlbumListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of albums to return in the response. Fewer albums might be returned than the specified number. The default `pageSize` is 20, the maximum is 50.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> SharedAlbumListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// If set, the results exclude media items that were not created by this app. Defaults to false (all albums are returned). This field is ignored if the photoslibrary.readonly.appcreateddata scope is used.
     ///
     /// Sets the *exclude non app created data* query property to the given value.
-    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> SharedAlbumListCall<'a, C> {
+    pub fn exclude_non_app_created_data(mut self, new_value: bool) -> SharedAlbumListCall<'a> {
         self._exclude_non_app_created_data = Some(new_value);
         self
     }
@@ -6681,7 +6660,7 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> SharedAlbumListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6706,7 +6685,7 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> SharedAlbumListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6726,7 +6705,7 @@ impl<'a, C> SharedAlbumListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SharedAlbumListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

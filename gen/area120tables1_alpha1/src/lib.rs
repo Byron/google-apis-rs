@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Area120 Tables* crate version *2.0.0+20210330*, where *20210330* is the exact revision of the *area120tables:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Area120 Tables* crate version *2.0.3+20210330*, where *20210330* is the exact revision of the *area120tables:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Area120 Tables* *v1_alpha1* API can be found at the
 //! [official documentation site](https://support.google.com/area120-tables/answer/10011390).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/area120tables1_alpha1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/area120tables1_alpha1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Area120Tables) ... 

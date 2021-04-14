@@ -4,12 +4,12 @@
 [package]
 
 name = "google-jobs4"
-version = "2.0.0+20210309"
+version = "2.0.3+20210309"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Talent Solution (protocol v4)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/jobs4"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/jobs4"
 homepage = "https://cloud.google.com/talent-solution/job-search/docs/"
-documentation = "https://docs.rs/google-jobs4/2.0.0+20210309"
+documentation = "https://docs.rs/google-jobs4/2.0.3+20210309"
 license = "MIT"
 keywords = ["jobs", "google", "protocol", "web", "api"]
 autobins = false

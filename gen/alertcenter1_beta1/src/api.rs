@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -104,38 +103,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AlertCenter<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AlertCenter<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AlertCenter<C> {}
+impl<'a, > client::Hub for AlertCenter<> {}
 
-impl<'a, C> AlertCenter<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AlertCenter<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AlertCenter<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AlertCenter<> {
         AlertCenter {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://alertcenter.googleapis.com/".to_string(),
             _root_url: "https://alertcenter.googleapis.com/".to_string(),
         }
     }
 
-    pub fn alerts(&'a self) -> AlertMethods<'a, C> {
+    pub fn alerts(&'a self) -> AlertMethods<'a> {
         AlertMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -553,15 +551,15 @@ impl client::RequestValue for UndeleteAlertRequest {}
 /// let rb = hub.alerts();
 /// # }
 /// ```
-pub struct AlertMethods<'a, C>
-    where C: 'a {
+pub struct AlertMethods<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AlertMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AlertMethods<'a> {}
 
-impl<'a, C> AlertMethods<'a, C> {
+impl<'a> AlertMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -571,7 +569,7 @@ impl<'a, C> AlertMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `alertId` - Required. The identifier of the alert this feedback belongs to.
-    pub fn feedback_create(&self, request: AlertFeedback, alert_id: &str) -> AlertFeedbackCreateCall<'a, C> {
+    pub fn feedback_create(&self, request: AlertFeedback, alert_id: &str) -> AlertFeedbackCreateCall<'a> {
         AlertFeedbackCreateCall {
             hub: self.hub,
             _request: request,
@@ -590,7 +588,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The alert identifier. The "-" wildcard could be used to represent all alerts.
-    pub fn feedback_list(&self, alert_id: &str) -> AlertFeedbackListCall<'a, C> {
+    pub fn feedback_list(&self, alert_id: &str) -> AlertFeedbackListCall<'a> {
         AlertFeedbackListCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -609,7 +607,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, C> {
+    pub fn batch_delete(&self, request: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a> {
         AlertBatchDeleteCall {
             hub: self.hub,
             _request: request,
@@ -626,7 +624,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn batch_undelete(&self, request: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, C> {
+    pub fn batch_undelete(&self, request: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a> {
         AlertBatchUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -643,7 +641,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert to delete.
-    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a, C> {
+    pub fn delete(&self, alert_id: &str) -> AlertDeleteCall<'a> {
         AlertDeleteCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -661,7 +659,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert to retrieve.
-    pub fn get(&self, alert_id: &str) -> AlertGetCall<'a, C> {
+    pub fn get(&self, alert_id: &str) -> AlertGetCall<'a> {
         AlertGetCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -679,7 +677,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// # Arguments
     ///
     /// * `alertId` - Required. The identifier of the alert this metadata belongs to.
-    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a, C> {
+    pub fn get_metadata(&self, alert_id: &str) -> AlertGetMetadataCall<'a> {
         AlertGetMetadataCall {
             hub: self.hub,
             _alert_id: alert_id.to_string(),
@@ -693,7 +691,7 @@ impl<'a, C> AlertMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the alerts.
-    pub fn list(&self) -> AlertListCall<'a, C> {
+    pub fn list(&self) -> AlertListCall<'a> {
         AlertListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -715,7 +713,7 @@ impl<'a, C> AlertMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `alertId` - Required. The identifier of the alert to undelete.
-    pub fn undelete(&self, request: UndeleteAlertRequest, alert_id: &str) -> AlertUndeleteCall<'a, C> {
+    pub fn undelete(&self, request: UndeleteAlertRequest, alert_id: &str) -> AlertUndeleteCall<'a> {
         AlertUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -759,20 +757,20 @@ impl<'a, C> AlertMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Returns customer-level settings.
-    pub fn get_settings(&self) -> MethodGetSettingCall<'a, C> {
+    pub fn get_settings(&self) -> MethodGetSettingCall<'a> {
         MethodGetSettingCall {
             hub: self.hub,
             _customer_id: Default::default(),
@@ -789,7 +787,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a, C> {
+    pub fn update_settings(&self, request: Settings) -> MethodUpdateSettingCall<'a> {
         MethodUpdateSettingCall {
             hub: self.hub,
             _request: request,
@@ -848,10 +846,10 @@ impl<'a, C> MethodMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertFeedbackCreateCall<'a, C>
-    where C: 'a {
+pub struct AlertFeedbackCreateCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _request: AlertFeedback,
     _alert_id: String,
     _customer_id: Option<String>,
@@ -860,9 +858,9 @@ pub struct AlertFeedbackCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertFeedbackCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertFeedbackCreateCall<'a> {}
 
-impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertFeedbackCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -937,8 +935,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -952,7 +949,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -963,7 +960,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1022,7 +1019,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AlertFeedback) -> AlertFeedbackCreateCall<'a, C> {
+    pub fn request(mut self, new_value: AlertFeedback) -> AlertFeedbackCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1032,14 +1029,14 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, C> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackCreateCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -1049,7 +1046,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1074,7 +1071,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1094,7 +1091,7 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertFeedbackCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertFeedbackCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1140,10 +1137,10 @@ impl<'a, C> AlertFeedbackCreateCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertFeedbackListCall<'a, C>
-    where C: 'a {
+pub struct AlertFeedbackListCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _alert_id: String,
     _filter: Option<String>,
     _customer_id: Option<String>,
@@ -1152,9 +1149,9 @@ pub struct AlertFeedbackListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertFeedbackListCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertFeedbackListCall<'a> {}
 
-impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertFeedbackListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1221,8 +1218,7 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1235,7 +1231,7 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1244,7 +1240,7 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1304,21 +1300,21 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, C> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. A query string for filtering alert feedback results. For more details, see [Query filters](/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](/admin-sdk/alertcenter/reference/filter-fields#alerts.feedback.list).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AlertFeedbackListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AlertFeedbackListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert feedback are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertFeedbackListCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -1328,7 +1324,7 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertFeedbackListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1353,7 +1349,7 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertFeedbackListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1373,7 +1369,7 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertFeedbackListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertFeedbackListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1423,19 +1419,19 @@ impl<'a, C> AlertFeedbackListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertBatchDeleteCall<'a, C>
-    where C: 'a {
+pub struct AlertBatchDeleteCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _request: BatchDeleteAlertsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertBatchDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertBatchDeleteCall<'a> {}
 
-impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertBatchDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1485,8 +1481,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1500,7 +1495,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1511,7 +1506,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1570,7 +1565,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a, C> {
+    pub fn request(mut self, new_value: BatchDeleteAlertsRequest) -> AlertBatchDeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -1580,7 +1575,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1605,7 +1600,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1625,7 +1620,7 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1675,19 +1670,19 @@ impl<'a, C> AlertBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertBatchUndeleteCall<'a, C>
-    where C: 'a {
+pub struct AlertBatchUndeleteCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _request: BatchUndeleteAlertsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertBatchUndeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertBatchUndeleteCall<'a> {}
 
-impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertBatchUndeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1737,8 +1732,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1752,7 +1746,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1763,7 +1757,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1822,7 +1816,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a, C> {
+    pub fn request(mut self, new_value: BatchUndeleteAlertsRequest) -> AlertBatchUndeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -1832,7 +1826,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchUndeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertBatchUndeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1857,7 +1851,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertBatchUndeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1877,7 +1871,7 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchUndeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertBatchUndeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1922,10 +1916,10 @@ impl<'a, C> AlertBatchUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertDeleteCall<'a, C>
-    where C: 'a {
+pub struct AlertDeleteCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _alert_id: String,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1933,9 +1927,9 @@ pub struct AlertDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertDeleteCall<'a> {}
 
-impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1999,8 +1993,7 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2013,7 +2006,7 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2022,7 +2015,7 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2082,14 +2075,14 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertDeleteCall<'a> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertDeleteCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertDeleteCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2099,7 +2092,7 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2124,7 +2117,7 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2144,7 +2137,7 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2189,10 +2182,10 @@ impl<'a, C> AlertDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertGetCall<'a, C>
-    where C: 'a {
+pub struct AlertGetCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _alert_id: String,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2200,9 +2193,9 @@ pub struct AlertGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertGetCall<'a> {}
 
-impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2266,8 +2259,7 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2280,7 +2272,7 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2289,7 +2281,7 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2349,14 +2341,14 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertGetCall<'a, C> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetCall<'a> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertGetCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2366,7 +2358,7 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2391,7 +2383,7 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2411,7 +2403,7 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2456,10 +2448,10 @@ impl<'a, C> AlertGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertGetMetadataCall<'a, C>
-    where C: 'a {
+pub struct AlertGetMetadataCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _alert_id: String,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2467,9 +2459,9 @@ pub struct AlertGetMetadataCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertGetMetadataCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertGetMetadataCall<'a> {}
 
-impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertGetMetadataCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2533,8 +2525,7 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2547,7 +2538,7 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2556,7 +2547,7 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2616,14 +2607,14 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, C> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a> {
         self._alert_id = new_value.to_string();
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert metadata is associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertGetMetadataCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2633,7 +2624,7 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetMetadataCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertGetMetadataCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2658,7 +2649,7 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertGetMetadataCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2678,7 +2669,7 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetMetadataCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertGetMetadataCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2727,10 +2718,10 @@ impl<'a, C> AlertGetMetadataCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertListCall<'a, C>
-    where C: 'a {
+pub struct AlertListCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
@@ -2741,9 +2732,9 @@ pub struct AlertListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertListCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertListCall<'a> {}
 
-impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2797,8 +2788,7 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2811,7 +2801,7 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2820,7 +2810,7 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2877,35 +2867,35 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Optional. A token identifying a page of results the server should return. If empty, a new iteration is started. To continue an iteration, pass in the value from the previous ListAlertsResponse's next_page_token field.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AlertListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AlertListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The requested page size. Server may return fewer items than requested. If unspecified, server picks an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AlertListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AlertListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. The sort order of the list results. If not specified results may be returned in arbitrary order. You can sort the results in descending order based on the creation timestamp using `order_by="create_time desc"`. Currently, supported sorting are `create_time asc`, `create_time desc`, `update_time desc`
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> AlertListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// Optional. A query string for filtering alert results. For more details, see [Query filters](/admin-sdk/alertcenter/guides/query-filters) and [Supported query filter fields](/admin-sdk/alertcenter/reference/filter-fields#alerts.list).
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AlertListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AlertListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alerts are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> AlertListCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> AlertListCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -2915,7 +2905,7 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2940,7 +2930,7 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2960,7 +2950,7 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3010,10 +3000,10 @@ impl<'a, C> AlertListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AlertUndeleteCall<'a, C>
-    where C: 'a {
+pub struct AlertUndeleteCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _request: UndeleteAlertRequest,
     _alert_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3021,9 +3011,9 @@ pub struct AlertUndeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AlertUndeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AlertUndeleteCall<'a> {}
 
-impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AlertUndeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3095,8 +3085,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3110,7 +3099,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3121,7 +3110,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3180,7 +3169,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UndeleteAlertRequest) -> AlertUndeleteCall<'a, C> {
+    pub fn request(mut self, new_value: UndeleteAlertRequest) -> AlertUndeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -3190,7 +3179,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alert_id(mut self, new_value: &str) -> AlertUndeleteCall<'a, C> {
+    pub fn alert_id(mut self, new_value: &str) -> AlertUndeleteCall<'a> {
         self._alert_id = new_value.to_string();
         self
     }
@@ -3200,7 +3189,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertUndeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AlertUndeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3225,7 +3214,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AlertUndeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AlertUndeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3245,7 +3234,7 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AlertUndeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AlertUndeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3290,19 +3279,19 @@ impl<'a, C> AlertUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetSettingCall<'a, C>
-    where C: 'a {
+pub struct MethodGetSettingCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodGetSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetSettingCall<'a> {}
 
-impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3344,8 +3333,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3358,7 +3346,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3367,7 +3355,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3424,7 +3412,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert settings are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> MethodGetSettingCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -3434,7 +3422,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3459,7 +3447,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3479,7 +3467,7 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3530,10 +3518,10 @@ impl<'a, C> MethodGetSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodUpdateSettingCall<'a, C>
-    where C: 'a {
+pub struct MethodUpdateSettingCall<'a>
+    where  {
 
-    hub: &'a AlertCenter<C>,
+    hub: &'a AlertCenter<>,
     _request: Settings,
     _customer_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3541,9 +3529,9 @@ pub struct MethodUpdateSettingCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodUpdateSettingCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodUpdateSettingCall<'a> {}
 
-impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodUpdateSettingCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3596,8 +3584,7 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3611,7 +3598,7 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3622,7 +3609,7 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3681,14 +3668,14 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Settings) -> MethodUpdateSettingCall<'a, C> {
+    pub fn request(mut self, new_value: Settings) -> MethodUpdateSettingCall<'a> {
         self._request = new_value;
         self
     }
     /// Optional. The unique identifier of the Google Workspace organization account of the customer the alert settings are associated with. Inferred from the caller identity if not provided.
     ///
     /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> MethodUpdateSettingCall<'a, C> {
+    pub fn customer_id(mut self, new_value: &str) -> MethodUpdateSettingCall<'a> {
         self._customer_id = Some(new_value.to_string());
         self
     }
@@ -3698,7 +3685,7 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateSettingCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateSettingCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3723,7 +3710,7 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateSettingCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateSettingCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3743,7 +3730,7 @@ impl<'a, C> MethodUpdateSettingCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodUpdateSettingCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodUpdateSettingCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

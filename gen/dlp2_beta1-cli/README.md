@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-dlp2_beta1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/dlp2_beta1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/dlp2_beta1-cli).
 
 # Usage
 
-This documentation was generated from the *DLP* API at revision *20171205*. The CLI is at version *2.0.0*.
+This documentation was generated from the *DLP* API at revision *20171205*. The CLI is at version *2.0.3*.
 
 ```bash
 dlp2-beta1 [options]

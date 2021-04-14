@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Translate<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Translate,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -634,7 +633,7 @@ async fn main() {
     
     let mut app = App::new("translate2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20170525")
+           .version("2.0.3+20170525")
            .about("The Google Cloud Translation API lets websites and programs integrate with
                Google Translate programmatically.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_translate2_cli")

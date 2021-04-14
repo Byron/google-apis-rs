@@ -1,8 +1,8 @@
-site_name: mirror v2.0.0+20190424
+site_name: mirror v2.0.3+20190424
 site_url: http://byron.github.io/google-apis-rs/google-mirror1-cli
 site_description: A complete library to interact with mirror (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/mirror1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mirror1-cli
 
 docs_dir: docs
 site_dir: build_html

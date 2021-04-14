@@ -1,8 +1,8 @@
-site_name: Chrome Policy v2.0.0+20210329
+site_name: Chrome Policy v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-chromepolicy1-cli
 site_description: A complete library to interact with Chrome Policy (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/chromepolicy1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/chromepolicy1-cli
 
 docs_dir: docs
 site_dir: build_html

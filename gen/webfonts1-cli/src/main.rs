@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Webfonts<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Webfonts,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -205,7 +204,7 @@ async fn main() {
     
     let mut app = App::new("webfonts1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210326")
+           .version("2.0.3+20210326")
            .about("The Google Web Fonts Developer API lets you retrieve information about web fonts served by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webfonts1_cli")
            .arg(Arg::with_name("folder")

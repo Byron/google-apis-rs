@@ -4,12 +4,12 @@
 [package]
 
 name = "google-translate3"
-version = "2.0.0+20210312"
+version = "2.0.3+20210312"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Translate (protocol v3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/translate3"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/translate3"
 homepage = "https://cloud.google.com/translate/docs/quickstarts"
-documentation = "https://docs.rs/google-translate3/2.0.0+20210312"
+documentation = "https://docs.rs/google-translate3/2.0.3+20210312"
 license = "MIT"
 keywords = ["translate", "google", "protocol", "web", "api"]
 autobins = false

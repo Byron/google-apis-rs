@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -118,35 +117,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudOSLogin<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudOSLogin<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudOSLogin<C> {}
+impl<'a, > client::Hub for CloudOSLogin<> {}
 
-impl<'a, C> CloudOSLogin<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudOSLogin<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudOSLogin<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudOSLogin<> {
         CloudOSLogin {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://oslogin.googleapis.com/".to_string(),
             _root_url: "https://oslogin.googleapis.com/".to_string(),
         }
     }
 
-    pub fn users(&'a self) -> UserMethods<'a, C> {
+    pub fn users(&'a self) -> UserMethods<'a> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -335,15 +333,15 @@ impl client::ResponseResult for SshPublicKey {}
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C>
-    where C: 'a {
+pub struct UserMethods<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserMethods<'a> {}
 
-impl<'a, C> UserMethods<'a, C> {
+impl<'a> UserMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -352,7 +350,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. A reference to the POSIX account to update. POSIX accounts are identified by the project ID they are associated with. A reference to the POSIX account is in format `users/{user}/projects/{project}`.
-    pub fn projects_delete(&self, name: &str) -> UserProjectDeleteCall<'a, C> {
+    pub fn projects_delete(&self, name: &str) -> UserProjectDeleteCall<'a> {
         UserProjectDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -369,7 +367,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fingerprint of the public key to update. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`.
-    pub fn ssh_public_keys_delete(&self, name: &str) -> UserSshPublicKeyDeleteCall<'a, C> {
+    pub fn ssh_public_keys_delete(&self, name: &str) -> UserSshPublicKeyDeleteCall<'a> {
         UserSshPublicKeyDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -386,7 +384,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The fingerprint of the public key to retrieve. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`.
-    pub fn ssh_public_keys_get(&self, name: &str) -> UserSshPublicKeyGetCall<'a, C> {
+    pub fn ssh_public_keys_get(&self, name: &str) -> UserSshPublicKeyGetCall<'a> {
         UserSshPublicKeyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -404,7 +402,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The fingerprint of the public key to update. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`.
-    pub fn ssh_public_keys_patch(&self, request: SshPublicKey, name: &str) -> UserSshPublicKeyPatchCall<'a, C> {
+    pub fn ssh_public_keys_patch(&self, request: SshPublicKey, name: &str) -> UserSshPublicKeyPatchCall<'a> {
         UserSshPublicKeyPatchCall {
             hub: self.hub,
             _request: request,
@@ -423,7 +421,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The unique ID for the user in format `users/{user}`.
-    pub fn get_login_profile(&self, name: &str) -> UserGetLoginProfileCall<'a, C> {
+    pub fn get_login_profile(&self, name: &str) -> UserGetLoginProfileCall<'a> {
         UserGetLoginProfileCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -443,7 +441,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The unique ID for the user in format `users/{user}`.
-    pub fn import_ssh_public_key(&self, request: SshPublicKey, parent: &str) -> UserImportSshPublicKeyCall<'a, C> {
+    pub fn import_ssh_public_key(&self, request: SshPublicKey, parent: &str) -> UserImportSshPublicKeyCall<'a> {
         UserImportSshPublicKeyCall {
             hub: self.hub,
             _request: request,
@@ -496,19 +494,19 @@ impl<'a, C> UserMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserProjectDeleteCall<'a, C>
-    where C: 'a {
+pub struct UserProjectDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserProjectDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for UserProjectDeleteCall<'a> {}
 
-impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserProjectDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -573,8 +571,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -587,7 +584,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -596,7 +593,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -656,7 +653,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserProjectDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> UserProjectDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -666,7 +663,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProjectDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserProjectDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -691,7 +688,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserProjectDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProjectDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -711,7 +708,7 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProjectDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserProjectDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -755,19 +752,19 @@ impl<'a, C> UserProjectDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSshPublicKeyDeleteCall<'a, C>
-    where C: 'a {
+pub struct UserSshPublicKeyDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserSshPublicKeyDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for UserSshPublicKeyDeleteCall<'a> {}
 
-impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserSshPublicKeyDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -832,8 +829,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -846,7 +842,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -855,7 +851,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -915,7 +911,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -925,7 +921,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSshPublicKeyDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSshPublicKeyDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -950,7 +946,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -970,7 +966,7 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1014,19 +1010,19 @@ impl<'a, C> UserSshPublicKeyDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSshPublicKeyGetCall<'a, C>
-    where C: 'a {
+pub struct UserSshPublicKeyGetCall<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserSshPublicKeyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for UserSshPublicKeyGetCall<'a> {}
 
-impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserSshPublicKeyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1091,8 +1087,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1105,7 +1100,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1114,7 +1109,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1174,7 +1169,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1184,7 +1179,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSshPublicKeyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSshPublicKeyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1209,7 +1204,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1229,7 +1224,7 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1280,10 +1275,10 @@ impl<'a, C> UserSshPublicKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserSshPublicKeyPatchCall<'a, C>
-    where C: 'a {
+pub struct UserSshPublicKeyPatchCall<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
     _request: SshPublicKey,
     _name: String,
     _update_mask: Option<String>,
@@ -1292,9 +1287,9 @@ pub struct UserSshPublicKeyPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserSshPublicKeyPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for UserSshPublicKeyPatchCall<'a> {}
 
-impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserSshPublicKeyPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1373,8 +1368,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1388,7 +1382,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1399,7 +1393,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1458,7 +1452,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SshPublicKey) -> UserSshPublicKeyPatchCall<'a, C> {
+    pub fn request(mut self, new_value: SshPublicKey) -> UserSshPublicKeyPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -1468,14 +1462,14 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Mask to control which fields get updated. Updates all if not present.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -1485,7 +1479,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSshPublicKeyPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserSshPublicKeyPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1510,7 +1504,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1530,7 +1524,7 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1576,10 +1570,10 @@ impl<'a, C> UserSshPublicKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserGetLoginProfileCall<'a, C>
-    where C: 'a {
+pub struct UserGetLoginProfileCall<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
     _name: String,
     _system_id: Option<String>,
     _project_id: Option<String>,
@@ -1588,9 +1582,9 @@ pub struct UserGetLoginProfileCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserGetLoginProfileCall<'a, C> {}
+impl<'a> client::CallBuilder for UserGetLoginProfileCall<'a> {}
 
-impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserGetLoginProfileCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1661,8 +1655,7 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1675,7 +1668,7 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1684,7 +1677,7 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1744,21 +1737,21 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserGetLoginProfileCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> UserGetLoginProfileCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// A system ID for filtering the results of the request.
     ///
     /// Sets the *system id* query property to the given value.
-    pub fn system_id(mut self, new_value: &str) -> UserGetLoginProfileCall<'a, C> {
+    pub fn system_id(mut self, new_value: &str) -> UserGetLoginProfileCall<'a> {
         self._system_id = Some(new_value.to_string());
         self
     }
     /// The project ID of the Google Cloud Platform project.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> UserGetLoginProfileCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> UserGetLoginProfileCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -1768,7 +1761,7 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetLoginProfileCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetLoginProfileCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1793,7 +1786,7 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetLoginProfileCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetLoginProfileCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1813,7 +1806,7 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetLoginProfileCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserGetLoginProfileCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1864,10 +1857,10 @@ impl<'a, C> UserGetLoginProfileCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserImportSshPublicKeyCall<'a, C>
-    where C: 'a {
+pub struct UserImportSshPublicKeyCall<'a>
+    where  {
 
-    hub: &'a CloudOSLogin<C>,
+    hub: &'a CloudOSLogin<>,
     _request: SshPublicKey,
     _parent: String,
     _project_id: Option<String>,
@@ -1876,9 +1869,9 @@ pub struct UserImportSshPublicKeyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for UserImportSshPublicKeyCall<'a, C> {}
+impl<'a> client::CallBuilder for UserImportSshPublicKeyCall<'a> {}
 
-impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserImportSshPublicKeyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1957,8 +1950,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1972,7 +1964,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1983,7 +1975,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2042,7 +2034,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SshPublicKey) -> UserImportSshPublicKeyCall<'a, C> {
+    pub fn request(mut self, new_value: SshPublicKey) -> UserImportSshPublicKeyCall<'a> {
         self._request = new_value;
         self
     }
@@ -2052,14 +2044,14 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> UserImportSshPublicKeyCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> UserImportSshPublicKeyCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// The project ID of the Google Cloud Platform project.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> UserImportSshPublicKeyCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> UserImportSshPublicKeyCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2069,7 +2061,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserImportSshPublicKeyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserImportSshPublicKeyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2094,7 +2086,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> UserImportSshPublicKeyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserImportSshPublicKeyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2114,7 +2106,7 @@ impl<'a, C> UserImportSshPublicKeyCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserImportSshPublicKeyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserImportSshPublicKeyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

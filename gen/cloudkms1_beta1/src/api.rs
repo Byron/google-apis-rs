@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,35 +105,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudKMS<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudKMS<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudKMS<C> {}
+impl<'a, > client::Hub for CloudKMS<> {}
 
-impl<'a, C> CloudKMS<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudKMS<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudKMS<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudKMS<> {
         CloudKMS {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudkms.googleapis.com/".to_string(),
             _root_url: "https://cloudkms.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1007,15 +1005,15 @@ impl client::ResponseResult for DecryptResponse {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1025,7 +1023,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `parent` - Required. The resource name of the CryptoKey to list, in the format
     ///              `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1050,7 +1048,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the CryptoKey associated with
     ///              the CryptoKeyVersions.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_create(&self, request: CryptoKeyVersion, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_create(&self, request: CryptoKeyVersion, parent: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1080,7 +1078,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the CryptoKeyVersion to destroy.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, request: DestroyCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_destroy(&self, request: DestroyCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall {
             hub: self.hub,
             _request: request,
@@ -1105,7 +1103,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the CryptoKeyVersion to restore.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, request: RestoreCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_restore(&self, request: RestoreCryptoKeyVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall {
             hub: self.hub,
             _request: request,
@@ -1131,7 +1129,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name for this CryptoKeyVersion in the format
     ///            `projects/*/locations/*/keyRings/*/cryptoKeys/*/cryptoKeyVersions/*`.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_patch(&self, request: CryptoKeyVersion, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_patch(&self, request: CryptoKeyVersion, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1150,7 +1148,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the CryptoKeyVersion to get.
-    pub fn locations_key_rings_crypto_keys_crypto_key_versions_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_crypto_key_versions_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
         ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1169,7 +1167,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource name for this CryptoKey in the format
     ///            `projects/*/locations/*/keyRings/*/cryptoKeys/*`.
-    pub fn locations_key_rings_crypto_keys_patch(&self, request: CryptoKey, name: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_patch(&self, request: CryptoKey, name: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
         ProjectLocationKeyRingCryptoKeyPatchCall {
             hub: self.hub,
             _request: request,
@@ -1189,7 +1187,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the CryptoKey to get.
-    pub fn locations_key_rings_crypto_keys_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_get(&self, name: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
         ProjectLocationKeyRingCryptoKeyGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1214,7 +1212,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_crypto_keys_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
         ProjectLocationKeyRingCryptoKeyTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1234,7 +1232,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `name` - Required. The resource name of the CryptoKey to use for decryption.
     ///            The server will choose the appropriate version.
-    pub fn locations_key_rings_crypto_keys_decrypt(&self, request: DecryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_decrypt(&self, request: DecryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
         ProjectLocationKeyRingCryptoKeyDecryptCall {
             hub: self.hub,
             _request: request,
@@ -1253,7 +1251,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `parent` - Required. The resource name of the KeyRing to list, in the format
     ///              `projects/*/locations/*/keyRings/*`.
-    pub fn locations_key_rings_crypto_keys_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_list(&self, parent: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
         ProjectLocationKeyRingCryptoKeyListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1276,7 +1274,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///            to use for encryption.
     ///            If a CryptoKey is specified, the server will use its
     ///            primary version.
-    pub fn locations_key_rings_crypto_keys_encrypt(&self, request: EncryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_encrypt(&self, request: EncryptRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
         ProjectLocationKeyRingCryptoKeyEncryptCall {
             hub: self.hub,
             _request: request,
@@ -1298,7 +1296,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the KeyRing associated with the
     ///              CryptoKeys.
-    pub fn locations_key_rings_crypto_keys_create(&self, request: CryptoKey, parent: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_create(&self, request: CryptoKey, parent: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
         ProjectLocationKeyRingCryptoKeyCreateCall {
             hub: self.hub,
             _request: request,
@@ -1320,7 +1318,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_crypto_keys_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
         ProjectLocationKeyRingCryptoKeySetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1339,7 +1337,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the CryptoKey to update.
-    pub fn locations_key_rings_crypto_keys_update_primary_version(&self, request: UpdateCryptoKeyPrimaryVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_update_primary_version(&self, request: UpdateCryptoKeyPrimaryVersionRequest, name: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
         ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall {
             hub: self.hub,
             _request: request,
@@ -1360,7 +1358,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_crypto_keys_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> {
+    pub fn locations_key_rings_crypto_keys_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
         ProjectLocationKeyRingCryptoKeyGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1380,7 +1378,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C> {
+    pub fn locations_key_rings_get_iam_policy(&self, resource: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
         ProjectLocationKeyRingGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1397,7 +1395,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the KeyRing to get.
-    pub fn locations_key_rings_get(&self, name: &str) -> ProjectLocationKeyRingGetCall<'a, C> {
+    pub fn locations_key_rings_get(&self, name: &str) -> ProjectLocationKeyRingGetCall<'a> {
         ProjectLocationKeyRingGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1422,7 +1420,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a, C> {
+    pub fn locations_key_rings_test_iam_permissions(&self, request: TestIamPermissionsRequest, resource: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
         ProjectLocationKeyRingTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1441,7 +1439,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `parent` - Required. The resource name of the location associated with the
     ///              KeyRings, in the format `projects/*/locations/*`.
-    pub fn locations_key_rings_list(&self, parent: &str) -> ProjectLocationKeyRingListCall<'a, C> {
+    pub fn locations_key_rings_list(&self, parent: &str) -> ProjectLocationKeyRingListCall<'a> {
         ProjectLocationKeyRingListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1463,7 +1461,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn locations_key_rings_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a, C> {
+    pub fn locations_key_rings_set_iam_policy(&self, request: SetIamPolicyRequest, resource: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
         ProjectLocationKeyRingSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1483,7 +1481,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `parent` - Required. The resource name of the location associated with the
     ///              KeyRings, in the format `projects/*/locations/*`.
-    pub fn locations_key_rings_create(&self, request: KeyRing, parent: &str) -> ProjectLocationKeyRingCreateCall<'a, C> {
+    pub fn locations_key_rings_create(&self, request: KeyRing, parent: &str) -> ProjectLocationKeyRingCreateCall<'a> {
         ProjectLocationKeyRingCreateCall {
             hub: self.hub,
             _request: request,
@@ -1502,7 +1500,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource that owns the locations collection, if applicable.
-    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn locations_list(&self, name: &str) -> ProjectLocationListCall<'a> {
         ProjectLocationListCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1522,7 +1520,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Resource name for the location.
-    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a> {
         ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1575,10 +1573,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1587,9 +1585,9 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1660,8 +1658,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1674,7 +1671,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1683,7 +1680,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1744,7 +1741,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -1752,7 +1749,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
     /// ListCryptoKeyVersionsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -1763,7 +1760,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
     /// If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1773,7 +1770,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1800,7 +1797,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1820,7 +1817,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1874,10 +1871,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionListCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: CryptoKeyVersion,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1885,9 +1882,9 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1963,8 +1960,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1978,7 +1974,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1989,7 +1985,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2048,7 +2044,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2059,7 +2055,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2069,7 +2065,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2096,7 +2092,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2116,7 +2112,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2177,10 +2173,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionCreateCall<'a, C> whe
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: DestroyCryptoKeyVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2188,9 +2184,9 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2266,8 +2262,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2281,7 +2276,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2292,7 +2287,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2351,7 +2346,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DestroyCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> {
+    pub fn request(mut self, new_value: DestroyCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
         self._request = new_value;
         self
     }
@@ -2361,7 +2356,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2371,7 +2366,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2398,7 +2393,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2418,7 +2413,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2474,10 +2469,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionDestroyCall<'a, C> wh
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: RestoreCryptoKeyVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2485,9 +2480,9 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2563,8 +2558,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2578,7 +2572,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2589,7 +2583,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2648,7 +2642,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RestoreCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> {
+    pub fn request(mut self, new_value: RestoreCryptoKeyVersionRequest) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
         self._request = new_value;
         self
     }
@@ -2658,7 +2652,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2668,7 +2662,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2695,7 +2689,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2715,7 +2709,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2772,10 +2766,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionRestoreCall<'a, C> wh
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: CryptoKeyVersion,
     _name: String,
     _update_mask: Option<String>,
@@ -2784,9 +2778,9 @@ pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2865,8 +2859,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2880,7 +2873,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2891,7 +2884,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2950,7 +2943,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> {
+    pub fn request(mut self, new_value: CryptoKeyVersion) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2961,14 +2954,14 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -2978,7 +2971,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3005,7 +2998,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3025,7 +3018,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3069,19 +3062,19 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionPatchCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3146,8 +3139,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3160,7 +3152,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3169,7 +3161,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3229,7 +3221,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3239,7 +3231,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3266,7 +3258,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3286,7 +3278,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3337,10 +3329,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCryptoKeyVersionGetCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyPatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyPatchCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: CryptoKey,
     _name: String,
     _update_mask: Option<String>,
@@ -3349,9 +3341,9 @@ pub struct ProjectLocationKeyRingCryptoKeyPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyPatchCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3430,8 +3422,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3445,7 +3436,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3456,7 +3447,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3515,7 +3506,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> {
+    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -3526,14 +3517,14 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Required list of fields to be updated in this request.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -3543,7 +3534,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3570,7 +3561,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3590,7 +3581,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3635,19 +3626,19 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyPatchCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyGetCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3712,8 +3703,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3726,7 +3716,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3735,7 +3725,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3795,7 +3785,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3805,7 +3795,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3832,7 +3822,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3852,7 +3842,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3908,10 +3898,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3919,9 +3909,9 @@ pub struct ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3997,8 +3987,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4012,7 +4001,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4023,7 +4012,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4082,7 +4071,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -4093,7 +4082,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -4103,7 +4092,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4130,7 +4119,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4150,7 +4139,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4200,10 +4189,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyTestIamPermissionCall<'a, C> where C:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: DecryptRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4211,9 +4200,9 @@ pub struct ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4289,8 +4278,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4304,7 +4292,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4315,7 +4303,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4374,7 +4362,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DecryptRequest) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> {
+    pub fn request(mut self, new_value: DecryptRequest) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
         self._request = new_value;
         self
     }
@@ -4385,7 +4373,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4395,7 +4383,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4422,7 +4410,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4442,7 +4430,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyDecryptCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4488,10 +4476,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyDecryptCall<'a, C> where C: BorrowMut
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyListCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4500,9 +4488,9 @@ pub struct ProjectLocationKeyRingCryptoKeyListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyListCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4573,8 +4561,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4587,7 +4574,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4596,7 +4583,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4657,7 +4644,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4665,7 +4652,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
     /// ListCryptoKeysResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4675,7 +4662,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
     /// request.  If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4685,7 +4672,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4712,7 +4699,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4732,7 +4719,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4782,10 +4769,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyListCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: EncryptRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4793,9 +4780,9 @@ pub struct ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4871,8 +4858,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4886,7 +4872,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4897,7 +4883,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4956,7 +4942,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EncryptRequest) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> {
+    pub fn request(mut self, new_value: EncryptRequest) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
         self._request = new_value;
         self
     }
@@ -4970,7 +4956,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4980,7 +4966,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5007,7 +4993,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5027,7 +5013,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyEncryptCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5080,10 +5066,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyEncryptCall<'a, C> where C: BorrowMut
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: CryptoKey,
     _parent: String,
     _crypto_key_id: Option<String>,
@@ -5092,9 +5078,9 @@ pub struct ProjectLocationKeyRingCryptoKeyCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5173,8 +5159,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5188,7 +5173,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5199,7 +5184,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5258,7 +5243,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CryptoKey) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5269,7 +5254,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -5277,7 +5262,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
     /// expression `[a-zA-Z0-9_-]{1,63}`
     ///
     /// Sets the *crypto key id* query property to the given value.
-    pub fn crypto_key_id(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> {
+    pub fn crypto_key_id(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
         self._crypto_key_id = Some(new_value.to_string());
         self
     }
@@ -5287,7 +5272,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5314,7 +5299,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5334,7 +5319,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5385,10 +5370,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyCreateCall<'a, C> where C: BorrowMut<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5396,9 +5381,9 @@ pub struct ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5474,8 +5459,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5489,7 +5473,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5500,7 +5484,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5559,7 +5543,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -5570,7 +5554,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -5580,7 +5564,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5607,7 +5591,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5627,7 +5611,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5677,10 +5661,10 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeySetIamPolicyCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: UpdateCryptoKeyPrimaryVersionRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5688,9 +5672,9 @@ pub struct ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5766,8 +5750,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5781,7 +5764,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5792,7 +5775,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5851,7 +5834,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateCryptoKeyPrimaryVersionRequest) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateCryptoKeyPrimaryVersionRequest) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
         self._request = new_value;
         self
     }
@@ -5861,7 +5844,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5871,7 +5854,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5898,7 +5881,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5918,7 +5901,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5964,19 +5947,19 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyUpdatePrimaryVersionCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6041,8 +6024,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6055,7 +6037,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6064,7 +6046,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6125,7 +6107,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -6135,7 +6117,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6162,7 +6144,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6182,7 +6164,7 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6228,19 +6210,19 @@ impl<'a, C> ProjectLocationKeyRingCryptoKeyGetIamPolicyCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingGetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6305,8 +6287,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6319,7 +6300,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6328,7 +6309,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6389,7 +6370,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -6399,7 +6380,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6426,7 +6407,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6446,7 +6427,7 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6490,19 +6471,19 @@ impl<'a, C> ProjectLocationKeyRingGetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingGetCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingGetCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6567,8 +6548,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6581,7 +6561,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6590,7 +6570,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6650,7 +6630,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationKeyRingGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6660,7 +6640,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6687,7 +6667,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6707,7 +6687,7 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6763,10 +6743,10 @@ impl<'a, C> ProjectLocationKeyRingGetCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6774,9 +6754,9 @@ pub struct ProjectLocationKeyRingTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingTestIamPermissionCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6852,8 +6832,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6867,7 +6846,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6878,7 +6857,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6937,7 +6916,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: TestIamPermissionsRequest) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -6948,7 +6927,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -6958,7 +6937,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6985,7 +6964,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7005,7 +6984,7 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7051,10 +7030,10 @@ impl<'a, C> ProjectLocationKeyRingTestIamPermissionCall<'a, C> where C: BorrowMu
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingListCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7063,9 +7042,9 @@ pub struct ProjectLocationKeyRingListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingListCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7136,8 +7115,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7150,7 +7128,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7159,7 +7137,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7220,7 +7198,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -7228,7 +7206,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// ListKeyRingsResponse.next_page_token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationKeyRingListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -7238,7 +7216,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// request.  If unspecified, the server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationKeyRingListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7248,7 +7226,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7275,7 +7253,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7295,7 +7273,7 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7346,10 +7324,10 @@ impl<'a, C> ProjectLocationKeyRingListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7357,9 +7335,9 @@ pub struct ProjectLocationKeyRingSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingSetIamPolicyCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7435,8 +7413,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7450,7 +7427,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7461,7 +7438,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7520,7 +7497,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: SetIamPolicyRequest) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -7531,7 +7508,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -7541,7 +7518,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7568,7 +7545,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7588,7 +7565,7 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7639,10 +7616,10 @@ impl<'a, C> ProjectLocationKeyRingSetIamPolicyCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationKeyRingCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationKeyRingCreateCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _request: KeyRing,
     _parent: String,
     _key_ring_id: Option<String>,
@@ -7651,9 +7628,9 @@ pub struct ProjectLocationKeyRingCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationKeyRingCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationKeyRingCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationKeyRingCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7732,8 +7709,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7747,7 +7723,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7758,7 +7734,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7817,7 +7793,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: KeyRing) -> ProjectLocationKeyRingCreateCall<'a, C> {
+    pub fn request(mut self, new_value: KeyRing) -> ProjectLocationKeyRingCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -7828,7 +7804,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -7836,7 +7812,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// expression `[a-zA-Z0-9_-]{1,63}`
     ///
     /// Sets the *key ring id* query property to the given value.
-    pub fn key_ring_id(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a, C> {
+    pub fn key_ring_id(mut self, new_value: &str) -> ProjectLocationKeyRingCreateCall<'a> {
         self._key_ring_id = Some(new_value.to_string());
         self
     }
@@ -7846,7 +7822,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationKeyRingCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7873,7 +7849,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationKeyRingCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7893,7 +7869,7 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationKeyRingCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7940,10 +7916,10 @@ impl<'a, C> ProjectLocationKeyRingCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationListCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _name: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7953,9 +7929,9 @@ pub struct ProjectLocationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationListCall<'a> {}
 
-impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8029,8 +8005,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8043,7 +8018,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8052,7 +8027,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8112,28 +8087,28 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8143,7 +8118,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8170,7 +8145,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8190,7 +8165,7 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8234,19 +8209,19 @@ impl<'a, C> ProjectLocationListCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationGetCall<'a>
+    where  {
 
-    hub: &'a CloudKMS<C>,
+    hub: &'a CloudKMS<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8311,8 +8286,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8325,7 +8299,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8334,7 +8308,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8394,7 +8368,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8404,7 +8378,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8431,7 +8405,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *callback* (query-string) - JSONP
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *alt* (query-string) - Data format for response.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8451,7 +8425,7 @@ impl<'a, C> ProjectLocationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

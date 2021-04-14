@@ -1,8 +1,8 @@
-site_name: Android Provisioning Partner v2.0.0+20210331
+site_name: Android Provisioning Partner v2.0.3+20210331
 site_url: http://byron.github.io/google-apis-rs/google-androiddeviceprovisioning1-cli
 site_description: A complete library to interact with Android Provisioning Partner (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/androiddeviceprovisioning1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/androiddeviceprovisioning1-cli
 
 docs_dir: docs
 site_dir: build_html

@@ -1,8 +1,8 @@
-site_name: BigQuery Connection Service v2.0.0+20210326
+site_name: BigQuery Connection Service v2.0.3+20210326
 site_url: http://byron.github.io/google-apis-rs/google-bigqueryconnection1_beta1-cli
 site_description: A complete library to interact with BigQuery Connection Service (protocol v1beta1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/bigqueryconnection1_beta1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigqueryconnection1_beta1-cli
 
 docs_dir: docs
 site_dir: build_html

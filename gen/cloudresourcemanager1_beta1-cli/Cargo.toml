@@ -4,10 +4,10 @@
 [package]
 
 name = "google-cloudresourcemanager1_beta1-cli"
-version = "2.0.0+20210328"
+version = "2.0.3+20210328"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Resource Manager (protocol v1beta1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1_beta1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudresourcemanager1_beta1-cli"
 homepage = "https://cloud.google.com/resource-manager"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudresourcemanager1_beta1]
 path = "../cloudresourcemanager1_beta1"
-version = "2.0.0+20210328"
+version = "2.0.3+20210328"

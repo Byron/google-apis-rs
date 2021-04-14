@@ -1,8 +1,8 @@
-site_name: Ad Experience Report v2.0.0+20210329
+site_name: Ad Experience Report v2.0.3+20210329
 site_url: http://byron.github.io/google-apis-rs/google-adexperiencereport1-cli
 site_description: A complete library to interact with Ad Experience Report (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/adexperiencereport1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adexperiencereport1-cli
 
 docs_dir: docs
 site_dir: build_html

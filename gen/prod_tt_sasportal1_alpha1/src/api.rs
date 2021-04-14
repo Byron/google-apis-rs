@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,47 +105,46 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct SASPortalTesting<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct SASPortalTesting<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for SASPortalTesting<C> {}
+impl<'a, > client::Hub for SASPortalTesting<> {}
 
-impl<'a, C> SASPortalTesting<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > SASPortalTesting<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SASPortalTesting<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> SASPortalTesting<> {
         SASPortalTesting {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://prod-tt-sasportal.googleapis.com/".to_string(),
             _root_url: "https://prod-tt-sasportal.googleapis.com/".to_string(),
         }
     }
 
-    pub fn customers(&'a self) -> CustomerMethods<'a, C> {
+    pub fn customers(&'a self) -> CustomerMethods<'a> {
         CustomerMethods { hub: &self }
     }
-    pub fn deployments(&'a self) -> DeploymentMethods<'a, C> {
+    pub fn deployments(&'a self) -> DeploymentMethods<'a> {
         DeploymentMethods { hub: &self }
     }
-    pub fn installer(&'a self) -> InstallerMethods<'a, C> {
+    pub fn installer(&'a self) -> InstallerMethods<'a> {
         InstallerMethods { hub: &self }
     }
-    pub fn nodes(&'a self) -> NodeMethods<'a, C> {
+    pub fn nodes(&'a self) -> NodeMethods<'a> {
         NodeMethods { hub: &self }
     }
-    pub fn policies(&'a self) -> PolicyMethods<'a, C> {
+    pub fn policies(&'a self) -> PolicyMethods<'a> {
         PolicyMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1077,15 +1075,15 @@ impl client::ResponseResult for SasPortalValidateInstallerResponse {}
 /// let rb = hub.customers();
 /// # }
 /// ```
-pub struct CustomerMethods<'a, C>
-    where C: 'a {
+pub struct CustomerMethods<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CustomerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CustomerMethods<'a> {}
 
-impl<'a, C> CustomerMethods<'a, C> {
+impl<'a> CustomerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1095,7 +1093,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeploymentDeviceCreateCall<'a, C> {
+    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeploymentDeviceCreateCall<'a> {
         CustomerDeploymentDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1114,7 +1112,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
         CustomerDeploymentDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1132,7 +1130,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_list(&self, parent: &str) -> CustomerDeploymentDeviceListCall<'a, C> {
+    pub fn deployments_devices_list(&self, parent: &str) -> CustomerDeploymentDeviceListCall<'a> {
         CustomerDeploymentDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1153,7 +1151,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the deployment is to be created.
-    pub fn deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerDeploymentCreateCall<'a, C> {
+    pub fn deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerDeploymentCreateCall<'a> {
         CustomerDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1171,7 +1169,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_delete(&self, name: &str) -> CustomerDeploymentDeleteCall<'a, C> {
+    pub fn deployments_delete(&self, name: &str) -> CustomerDeploymentDeleteCall<'a> {
         CustomerDeploymentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1188,7 +1186,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_get(&self, name: &str) -> CustomerDeploymentGetCall<'a, C> {
+    pub fn deployments_get(&self, name: &str) -> CustomerDeploymentGetCall<'a> {
         CustomerDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1205,7 +1203,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn deployments_list(&self, parent: &str) -> CustomerDeploymentListCall<'a, C> {
+    pub fn deployments_list(&self, parent: &str) -> CustomerDeploymentListCall<'a> {
         CustomerDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1226,7 +1224,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the deployment to move.
-    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> CustomerDeploymentMoveCall<'a, C> {
+    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> CustomerDeploymentMoveCall<'a> {
         CustomerDeploymentMoveCall {
             hub: self.hub,
             _request: request,
@@ -1245,7 +1243,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> CustomerDeploymentPatchCall<'a, C> {
+    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> CustomerDeploymentPatchCall<'a> {
         CustomerDeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -1265,7 +1263,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeviceCreateCall<'a, C> {
+    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerDeviceCreateCall<'a> {
         CustomerDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1284,7 +1282,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeviceCreateSignedCall<'a, C> {
+    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerDeviceCreateSignedCall<'a> {
         CustomerDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1302,7 +1300,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_delete(&self, name: &str) -> CustomerDeviceDeleteCall<'a, C> {
+    pub fn devices_delete(&self, name: &str) -> CustomerDeviceDeleteCall<'a> {
         CustomerDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1319,7 +1317,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_get(&self, name: &str) -> CustomerDeviceGetCall<'a, C> {
+    pub fn devices_get(&self, name: &str) -> CustomerDeviceGetCall<'a> {
         CustomerDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1336,7 +1334,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_list(&self, parent: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn devices_list(&self, parent: &str) -> CustomerDeviceListCall<'a> {
         CustomerDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1357,7 +1355,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to move.
-    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> CustomerDeviceMoveCall<'a, C> {
+    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> CustomerDeviceMoveCall<'a> {
         CustomerDeviceMoveCall {
             hub: self.hub,
             _request: request,
@@ -1376,7 +1374,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> CustomerDevicePatchCall<'a, C> {
+    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> CustomerDevicePatchCall<'a> {
         CustomerDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -1396,7 +1394,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> CustomerDeviceSignDeviceCall<'a, C> {
+    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> CustomerDeviceSignDeviceCall<'a> {
         CustomerDeviceSignDeviceCall {
             hub: self.hub,
             _request: request,
@@ -1415,7 +1413,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to update.
-    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> CustomerDeviceUpdateSignedCall<'a, C> {
+    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> CustomerDeviceUpdateSignedCall<'a> {
         CustomerDeviceUpdateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1434,7 +1432,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the deployment is to be created.
-    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerNodeDeploymentCreateCall<'a, C> {
+    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> CustomerNodeDeploymentCreateCall<'a> {
         CustomerNodeDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1452,7 +1450,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn nodes_deployments_list(&self, parent: &str) -> CustomerNodeDeploymentListCall<'a, C> {
+    pub fn nodes_deployments_list(&self, parent: &str) -> CustomerNodeDeploymentListCall<'a> {
         CustomerNodeDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1473,7 +1471,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerNodeDeviceCreateCall<'a, C> {
+    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> CustomerNodeDeviceCreateCall<'a> {
         CustomerNodeDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1492,7 +1490,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerNodeDeviceCreateSignedCall<'a, C> {
+    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> CustomerNodeDeviceCreateSignedCall<'a> {
         CustomerNodeDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1510,7 +1508,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_list(&self, parent: &str) -> CustomerNodeDeviceListCall<'a, C> {
+    pub fn nodes_devices_list(&self, parent: &str) -> CustomerNodeDeviceListCall<'a> {
         CustomerNodeDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1531,7 +1529,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeNodeCreateCall<'a, C> {
+    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeNodeCreateCall<'a> {
         CustomerNodeNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -1549,7 +1547,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_nodes_list(&self, parent: &str) -> CustomerNodeNodeListCall<'a, C> {
+    pub fn nodes_nodes_list(&self, parent: &str) -> CustomerNodeNodeListCall<'a> {
         CustomerNodeNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1570,7 +1568,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeCreateCall<'a, C> {
+    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> CustomerNodeCreateCall<'a> {
         CustomerNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -1588,7 +1586,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_delete(&self, name: &str) -> CustomerNodeDeleteCall<'a, C> {
+    pub fn nodes_delete(&self, name: &str) -> CustomerNodeDeleteCall<'a> {
         CustomerNodeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1605,7 +1603,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_get(&self, name: &str) -> CustomerNodeGetCall<'a, C> {
+    pub fn nodes_get(&self, name: &str) -> CustomerNodeGetCall<'a> {
         CustomerNodeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1622,7 +1620,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_list(&self, parent: &str) -> CustomerNodeListCall<'a, C> {
+    pub fn nodes_list(&self, parent: &str) -> CustomerNodeListCall<'a> {
         CustomerNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1643,7 +1641,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the node to move.
-    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> CustomerNodeMoveCall<'a, C> {
+    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> CustomerNodeMoveCall<'a> {
         CustomerNodeMoveCall {
             hub: self.hub,
             _request: request,
@@ -1662,7 +1660,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> CustomerNodePatchCall<'a, C> {
+    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> CustomerNodePatchCall<'a> {
         CustomerNodePatchCall {
             hub: self.hub,
             _request: request,
@@ -1681,7 +1679,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the customer.
-    pub fn get(&self, name: &str) -> CustomerGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> CustomerGetCall<'a> {
         CustomerGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1694,7 +1692,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Returns a list of requested customers.
-    pub fn list(&self) -> CustomerListCall<'a, C> {
+    pub fn list(&self) -> CustomerListCall<'a> {
         CustomerListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1713,7 +1711,7 @@ impl<'a, C> CustomerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name of the customer.
-    pub fn patch(&self, request: SasPortalCustomer, name: &str) -> CustomerPatchCall<'a, C> {
+    pub fn patch(&self, request: SasPortalCustomer, name: &str) -> CustomerPatchCall<'a> {
         CustomerPatchCall {
             hub: self.hub,
             _request: request,
@@ -1758,15 +1756,15 @@ impl<'a, C> CustomerMethods<'a, C> {
 /// let rb = hub.deployments();
 /// # }
 /// ```
-pub struct DeploymentMethods<'a, C>
-    where C: 'a {
+pub struct DeploymentMethods<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DeploymentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DeploymentMethods<'a> {}
 
-impl<'a, C> DeploymentMethods<'a, C> {
+impl<'a> DeploymentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1775,7 +1773,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_delete(&self, name: &str) -> DeploymentDeviceDeleteCall<'a, C> {
+    pub fn devices_delete(&self, name: &str) -> DeploymentDeviceDeleteCall<'a> {
         DeploymentDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1792,7 +1790,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_get(&self, name: &str) -> DeploymentDeviceGetCall<'a, C> {
+    pub fn devices_get(&self, name: &str) -> DeploymentDeviceGetCall<'a> {
         DeploymentDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1810,7 +1808,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to move.
-    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> DeploymentDeviceMoveCall<'a, C> {
+    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> DeploymentDeviceMoveCall<'a> {
         DeploymentDeviceMoveCall {
             hub: self.hub,
             _request: request,
@@ -1829,7 +1827,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> DeploymentDevicePatchCall<'a, C> {
+    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> DeploymentDevicePatchCall<'a> {
         DeploymentDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -1849,7 +1847,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> DeploymentDeviceSignDeviceCall<'a, C> {
+    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> DeploymentDeviceSignDeviceCall<'a> {
         DeploymentDeviceSignDeviceCall {
             hub: self.hub,
             _request: request,
@@ -1868,7 +1866,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to update.
-    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> DeploymentDeviceUpdateSignedCall<'a, C> {
+    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> DeploymentDeviceUpdateSignedCall<'a> {
         DeploymentDeviceUpdateSignedCall {
             hub: self.hub,
             _request: request,
@@ -1886,7 +1884,7 @@ impl<'a, C> DeploymentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn get(&self, name: &str) -> DeploymentGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> DeploymentGetCall<'a> {
         DeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1929,15 +1927,15 @@ impl<'a, C> DeploymentMethods<'a, C> {
 /// let rb = hub.installer();
 /// # }
 /// ```
-pub struct InstallerMethods<'a, C>
-    where C: 'a {
+pub struct InstallerMethods<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for InstallerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for InstallerMethods<'a> {}
 
-impl<'a, C> InstallerMethods<'a, C> {
+impl<'a> InstallerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1946,7 +1944,7 @@ impl<'a, C> InstallerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn generate_secret(&self, request: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a, C> {
+    pub fn generate_secret(&self, request: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a> {
         InstallerGenerateSecretCall {
             hub: self.hub,
             _request: request,
@@ -1963,7 +1961,7 @@ impl<'a, C> InstallerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn validate(&self, request: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a, C> {
+    pub fn validate(&self, request: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a> {
         InstallerValidateCall {
             hub: self.hub,
             _request: request,
@@ -2006,15 +2004,15 @@ impl<'a, C> InstallerMethods<'a, C> {
 /// let rb = hub.nodes();
 /// # }
 /// ```
-pub struct NodeMethods<'a, C>
-    where C: 'a {
+pub struct NodeMethods<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for NodeMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for NodeMethods<'a> {}
 
-impl<'a, C> NodeMethods<'a, C> {
+impl<'a> NodeMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2024,7 +2022,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeploymentDeviceCreateCall<'a, C> {
+    pub fn deployments_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeploymentDeviceCreateCall<'a> {
         NodeDeploymentDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2043,7 +2041,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn deployments_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeploymentDeviceCreateSignedCall<'a> {
         NodeDeploymentDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2061,7 +2059,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn deployments_devices_list(&self, parent: &str) -> NodeDeploymentDeviceListCall<'a, C> {
+    pub fn deployments_devices_list(&self, parent: &str) -> NodeDeploymentDeviceListCall<'a> {
         NodeDeploymentDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2081,7 +2079,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_delete(&self, name: &str) -> NodeDeploymentDeleteCall<'a, C> {
+    pub fn deployments_delete(&self, name: &str) -> NodeDeploymentDeleteCall<'a> {
         NodeDeploymentDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2098,7 +2096,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the deployment.
-    pub fn deployments_get(&self, name: &str) -> NodeDeploymentGetCall<'a, C> {
+    pub fn deployments_get(&self, name: &str) -> NodeDeploymentGetCall<'a> {
         NodeDeploymentGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2115,7 +2113,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn deployments_list(&self, parent: &str) -> NodeDeploymentListCall<'a, C> {
+    pub fn deployments_list(&self, parent: &str) -> NodeDeploymentListCall<'a> {
         NodeDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2136,7 +2134,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the deployment to move.
-    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> NodeDeploymentMoveCall<'a, C> {
+    pub fn deployments_move(&self, request: SasPortalMoveDeploymentRequest, name: &str) -> NodeDeploymentMoveCall<'a> {
         NodeDeploymentMoveCall {
             hub: self.hub,
             _request: request,
@@ -2155,7 +2153,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> NodeDeploymentPatchCall<'a, C> {
+    pub fn deployments_patch(&self, request: SasPortalDeployment, name: &str) -> NodeDeploymentPatchCall<'a> {
         NodeDeploymentPatchCall {
             hub: self.hub,
             _request: request,
@@ -2175,7 +2173,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeviceCreateCall<'a, C> {
+    pub fn devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeDeviceCreateCall<'a> {
         NodeDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2194,7 +2192,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeviceCreateSignedCall<'a, C> {
+    pub fn devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeDeviceCreateSignedCall<'a> {
         NodeDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2212,7 +2210,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_delete(&self, name: &str) -> NodeDeviceDeleteCall<'a, C> {
+    pub fn devices_delete(&self, name: &str) -> NodeDeviceDeleteCall<'a> {
         NodeDeviceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2229,7 +2227,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the device.
-    pub fn devices_get(&self, name: &str) -> NodeDeviceGetCall<'a, C> {
+    pub fn devices_get(&self, name: &str) -> NodeDeviceGetCall<'a> {
         NodeDeviceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2246,7 +2244,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn devices_list(&self, parent: &str) -> NodeDeviceListCall<'a, C> {
+    pub fn devices_list(&self, parent: &str) -> NodeDeviceListCall<'a> {
         NodeDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2267,7 +2265,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to move.
-    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> NodeDeviceMoveCall<'a, C> {
+    pub fn devices_move(&self, request: SasPortalMoveDeviceRequest, name: &str) -> NodeDeviceMoveCall<'a> {
         NodeDeviceMoveCall {
             hub: self.hub,
             _request: request,
@@ -2286,7 +2284,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> NodeDevicePatchCall<'a, C> {
+    pub fn devices_patch(&self, request: SasPortalDevice, name: &str) -> NodeDevicePatchCall<'a> {
         NodeDevicePatchCall {
             hub: self.hub,
             _request: request,
@@ -2306,7 +2304,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. The resource path name.
-    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> NodeDeviceSignDeviceCall<'a, C> {
+    pub fn devices_sign_device(&self, request: SasPortalSignDeviceRequest, name: &str) -> NodeDeviceSignDeviceCall<'a> {
         NodeDeviceSignDeviceCall {
             hub: self.hub,
             _request: request,
@@ -2325,7 +2323,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the device to update.
-    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> NodeDeviceUpdateSignedCall<'a, C> {
+    pub fn devices_update_signed(&self, request: SasPortalUpdateSignedDeviceRequest, name: &str) -> NodeDeviceUpdateSignedCall<'a> {
         NodeDeviceUpdateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2344,7 +2342,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the deployment is to be created.
-    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> NodeNodeDeploymentCreateCall<'a, C> {
+    pub fn nodes_deployments_create(&self, request: SasPortalDeployment, parent: &str) -> NodeNodeDeploymentCreateCall<'a> {
         NodeNodeDeploymentCreateCall {
             hub: self.hub,
             _request: request,
@@ -2362,7 +2360,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1", customer/1/nodes/2.
-    pub fn nodes_deployments_list(&self, parent: &str) -> NodeNodeDeploymentListCall<'a, C> {
+    pub fn nodes_deployments_list(&self, parent: &str) -> NodeNodeDeploymentListCall<'a> {
         NodeNodeDeploymentListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2383,7 +2381,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeNodeDeviceCreateCall<'a, C> {
+    pub fn nodes_devices_create(&self, request: SasPortalDevice, parent: &str) -> NodeNodeDeviceCreateCall<'a> {
         NodeNodeDeviceCreateCall {
             hub: self.hub,
             _request: request,
@@ -2402,7 +2400,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeNodeDeviceCreateSignedCall<'a, C> {
+    pub fn nodes_devices_create_signed(&self, request: SasPortalCreateSignedDeviceRequest, parent: &str) -> NodeNodeDeviceCreateSignedCall<'a> {
         NodeNodeDeviceCreateSignedCall {
             hub: self.hub,
             _request: request,
@@ -2420,7 +2418,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the parent resource.
-    pub fn nodes_devices_list(&self, parent: &str) -> NodeNodeDeviceListCall<'a, C> {
+    pub fn nodes_devices_list(&self, parent: &str) -> NodeNodeDeviceListCall<'a> {
         NodeNodeDeviceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2441,7 +2439,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeNodeCreateCall<'a, C> {
+    pub fn nodes_nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeNodeCreateCall<'a> {
         NodeNodeNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -2459,7 +2457,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_nodes_list(&self, parent: &str) -> NodeNodeNodeListCall<'a, C> {
+    pub fn nodes_nodes_list(&self, parent: &str) -> NodeNodeNodeListCall<'a> {
         NodeNodeNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2480,7 +2478,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Required. The parent resource name where the node is to be created.
-    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeCreateCall<'a, C> {
+    pub fn nodes_create(&self, request: SasPortalNode, parent: &str) -> NodeNodeCreateCall<'a> {
         NodeNodeCreateCall {
             hub: self.hub,
             _request: request,
@@ -2498,7 +2496,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_delete(&self, name: &str) -> NodeNodeDeleteCall<'a, C> {
+    pub fn nodes_delete(&self, name: &str) -> NodeNodeDeleteCall<'a> {
         NodeNodeDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2515,7 +2513,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn nodes_get(&self, name: &str) -> NodeNodeGetCall<'a, C> {
+    pub fn nodes_get(&self, name: &str) -> NodeNodeGetCall<'a> {
         NodeNodeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2532,7 +2530,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The parent resource name, for example, "nodes/1".
-    pub fn nodes_list(&self, parent: &str) -> NodeNodeListCall<'a, C> {
+    pub fn nodes_list(&self, parent: &str) -> NodeNodeListCall<'a> {
         NodeNodeListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -2553,7 +2551,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. The name of the node to move.
-    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> NodeNodeMoveCall<'a, C> {
+    pub fn nodes_move(&self, request: SasPortalMoveNodeRequest, name: &str) -> NodeNodeMoveCall<'a> {
         NodeNodeMoveCall {
             hub: self.hub,
             _request: request,
@@ -2572,7 +2570,7 @@ impl<'a, C> NodeMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Resource name.
-    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> NodeNodePatchCall<'a, C> {
+    pub fn nodes_patch(&self, request: SasPortalNode, name: &str) -> NodeNodePatchCall<'a> {
         NodeNodePatchCall {
             hub: self.hub,
             _request: request,
@@ -2591,7 +2589,7 @@ impl<'a, C> NodeMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. The name of the node.
-    pub fn get(&self, name: &str) -> NodeGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> NodeGetCall<'a> {
         NodeGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -2634,15 +2632,15 @@ impl<'a, C> NodeMethods<'a, C> {
 /// let rb = hub.policies();
 /// # }
 /// ```
-pub struct PolicyMethods<'a, C>
-    where C: 'a {
+pub struct PolicyMethods<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PolicyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PolicyMethods<'a> {}
 
-impl<'a, C> PolicyMethods<'a, C> {
+impl<'a> PolicyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2651,7 +2649,7 @@ impl<'a, C> PolicyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get(&self, request: SasPortalGetPolicyRequest) -> PolicyGetCall<'a, C> {
+    pub fn get(&self, request: SasPortalGetPolicyRequest) -> PolicyGetCall<'a> {
         PolicyGetCall {
             hub: self.hub,
             _request: request,
@@ -2668,7 +2666,7 @@ impl<'a, C> PolicyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn set(&self, request: SasPortalSetPolicyRequest) -> PolicySetCall<'a, C> {
+    pub fn set(&self, request: SasPortalSetPolicyRequest) -> PolicySetCall<'a> {
         PolicySetCall {
             hub: self.hub,
             _request: request,
@@ -2685,7 +2683,7 @@ impl<'a, C> PolicyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn test(&self, request: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a, C> {
+    pub fn test(&self, request: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a> {
         PolicyTestCall {
             hub: self.hub,
             _request: request,
@@ -2742,10 +2740,10 @@ impl<'a, C> PolicyMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentDeviceCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2753,9 +2751,9 @@ pub struct CustomerDeploymentDeviceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentDeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentDeviceCreateCall<'a> {}
 
-impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentDeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2831,8 +2829,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2846,7 +2843,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2857,7 +2854,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2916,7 +2913,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeploymentDeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeploymentDeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2926,7 +2923,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2936,7 +2933,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2961,7 +2958,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2981,7 +2978,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3031,10 +3028,10 @@ impl<'a, C> CustomerDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeviceCreateSignedCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentDeviceCreateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3042,9 +3039,9 @@ pub struct CustomerDeploymentDeviceCreateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentDeviceCreateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentDeviceCreateSignedCall<'a> {}
 
-impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentDeviceCreateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3120,8 +3117,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3135,7 +3131,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3146,7 +3142,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3205,7 +3201,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -3215,7 +3211,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3225,7 +3221,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceCreateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3250,7 +3246,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceCreateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3270,7 +3266,7 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceCreateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceCreateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3317,10 +3313,10 @@ impl<'a, C> CustomerDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeviceListCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentDeviceListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3330,9 +3326,9 @@ pub struct CustomerDeploymentDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentDeviceListCall<'a> {}
 
-impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3406,8 +3402,7 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3420,7 +3415,7 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3429,7 +3424,7 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3489,28 +3484,28 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3520,7 +3515,7 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3545,7 +3540,7 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3565,7 +3560,7 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3615,10 +3610,10 @@ impl<'a, C> CustomerDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDeployment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3626,9 +3621,9 @@ pub struct CustomerDeploymentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentCreateCall<'a> {}
 
-impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3704,8 +3699,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3719,7 +3713,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3730,7 +3724,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3789,7 +3783,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3799,7 +3793,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3809,7 +3803,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3834,7 +3828,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3854,7 +3848,7 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3898,19 +3892,19 @@ impl<'a, C> CustomerDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentDeleteCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentDeleteCall<'a> {}
 
-impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3975,8 +3969,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3989,7 +3982,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3998,7 +3991,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4058,7 +4051,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4068,7 +4061,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4093,7 +4086,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4113,7 +4106,7 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4157,19 +4150,19 @@ impl<'a, C> CustomerDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentGetCall<'a> {}
 
-impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4234,8 +4227,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4248,7 +4240,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4257,7 +4249,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4317,7 +4309,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4327,7 +4319,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4352,7 +4344,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4372,7 +4364,7 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4419,10 +4411,10 @@ impl<'a, C> CustomerDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentListCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4432,9 +4424,9 @@ pub struct CustomerDeploymentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentListCall<'a> {}
 
-impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4508,8 +4500,7 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4522,7 +4513,7 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4531,7 +4522,7 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4591,28 +4582,28 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeploymentListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeploymentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerDeploymentListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerDeploymentListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4622,7 +4613,7 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4647,7 +4638,7 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4667,7 +4658,7 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4717,10 +4708,10 @@ impl<'a, C> CustomerDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentMoveCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveDeploymentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4728,9 +4719,9 @@ pub struct CustomerDeploymentMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentMoveCall<'a> {}
 
-impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4806,8 +4797,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4821,7 +4811,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4832,7 +4822,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4891,7 +4881,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> CustomerDeploymentMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> CustomerDeploymentMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -4901,7 +4891,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4911,7 +4901,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4936,7 +4926,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4956,7 +4946,7 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5007,10 +4997,10 @@ impl<'a, C> CustomerDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeploymentPatchCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeploymentPatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDeployment,
     _name: String,
     _update_mask: Option<String>,
@@ -5019,9 +5009,9 @@ pub struct CustomerDeploymentPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeploymentPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeploymentPatchCall<'a> {}
 
-impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeploymentPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5100,8 +5090,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5115,7 +5104,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5126,7 +5115,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5185,7 +5174,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentPatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerDeploymentPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -5195,14 +5184,14 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerDeploymentPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -5212,7 +5201,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeploymentPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5237,7 +5226,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeploymentPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5257,7 +5246,7 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeploymentPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5307,10 +5296,10 @@ impl<'a, C> CustomerDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5318,9 +5307,9 @@ pub struct CustomerDeviceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceCreateCall<'a> {}
 
-impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5396,8 +5385,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5411,7 +5399,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5422,7 +5410,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5481,7 +5469,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5491,7 +5479,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -5501,7 +5489,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5526,7 +5514,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5546,7 +5534,7 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5596,10 +5584,10 @@ impl<'a, C> CustomerDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceCreateSignedCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceCreateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5607,9 +5595,9 @@ pub struct CustomerDeviceCreateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceCreateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceCreateSignedCall<'a> {}
 
-impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceCreateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5685,8 +5673,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5700,7 +5687,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5711,7 +5698,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5770,7 +5757,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeviceCreateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerDeviceCreateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -5780,7 +5767,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateSignedCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceCreateSignedCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -5790,7 +5777,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceCreateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5815,7 +5802,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceCreateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5835,7 +5822,7 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceCreateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceCreateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5879,19 +5866,19 @@ impl<'a, C> CustomerDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceDeleteCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceDeleteCall<'a> {}
 
-impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5956,8 +5943,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5970,7 +5956,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5979,7 +5965,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6039,7 +6025,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6049,7 +6035,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6074,7 +6060,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6094,7 +6080,7 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6138,19 +6124,19 @@ impl<'a, C> CustomerDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceGetCall<'a> {}
 
-impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6215,8 +6201,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6229,7 +6214,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6238,7 +6223,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6298,7 +6283,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6308,7 +6293,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6333,7 +6318,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6353,7 +6338,7 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6400,10 +6385,10 @@ impl<'a, C> CustomerDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceListCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6413,9 +6398,9 @@ pub struct CustomerDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceListCall<'a> {}
 
-impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6489,8 +6474,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6503,7 +6487,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6512,7 +6496,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6572,28 +6556,28 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6603,7 +6587,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6628,7 +6612,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6648,7 +6632,7 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6698,10 +6682,10 @@ impl<'a, C> CustomerDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceMoveCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6709,9 +6693,9 @@ pub struct CustomerDeviceMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceMoveCall<'a> {}
 
-impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6787,8 +6771,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6802,7 +6785,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6813,7 +6796,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6872,7 +6855,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> CustomerDeviceMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> CustomerDeviceMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -6882,7 +6865,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6892,7 +6875,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6917,7 +6900,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6937,7 +6920,7 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6988,10 +6971,10 @@ impl<'a, C> CustomerDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDevicePatchCall<'a, C>
-    where C: 'a {
+pub struct CustomerDevicePatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _name: String,
     _update_mask: Option<String>,
@@ -7000,9 +6983,9 @@ pub struct CustomerDevicePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDevicePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDevicePatchCall<'a> {}
 
-impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDevicePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7081,8 +7064,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7096,7 +7078,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7107,7 +7089,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7166,7 +7148,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDevicePatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerDevicePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -7176,14 +7158,14 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDevicePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDevicePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerDevicePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerDevicePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7193,7 +7175,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDevicePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDevicePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7218,7 +7200,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDevicePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDevicePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7238,7 +7220,7 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDevicePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDevicePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7288,10 +7270,10 @@ impl<'a, C> CustomerDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceSignDeviceCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceSignDeviceCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalSignDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7299,9 +7281,9 @@ pub struct CustomerDeviceSignDeviceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceSignDeviceCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceSignDeviceCall<'a> {}
 
-impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceSignDeviceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7377,8 +7359,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7392,7 +7373,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7403,7 +7384,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7462,7 +7443,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> CustomerDeviceSignDeviceCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> CustomerDeviceSignDeviceCall<'a> {
         self._request = new_value;
         self
     }
@@ -7472,7 +7453,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceSignDeviceCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceSignDeviceCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7482,7 +7463,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceSignDeviceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceSignDeviceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7507,7 +7488,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceSignDeviceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceSignDeviceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7527,7 +7508,7 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceSignDeviceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceSignDeviceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7577,10 +7558,10 @@ impl<'a, C> CustomerDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerDeviceUpdateSignedCall<'a, C>
-    where C: 'a {
+pub struct CustomerDeviceUpdateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalUpdateSignedDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7588,9 +7569,9 @@ pub struct CustomerDeviceUpdateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerDeviceUpdateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerDeviceUpdateSignedCall<'a> {}
 
-impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerDeviceUpdateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7666,8 +7647,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7681,7 +7661,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7692,7 +7672,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7751,7 +7731,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> CustomerDeviceUpdateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> CustomerDeviceUpdateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -7761,7 +7741,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerDeviceUpdateSignedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerDeviceUpdateSignedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7771,7 +7751,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceUpdateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerDeviceUpdateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7796,7 +7776,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceUpdateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerDeviceUpdateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7816,7 +7796,7 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceUpdateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerDeviceUpdateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7866,10 +7846,10 @@ impl<'a, C> CustomerDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeploymentCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeDeploymentCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDeployment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7877,9 +7857,9 @@ pub struct CustomerNodeDeploymentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeDeploymentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeDeploymentCreateCall<'a> {}
 
-impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeDeploymentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7955,8 +7935,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7970,7 +7949,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7981,7 +7960,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8040,7 +8019,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerNodeDeploymentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> CustomerNodeDeploymentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8050,7 +8029,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -8060,7 +8039,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8085,7 +8064,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8105,7 +8084,7 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeploymentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeploymentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8152,10 +8131,10 @@ impl<'a, C> CustomerNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeploymentListCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeDeploymentListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8165,9 +8144,9 @@ pub struct CustomerNodeDeploymentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeDeploymentListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeDeploymentListCall<'a> {}
 
-impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeDeploymentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8241,8 +8220,7 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8255,7 +8233,7 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8264,7 +8242,7 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8324,28 +8302,28 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeploymentListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeploymentListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeploymentListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8355,7 +8333,7 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeploymentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8380,7 +8358,7 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeploymentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8400,7 +8378,7 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeploymentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeploymentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8450,10 +8428,10 @@ impl<'a, C> CustomerNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeDeviceCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8461,9 +8439,9 @@ pub struct CustomerNodeDeviceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeDeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeDeviceCreateCall<'a> {}
 
-impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeDeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8539,8 +8517,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8554,7 +8531,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8565,7 +8542,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8624,7 +8601,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerNodeDeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> CustomerNodeDeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -8634,7 +8611,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -8644,7 +8621,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8669,7 +8646,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8689,7 +8666,7 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8739,10 +8716,10 @@ impl<'a, C> CustomerNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeviceCreateSignedCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeDeviceCreateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8750,9 +8727,9 @@ pub struct CustomerNodeDeviceCreateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeDeviceCreateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeDeviceCreateSignedCall<'a> {}
 
-impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeDeviceCreateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8828,8 +8805,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8843,7 +8819,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8854,7 +8830,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8913,7 +8889,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerNodeDeviceCreateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> CustomerNodeDeviceCreateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -8923,7 +8899,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateSignedCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceCreateSignedCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -8933,7 +8909,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceCreateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8958,7 +8934,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceCreateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8978,7 +8954,7 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceCreateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceCreateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9025,10 +9001,10 @@ impl<'a, C> CustomerNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeviceListCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeDeviceListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9038,9 +9014,9 @@ pub struct CustomerNodeDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeDeviceListCall<'a> {}
 
-impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9114,8 +9090,7 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9128,7 +9103,7 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9137,7 +9112,7 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9197,28 +9172,28 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9228,7 +9203,7 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9253,7 +9228,7 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9273,7 +9248,7 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9323,10 +9298,10 @@ impl<'a, C> CustomerNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeNodeCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeNodeCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9334,9 +9309,9 @@ pub struct CustomerNodeNodeCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeNodeCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeNodeCreateCall<'a> {}
 
-impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeNodeCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9412,8 +9387,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9427,7 +9401,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9438,7 +9412,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9497,7 +9471,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeNodeCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeNodeCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -9507,7 +9481,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -9517,7 +9491,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9542,7 +9516,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9562,7 +9536,7 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeNodeCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeNodeCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9609,10 +9583,10 @@ impl<'a, C> CustomerNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeNodeListCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeNodeListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9622,9 +9596,9 @@ pub struct CustomerNodeNodeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeNodeListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeNodeListCall<'a> {}
 
-impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeNodeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9698,8 +9672,7 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9712,7 +9685,7 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9721,7 +9694,7 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9781,28 +9754,28 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeNodeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeNodeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeNodeListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9812,7 +9785,7 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeNodeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9837,7 +9810,7 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeNodeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9857,7 +9830,7 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeNodeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeNodeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9907,10 +9880,10 @@ impl<'a, C> CustomerNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeCreateCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9918,9 +9891,9 @@ pub struct CustomerNodeCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeCreateCall<'a> {}
 
-impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9996,8 +9969,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10011,7 +9983,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10022,7 +9994,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10081,7 +10053,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodeCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -10091,7 +10063,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -10101,7 +10073,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10126,7 +10098,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10146,7 +10118,7 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10190,19 +10162,19 @@ impl<'a, C> CustomerNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeDeleteCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeDeleteCall<'a> {}
 
-impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10267,8 +10239,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10281,7 +10252,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10290,7 +10261,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10350,7 +10321,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodeDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodeDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10360,7 +10331,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10385,7 +10356,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10405,7 +10376,7 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10449,19 +10420,19 @@ impl<'a, C> CustomerNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeGetCall<'a> {}
 
-impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10526,8 +10497,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10540,7 +10510,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10549,7 +10519,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10609,7 +10579,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodeGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodeGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10619,7 +10589,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10644,7 +10614,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10664,7 +10634,7 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10711,10 +10681,10 @@ impl<'a, C> CustomerNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeListCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -10724,9 +10694,9 @@ pub struct CustomerNodeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeListCall<'a> {}
 
-impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10800,8 +10770,7 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10814,7 +10783,7 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10823,7 +10792,7 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10883,28 +10852,28 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CustomerNodeListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CustomerNodeListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerNodeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerNodeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerNodeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerNodeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CustomerNodeListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CustomerNodeListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -10914,7 +10883,7 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10939,7 +10908,7 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10959,7 +10928,7 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11009,10 +10978,10 @@ impl<'a, C> CustomerNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodeMoveCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodeMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveNodeRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11020,9 +10989,9 @@ pub struct CustomerNodeMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodeMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodeMoveCall<'a> {}
 
-impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodeMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11098,8 +11067,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11113,7 +11081,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11124,7 +11092,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11183,7 +11151,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> CustomerNodeMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> CustomerNodeMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -11193,7 +11161,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodeMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodeMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11203,7 +11171,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodeMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11228,7 +11196,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodeMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11248,7 +11216,7 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodeMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11299,10 +11267,10 @@ impl<'a, C> CustomerNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerNodePatchCall<'a, C>
-    where C: 'a {
+pub struct CustomerNodePatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalNode,
     _name: String,
     _update_mask: Option<String>,
@@ -11311,9 +11279,9 @@ pub struct CustomerNodePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerNodePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerNodePatchCall<'a> {}
 
-impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerNodePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11392,8 +11360,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11407,7 +11374,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11418,7 +11385,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11477,7 +11444,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodePatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalNode) -> CustomerNodePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -11487,14 +11454,14 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerNodePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerNodePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerNodePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerNodePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -11504,7 +11471,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerNodePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11529,7 +11496,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerNodePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11549,7 +11516,7 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerNodePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11593,19 +11560,19 @@ impl<'a, C> CustomerNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerGetCall<'a, C>
-    where C: 'a {
+pub struct CustomerGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerGetCall<'a> {}
 
-impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11670,8 +11637,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11684,7 +11650,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11693,7 +11659,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11753,7 +11719,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -11763,7 +11729,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -11788,7 +11754,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11808,7 +11774,7 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11854,10 +11820,10 @@ impl<'a, C> CustomerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerListCall<'a, C>
-    where C: 'a {
+pub struct CustomerListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -11865,9 +11831,9 @@ pub struct CustomerListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerListCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerListCall<'a> {}
 
-impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -11912,8 +11878,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -11926,7 +11891,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -11935,7 +11900,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -11992,14 +11957,14 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// A pagination token returned from a previous call to ListCustomers that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CustomerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CustomerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of customers to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CustomerListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CustomerListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -12009,7 +11974,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12034,7 +11999,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12054,7 +12019,7 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12105,10 +12070,10 @@ impl<'a, C> CustomerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CustomerPatchCall<'a, C>
-    where C: 'a {
+pub struct CustomerPatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCustomer,
     _name: String,
     _update_mask: Option<String>,
@@ -12117,9 +12082,9 @@ pub struct CustomerPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CustomerPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CustomerPatchCall<'a> {}
 
-impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CustomerPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12198,8 +12163,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12213,7 +12177,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12224,7 +12188,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12283,7 +12247,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCustomer) -> CustomerPatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCustomer) -> CustomerPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -12293,14 +12257,14 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CustomerPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CustomerPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CustomerPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CustomerPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -12310,7 +12274,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CustomerPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12335,7 +12299,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CustomerPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12355,7 +12319,7 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CustomerPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12399,19 +12363,19 @@ impl<'a, C> CustomerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceDeleteCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDeviceDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDeviceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDeviceDeleteCall<'a> {}
 
-impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDeviceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12476,8 +12440,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12490,7 +12453,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12499,7 +12462,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12559,7 +12522,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -12569,7 +12532,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12594,7 +12557,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12614,7 +12577,7 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12658,19 +12621,19 @@ impl<'a, C> DeploymentDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceGetCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDeviceGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDeviceGetCall<'a> {}
 
-impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -12735,8 +12698,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -12749,7 +12711,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -12758,7 +12720,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -12818,7 +12780,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -12828,7 +12790,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -12853,7 +12815,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12873,7 +12835,7 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12923,10 +12885,10 @@ impl<'a, C> DeploymentDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceMoveCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDeviceMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -12934,9 +12896,9 @@ pub struct DeploymentDeviceMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDeviceMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDeviceMoveCall<'a> {}
 
-impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDeviceMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13012,8 +12974,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13027,7 +12988,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13038,7 +12999,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13097,7 +13058,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> DeploymentDeviceMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> DeploymentDeviceMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -13107,7 +13068,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -13117,7 +13078,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13142,7 +13103,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13162,7 +13123,7 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13213,10 +13174,10 @@ impl<'a, C> DeploymentDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDevicePatchCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDevicePatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _name: String,
     _update_mask: Option<String>,
@@ -13225,9 +13186,9 @@ pub struct DeploymentDevicePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDevicePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDevicePatchCall<'a> {}
 
-impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDevicePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13306,8 +13267,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13321,7 +13281,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13332,7 +13292,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13391,7 +13351,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> DeploymentDevicePatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> DeploymentDevicePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -13401,14 +13361,14 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> DeploymentDevicePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -13418,7 +13378,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDevicePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDevicePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13443,7 +13403,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDevicePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDevicePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13463,7 +13423,7 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDevicePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDevicePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13513,10 +13473,10 @@ impl<'a, C> DeploymentDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceSignDeviceCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDeviceSignDeviceCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalSignDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13524,9 +13484,9 @@ pub struct DeploymentDeviceSignDeviceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDeviceSignDeviceCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDeviceSignDeviceCall<'a> {}
 
-impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDeviceSignDeviceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13602,8 +13562,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13617,7 +13576,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13628,7 +13587,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13687,7 +13646,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> DeploymentDeviceSignDeviceCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> DeploymentDeviceSignDeviceCall<'a> {
         self._request = new_value;
         self
     }
@@ -13697,7 +13656,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceSignDeviceCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceSignDeviceCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -13707,7 +13666,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceSignDeviceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceSignDeviceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -13732,7 +13691,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceSignDeviceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceSignDeviceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13752,7 +13711,7 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceSignDeviceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceSignDeviceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13802,10 +13761,10 @@ impl<'a, C> DeploymentDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentDeviceUpdateSignedCall<'a, C>
-    where C: 'a {
+pub struct DeploymentDeviceUpdateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalUpdateSignedDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -13813,9 +13772,9 @@ pub struct DeploymentDeviceUpdateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentDeviceUpdateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentDeviceUpdateSignedCall<'a> {}
 
-impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentDeviceUpdateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -13891,8 +13850,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -13906,7 +13864,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -13917,7 +13875,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -13976,7 +13934,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> DeploymentDeviceUpdateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> DeploymentDeviceUpdateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -13986,7 +13944,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentDeviceUpdateSignedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentDeviceUpdateSignedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -13996,7 +13954,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceUpdateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentDeviceUpdateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14021,7 +13979,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceUpdateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeviceUpdateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14041,7 +13999,7 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceUpdateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentDeviceUpdateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14085,19 +14043,19 @@ impl<'a, C> DeploymentDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DeploymentGetCall<'a, C>
-    where C: 'a {
+pub struct DeploymentGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DeploymentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DeploymentGetCall<'a> {}
 
-impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DeploymentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14162,8 +14120,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14176,7 +14133,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14185,7 +14142,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14245,7 +14202,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> DeploymentGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> DeploymentGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -14255,7 +14212,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DeploymentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14280,7 +14237,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14300,7 +14257,7 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DeploymentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14350,19 +14307,19 @@ impl<'a, C> DeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InstallerGenerateSecretCall<'a, C>
-    where C: 'a {
+pub struct InstallerGenerateSecretCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalGenerateSecretRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InstallerGenerateSecretCall<'a, C> {}
+impl<'a> client::CallBuilder for InstallerGenerateSecretCall<'a> {}
 
-impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InstallerGenerateSecretCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14412,8 +14369,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14427,7 +14383,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14438,7 +14394,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14497,7 +14453,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalGenerateSecretRequest) -> InstallerGenerateSecretCall<'a> {
         self._request = new_value;
         self
     }
@@ -14507,7 +14463,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerGenerateSecretCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerGenerateSecretCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14532,7 +14488,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InstallerGenerateSecretCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InstallerGenerateSecretCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14552,7 +14508,7 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InstallerGenerateSecretCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InstallerGenerateSecretCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14602,19 +14558,19 @@ impl<'a, C> InstallerGenerateSecretCall<'a, C> where C: BorrowMut<hyper::Client<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct InstallerValidateCall<'a, C>
-    where C: 'a {
+pub struct InstallerValidateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalValidateInstallerRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for InstallerValidateCall<'a, C> {}
+impl<'a> client::CallBuilder for InstallerValidateCall<'a> {}
 
-impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> InstallerValidateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14664,8 +14620,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14679,7 +14634,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14690,7 +14645,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -14749,7 +14704,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalValidateInstallerRequest) -> InstallerValidateCall<'a> {
         self._request = new_value;
         self
     }
@@ -14759,7 +14714,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerValidateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> InstallerValidateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -14784,7 +14739,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> InstallerValidateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> InstallerValidateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -14804,7 +14759,7 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InstallerValidateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> InstallerValidateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -14854,10 +14809,10 @@ impl<'a, C> InstallerValidateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentDeviceCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -14865,9 +14820,9 @@ pub struct NodeDeploymentDeviceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentDeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentDeviceCreateCall<'a> {}
 
-impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentDeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -14943,8 +14898,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -14958,7 +14912,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -14969,7 +14923,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15028,7 +14982,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeploymentDeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeploymentDeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -15038,7 +14992,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -15048,7 +15002,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15073,7 +15027,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15093,7 +15047,7 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15143,10 +15097,10 @@ impl<'a, C> NodeDeploymentDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeviceCreateSignedCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentDeviceCreateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -15154,9 +15108,9 @@ pub struct NodeDeploymentDeviceCreateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentDeviceCreateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentDeviceCreateSignedCall<'a> {}
 
-impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentDeviceCreateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15232,8 +15186,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15247,7 +15200,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15258,7 +15211,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15317,7 +15270,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeploymentDeviceCreateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -15327,7 +15280,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceCreateSignedCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -15337,7 +15290,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceCreateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15362,7 +15315,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceCreateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15382,7 +15335,7 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceCreateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceCreateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15429,10 +15382,10 @@ impl<'a, C> NodeDeploymentDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeviceListCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentDeviceListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -15442,9 +15395,9 @@ pub struct NodeDeploymentDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentDeviceListCall<'a> {}
 
-impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15518,8 +15471,7 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15532,7 +15484,7 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15541,7 +15493,7 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15601,28 +15553,28 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeDeploymentDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -15632,7 +15584,7 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15657,7 +15609,7 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15677,7 +15629,7 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15721,19 +15673,19 @@ impl<'a, C> NodeDeploymentDeviceListCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentDeleteCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentDeleteCall<'a> {}
 
-impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -15798,8 +15750,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -15812,7 +15763,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -15821,7 +15772,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -15881,7 +15832,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -15891,7 +15842,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -15916,7 +15867,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -15936,7 +15887,7 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15980,19 +15931,19 @@ impl<'a, C> NodeDeploymentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentGetCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentGetCall<'a> {}
 
-impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16057,8 +16008,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16071,7 +16021,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16080,7 +16030,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16140,7 +16090,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -16150,7 +16100,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16175,7 +16125,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16195,7 +16145,7 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16242,10 +16192,10 @@ impl<'a, C> NodeDeploymentGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentListCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -16255,9 +16205,9 @@ pub struct NodeDeploymentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentListCall<'a> {}
 
-impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16331,8 +16281,7 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16345,7 +16294,7 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16354,7 +16303,7 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16414,28 +16363,28 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeploymentListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeploymentListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeDeploymentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeDeploymentListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeDeploymentListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeDeploymentListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -16445,7 +16394,7 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16470,7 +16419,7 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16490,7 +16439,7 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16540,10 +16489,10 @@ impl<'a, C> NodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentMoveCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveDeploymentRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -16551,9 +16500,9 @@ pub struct NodeDeploymentMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentMoveCall<'a> {}
 
-impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16629,8 +16578,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16644,7 +16592,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16655,7 +16603,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -16714,7 +16662,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> NodeDeploymentMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveDeploymentRequest) -> NodeDeploymentMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -16724,7 +16672,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -16734,7 +16682,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -16759,7 +16707,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16779,7 +16727,7 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16830,10 +16778,10 @@ impl<'a, C> NodeDeploymentMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeploymentPatchCall<'a, C>
-    where C: 'a {
+pub struct NodeDeploymentPatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDeployment,
     _name: String,
     _update_mask: Option<String>,
@@ -16842,9 +16790,9 @@ pub struct NodeDeploymentPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeploymentPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeploymentPatchCall<'a> {}
 
-impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeploymentPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -16923,8 +16871,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -16938,7 +16885,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -16949,7 +16896,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17008,7 +16955,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeDeploymentPatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeDeploymentPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -17018,14 +16965,14 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> NodeDeploymentPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -17035,7 +16982,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeploymentPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17060,7 +17007,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeploymentPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17080,7 +17027,7 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeploymentPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17130,10 +17077,10 @@ impl<'a, C> NodeDeploymentPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17141,9 +17088,9 @@ pub struct NodeDeviceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceCreateCall<'a> {}
 
-impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17219,8 +17166,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17234,7 +17180,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17245,7 +17191,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17304,7 +17250,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -17314,7 +17260,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -17324,7 +17270,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17349,7 +17295,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17369,7 +17315,7 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17419,10 +17365,10 @@ impl<'a, C> NodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceCreateSignedCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceCreateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -17430,9 +17376,9 @@ pub struct NodeDeviceCreateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceCreateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceCreateSignedCall<'a> {}
 
-impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceCreateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17508,8 +17454,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17523,7 +17468,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17534,7 +17479,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17593,7 +17538,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeviceCreateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeDeviceCreateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -17603,7 +17548,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateSignedCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeviceCreateSignedCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -17613,7 +17558,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceCreateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17638,7 +17583,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceCreateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17658,7 +17603,7 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceCreateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceCreateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17702,19 +17647,19 @@ impl<'a, C> NodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceDeleteCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceDeleteCall<'a> {}
 
-impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -17779,8 +17724,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -17793,7 +17737,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -17802,7 +17746,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -17862,7 +17806,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -17872,7 +17816,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -17897,7 +17841,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -17917,7 +17861,7 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -17961,19 +17905,19 @@ impl<'a, C> NodeDeviceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceGetCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceGetCall<'a> {}
 
-impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18038,8 +17982,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18052,7 +17995,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18061,7 +18004,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18121,7 +18064,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -18131,7 +18074,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18156,7 +18099,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18176,7 +18119,7 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18223,10 +18166,10 @@ impl<'a, C> NodeDeviceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceListCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -18236,9 +18179,9 @@ pub struct NodeDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceListCall<'a> {}
 
-impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18312,8 +18255,7 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18326,7 +18268,7 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18335,7 +18277,7 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18395,28 +18337,28 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -18426,7 +18368,7 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18451,7 +18393,7 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18471,7 +18413,7 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18521,10 +18463,10 @@ impl<'a, C> NodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceMoveCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -18532,9 +18474,9 @@ pub struct NodeDeviceMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceMoveCall<'a> {}
 
-impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18610,8 +18552,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18625,7 +18566,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18636,7 +18577,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18695,7 +18636,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> NodeDeviceMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveDeviceRequest) -> NodeDeviceMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -18705,7 +18646,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -18715,7 +18656,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -18740,7 +18681,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18760,7 +18701,7 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18811,10 +18752,10 @@ impl<'a, C> NodeDeviceMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDevicePatchCall<'a, C>
-    where C: 'a {
+pub struct NodeDevicePatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _name: String,
     _update_mask: Option<String>,
@@ -18823,9 +18764,9 @@ pub struct NodeDevicePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDevicePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDevicePatchCall<'a> {}
 
-impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDevicePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -18904,8 +18845,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -18919,7 +18859,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -18930,7 +18870,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -18989,7 +18929,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDevicePatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeDevicePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -18999,14 +18939,14 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDevicePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDevicePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> NodeDevicePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> NodeDevicePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -19016,7 +18956,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDevicePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDevicePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19041,7 +18981,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDevicePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDevicePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19061,7 +19001,7 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDevicePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDevicePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19111,10 +19051,10 @@ impl<'a, C> NodeDevicePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceSignDeviceCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceSignDeviceCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalSignDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19122,9 +19062,9 @@ pub struct NodeDeviceSignDeviceCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceSignDeviceCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceSignDeviceCall<'a> {}
 
-impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceSignDeviceCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19200,8 +19140,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19215,7 +19154,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19226,7 +19165,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19285,7 +19224,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> NodeDeviceSignDeviceCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalSignDeviceRequest) -> NodeDeviceSignDeviceCall<'a> {
         self._request = new_value;
         self
     }
@@ -19295,7 +19234,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceSignDeviceCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceSignDeviceCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -19305,7 +19244,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceSignDeviceCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceSignDeviceCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19330,7 +19269,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceSignDeviceCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceSignDeviceCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19350,7 +19289,7 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceSignDeviceCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceSignDeviceCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19400,10 +19339,10 @@ impl<'a, C> NodeDeviceSignDeviceCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeDeviceUpdateSignedCall<'a, C>
-    where C: 'a {
+pub struct NodeDeviceUpdateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalUpdateSignedDeviceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19411,9 +19350,9 @@ pub struct NodeDeviceUpdateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeDeviceUpdateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeDeviceUpdateSignedCall<'a> {}
 
-impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeDeviceUpdateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19489,8 +19428,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19504,7 +19442,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19515,7 +19453,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19574,7 +19512,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> NodeDeviceUpdateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalUpdateSignedDeviceRequest) -> NodeDeviceUpdateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -19584,7 +19522,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeDeviceUpdateSignedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeDeviceUpdateSignedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -19594,7 +19532,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceUpdateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeDeviceUpdateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19619,7 +19557,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceUpdateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeDeviceUpdateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19639,7 +19577,7 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceUpdateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeDeviceUpdateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19689,10 +19627,10 @@ impl<'a, C> NodeDeviceUpdateSignedCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeploymentCreateCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeDeploymentCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDeployment,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -19700,9 +19638,9 @@ pub struct NodeNodeDeploymentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeDeploymentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeDeploymentCreateCall<'a> {}
 
-impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeDeploymentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -19778,8 +19716,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -19793,7 +19730,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -19804,7 +19741,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -19863,7 +19800,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeNodeDeploymentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDeployment) -> NodeNodeDeploymentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -19873,7 +19810,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -19883,7 +19820,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -19908,7 +19845,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19928,7 +19865,7 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeploymentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeploymentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19975,10 +19912,10 @@ impl<'a, C> NodeNodeDeploymentCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeploymentListCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeDeploymentListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -19988,9 +19925,9 @@ pub struct NodeNodeDeploymentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeDeploymentListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeDeploymentListCall<'a> {}
 
-impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeDeploymentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20064,8 +20001,7 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20078,7 +20014,7 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20087,7 +20023,7 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20147,28 +20083,28 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDeployments that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of deployments to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeploymentListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeploymentListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no deployments are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeDeploymentListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -20178,7 +20114,7 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeploymentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20203,7 +20139,7 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeploymentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20223,7 +20159,7 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeploymentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeploymentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20273,10 +20209,10 @@ impl<'a, C> NodeNodeDeploymentListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeviceCreateCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeDeviceCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalDevice,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20284,9 +20220,9 @@ pub struct NodeNodeDeviceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeDeviceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeDeviceCreateCall<'a> {}
 
-impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeDeviceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20362,8 +20298,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20377,7 +20312,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20388,7 +20323,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20447,7 +20382,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalDevice) -> NodeNodeDeviceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalDevice) -> NodeNodeDeviceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -20457,7 +20392,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -20467,7 +20402,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20492,7 +20427,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20512,7 +20447,7 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20562,10 +20497,10 @@ impl<'a, C> NodeNodeDeviceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeviceCreateSignedCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeDeviceCreateSignedCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalCreateSignedDeviceRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -20573,9 +20508,9 @@ pub struct NodeNodeDeviceCreateSignedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeDeviceCreateSignedCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeDeviceCreateSignedCall<'a> {}
 
-impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeDeviceCreateSignedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20651,8 +20586,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20666,7 +20600,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20677,7 +20611,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -20736,7 +20670,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeNodeDeviceCreateSignedCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalCreateSignedDeviceRequest) -> NodeNodeDeviceCreateSignedCall<'a> {
         self._request = new_value;
         self
     }
@@ -20746,7 +20680,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateSignedCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceCreateSignedCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -20756,7 +20690,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateSignedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceCreateSignedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -20781,7 +20715,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateSignedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceCreateSignedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20801,7 +20735,7 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceCreateSignedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceCreateSignedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20848,10 +20782,10 @@ impl<'a, C> NodeNodeDeviceCreateSignedCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeviceListCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeDeviceListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -20861,9 +20795,9 @@ pub struct NodeNodeDeviceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeDeviceListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeDeviceListCall<'a> {}
 
-impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeDeviceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -20937,8 +20871,7 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -20951,7 +20884,7 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -20960,7 +20893,7 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21020,28 +20953,28 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListDevices that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of devices to return in the response. If empty or zero, all devices will be listed. Must be in the range [0, 1000].
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeviceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeDeviceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have one of the following formats: "sn=123454" or "display_name=MyDevice". sn corresponds to serial number of the device. The filter is case insensitive.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeDeviceListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -21051,7 +20984,7 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeviceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21076,7 +21009,7 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeviceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21096,7 +21029,7 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeviceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21146,10 +21079,10 @@ impl<'a, C> NodeNodeDeviceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeNodeCreateCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeNodeCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21157,9 +21090,9 @@ pub struct NodeNodeNodeCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeNodeCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeNodeCreateCall<'a> {}
 
-impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeNodeCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21235,8 +21168,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21250,7 +21182,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21261,7 +21193,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21320,7 +21252,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeNodeCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeNodeCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -21330,7 +21262,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -21340,7 +21272,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21365,7 +21297,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21385,7 +21317,7 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeNodeCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeNodeCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21432,10 +21364,10 @@ impl<'a, C> NodeNodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeNodeListCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeNodeListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -21445,9 +21377,9 @@ pub struct NodeNodeNodeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeNodeListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeNodeListCall<'a> {}
 
-impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeNodeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21521,8 +21453,7 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21535,7 +21466,7 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21544,7 +21475,7 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21604,28 +21535,28 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeNodeListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeNodeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeNodeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeNodeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeNodeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeNodeListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeNodeListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -21635,7 +21566,7 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeNodeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21660,7 +21591,7 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeNodeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21680,7 +21611,7 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeNodeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeNodeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -21730,10 +21661,10 @@ impl<'a, C> NodeNodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeCreateCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeCreateCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalNode,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -21741,9 +21672,9 @@ pub struct NodeNodeCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeCreateCall<'a> {}
 
-impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -21819,8 +21750,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -21834,7 +21764,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -21845,7 +21775,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -21904,7 +21834,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeCreateCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodeCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -21914,7 +21844,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -21924,7 +21854,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -21949,7 +21879,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -21969,7 +21899,7 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22013,19 +21943,19 @@ impl<'a, C> NodeNodeCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeDeleteCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeDeleteCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeDeleteCall<'a> {}
 
-impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22090,8 +22020,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22104,7 +22033,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22113,7 +22042,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22173,7 +22102,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodeDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeNodeDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -22183,7 +22112,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22208,7 +22137,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22228,7 +22157,7 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22272,19 +22201,19 @@ impl<'a, C> NodeNodeDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeGetCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeGetCall<'a> {}
 
-impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22349,8 +22278,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22363,7 +22291,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22372,7 +22300,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22432,7 +22360,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodeGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeNodeGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -22442,7 +22370,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22467,7 +22395,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22487,7 +22415,7 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22534,10 +22462,10 @@ impl<'a, C> NodeNodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeListCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeListCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -22547,9 +22475,9 @@ pub struct NodeNodeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeListCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeListCall<'a> {}
 
-impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22623,8 +22551,7 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22637,7 +22564,7 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22646,7 +22573,7 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -22706,28 +22633,28 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> NodeNodeListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> NodeNodeListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A pagination token returned from a previous call to ListNodes that indicates where this listing should continue from.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> NodeNodeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> NodeNodeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of nodes to return in the response.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> NodeNodeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> NodeNodeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The filter expression. The filter should have the following format: "DIRECT_CHILDREN" or format: "direct_children". The filter is case insensitive. If empty, then no nodes are filtered.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> NodeNodeListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> NodeNodeListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -22737,7 +22664,7 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -22762,7 +22689,7 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -22782,7 +22709,7 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -22832,10 +22759,10 @@ impl<'a, C> NodeNodeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodeMoveCall<'a, C>
-    where C: 'a {
+pub struct NodeNodeMoveCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalMoveNodeRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -22843,9 +22770,9 @@ pub struct NodeNodeMoveCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodeMoveCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodeMoveCall<'a> {}
 
-impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodeMoveCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -22921,8 +22848,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -22936,7 +22862,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -22947,7 +22873,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23006,7 +22932,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> NodeNodeMoveCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalMoveNodeRequest) -> NodeNodeMoveCall<'a> {
         self._request = new_value;
         self
     }
@@ -23016,7 +22942,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodeMoveCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeNodeMoveCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -23026,7 +22952,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeMoveCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodeMoveCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23051,7 +22977,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeMoveCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodeMoveCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23071,7 +22997,7 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeMoveCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodeMoveCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23122,10 +23048,10 @@ impl<'a, C> NodeNodeMoveCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeNodePatchCall<'a, C>
-    where C: 'a {
+pub struct NodeNodePatchCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalNode,
     _name: String,
     _update_mask: Option<String>,
@@ -23134,9 +23060,9 @@ pub struct NodeNodePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeNodePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeNodePatchCall<'a> {}
 
-impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeNodePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23215,8 +23141,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23230,7 +23155,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23241,7 +23166,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23300,7 +23225,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodePatchCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalNode) -> NodeNodePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -23310,14 +23235,14 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeNodePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeNodePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Fields to be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> NodeNodePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> NodeNodePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -23327,7 +23252,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeNodePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23352,7 +23277,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeNodePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeNodePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23372,7 +23297,7 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeNodePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23416,19 +23341,19 @@ impl<'a, C> NodeNodePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NodeGetCall<'a, C>
-    where C: 'a {
+pub struct NodeGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NodeGetCall<'a, C> {}
+impl<'a> client::CallBuilder for NodeGetCall<'a> {}
 
-impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NodeGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23493,8 +23418,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23507,7 +23431,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23516,7 +23440,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23576,7 +23500,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> NodeGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> NodeGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -23586,7 +23510,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NodeGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23611,7 +23535,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NodeGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NodeGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23631,7 +23555,7 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NodeGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NodeGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23681,19 +23605,19 @@ impl<'a, C> NodeGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicyGetCall<'a, C>
-    where C: 'a {
+pub struct PolicyGetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalGetPolicyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PolicyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for PolicyGetCall<'a> {}
 
-impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PolicyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23743,8 +23667,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -23758,7 +23681,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -23769,7 +23692,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -23828,7 +23751,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalGetPolicyRequest) -> PolicyGetCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalGetPolicyRequest) -> PolicyGetCall<'a> {
         self._request = new_value;
         self
     }
@@ -23838,7 +23761,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -23863,7 +23786,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PolicyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -23883,7 +23806,7 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23933,19 +23856,19 @@ impl<'a, C> PolicyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicySetCall<'a, C>
-    where C: 'a {
+pub struct PolicySetCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalSetPolicyRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PolicySetCall<'a, C> {}
+impl<'a> client::CallBuilder for PolicySetCall<'a> {}
 
-impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PolicySetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -23995,8 +23918,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24010,7 +23932,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24021,7 +23943,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24080,7 +24002,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalSetPolicyRequest) -> PolicySetCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalSetPolicyRequest) -> PolicySetCall<'a> {
         self._request = new_value;
         self
     }
@@ -24090,7 +24012,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicySetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicySetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24115,7 +24037,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicySetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PolicySetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24135,7 +24057,7 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicySetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PolicySetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24185,19 +24107,19 @@ impl<'a, C> PolicySetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PolicyTestCall<'a, C>
-    where C: 'a {
+pub struct PolicyTestCall<'a>
+    where  {
 
-    hub: &'a SASPortalTesting<C>,
+    hub: &'a SASPortalTesting<>,
     _request: SasPortalTestPermissionsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PolicyTestCall<'a, C> {}
+impl<'a> client::CallBuilder for PolicyTestCall<'a> {}
 
-impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PolicyTestCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -24247,8 +24169,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -24262,7 +24183,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -24273,7 +24194,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -24332,7 +24253,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a, C> {
+    pub fn request(mut self, new_value: SasPortalTestPermissionsRequest) -> PolicyTestCall<'a> {
         self._request = new_value;
         self
     }
@@ -24342,7 +24263,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyTestCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PolicyTestCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -24367,7 +24288,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PolicyTestCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PolicyTestCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -24387,7 +24308,7 @@ impl<'a, C> PolicyTestCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyTestCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PolicyTestCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

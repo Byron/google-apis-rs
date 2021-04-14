@@ -4,12 +4,12 @@
 [package]
 
 name = "google-assuredworkloads1"
-version = "2.0.0+20210325"
+version = "2.0.3+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Assuredworkloads (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/assuredworkloads1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/assuredworkloads1"
 homepage = "https://cloud.google.com"
-documentation = "https://docs.rs/google-assuredworkloads1/2.0.0+20210325"
+documentation = "https://docs.rs/google-assuredworkloads1/2.0.3+20210325"
 license = "MIT"
 keywords = ["assuredworkloads", "google", "protocol", "web", "api"]
 autobins = false

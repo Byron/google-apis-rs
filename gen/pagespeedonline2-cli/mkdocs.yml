@@ -1,8 +1,8 @@
-site_name: pagespeedonline v2.0.0+20191206
+site_name: pagespeedonline v2.0.3+20191206
 site_url: http://byron.github.io/google-apis-rs/google-pagespeedonline2-cli
 site_description: A complete library to interact with pagespeedonline (protocol v2)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline2-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/pagespeedonline2-cli
 
 docs_dir: docs
 site_dir: build_html

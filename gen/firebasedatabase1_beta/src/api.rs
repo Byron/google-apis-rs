@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -119,35 +118,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct FirebaseRealtimeDatabase<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct FirebaseRealtimeDatabase<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for FirebaseRealtimeDatabase<C> {}
+impl<'a, > client::Hub for FirebaseRealtimeDatabase<> {}
 
-impl<'a, C> FirebaseRealtimeDatabase<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > FirebaseRealtimeDatabase<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseRealtimeDatabase<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> FirebaseRealtimeDatabase<> {
         FirebaseRealtimeDatabase {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://firebasedatabase.googleapis.com/".to_string(),
             _root_url: "https://firebasedatabase.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -294,15 +292,15 @@ impl client::RequestValue for ReenableDatabaseInstanceRequest {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -312,7 +310,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The parent project for which to create a database instance, in the form: `projects/{project-number}/locations/{location-id}`.
-    pub fn locations_instances_create(&self, request: DatabaseInstance, parent: &str) -> ProjectLocationInstanceCreateCall<'a, C> {
+    pub fn locations_instances_create(&self, request: DatabaseInstance, parent: &str) -> ProjectLocationInstanceCreateCall<'a> {
         ProjectLocationInstanceCreateCall {
             hub: self.hub,
             _request: request,
@@ -332,7 +330,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`
-    pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a, C> {
+    pub fn locations_instances_delete(&self, name: &str) -> ProjectLocationInstanceDeleteCall<'a> {
         ProjectLocationInstanceDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -350,7 +348,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`
-    pub fn locations_instances_disable(&self, request: DisableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceDisableCall<'a, C> {
+    pub fn locations_instances_disable(&self, request: DisableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceDisableCall<'a> {
         ProjectLocationInstanceDisableCall {
             hub: self.hub,
             _request: request,
@@ -368,7 +366,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`. `database-id` is a globally unique identifier across all parent collections. For convenience, this method allows you to supply `-` as a wildcard character in place of specific collections under `projects` and `locations`. The resulting wildcarding form of the method is: `projects/-/locations/-/instances/{database-id}`.
-    pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a, C> {
+    pub fn locations_instances_get(&self, name: &str) -> ProjectLocationInstanceGetCall<'a> {
         ProjectLocationInstanceGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -385,7 +383,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The parent project for which to list database instances, in the form: `projects/{project-number}/locations/{location-id}` To list across all locations, use a parent in the form: `projects/{project-number}/locations/-`
-    pub fn locations_instances_list(&self, parent: &str) -> ProjectLocationInstanceListCall<'a, C> {
+    pub fn locations_instances_list(&self, parent: &str) -> ProjectLocationInstanceListCall<'a> {
         ProjectLocationInstanceListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -405,7 +403,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The fully qualified resource name of the database instance, in the form: `projects/{project-number}/locations/{location-id}/instances/{database-id}`
-    pub fn locations_instances_reenable(&self, request: ReenableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceReenableCall<'a, C> {
+    pub fn locations_instances_reenable(&self, request: ReenableDatabaseInstanceRequest, name: &str) -> ProjectLocationInstanceReenableCall<'a> {
         ProjectLocationInstanceReenableCall {
             hub: self.hub,
             _request: request,
@@ -465,10 +463,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInstanceCreateCall<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
     _request: DatabaseInstance,
     _parent: String,
     _validate_only: Option<bool>,
@@ -478,9 +476,9 @@ pub struct ProjectLocationInstanceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInstanceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInstanceCreateCall<'a> {}
 
-impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInstanceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -562,8 +560,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -577,7 +574,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -588,7 +585,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -647,7 +644,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DatabaseInstance) -> ProjectLocationInstanceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: DatabaseInstance) -> ProjectLocationInstanceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -657,21 +654,21 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// When set to true, the request will be validated but not submitted.
     ///
     /// Sets the *validate only* query property to the given value.
-    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationInstanceCreateCall<'a, C> {
+    pub fn validate_only(mut self, new_value: bool) -> ProjectLocationInstanceCreateCall<'a> {
         self._validate_only = Some(new_value);
         self
     }
     /// The globally unique identifier of the database instance.
     ///
     /// Sets the *database id* query property to the given value.
-    pub fn database_id(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a, C> {
+    pub fn database_id(mut self, new_value: &str) -> ProjectLocationInstanceCreateCall<'a> {
         self._database_id = Some(new_value.to_string());
         self
     }
@@ -681,7 +678,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -706,7 +703,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -726,7 +723,7 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -770,19 +767,19 @@ impl<'a, C> ProjectLocationInstanceCreateCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceDeleteCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInstanceDeleteCall<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInstanceDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInstanceDeleteCall<'a> {}
 
-impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInstanceDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -847,8 +844,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -861,7 +857,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -870,7 +866,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -930,7 +926,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -940,7 +936,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -965,7 +961,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -985,7 +981,7 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1035,10 +1031,10 @@ impl<'a, C> ProjectLocationInstanceDeleteCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceDisableCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInstanceDisableCall<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
     _request: DisableDatabaseInstanceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1046,9 +1042,9 @@ pub struct ProjectLocationInstanceDisableCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInstanceDisableCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInstanceDisableCall<'a> {}
 
-impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInstanceDisableCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1124,8 +1120,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1139,7 +1134,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1150,7 +1145,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1209,7 +1204,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: DisableDatabaseInstanceRequest) -> ProjectLocationInstanceDisableCall<'a, C> {
+    pub fn request(mut self, new_value: DisableDatabaseInstanceRequest) -> ProjectLocationInstanceDisableCall<'a> {
         self._request = new_value;
         self
     }
@@ -1219,7 +1214,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDisableCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceDisableCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1229,7 +1224,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDisableCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceDisableCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1254,7 +1249,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDisableCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceDisableCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1274,7 +1269,7 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDisableCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceDisableCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1318,19 +1313,19 @@ impl<'a, C> ProjectLocationInstanceDisableCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInstanceGetCall<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInstanceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInstanceGetCall<'a> {}
 
-impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInstanceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1395,8 +1390,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1409,7 +1403,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1418,7 +1412,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1478,7 +1472,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1488,7 +1482,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1513,7 +1507,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1533,7 +1527,7 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1579,10 +1573,10 @@ impl<'a, C> ProjectLocationInstanceGetCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInstanceListCall<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1591,9 +1585,9 @@ pub struct ProjectLocationInstanceListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInstanceListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInstanceListCall<'a> {}
 
-impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInstanceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1664,8 +1658,7 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1678,7 +1671,7 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1687,7 +1680,7 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1747,21 +1740,21 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Token returned from a previous call to `ListDatabaseInstances` indicating where in the set of database instances to resume listing.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationInstanceListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of database instances to return in the response. The server may return fewer than this at its discretion. If no value is specified (or too large a value is specified), then the server will impose its own limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationInstanceListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationInstanceListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1771,7 +1764,7 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1796,7 +1789,7 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1816,7 +1809,7 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1866,10 +1859,10 @@ impl<'a, C> ProjectLocationInstanceListCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInstanceReenableCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInstanceReenableCall<'a>
+    where  {
 
-    hub: &'a FirebaseRealtimeDatabase<C>,
+    hub: &'a FirebaseRealtimeDatabase<>,
     _request: ReenableDatabaseInstanceRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1877,9 +1870,9 @@ pub struct ProjectLocationInstanceReenableCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInstanceReenableCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInstanceReenableCall<'a> {}
 
-impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInstanceReenableCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1955,8 +1948,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1970,7 +1962,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1981,7 +1973,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2040,7 +2032,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ReenableDatabaseInstanceRequest) -> ProjectLocationInstanceReenableCall<'a, C> {
+    pub fn request(mut self, new_value: ReenableDatabaseInstanceRequest) -> ProjectLocationInstanceReenableCall<'a> {
         self._request = new_value;
         self
     }
@@ -2050,7 +2042,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceReenableCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInstanceReenableCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2060,7 +2052,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceReenableCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInstanceReenableCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2085,7 +2077,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceReenableCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInstanceReenableCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2105,7 +2097,7 @@ impl<'a, C> ProjectLocationInstanceReenableCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceReenableCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInstanceReenableCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

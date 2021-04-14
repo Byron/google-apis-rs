@@ -4,10 +4,10 @@
 [package]
 
 name = "google-fusiontables2-cli"
-version = "2.0.0+20171117"
+version = "2.0.3+20171117"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fusiontables (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/fusiontables2-cli"
 homepage = "https://developers.google.com/fusiontables"
 documentation = "http://byron.github.io/google-apis-rs/google_fusiontables2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-fusiontables2]
 path = "../fusiontables2"
-version = "2.0.0+20171117"
+version = "2.0.3+20171117"

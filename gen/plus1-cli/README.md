@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-plus1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/plus1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/plus1-cli).
 
 # Usage
 
-This documentation was generated from the *plus* API at revision *20190616*. The CLI is at version *2.0.0*.
+This documentation was generated from the *plus* API at revision *20190616*. The CLI is at version *2.0.3*.
 
 ```bash
 plus1 [options]

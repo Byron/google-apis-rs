@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,41 +108,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct YouTubeReporting<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct YouTubeReporting<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for YouTubeReporting<C> {}
+impl<'a, > client::Hub for YouTubeReporting<> {}
 
-impl<'a, C> YouTubeReporting<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > YouTubeReporting<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> YouTubeReporting<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> YouTubeReporting<> {
         YouTubeReporting {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://youtubereporting.googleapis.com/".to_string(),
             _root_url: "https://youtubereporting.googleapis.com/".to_string(),
         }
     }
 
-    pub fn jobs(&'a self) -> JobMethods<'a, C> {
+    pub fn jobs(&'a self) -> JobMethods<'a> {
         JobMethods { hub: &self }
     }
-    pub fn media(&'a self) -> MediaMethods<'a, C> {
+    pub fn media(&'a self) -> MediaMethods<'a> {
         MediaMethods { hub: &self }
     }
-    pub fn report_types(&'a self) -> ReportTypeMethods<'a, C> {
+    pub fn report_types(&'a self) -> ReportTypeMethods<'a> {
         ReportTypeMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -707,15 +705,15 @@ impl client::Resource for ReportType {}
 /// let rb = hub.jobs();
 /// # }
 /// ```
-pub struct JobMethods<'a, C>
-    where C: 'a {
+pub struct JobMethods<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for JobMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for JobMethods<'a> {}
 
-impl<'a, C> JobMethods<'a, C> {
+impl<'a> JobMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -725,7 +723,7 @@ impl<'a, C> JobMethods<'a, C> {
     ///
     /// * `jobId` - The ID of the job.
     /// * `reportId` - The ID of the report to retrieve.
-    pub fn reports_get(&self, job_id: &str, report_id: &str) -> JobReportGetCall<'a, C> {
+    pub fn reports_get(&self, job_id: &str, report_id: &str) -> JobReportGetCall<'a> {
         JobReportGetCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
@@ -744,7 +742,7 @@ impl<'a, C> JobMethods<'a, C> {
     /// # Arguments
     ///
     /// * `jobId` - The ID of the job.
-    pub fn reports_list(&self, job_id: &str) -> JobReportListCall<'a, C> {
+    pub fn reports_list(&self, job_id: &str) -> JobReportListCall<'a> {
         JobReportListCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
@@ -767,7 +765,7 @@ impl<'a, C> JobMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: Job) -> JobCreateCall<'a, C> {
+    pub fn create(&self, request: Job) -> JobCreateCall<'a> {
         JobCreateCall {
             hub: self.hub,
             _request: request,
@@ -785,7 +783,7 @@ impl<'a, C> JobMethods<'a, C> {
     /// # Arguments
     ///
     /// * `jobId` - The ID of the job to delete.
-    pub fn delete(&self, job_id: &str) -> JobDeleteCall<'a, C> {
+    pub fn delete(&self, job_id: &str) -> JobDeleteCall<'a> {
         JobDeleteCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
@@ -803,7 +801,7 @@ impl<'a, C> JobMethods<'a, C> {
     /// # Arguments
     ///
     /// * `jobId` - The ID of the job to retrieve.
-    pub fn get(&self, job_id: &str) -> JobGetCall<'a, C> {
+    pub fn get(&self, job_id: &str) -> JobGetCall<'a> {
         JobGetCall {
             hub: self.hub,
             _job_id: job_id.to_string(),
@@ -817,7 +815,7 @@ impl<'a, C> JobMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists jobs.
-    pub fn list(&self) -> JobListCall<'a, C> {
+    pub fn list(&self) -> JobListCall<'a> {
         JobListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -863,15 +861,15 @@ impl<'a, C> JobMethods<'a, C> {
 /// let rb = hub.media();
 /// # }
 /// ```
-pub struct MediaMethods<'a, C>
-    where C: 'a {
+pub struct MediaMethods<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MediaMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MediaMethods<'a> {}
 
-impl<'a, C> MediaMethods<'a, C> {
+impl<'a> MediaMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -880,7 +878,7 @@ impl<'a, C> MediaMethods<'a, C> {
     /// # Arguments
     ///
     /// * `resourceName` - Name of the media that is being downloaded.
-    pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C> {
+    pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a> {
         MediaDownloadCall {
             hub: self.hub,
             _resource_name: resource_name.to_string(),
@@ -923,20 +921,20 @@ impl<'a, C> MediaMethods<'a, C> {
 /// let rb = hub.report_types();
 /// # }
 /// ```
-pub struct ReportTypeMethods<'a, C>
-    where C: 'a {
+pub struct ReportTypeMethods<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ReportTypeMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ReportTypeMethods<'a> {}
 
-impl<'a, C> ReportTypeMethods<'a, C> {
+impl<'a> ReportTypeMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists report types.
-    pub fn list(&self) -> ReportTypeListCall<'a, C> {
+    pub fn list(&self) -> ReportTypeListCall<'a> {
         ReportTypeListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -991,10 +989,10 @@ impl<'a, C> ReportTypeMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobReportGetCall<'a, C>
-    where C: 'a {
+pub struct JobReportGetCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _job_id: String,
     _report_id: String,
     _on_behalf_of_content_owner: Option<String>,
@@ -1003,9 +1001,9 @@ pub struct JobReportGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for JobReportGetCall<'a, C> {}
+impl<'a> client::CallBuilder for JobReportGetCall<'a> {}
 
-impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> JobReportGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1070,8 +1068,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1084,7 +1081,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1093,7 +1090,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1153,7 +1150,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobReportGetCall<'a, C> {
+    pub fn job_id(mut self, new_value: &str) -> JobReportGetCall<'a> {
         self._job_id = new_value.to_string();
         self
     }
@@ -1163,14 +1160,14 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn report_id(mut self, new_value: &str) -> JobReportGetCall<'a, C> {
+    pub fn report_id(mut self, new_value: &str) -> JobReportGetCall<'a> {
         self._report_id = new_value.to_string();
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobReportGetCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobReportGetCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -1180,7 +1177,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobReportGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobReportGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1205,7 +1202,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JobReportGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> JobReportGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1225,7 +1222,7 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobReportGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> JobReportGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1275,10 +1272,10 @@ impl<'a, C> JobReportGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobReportListCall<'a, C>
-    where C: 'a {
+pub struct JobReportListCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _job_id: String,
     _start_time_before: Option<String>,
     _start_time_at_or_after: Option<String>,
@@ -1291,9 +1288,9 @@ pub struct JobReportListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for JobReportListCall<'a, C> {}
+impl<'a> client::CallBuilder for JobReportListCall<'a> {}
 
-impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> JobReportListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1372,8 +1369,7 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1386,7 +1382,7 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1395,7 +1391,7 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1455,49 +1451,49 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobReportListCall<'a, C> {
+    pub fn job_id(mut self, new_value: &str) -> JobReportListCall<'a> {
         self._job_id = new_value.to_string();
         self
     }
     /// If set, only reports whose start time is smaller than the specified date/time are returned.
     ///
     /// Sets the *start time before* query property to the given value.
-    pub fn start_time_before(mut self, new_value: &str) -> JobReportListCall<'a, C> {
+    pub fn start_time_before(mut self, new_value: &str) -> JobReportListCall<'a> {
         self._start_time_before = Some(new_value.to_string());
         self
     }
     /// If set, only reports whose start time is greater than or equal the specified date/time are returned.
     ///
     /// Sets the *start time at or after* query property to the given value.
-    pub fn start_time_at_or_after(mut self, new_value: &str) -> JobReportListCall<'a, C> {
+    pub fn start_time_at_or_after(mut self, new_value: &str) -> JobReportListCall<'a> {
         self._start_time_at_or_after = Some(new_value.to_string());
         self
     }
     /// A token identifying a page of results the server should return. Typically, this is the value of ListReportsResponse.next_page_token returned in response to the previous call to the `ListReports` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> JobReportListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> JobReportListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer report types than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> JobReportListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> JobReportListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobReportListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobReportListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// If set, only reports created after the specified date/time are returned.
     ///
     /// Sets the *created after* query property to the given value.
-    pub fn created_after(mut self, new_value: &str) -> JobReportListCall<'a, C> {
+    pub fn created_after(mut self, new_value: &str) -> JobReportListCall<'a> {
         self._created_after = Some(new_value.to_string());
         self
     }
@@ -1507,7 +1503,7 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobReportListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobReportListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1532,7 +1528,7 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JobReportListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> JobReportListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1552,7 +1548,7 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobReportListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> JobReportListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1603,10 +1599,10 @@ impl<'a, C> JobReportListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobCreateCall<'a, C>
-    where C: 'a {
+pub struct JobCreateCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _request: Job,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1614,9 +1610,9 @@ pub struct JobCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for JobCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for JobCreateCall<'a> {}
 
-impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> JobCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1669,8 +1665,7 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1684,7 +1679,7 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1695,7 +1690,7 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1754,14 +1749,14 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Job) -> JobCreateCall<'a, C> {
+    pub fn request(mut self, new_value: Job) -> JobCreateCall<'a> {
         self._request = new_value;
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobCreateCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobCreateCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -1771,7 +1766,7 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1796,7 +1791,7 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JobCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> JobCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1816,7 +1811,7 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> JobCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1861,10 +1856,10 @@ impl<'a, C> JobCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobDeleteCall<'a, C>
-    where C: 'a {
+pub struct JobDeleteCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _job_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1872,9 +1867,9 @@ pub struct JobDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for JobDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for JobDeleteCall<'a> {}
 
-impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> JobDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1938,8 +1933,7 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1952,7 +1946,7 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1961,7 +1955,7 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2021,14 +2015,14 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobDeleteCall<'a, C> {
+    pub fn job_id(mut self, new_value: &str) -> JobDeleteCall<'a> {
         self._job_id = new_value.to_string();
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobDeleteCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobDeleteCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2038,7 +2032,7 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2063,7 +2057,7 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JobDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> JobDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2083,7 +2077,7 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> JobDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2128,10 +2122,10 @@ impl<'a, C> JobDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobGetCall<'a, C>
-    where C: 'a {
+pub struct JobGetCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _job_id: String,
     _on_behalf_of_content_owner: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2139,9 +2133,9 @@ pub struct JobGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for JobGetCall<'a, C> {}
+impl<'a> client::CallBuilder for JobGetCall<'a> {}
 
-impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> JobGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2205,8 +2199,7 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2219,7 +2212,7 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2228,7 +2221,7 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2288,14 +2281,14 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a, C> {
+    pub fn job_id(mut self, new_value: &str) -> JobGetCall<'a> {
         self._job_id = new_value.to_string();
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobGetCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobGetCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
@@ -2305,7 +2298,7 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2330,7 +2323,7 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2350,7 +2343,7 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> JobGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2398,10 +2391,10 @@ impl<'a, C> JobGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Htt
 ///              .doit().await;
 /// # }
 /// ```
-pub struct JobListCall<'a, C>
-    where C: 'a {
+pub struct JobListCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _on_behalf_of_content_owner: Option<String>,
@@ -2411,9 +2404,9 @@ pub struct JobListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for JobListCall<'a, C> {}
+impl<'a> client::CallBuilder for JobListCall<'a> {}
 
-impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> JobListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2464,8 +2457,7 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2478,7 +2470,7 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2487,7 +2479,7 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2544,28 +2536,28 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// A token identifying a page of results the server should return. Typically, this is the value of ListReportTypesResponse.next_page_token returned in response to the previous call to the `ListJobs` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> JobListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> JobListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer jobs than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> JobListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> JobListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> JobListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// If set to true, also system-managed jobs will be returned; otherwise only user-created jobs will be returned. System-managed jobs can neither be modified nor deleted.
     ///
     /// Sets the *include system managed* query property to the given value.
-    pub fn include_system_managed(mut self, new_value: bool) -> JobListCall<'a, C> {
+    pub fn include_system_managed(mut self, new_value: bool) -> JobListCall<'a> {
         self._include_system_managed = Some(new_value);
         self
     }
@@ -2575,7 +2567,7 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> JobListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2600,7 +2592,7 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2620,7 +2612,7 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> JobListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> JobListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2669,19 +2661,19 @@ impl<'a, C> JobListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MediaDownloadCall<'a, C>
-    where C: 'a {
+pub struct MediaDownloadCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _resource_name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MediaDownloadCall<'a, C> {}
+impl<'a> client::CallBuilder for MediaDownloadCall<'a> {}
 
-impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MediaDownloadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2762,8 +2754,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2776,7 +2767,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2785,7 +2776,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2845,7 +2836,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource_name(mut self, new_value: &str) -> MediaDownloadCall<'a, C> {
+    pub fn resource_name(mut self, new_value: &str) -> MediaDownloadCall<'a> {
         self._resource_name = new_value.to_string();
         self
     }
@@ -2855,7 +2846,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MediaDownloadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2880,7 +2871,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2900,7 +2891,7 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MediaDownloadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MediaDownloadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2948,10 +2939,10 @@ impl<'a, C> MediaDownloadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ReportTypeListCall<'a, C>
-    where C: 'a {
+pub struct ReportTypeListCall<'a>
+    where  {
 
-    hub: &'a YouTubeReporting<C>,
+    hub: &'a YouTubeReporting<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _on_behalf_of_content_owner: Option<String>,
@@ -2961,9 +2952,9 @@ pub struct ReportTypeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ReportTypeListCall<'a, C> {}
+impl<'a> client::CallBuilder for ReportTypeListCall<'a> {}
 
-impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ReportTypeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3014,8 +3005,7 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3028,7 +3018,7 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3037,7 +3027,7 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3094,28 +3084,28 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// A token identifying a page of results the server should return. Typically, this is the value of ListReportTypesResponse.next_page_token returned in response to the previous call to the `ListReportTypes` method.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ReportTypeListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ReportTypeListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Requested page size. Server may return fewer report types than requested. If unspecified, server will pick an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ReportTypeListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ReportTypeListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The content owner's external ID on which behalf the user is acting on. If not set, the user is acting for himself (his own channel).
     ///
     /// Sets the *on behalf of content owner* query property to the given value.
-    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ReportTypeListCall<'a, C> {
+    pub fn on_behalf_of_content_owner(mut self, new_value: &str) -> ReportTypeListCall<'a> {
         self._on_behalf_of_content_owner = Some(new_value.to_string());
         self
     }
     /// If set to true, also system-managed report types will be returned; otherwise only the report types that can be used to create new reporting jobs will be returned.
     ///
     /// Sets the *include system managed* query property to the given value.
-    pub fn include_system_managed(mut self, new_value: bool) -> ReportTypeListCall<'a, C> {
+    pub fn include_system_managed(mut self, new_value: bool) -> ReportTypeListCall<'a> {
         self._include_system_managed = Some(new_value);
         self
     }
@@ -3125,7 +3115,7 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportTypeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ReportTypeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3150,7 +3140,7 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ReportTypeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ReportTypeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3170,7 +3160,7 @@ impl<'a, C> ReportTypeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ReportTypeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ReportTypeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

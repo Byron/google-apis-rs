@@ -4,12 +4,12 @@
 [package]
 
 name = "google-vectortile1"
-version = "2.0.0+20210331"
+version = "2.0.3+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Semantic Tile (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/vectortile1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/vectortile1"
 homepage = "https://developers.google.com/maps/contact-sales/"
-documentation = "https://docs.rs/google-vectortile1/2.0.0+20210331"
+documentation = "https://docs.rs/google-vectortile1/2.0.3+20210331"
 license = "MIT"
 keywords = ["vectortile", "google", "protocol", "web", "api"]
 autobins = false

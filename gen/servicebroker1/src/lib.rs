@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Broker* crate version *2.0.0+20190624*, where *20190624* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Service Broker* crate version *2.0.3+20190624*, where *20190624* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Service Broker* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kubernetes-engine/docs/concepts/add-on/service-broker).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/servicebroker1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/servicebroker1).
 //! # Features
 //! 
 //! Use the following functionality with ease from the central [hub](ServiceBroker) ... 

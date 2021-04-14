@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-blogger3-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/blogger3-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/blogger3-cli).
 
 # Usage
 
-This documentation was generated from the *Blogger* API at revision *20210331*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Blogger* API at revision *20210331*. The CLI is at version *2.0.3*.
 
 ```bash
 blogger3 [options]

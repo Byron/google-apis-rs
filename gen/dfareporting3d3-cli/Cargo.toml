@@ -4,10 +4,10 @@
 [package]
 
 name = "google-dfareporting3d3-cli"
-version = "2.0.0+20210210"
+version = "2.0.3+20210210"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dfareporting (protocol v3.3)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/dfareporting3d3-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d3-cli"
 homepage = "https://developers.google.com/doubleclick-advertisers/"
 documentation = "http://byron.github.io/google-apis-rs/google_dfareporting3d3_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-dfareporting3d3]
 path = "../dfareporting3d3"
-version = "2.0.0+20210210"
+version = "2.0.3+20210210"

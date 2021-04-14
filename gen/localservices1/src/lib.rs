@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Localservices* crate version *2.0.0+20210330*, where *20210330* is the exact revision of the *localservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Localservices* crate version *2.0.3+20210330*, where *20210330* is the exact revision of the *localservices:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Localservices* *v1* API can be found at the
 //! [official documentation site](https://ads.google.com/local-services-ads/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/localservices1).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/localservices1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Localservices) ... 

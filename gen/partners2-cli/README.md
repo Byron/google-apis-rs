@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-partners2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/partners2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/partners2-cli).
 
 # Usage
 
-This documentation was generated from the *Partners* API at revision *20180925*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Partners* API at revision *20180925*. The CLI is at version *2.0.3*.
 
 ```bash
 partners2 [options]

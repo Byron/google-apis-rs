@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-androidpublisher3-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher3-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli).
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20210401*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Android Publisher* API at revision *20210401*. The CLI is at version *2.0.3*.
 
 ```bash
 androidpublisher3 [options]

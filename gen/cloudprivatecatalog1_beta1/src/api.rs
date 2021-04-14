@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -102,41 +101,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudPrivateCatalog<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudPrivateCatalog<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudPrivateCatalog<C> {}
+impl<'a, > client::Hub for CloudPrivateCatalog<> {}
 
-impl<'a, C> CloudPrivateCatalog<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudPrivateCatalog<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudPrivateCatalog<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudPrivateCatalog<> {
         CloudPrivateCatalog {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudprivatecatalog.googleapis.com/".to_string(),
             _root_url: "https://cloudprivatecatalog.googleapis.com/".to_string(),
         }
     }
 
-    pub fn folders(&'a self) -> FolderMethods<'a, C> {
+    pub fn folders(&'a self) -> FolderMethods<'a> {
         FolderMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a, C> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -472,15 +470,15 @@ impl client::Part for GoogleCloudPrivatecatalogV1beta1Version {}
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a, C>
-    where C: 'a {
+pub struct FolderMethods<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FolderMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
 
-impl<'a, C> FolderMethods<'a, C> {
+impl<'a> FolderMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -493,7 +491,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///                * `projects/{project_id}`
     ///                * `folders/{folder_id}`
     ///                * `organizations/{organization_id}`
-    pub fn catalogs_search(&self, resource: &str) -> FolderCatalogSearchCall<'a, C> {
+    pub fn catalogs_search(&self, resource: &str) -> FolderCatalogSearchCall<'a> {
         FolderCatalogSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -515,7 +513,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn products_search(&self, resource: &str) -> FolderProductSearchCall<'a, C> {
+    pub fn products_search(&self, resource: &str) -> FolderProductSearchCall<'a> {
         FolderProductSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -537,7 +535,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn versions_search(&self, resource: &str) -> FolderVersionSearchCall<'a, C> {
+    pub fn versions_search(&self, resource: &str) -> FolderVersionSearchCall<'a> {
         FolderVersionSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -583,15 +581,15 @@ impl<'a, C> FolderMethods<'a, C> {
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a, C>
-    where C: 'a {
+pub struct OrganizationMethods<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrganizationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
 
-impl<'a, C> OrganizationMethods<'a, C> {
+impl<'a> OrganizationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -604,7 +602,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///                * `projects/{project_id}`
     ///                * `folders/{folder_id}`
     ///                * `organizations/{organization_id}`
-    pub fn catalogs_search(&self, resource: &str) -> OrganizationCatalogSearchCall<'a, C> {
+    pub fn catalogs_search(&self, resource: &str) -> OrganizationCatalogSearchCall<'a> {
         OrganizationCatalogSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -626,7 +624,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn products_search(&self, resource: &str) -> OrganizationProductSearchCall<'a, C> {
+    pub fn products_search(&self, resource: &str) -> OrganizationProductSearchCall<'a> {
         OrganizationProductSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -648,7 +646,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn versions_search(&self, resource: &str) -> OrganizationVersionSearchCall<'a, C> {
+    pub fn versions_search(&self, resource: &str) -> OrganizationVersionSearchCall<'a> {
         OrganizationVersionSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -694,15 +692,15 @@ impl<'a, C> OrganizationMethods<'a, C> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -715,7 +713,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///                * `projects/{project_id}`
     ///                * `folders/{folder_id}`
     ///                * `organizations/{organization_id}`
-    pub fn catalogs_search(&self, resource: &str) -> ProjectCatalogSearchCall<'a, C> {
+    pub fn catalogs_search(&self, resource: &str) -> ProjectCatalogSearchCall<'a> {
         ProjectCatalogSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -737,7 +735,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn products_search(&self, resource: &str) -> ProjectProductSearchCall<'a, C> {
+    pub fn products_search(&self, resource: &str) -> ProjectProductSearchCall<'a> {
         ProjectProductSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -759,7 +757,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `resource` - Required. The name of the resource context. See
     ///                SearchCatalogsRequest.resource for details.
-    pub fn versions_search(&self, resource: &str) -> ProjectVersionSearchCall<'a, C> {
+    pub fn versions_search(&self, resource: &str) -> ProjectVersionSearchCall<'a> {
         ProjectVersionSearchCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -817,10 +815,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderCatalogSearchCall<'a, C>
-    where C: 'a {
+pub struct FolderCatalogSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -830,9 +828,9 @@ pub struct FolderCatalogSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderCatalogSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderCatalogSearchCall<'a> {}
 
-impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderCatalogSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -906,8 +904,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -920,7 +917,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -929,7 +926,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -993,7 +990,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> FolderCatalogSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -1002,7 +999,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * Get a single catalog: `name=catalogs/{catalog_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> FolderCatalogSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1011,14 +1008,14 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderCatalogSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderCatalogSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderCatalogSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderCatalogSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1028,7 +1025,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderCatalogSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderCatalogSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1053,7 +1050,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderCatalogSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderCatalogSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1073,7 +1070,7 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderCatalogSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderCatalogSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1121,10 +1118,10 @@ impl<'a, C> FolderCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderProductSearchCall<'a, C>
-    where C: 'a {
+pub struct FolderProductSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -1134,9 +1131,9 @@ pub struct FolderProductSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderProductSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderProductSearchCall<'a> {}
 
-impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderProductSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1210,8 +1207,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1224,7 +1220,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1233,7 +1229,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1294,7 +1290,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderProductSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> FolderProductSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -1307,7 +1303,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// `name=catalogs/{catalog_id}/products/{product_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> FolderProductSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> FolderProductSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1316,14 +1312,14 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderProductSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderProductSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderProductSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderProductSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1333,7 +1329,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderProductSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderProductSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1358,7 +1354,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderProductSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderProductSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1378,7 +1374,7 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderProductSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderProductSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1426,10 +1422,10 @@ impl<'a, C> FolderProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderVersionSearchCall<'a, C>
-    where C: 'a {
+pub struct FolderVersionSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -1439,9 +1435,9 @@ pub struct FolderVersionSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderVersionSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderVersionSearchCall<'a> {}
 
-impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderVersionSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1515,8 +1511,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1529,7 +1524,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1538,7 +1533,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1599,7 +1594,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> FolderVersionSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> FolderVersionSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -1612,7 +1607,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// `name=catalogs/{catalog_id}/products/{product_id}/versions/{version_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> FolderVersionSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> FolderVersionSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1621,14 +1616,14 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderVersionSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderVersionSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderVersionSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderVersionSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1638,7 +1633,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderVersionSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderVersionSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1663,7 +1658,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderVersionSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderVersionSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1683,7 +1678,7 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderVersionSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderVersionSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1731,10 +1726,10 @@ impl<'a, C> FolderVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationCatalogSearchCall<'a, C>
-    where C: 'a {
+pub struct OrganizationCatalogSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -1744,9 +1739,9 @@ pub struct OrganizationCatalogSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationCatalogSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationCatalogSearchCall<'a> {}
 
-impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationCatalogSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1820,8 +1815,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1834,7 +1828,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1843,7 +1837,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1907,7 +1901,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -1916,7 +1910,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * Get a single catalog: `name=catalogs/{catalog_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -1925,14 +1919,14 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationCatalogSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationCatalogSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationCatalogSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1942,7 +1936,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationCatalogSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationCatalogSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1967,7 +1961,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationCatalogSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationCatalogSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1987,7 +1981,7 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationCatalogSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationCatalogSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2035,10 +2029,10 @@ impl<'a, C> OrganizationCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationProductSearchCall<'a, C>
-    where C: 'a {
+pub struct OrganizationProductSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -2048,9 +2042,9 @@ pub struct OrganizationProductSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationProductSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationProductSearchCall<'a> {}
 
-impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationProductSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2124,8 +2118,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2138,7 +2131,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2147,7 +2140,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2208,7 +2201,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationProductSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -2221,7 +2214,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// `name=catalogs/{catalog_id}/products/{product_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> OrganizationProductSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2230,14 +2223,14 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationProductSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationProductSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationProductSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationProductSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2247,7 +2240,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationProductSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationProductSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2272,7 +2265,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationProductSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationProductSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2292,7 +2285,7 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationProductSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationProductSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2340,10 +2333,10 @@ impl<'a, C> OrganizationProductSearchCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationVersionSearchCall<'a, C>
-    where C: 'a {
+pub struct OrganizationVersionSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -2353,9 +2346,9 @@ pub struct OrganizationVersionSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationVersionSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationVersionSearchCall<'a> {}
 
-impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationVersionSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2429,8 +2422,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2443,7 +2435,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2452,7 +2444,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2513,7 +2505,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -2526,7 +2518,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// `name=catalogs/{catalog_id}/products/{product_id}/versions/{version_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2535,14 +2527,14 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationVersionSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationVersionSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationVersionSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2552,7 +2544,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationVersionSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationVersionSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2577,7 +2569,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationVersionSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationVersionSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2597,7 +2589,7 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationVersionSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationVersionSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2645,10 +2637,10 @@ impl<'a, C> OrganizationVersionSearchCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectCatalogSearchCall<'a, C>
-    where C: 'a {
+pub struct ProjectCatalogSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -2658,9 +2650,9 @@ pub struct ProjectCatalogSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectCatalogSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectCatalogSearchCall<'a> {}
 
-impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectCatalogSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2734,8 +2726,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2748,7 +2739,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2757,7 +2748,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2821,7 +2812,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -2830,7 +2821,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * Get a single catalog: `name=catalogs/{catalog_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -2839,14 +2830,14 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectCatalogSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectCatalogSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectCatalogSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2856,7 +2847,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCatalogSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectCatalogSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2881,7 +2872,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectCatalogSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectCatalogSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2901,7 +2892,7 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectCatalogSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectCatalogSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2949,10 +2940,10 @@ impl<'a, C> ProjectCatalogSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProductSearchCall<'a, C>
-    where C: 'a {
+pub struct ProjectProductSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -2962,9 +2953,9 @@ pub struct ProjectProductSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectProductSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectProductSearchCall<'a> {}
 
-impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectProductSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3038,8 +3029,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3052,7 +3042,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3061,7 +3051,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3122,7 +3112,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectProductSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectProductSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -3135,7 +3125,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// `name=catalogs/{catalog_id}/products/{product_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectProductSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> ProjectProductSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -3144,14 +3134,14 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectProductSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectProductSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectProductSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectProductSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3161,7 +3151,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProductSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProductSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3186,7 +3176,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProductSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProductSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3206,7 +3196,7 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProductSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProductSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3254,10 +3244,10 @@ impl<'a, C> ProjectProductSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectVersionSearchCall<'a, C>
-    where C: 'a {
+pub struct ProjectVersionSearchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalog<C>,
+    hub: &'a CloudPrivateCatalog<>,
     _resource: String,
     _query: Option<String>,
     _page_token: Option<String>,
@@ -3267,9 +3257,9 @@ pub struct ProjectVersionSearchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectVersionSearchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectVersionSearchCall<'a> {}
 
-impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectVersionSearchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3343,8 +3333,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3357,7 +3346,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3366,7 +3355,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3427,7 +3416,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> ProjectVersionSearchCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -3440,7 +3429,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// `name=catalogs/{catalog_id}/products/{product_id}/versions/{version_id}`
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> ProjectVersionSearchCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
@@ -3449,14 +3438,14 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectVersionSearchCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectVersionSearchCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of entries that are requested.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectVersionSearchCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectVersionSearchCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3466,7 +3455,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectVersionSearchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectVersionSearchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3491,7 +3480,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectVersionSearchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectVersionSearchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3511,7 +3500,7 @@ impl<'a, C> ProjectVersionSearchCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectVersionSearchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectVersionSearchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

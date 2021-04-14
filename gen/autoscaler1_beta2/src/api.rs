@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,41 +105,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct AutoscalerHub<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct AutoscalerHub<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for AutoscalerHub<C> {}
+impl<'a, > client::Hub for AutoscalerHub<> {}
 
-impl<'a, C> AutoscalerHub<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > AutoscalerHub<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AutoscalerHub<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> AutoscalerHub<> {
         AutoscalerHub {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/autoscaler/v1beta2/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn autoscalers(&'a self) -> AutoscalerMethods<'a, C> {
+    pub fn autoscalers(&'a self) -> AutoscalerMethods<'a> {
         AutoscalerMethods { hub: &self }
     }
-    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a, C> {
+    pub fn zone_operations(&'a self) -> ZoneOperationMethods<'a> {
         ZoneOperationMethods { hub: &self }
     }
-    pub fn zones(&'a self) -> ZoneMethods<'a, C> {
+    pub fn zones(&'a self) -> ZoneMethods<'a> {
         ZoneMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -624,15 +622,15 @@ impl client::Part for ZoneMaintenanceWindows {}
 /// let rb = hub.autoscalers();
 /// # }
 /// ```
-pub struct AutoscalerMethods<'a, C>
-    where C: 'a {
+pub struct AutoscalerMethods<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AutoscalerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AutoscalerMethods<'a> {}
 
-impl<'a, C> AutoscalerMethods<'a, C> {
+impl<'a> AutoscalerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -643,7 +641,7 @@ impl<'a, C> AutoscalerMethods<'a, C> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn delete(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerDeleteCall<'a, C> {
+    pub fn delete(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerDeleteCall<'a> {
         AutoscalerDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -664,7 +662,7 @@ impl<'a, C> AutoscalerMethods<'a, C> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn get(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerGetCall<'a, C> {
+    pub fn get(&self, project: &str, zone: &str, autoscaler: &str) -> AutoscalerGetCall<'a> {
         AutoscalerGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -685,7 +683,7 @@ impl<'a, C> AutoscalerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
-    pub fn insert(&self, request: Autoscaler, project: &str, zone: &str) -> AutoscalerInsertCall<'a, C> {
+    pub fn insert(&self, request: Autoscaler, project: &str, zone: &str) -> AutoscalerInsertCall<'a> {
         AutoscalerInsertCall {
             hub: self.hub,
             _request: request,
@@ -705,7 +703,7 @@ impl<'a, C> AutoscalerMethods<'a, C> {
     ///
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
-    pub fn list(&self, project: &str, zone: &str) -> AutoscalerListCall<'a, C> {
+    pub fn list(&self, project: &str, zone: &str) -> AutoscalerListCall<'a> {
         AutoscalerListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -729,7 +727,7 @@ impl<'a, C> AutoscalerMethods<'a, C> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn patch(&self, request: Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerPatchCall<'a, C> {
+    pub fn patch(&self, request: Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerPatchCall<'a> {
         AutoscalerPatchCall {
             hub: self.hub,
             _request: request,
@@ -752,7 +750,7 @@ impl<'a, C> AutoscalerMethods<'a, C> {
     /// * `project` - Project ID of Autoscaler resource.
     /// * `zone` - Zone name of Autoscaler resource.
     /// * `autoscaler` - Name of the Autoscaler resource.
-    pub fn update(&self, request: Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerUpdateCall<'a, C> {
+    pub fn update(&self, request: Autoscaler, project: &str, zone: &str, autoscaler: &str) -> AutoscalerUpdateCall<'a> {
         AutoscalerUpdateCall {
             hub: self.hub,
             _request: request,
@@ -798,15 +796,15 @@ impl<'a, C> AutoscalerMethods<'a, C> {
 /// let rb = hub.zone_operations();
 /// # }
 /// ```
-pub struct ZoneOperationMethods<'a, C>
-    where C: 'a {
+pub struct ZoneOperationMethods<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ZoneOperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ZoneOperationMethods<'a> {}
 
-impl<'a, C> ZoneOperationMethods<'a, C> {
+impl<'a> ZoneOperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -817,7 +815,7 @@ impl<'a, C> ZoneOperationMethods<'a, C> {
     /// * `project` - No description provided.
     /// * `zone` - No description provided.
     /// * `operation` - No description provided.
-    pub fn delete(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationDeleteCall<'a, C> {
+    pub fn delete(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationDeleteCall<'a> {
         ZoneOperationDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -838,7 +836,7 @@ impl<'a, C> ZoneOperationMethods<'a, C> {
     /// * `project` - No description provided.
     /// * `zone` - No description provided.
     /// * `operation` - No description provided.
-    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a, C> {
+    pub fn get(&self, project: &str, zone: &str, operation: &str) -> ZoneOperationGetCall<'a> {
         ZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -858,7 +856,7 @@ impl<'a, C> ZoneOperationMethods<'a, C> {
     ///
     /// * `project` - No description provided.
     /// * `zone` - No description provided.
-    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a, C> {
+    pub fn list(&self, project: &str, zone: &str) -> ZoneOperationListCall<'a> {
         ZoneOperationListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -905,15 +903,15 @@ impl<'a, C> ZoneOperationMethods<'a, C> {
 /// let rb = hub.zones();
 /// # }
 /// ```
-pub struct ZoneMethods<'a, C>
-    where C: 'a {
+pub struct ZoneMethods<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ZoneMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ZoneMethods<'a> {}
 
-impl<'a, C> ZoneMethods<'a, C> {
+impl<'a> ZoneMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -922,7 +920,7 @@ impl<'a, C> ZoneMethods<'a, C> {
     /// # Arguments
     ///
     /// * `project` - No description provided.
-    pub fn list(&self, project: &str) -> ZoneListCall<'a, C> {
+    pub fn list(&self, project: &str) -> ZoneListCall<'a> {
         ZoneListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -976,10 +974,10 @@ impl<'a, C> ZoneMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutoscalerDeleteCall<'a, C>
-    where C: 'a {
+pub struct AutoscalerDeleteCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _zone: String,
     _autoscaler: String,
@@ -988,9 +986,9 @@ pub struct AutoscalerDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AutoscalerDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for AutoscalerDeleteCall<'a> {}
 
-impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutoscalerDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1053,8 +1051,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1067,7 +1064,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1076,7 +1073,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1136,7 +1133,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerDeleteCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1146,7 +1143,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerDeleteCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -1156,7 +1153,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerDeleteCall<'a, C> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerDeleteCall<'a> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -1166,7 +1163,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1187,7 +1184,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1207,7 +1204,7 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1251,10 +1248,10 @@ impl<'a, C> AutoscalerDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutoscalerGetCall<'a, C>
-    where C: 'a {
+pub struct AutoscalerGetCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _zone: String,
     _autoscaler: String,
@@ -1263,9 +1260,9 @@ pub struct AutoscalerGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AutoscalerGetCall<'a, C> {}
+impl<'a> client::CallBuilder for AutoscalerGetCall<'a> {}
 
-impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutoscalerGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1328,8 +1325,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1342,7 +1338,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1351,7 +1347,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1411,7 +1407,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> AutoscalerGetCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerGetCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1421,7 +1417,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerGetCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerGetCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -1431,7 +1427,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerGetCall<'a, C> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerGetCall<'a> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -1441,7 +1437,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1462,7 +1458,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1482,7 +1478,7 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1532,10 +1528,10 @@ impl<'a, C> AutoscalerGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutoscalerInsertCall<'a, C>
-    where C: 'a {
+pub struct AutoscalerInsertCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _request: Autoscaler,
     _project: String,
     _zone: String,
@@ -1544,9 +1540,9 @@ pub struct AutoscalerInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AutoscalerInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for AutoscalerInsertCall<'a> {}
 
-impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutoscalerInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1619,8 +1615,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1634,7 +1629,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1645,7 +1640,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1704,7 +1699,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Autoscaler) -> AutoscalerInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Autoscaler) -> AutoscalerInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -1714,7 +1709,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerInsertCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1724,7 +1719,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerInsertCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerInsertCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -1734,7 +1729,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1755,7 +1750,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1775,7 +1770,7 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1822,10 +1817,10 @@ impl<'a, C> AutoscalerInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutoscalerListCall<'a, C>
-    where C: 'a {
+pub struct AutoscalerListCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -1836,9 +1831,9 @@ pub struct AutoscalerListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AutoscalerListCall<'a, C> {}
+impl<'a> client::CallBuilder for AutoscalerListCall<'a> {}
 
-impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutoscalerListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1909,8 +1904,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1923,7 +1917,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1932,7 +1926,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1992,7 +1986,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> AutoscalerListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerListCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2002,25 +1996,25 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerListCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerListCall<'a> {
         self._zone = new_value.to_string();
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AutoscalerListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AutoscalerListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> AutoscalerListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> AutoscalerListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> AutoscalerListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> AutoscalerListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2030,7 +2024,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2051,7 +2045,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2071,7 +2065,7 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2121,10 +2115,10 @@ impl<'a, C> AutoscalerListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutoscalerPatchCall<'a, C>
-    where C: 'a {
+pub struct AutoscalerPatchCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _request: Autoscaler,
     _project: String,
     _zone: String,
@@ -2134,9 +2128,9 @@ pub struct AutoscalerPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AutoscalerPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for AutoscalerPatchCall<'a> {}
 
-impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutoscalerPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2210,8 +2204,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2225,7 +2218,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2236,7 +2229,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2295,7 +2288,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Autoscaler) -> AutoscalerPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Autoscaler) -> AutoscalerPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2305,7 +2298,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerPatchCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2315,7 +2308,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerPatchCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -2325,7 +2318,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerPatchCall<'a, C> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerPatchCall<'a> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -2335,7 +2328,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2356,7 +2349,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2376,7 +2369,7 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2426,10 +2419,10 @@ impl<'a, C> AutoscalerPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AutoscalerUpdateCall<'a, C>
-    where C: 'a {
+pub struct AutoscalerUpdateCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _request: Autoscaler,
     _project: String,
     _zone: String,
@@ -2439,9 +2432,9 @@ pub struct AutoscalerUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AutoscalerUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for AutoscalerUpdateCall<'a> {}
 
-impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AutoscalerUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2515,8 +2508,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2530,7 +2522,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2541,7 +2533,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2600,7 +2592,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Autoscaler) -> AutoscalerUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Autoscaler) -> AutoscalerUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2610,7 +2602,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> AutoscalerUpdateCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2620,7 +2612,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> AutoscalerUpdateCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -2630,7 +2622,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerUpdateCall<'a, C> {
+    pub fn autoscaler(mut self, new_value: &str) -> AutoscalerUpdateCall<'a> {
         self._autoscaler = new_value.to_string();
         self
     }
@@ -2640,7 +2632,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AutoscalerUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2661,7 +2653,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AutoscalerUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2681,7 +2673,7 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AutoscalerUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2725,10 +2717,10 @@ impl<'a, C> AutoscalerUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationDeleteCall<'a, C>
-    where C: 'a {
+pub struct ZoneOperationDeleteCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -2737,9 +2729,9 @@ pub struct ZoneOperationDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ZoneOperationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for ZoneOperationDeleteCall<'a> {}
 
-impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ZoneOperationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2801,8 +2793,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2815,7 +2806,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2824,7 +2815,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2873,7 +2864,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2882,7 +2873,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -2891,7 +2882,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a, C> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationDeleteCall<'a> {
         self._operation = new_value.to_string();
         self
     }
@@ -2901,7 +2892,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2922,7 +2913,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2942,7 +2933,7 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2986,10 +2977,10 @@ impl<'a, C> ZoneOperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationGetCall<'a, C>
-    where C: 'a {
+pub struct ZoneOperationGetCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _zone: String,
     _operation: String,
@@ -2998,9 +2989,9 @@ pub struct ZoneOperationGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ZoneOperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ZoneOperationGetCall<'a> {}
 
-impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ZoneOperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3063,8 +3054,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3077,7 +3067,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3086,7 +3076,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3145,7 +3135,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -3154,7 +3144,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
         self._zone = new_value.to_string();
         self
     }
@@ -3163,7 +3153,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a, C> {
+    pub fn operation(mut self, new_value: &str) -> ZoneOperationGetCall<'a> {
         self._operation = new_value.to_string();
         self
     }
@@ -3173,7 +3163,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3194,7 +3184,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3214,7 +3204,7 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3261,10 +3251,10 @@ impl<'a, C> ZoneOperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneOperationListCall<'a, C>
-    where C: 'a {
+pub struct ZoneOperationListCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _zone: String,
     _page_token: Option<String>,
@@ -3275,9 +3265,9 @@ pub struct ZoneOperationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ZoneOperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ZoneOperationListCall<'a> {}
 
-impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ZoneOperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3348,8 +3338,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3362,7 +3351,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3371,7 +3360,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3430,7 +3419,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -3439,25 +3428,25 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a, C> {
+    pub fn zone(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
         self._zone = new_value.to_string();
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneOperationListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ZoneOperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3467,7 +3456,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneOperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3488,7 +3477,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneOperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3508,7 +3497,7 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneOperationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3555,10 +3544,10 @@ impl<'a, C> ZoneOperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ZoneListCall<'a, C>
-    where C: 'a {
+pub struct ZoneListCall<'a>
+    where  {
 
-    hub: &'a AutoscalerHub<C>,
+    hub: &'a AutoscalerHub<>,
     _project: String,
     _page_token: Option<String>,
     _max_results: Option<u32>,
@@ -3568,9 +3557,9 @@ pub struct ZoneListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ZoneListCall<'a, C> {}
+impl<'a> client::CallBuilder for ZoneListCall<'a> {}
 
-impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ZoneListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3640,8 +3629,7 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3654,7 +3642,7 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3663,7 +3651,7 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3722,25 +3710,25 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ZoneListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> ZoneListCall<'a> {
         self._project = new_value.to_string();
         self
     }
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ZoneListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ZoneListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> ZoneListCall<'a, C> {
+    pub fn max_results(mut self, new_value: u32) -> ZoneListCall<'a> {
         self._max_results = Some(new_value);
         self
     }
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ZoneListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ZoneListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -3750,7 +3738,7 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ZoneListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3771,7 +3759,7 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> ZoneListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ZoneListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3791,7 +3779,7 @@ impl<'a, C> ZoneListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ZoneListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

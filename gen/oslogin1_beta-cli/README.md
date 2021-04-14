@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-oslogin1_beta-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/oslogin1_beta-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/oslogin1_beta-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud OS Login* API at revision *20210316*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud OS Login* API at revision *20210316*. The CLI is at version *2.0.3*.
 
 ```bash
 oslogin1-beta [options]

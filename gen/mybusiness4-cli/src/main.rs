@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::MyBusiness<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::MyBusiness,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -7420,7 +7419,7 @@ async fn main() {
     
     let mut app = App::new("mybusiness4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+0")
+           .version("2.0.3+0")
            .about("The Google My Business API provides an interface for managing business location information on Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusiness4_cli")
            .arg(Arg::with_name("folder")

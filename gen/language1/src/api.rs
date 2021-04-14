@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudNaturalLanguage<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudNaturalLanguage<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudNaturalLanguage<C> {}
+impl<'a, > client::Hub for CloudNaturalLanguage<> {}
 
-impl<'a, C> CloudNaturalLanguage<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudNaturalLanguage<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudNaturalLanguage<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudNaturalLanguage<> {
         CloudNaturalLanguage {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://language.googleapis.com/".to_string(),
             _root_url: "https://language.googleapis.com/".to_string(),
         }
     }
 
-    pub fn documents(&'a self) -> DocumentMethods<'a, C> {
+    pub fn documents(&'a self) -> DocumentMethods<'a> {
         DocumentMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -689,15 +687,15 @@ impl client::Part for Token {}
 /// let rb = hub.documents();
 /// # }
 /// ```
-pub struct DocumentMethods<'a, C>
-    where C: 'a {
+pub struct DocumentMethods<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DocumentMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DocumentMethods<'a> {}
 
-impl<'a, C> DocumentMethods<'a, C> {
+impl<'a> DocumentMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -706,7 +704,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_entities(&self, request: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a, C> {
+    pub fn analyze_entities(&self, request: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a> {
         DocumentAnalyzeEntityCall {
             hub: self.hub,
             _request: request,
@@ -723,7 +721,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_entity_sentiment(&self, request: AnalyzeEntitySentimentRequest) -> DocumentAnalyzeEntitySentimentCall<'a, C> {
+    pub fn analyze_entity_sentiment(&self, request: AnalyzeEntitySentimentRequest) -> DocumentAnalyzeEntitySentimentCall<'a> {
         DocumentAnalyzeEntitySentimentCall {
             hub: self.hub,
             _request: request,
@@ -740,7 +738,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_sentiment(&self, request: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a, C> {
+    pub fn analyze_sentiment(&self, request: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a> {
         DocumentAnalyzeSentimentCall {
             hub: self.hub,
             _request: request,
@@ -757,7 +755,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn analyze_syntax(&self, request: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, C> {
+    pub fn analyze_syntax(&self, request: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a> {
         DocumentAnalyzeSyntaxCall {
             hub: self.hub,
             _request: request,
@@ -774,7 +772,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn annotate_text(&self, request: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, C> {
+    pub fn annotate_text(&self, request: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a> {
         DocumentAnnotateTextCall {
             hub: self.hub,
             _request: request,
@@ -791,7 +789,7 @@ impl<'a, C> DocumentMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn classify_text(&self, request: ClassifyTextRequest) -> DocumentClassifyTextCall<'a, C> {
+    pub fn classify_text(&self, request: ClassifyTextRequest) -> DocumentClassifyTextCall<'a> {
         DocumentClassifyTextCall {
             hub: self.hub,
             _request: request,
@@ -848,19 +846,19 @@ impl<'a, C> DocumentMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeEntityCall<'a, C>
-    where C: 'a {
+pub struct DocumentAnalyzeEntityCall<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
     _request: AnalyzeEntitiesRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentAnalyzeEntityCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentAnalyzeEntityCall<'a> {}
 
-impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentAnalyzeEntityCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -910,8 +908,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -925,7 +922,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -936,7 +933,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -995,7 +992,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a, C> {
+    pub fn request(mut self, new_value: AnalyzeEntitiesRequest) -> DocumentAnalyzeEntityCall<'a> {
         self._request = new_value;
         self
     }
@@ -1005,7 +1002,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntityCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntityCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1030,7 +1027,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntityCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntityCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1050,7 +1047,7 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeEntityCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeEntityCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1100,19 +1097,19 @@ impl<'a, C> DocumentAnalyzeEntityCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeEntitySentimentCall<'a, C>
-    where C: 'a {
+pub struct DocumentAnalyzeEntitySentimentCall<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
     _request: AnalyzeEntitySentimentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentAnalyzeEntitySentimentCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentAnalyzeEntitySentimentCall<'a> {}
 
-impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentAnalyzeEntitySentimentCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1162,8 +1159,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1177,7 +1173,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1188,7 +1184,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1247,7 +1243,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeEntitySentimentRequest) -> DocumentAnalyzeEntitySentimentCall<'a, C> {
+    pub fn request(mut self, new_value: AnalyzeEntitySentimentRequest) -> DocumentAnalyzeEntitySentimentCall<'a> {
         self._request = new_value;
         self
     }
@@ -1257,7 +1253,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntitySentimentCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeEntitySentimentCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1282,7 +1278,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntitySentimentCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeEntitySentimentCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1302,7 +1298,7 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeEntitySentimentCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeEntitySentimentCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1352,19 +1348,19 @@ impl<'a, C> DocumentAnalyzeEntitySentimentCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeSentimentCall<'a, C>
-    where C: 'a {
+pub struct DocumentAnalyzeSentimentCall<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
     _request: AnalyzeSentimentRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentAnalyzeSentimentCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentAnalyzeSentimentCall<'a> {}
 
-impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentAnalyzeSentimentCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1414,8 +1410,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1429,7 +1424,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1440,7 +1435,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1499,7 +1494,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a, C> {
+    pub fn request(mut self, new_value: AnalyzeSentimentRequest) -> DocumentAnalyzeSentimentCall<'a> {
         self._request = new_value;
         self
     }
@@ -1509,7 +1504,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSentimentCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSentimentCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1534,7 +1529,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSentimentCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSentimentCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1554,7 +1549,7 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeSentimentCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeSentimentCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1604,19 +1599,19 @@ impl<'a, C> DocumentAnalyzeSentimentCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnalyzeSyntaxCall<'a, C>
-    where C: 'a {
+pub struct DocumentAnalyzeSyntaxCall<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
     _request: AnalyzeSyntaxRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentAnalyzeSyntaxCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentAnalyzeSyntaxCall<'a> {}
 
-impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentAnalyzeSyntaxCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1666,8 +1661,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1681,7 +1675,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1692,7 +1686,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1751,7 +1745,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a, C> {
+    pub fn request(mut self, new_value: AnalyzeSyntaxRequest) -> DocumentAnalyzeSyntaxCall<'a> {
         self._request = new_value;
         self
     }
@@ -1761,7 +1755,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSyntaxCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnalyzeSyntaxCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1786,7 +1780,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSyntaxCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnalyzeSyntaxCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1806,7 +1800,7 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeSyntaxCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnalyzeSyntaxCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1856,19 +1850,19 @@ impl<'a, C> DocumentAnalyzeSyntaxCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentAnnotateTextCall<'a, C>
-    where C: 'a {
+pub struct DocumentAnnotateTextCall<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
     _request: AnnotateTextRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentAnnotateTextCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentAnnotateTextCall<'a> {}
 
-impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentAnnotateTextCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1918,8 +1912,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1933,7 +1926,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1944,7 +1937,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2003,7 +1996,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a, C> {
+    pub fn request(mut self, new_value: AnnotateTextRequest) -> DocumentAnnotateTextCall<'a> {
         self._request = new_value;
         self
     }
@@ -2013,7 +2006,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnnotateTextCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentAnnotateTextCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2038,7 +2031,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnnotateTextCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentAnnotateTextCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2058,7 +2051,7 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnnotateTextCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentAnnotateTextCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2108,19 +2101,19 @@ impl<'a, C> DocumentAnnotateTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DocumentClassifyTextCall<'a, C>
-    where C: 'a {
+pub struct DocumentClassifyTextCall<'a>
+    where  {
 
-    hub: &'a CloudNaturalLanguage<C>,
+    hub: &'a CloudNaturalLanguage<>,
     _request: ClassifyTextRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DocumentClassifyTextCall<'a, C> {}
+impl<'a> client::CallBuilder for DocumentClassifyTextCall<'a> {}
 
-impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DocumentClassifyTextCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2170,8 +2163,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2185,7 +2177,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2196,7 +2188,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2255,7 +2247,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ClassifyTextRequest) -> DocumentClassifyTextCall<'a, C> {
+    pub fn request(mut self, new_value: ClassifyTextRequest) -> DocumentClassifyTextCall<'a> {
         self._request = new_value;
         self
     }
@@ -2265,7 +2257,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentClassifyTextCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DocumentClassifyTextCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2290,7 +2282,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DocumentClassifyTextCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DocumentClassifyTextCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2310,7 +2302,7 @@ impl<'a, C> DocumentClassifyTextCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentClassifyTextCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DocumentClassifyTextCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

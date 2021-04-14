@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,38 +104,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Taskqueue<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Taskqueue<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Taskqueue<C> {}
+impl<'a, > client::Hub for Taskqueue<> {}
 
-impl<'a, C> Taskqueue<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Taskqueue<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Taskqueue<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Taskqueue<> {
         Taskqueue {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/taskqueue/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn taskqueues(&'a self) -> TaskqueueMethods<'a, C> {
+    pub fn taskqueues(&'a self) -> TaskqueueMethods<'a> {
         TaskqueueMethods { hub: &self }
     }
-    pub fn tasks(&'a self) -> TaskMethods<'a, C> {
+    pub fn tasks(&'a self) -> TaskMethods<'a> {
         TaskMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -356,15 +354,15 @@ impl client::Part for TaskQueueStats {}
 /// let rb = hub.taskqueues();
 /// # }
 /// ```
-pub struct TaskqueueMethods<'a, C>
-    where C: 'a {
+pub struct TaskqueueMethods<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TaskqueueMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TaskqueueMethods<'a> {}
 
-impl<'a, C> TaskqueueMethods<'a, C> {
+impl<'a> TaskqueueMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -374,7 +372,7 @@ impl<'a, C> TaskqueueMethods<'a, C> {
     ///
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The id of the taskqueue to get the properties of.
-    pub fn get(&self, project: &str, taskqueue: &str) -> TaskqueueGetCall<'a, C> {
+    pub fn get(&self, project: &str, taskqueue: &str) -> TaskqueueGetCall<'a> {
         TaskqueueGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -419,15 +417,15 @@ impl<'a, C> TaskqueueMethods<'a, C> {
 /// let rb = hub.tasks();
 /// # }
 /// ```
-pub struct TaskMethods<'a, C>
-    where C: 'a {
+pub struct TaskMethods<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TaskMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TaskMethods<'a> {}
 
-impl<'a, C> TaskMethods<'a, C> {
+impl<'a> TaskMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -438,7 +436,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The taskqueue to delete a task from.
     /// * `task` - The id of the task to delete.
-    pub fn delete(&self, project: &str, taskqueue: &str, task: &str) -> TaskDeleteCall<'a, C> {
+    pub fn delete(&self, project: &str, taskqueue: &str, task: &str) -> TaskDeleteCall<'a> {
         TaskDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -459,7 +457,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The taskqueue in which the task belongs.
     /// * `task` - The task to get properties of.
-    pub fn get(&self, project: &str, taskqueue: &str, task: &str) -> TaskGetCall<'a, C> {
+    pub fn get(&self, project: &str, taskqueue: &str, task: &str) -> TaskGetCall<'a> {
         TaskGetCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -480,7 +478,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `project` - The project under which the queue lies
     /// * `taskqueue` - The taskqueue to insert the task into
-    pub fn insert(&self, request: Task, project: &str, taskqueue: &str) -> TaskInsertCall<'a, C> {
+    pub fn insert(&self, request: Task, project: &str, taskqueue: &str) -> TaskInsertCall<'a> {
         TaskInsertCall {
             hub: self.hub,
             _request: request,
@@ -502,7 +500,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `taskqueue` - The taskqueue to lease a task from.
     /// * `numTasks` - The number of tasks to lease.
     /// * `leaseSecs` - The lease in seconds.
-    pub fn lease(&self, project: &str, taskqueue: &str, num_tasks: i32, lease_secs: i32) -> TaskLeaseCall<'a, C> {
+    pub fn lease(&self, project: &str, taskqueue: &str, num_tasks: i32, lease_secs: i32) -> TaskLeaseCall<'a> {
         TaskLeaseCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -525,7 +523,7 @@ impl<'a, C> TaskMethods<'a, C> {
     ///
     /// * `project` - The project under which the queue lies.
     /// * `taskqueue` - The id of the taskqueue to list tasks from.
-    pub fn list(&self, project: &str, taskqueue: &str) -> TaskListCall<'a, C> {
+    pub fn list(&self, project: &str, taskqueue: &str) -> TaskListCall<'a> {
         TaskListCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -547,7 +545,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `taskqueue` - No description provided.
     /// * `task` - No description provided.
     /// * `newLeaseSeconds` - The new lease in seconds.
-    pub fn patch(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskPatchCall<'a, C> {
+    pub fn patch(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskPatchCall<'a> {
         TaskPatchCall {
             hub: self.hub,
             _request: request,
@@ -572,7 +570,7 @@ impl<'a, C> TaskMethods<'a, C> {
     /// * `taskqueue` - No description provided.
     /// * `task` - No description provided.
     /// * `newLeaseSeconds` - The new lease in seconds.
-    pub fn update(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskUpdateCall<'a, C> {
+    pub fn update(&self, request: Task, project: &str, taskqueue: &str, task: &str, new_lease_seconds: i32) -> TaskUpdateCall<'a> {
         TaskUpdateCall {
             hub: self.hub,
             _request: request,
@@ -628,10 +626,10 @@ impl<'a, C> TaskMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskqueueGetCall<'a, C>
-    where C: 'a {
+pub struct TaskqueueGetCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _project: String,
     _taskqueue: String,
     _get_stats: Option<bool>,
@@ -640,9 +638,9 @@ pub struct TaskqueueGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskqueueGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskqueueGetCall<'a> {}
 
-impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskqueueGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -707,8 +705,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -721,7 +718,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -730,7 +727,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -790,7 +787,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskqueueGetCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskqueueGetCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -800,14 +797,14 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskqueueGetCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskqueueGetCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
     /// Whether to get stats. Optional.
     ///
     /// Sets the *get stats* query property to the given value.
-    pub fn get_stats(mut self, new_value: bool) -> TaskqueueGetCall<'a, C> {
+    pub fn get_stats(mut self, new_value: bool) -> TaskqueueGetCall<'a> {
         self._get_stats = Some(new_value);
         self
     }
@@ -817,7 +814,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskqueueGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskqueueGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -838,7 +835,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskqueueGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskqueueGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -858,7 +855,7 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskqueueGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskqueueGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -902,10 +899,10 @@ impl<'a, C> TaskqueueGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskDeleteCall<'a, C>
-    where C: 'a {
+pub struct TaskDeleteCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _project: String,
     _taskqueue: String,
     _task: String,
@@ -914,9 +911,9 @@ pub struct TaskDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskDeleteCall<'a> {}
 
-impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -978,8 +975,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -992,7 +988,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1001,7 +997,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1051,7 +1047,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskDeleteCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskDeleteCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1061,7 +1057,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskDeleteCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskDeleteCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1071,7 +1067,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskDeleteCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -1081,7 +1077,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1102,7 +1098,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1122,7 +1118,7 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1166,10 +1162,10 @@ impl<'a, C> TaskDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskGetCall<'a, C>
-    where C: 'a {
+pub struct TaskGetCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _project: String,
     _taskqueue: String,
     _task: String,
@@ -1178,9 +1174,9 @@ pub struct TaskGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskGetCall<'a> {}
 
-impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1243,8 +1239,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1257,7 +1252,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1266,7 +1261,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1326,7 +1321,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskGetCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskGetCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1336,7 +1331,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskGetCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskGetCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1346,7 +1341,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskGetCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -1356,7 +1351,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1377,7 +1372,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1397,7 +1392,7 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1447,10 +1442,10 @@ impl<'a, C> TaskGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskInsertCall<'a, C>
-    where C: 'a {
+pub struct TaskInsertCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _request: Task,
     _project: String,
     _taskqueue: String,
@@ -1459,9 +1454,9 @@ pub struct TaskInsertCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskInsertCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskInsertCall<'a> {}
 
-impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskInsertCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1534,8 +1529,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1549,7 +1543,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1560,7 +1554,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1619,7 +1613,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a, C> {
+    pub fn request(mut self, new_value: Task) -> TaskInsertCall<'a> {
         self._request = new_value;
         self
     }
@@ -1629,7 +1623,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskInsertCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskInsertCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1639,7 +1633,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskInsertCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskInsertCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1649,7 +1643,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskInsertCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1670,7 +1664,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskInsertCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1690,7 +1684,7 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskInsertCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskInsertCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1736,10 +1730,10 @@ impl<'a, C> TaskInsertCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskLeaseCall<'a, C>
-    where C: 'a {
+pub struct TaskLeaseCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _project: String,
     _taskqueue: String,
     _num_tasks: i32,
@@ -1751,9 +1745,9 @@ pub struct TaskLeaseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskLeaseCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskLeaseCall<'a> {}
 
-impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskLeaseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1823,8 +1817,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1837,7 +1830,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1846,7 +1839,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1906,7 +1899,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskLeaseCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskLeaseCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1916,7 +1909,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskLeaseCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskLeaseCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -1926,7 +1919,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn num_tasks(mut self, new_value: i32) -> TaskLeaseCall<'a, C> {
+    pub fn num_tasks(mut self, new_value: i32) -> TaskLeaseCall<'a> {
         self._num_tasks = new_value;
         self
     }
@@ -1936,21 +1929,21 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn lease_secs(mut self, new_value: i32) -> TaskLeaseCall<'a, C> {
+    pub fn lease_secs(mut self, new_value: i32) -> TaskLeaseCall<'a> {
         self._lease_secs = new_value;
         self
     }
     /// The tag allowed for tasks in the response. Must only be specified if group_by_tag is true. If group_by_tag is true and tag is not specified the tag will be that of the oldest task by eta, i.e. the first available tag
     ///
     /// Sets the *tag* query property to the given value.
-    pub fn tag(mut self, new_value: &str) -> TaskLeaseCall<'a, C> {
+    pub fn tag(mut self, new_value: &str) -> TaskLeaseCall<'a> {
         self._tag = Some(new_value.to_string());
         self
     }
     /// When true, all returned tasks will have the same tag
     ///
     /// Sets the *group by tag* query property to the given value.
-    pub fn group_by_tag(mut self, new_value: bool) -> TaskLeaseCall<'a, C> {
+    pub fn group_by_tag(mut self, new_value: bool) -> TaskLeaseCall<'a> {
         self._group_by_tag = Some(new_value);
         self
     }
@@ -1960,7 +1953,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskLeaseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskLeaseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1981,7 +1974,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskLeaseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskLeaseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2001,7 +1994,7 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskLeaseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskLeaseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2045,10 +2038,10 @@ impl<'a, C> TaskLeaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskListCall<'a, C>
-    where C: 'a {
+pub struct TaskListCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _project: String,
     _taskqueue: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2056,9 +2049,9 @@ pub struct TaskListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskListCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskListCall<'a> {}
 
-impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2120,8 +2113,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2134,7 +2126,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2143,7 +2135,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2203,7 +2195,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskListCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2213,7 +2205,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskListCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskListCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -2223,7 +2215,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2244,7 +2236,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2264,7 +2256,7 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2314,10 +2306,10 @@ impl<'a, C> TaskListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskPatchCall<'a, C>
-    where C: 'a {
+pub struct TaskPatchCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _request: Task,
     _project: String,
     _taskqueue: String,
@@ -2328,9 +2320,9 @@ pub struct TaskPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskPatchCall<'a> {}
 
-impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2405,8 +2397,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2420,7 +2411,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2431,7 +2422,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2490,7 +2481,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a, C> {
+    pub fn request(mut self, new_value: Task) -> TaskPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -2500,7 +2491,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskPatchCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskPatchCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2509,7 +2500,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskPatchCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskPatchCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -2518,7 +2509,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskPatchCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -2528,7 +2519,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskPatchCall<'a, C> {
+    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskPatchCall<'a> {
         self._new_lease_seconds = new_value;
         self
     }
@@ -2538,7 +2529,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2559,7 +2550,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2579,7 +2570,7 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2629,10 +2620,10 @@ impl<'a, C> TaskPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TaskUpdateCall<'a, C>
-    where C: 'a {
+pub struct TaskUpdateCall<'a>
+    where  {
 
-    hub: &'a Taskqueue<C>,
+    hub: &'a Taskqueue<>,
     _request: Task,
     _project: String,
     _taskqueue: String,
@@ -2643,9 +2634,9 @@ pub struct TaskUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TaskUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for TaskUpdateCall<'a> {}
 
-impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TaskUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2720,8 +2711,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2735,7 +2725,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2746,7 +2736,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2805,7 +2795,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Task) -> TaskUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2815,7 +2805,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TaskUpdateCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TaskUpdateCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2824,7 +2814,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn taskqueue(mut self, new_value: &str) -> TaskUpdateCall<'a, C> {
+    pub fn taskqueue(mut self, new_value: &str) -> TaskUpdateCall<'a> {
         self._taskqueue = new_value.to_string();
         self
     }
@@ -2833,7 +2823,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a, C> {
+    pub fn task(mut self, new_value: &str) -> TaskUpdateCall<'a> {
         self._task = new_value.to_string();
         self
     }
@@ -2843,7 +2833,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskUpdateCall<'a, C> {
+    pub fn new_lease_seconds(mut self, new_value: i32) -> TaskUpdateCall<'a> {
         self._new_lease_seconds = new_value;
         self
     }
@@ -2853,7 +2843,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TaskUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2874,7 +2864,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TaskUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2894,7 +2884,7 @@ impl<'a, C> TaskUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TaskUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TaskUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

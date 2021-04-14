@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,35 +104,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct PagespeedInsights<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct PagespeedInsights<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for PagespeedInsights<C> {}
+impl<'a, > client::Hub for PagespeedInsights<> {}
 
-impl<'a, C> PagespeedInsights<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > PagespeedInsights<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PagespeedInsights<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> PagespeedInsights<> {
         PagespeedInsights {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://pagespeedonline.googleapis.com/".to_string(),
             _root_url: "https://pagespeedonline.googleapis.com/".to_string(),
         }
     }
 
-    pub fn pagespeedapi(&'a self) -> PagespeedapiMethods<'a, C> {
+    pub fn pagespeedapi(&'a self) -> PagespeedapiMethods<'a> {
         PagespeedapiMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -643,15 +641,15 @@ impl client::Part for UserPageLoadMetricV5 {}
 /// let rb = hub.pagespeedapi();
 /// # }
 /// ```
-pub struct PagespeedapiMethods<'a, C>
-    where C: 'a {
+pub struct PagespeedapiMethods<'a>
+    where  {
 
-    hub: &'a PagespeedInsights<C>,
+    hub: &'a PagespeedInsights<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PagespeedapiMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PagespeedapiMethods<'a> {}
 
-impl<'a, C> PagespeedapiMethods<'a, C> {
+impl<'a> PagespeedapiMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -660,7 +658,7 @@ impl<'a, C> PagespeedapiMethods<'a, C> {
     /// # Arguments
     ///
     /// * `url` - Required. The URL to fetch and analyze
-    pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn runpagespeed(&self, url: &str) -> PagespeedapiRunpagespeedCall<'a> {
         PagespeedapiRunpagespeedCall {
             hub: self.hub,
             _url: url.to_string(),
@@ -723,10 +721,10 @@ impl<'a, C> PagespeedapiMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PagespeedapiRunpagespeedCall<'a, C>
-    where C: 'a {
+pub struct PagespeedapiRunpagespeedCall<'a>
+    where  {
 
-    hub: &'a PagespeedInsights<C>,
+    hub: &'a PagespeedInsights<>,
     _url: String,
     _utm_source: Option<String>,
     _utm_campaign: Option<String>,
@@ -739,9 +737,9 @@ pub struct PagespeedapiRunpagespeedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PagespeedapiRunpagespeedCall<'a, C> {}
+impl<'a> client::CallBuilder for PagespeedapiRunpagespeedCall<'a> {}
 
-impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PagespeedapiRunpagespeedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -801,8 +799,7 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -815,7 +812,7 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -824,7 +821,7 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -884,35 +881,35 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn url(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._url = new_value.to_string();
         self
     }
     /// Campaign source for analytics.
     ///
     /// Sets the *utm_source* query property to the given value.
-    pub fn utm_source(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn utm_source(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._utm_source = Some(new_value.to_string());
         self
     }
     /// Campaign name for analytics.
     ///
     /// Sets the *utm_campaign* query property to the given value.
-    pub fn utm_campaign(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn utm_campaign(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._utm_campaign = Some(new_value.to_string());
         self
     }
     /// The analysis strategy (desktop or mobile) to use, and desktop is the default
     ///
     /// Sets the *strategy* query property to the given value.
-    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn strategy(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._strategy = Some(new_value.to_string());
         self
     }
     /// The locale used to localize formatted results
     ///
     /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn locale(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._locale = Some(new_value.to_string());
         self
     }
@@ -920,14 +917,14 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Append the given value to the *category* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_category(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn add_category(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._category.push(new_value.to_string());
         self
     }
     /// The captcha token passed when filling out a captcha.
     ///
     /// Sets the *captcha token* query property to the given value.
-    pub fn captcha_token(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn captcha_token(mut self, new_value: &str) -> PagespeedapiRunpagespeedCall<'a> {
         self._captcha_token = Some(new_value.to_string());
         self
     }
@@ -937,7 +934,7 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagespeedapiRunpagespeedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PagespeedapiRunpagespeedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -962,7 +959,7 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -982,7 +979,7 @@ impl<'a, C> PagespeedapiRunpagespeedCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PagespeedapiRunpagespeedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PagespeedapiRunpagespeedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

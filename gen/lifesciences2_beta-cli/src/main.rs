@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::CloudLifeSciences<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::CloudLifeSciences,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -711,7 +710,7 @@ async fn main() {
     
     let mut app = App::new("lifesciences2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210319")
+           .version("2.0.3+20210319")
            .about("Cloud Life Sciences is a suite of services and tools for managing, processing, and transforming life sciences data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_lifesciences2_beta_cli")
            .arg(Arg::with_name("url")

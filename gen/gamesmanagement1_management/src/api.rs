@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -99,47 +98,46 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct GamesManagement<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct GamesManagement<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for GamesManagement<C> {}
+impl<'a, > client::Hub for GamesManagement<> {}
 
-impl<'a, C> GamesManagement<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > GamesManagement<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GamesManagement<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> GamesManagement<> {
         GamesManagement {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://gamesmanagement.googleapis.com/".to_string(),
             _root_url: "https://gamesmanagement.googleapis.com/".to_string(),
         }
     }
 
-    pub fn achievements(&'a self) -> AchievementMethods<'a, C> {
+    pub fn achievements(&'a self) -> AchievementMethods<'a> {
         AchievementMethods { hub: &self }
     }
-    pub fn applications(&'a self) -> ApplicationMethods<'a, C> {
+    pub fn applications(&'a self) -> ApplicationMethods<'a> {
         ApplicationMethods { hub: &self }
     }
-    pub fn events(&'a self) -> EventMethods<'a, C> {
+    pub fn events(&'a self) -> EventMethods<'a> {
         EventMethods { hub: &self }
     }
-    pub fn players(&'a self) -> PlayerMethods<'a, C> {
+    pub fn players(&'a self) -> PlayerMethods<'a> {
         PlayerMethods { hub: &self }
     }
-    pub fn scores(&'a self) -> ScoreMethods<'a, C> {
+    pub fn scores(&'a self) -> ScoreMethods<'a> {
         ScoreMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -517,15 +515,15 @@ impl client::Part for PlayerName {}
 /// let rb = hub.achievements();
 /// # }
 /// ```
-pub struct AchievementMethods<'a, C>
-    where C: 'a {
+pub struct AchievementMethods<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AchievementMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AchievementMethods<'a> {}
 
-impl<'a, C> AchievementMethods<'a, C> {
+impl<'a> AchievementMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -534,7 +532,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a, C> {
+    pub fn reset(&self, achievement_id: &str) -> AchievementResetCall<'a> {
         AchievementResetCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -547,7 +545,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all achievements for the currently authenticated player for your application. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> AchievementResetAllCall<'a, C> {
+    pub fn reset_all(&self) -> AchievementResetAllCall<'a> {
         AchievementResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -559,7 +557,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft achievements for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a, C> {
+    pub fn reset_all_for_all_players(&self) -> AchievementResetAllForAllPlayerCall<'a> {
         AchievementResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -575,7 +573,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `achievementId` - The ID of the achievement used by this method.
-    pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a, C> {
+    pub fn reset_for_all_players(&self, achievement_id: &str) -> AchievementResetForAllPlayerCall<'a> {
         AchievementResetForAllPlayerCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
@@ -592,7 +590,7 @@ impl<'a, C> AchievementMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C> {
+    pub fn reset_multiple_for_all_players(&self, request: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a> {
         AchievementResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request,
@@ -635,15 +633,15 @@ impl<'a, C> AchievementMethods<'a, C> {
 /// let rb = hub.applications();
 /// # }
 /// ```
-pub struct ApplicationMethods<'a, C>
-    where C: 'a {
+pub struct ApplicationMethods<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ApplicationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ApplicationMethods<'a> {}
 
-impl<'a, C> ApplicationMethods<'a, C> {
+impl<'a> ApplicationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -652,7 +650,7 @@ impl<'a, C> ApplicationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
-    pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a, C> {
+    pub fn list_hidden(&self, application_id: &str) -> ApplicationListHiddenCall<'a> {
         ApplicationListHiddenCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -697,15 +695,15 @@ impl<'a, C> ApplicationMethods<'a, C> {
 /// let rb = hub.events();
 /// # }
 /// ```
-pub struct EventMethods<'a, C>
-    where C: 'a {
+pub struct EventMethods<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for EventMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for EventMethods<'a> {}
 
-impl<'a, C> EventMethods<'a, C> {
+impl<'a> EventMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -714,7 +712,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `eventId` - The ID of the event.
-    pub fn reset(&self, event_id: &str) -> EventResetCall<'a, C> {
+    pub fn reset(&self, event_id: &str) -> EventResetCall<'a> {
         EventResetCall {
             hub: self.hub,
             _event_id: event_id.to_string(),
@@ -727,7 +725,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all player progress on all events for the currently authenticated player. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> EventResetAllCall<'a, C> {
+    pub fn reset_all(&self) -> EventResetAllCall<'a> {
         EventResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -739,7 +737,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all draft events for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a, C> {
+    pub fn reset_all_for_all_players(&self) -> EventResetAllForAllPlayerCall<'a> {
         EventResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -755,7 +753,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `eventId` - The ID of the event.
-    pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a, C> {
+    pub fn reset_for_all_players(&self, event_id: &str) -> EventResetForAllPlayerCall<'a> {
         EventResetForAllPlayerCall {
             hub: self.hub,
             _event_id: event_id.to_string(),
@@ -772,7 +770,7 @@ impl<'a, C> EventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C> {
+    pub fn reset_multiple_for_all_players(&self, request: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a> {
         EventResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request,
@@ -815,15 +813,15 @@ impl<'a, C> EventMethods<'a, C> {
 /// let rb = hub.players();
 /// # }
 /// ```
-pub struct PlayerMethods<'a, C>
-    where C: 'a {
+pub struct PlayerMethods<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for PlayerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for PlayerMethods<'a> {}
 
-impl<'a, C> PlayerMethods<'a, C> {
+impl<'a> PlayerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -833,7 +831,7 @@ impl<'a, C> PlayerMethods<'a, C> {
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a, C> {
+    pub fn hide(&self, application_id: &str, player_id: &str) -> PlayerHideCall<'a> {
         PlayerHideCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -852,7 +850,7 @@ impl<'a, C> PlayerMethods<'a, C> {
     ///
     /// * `applicationId` - The application ID from the Google Play developer console.
     /// * `playerId` - A player ID. A value of `me` may be used in place of the authenticated player's ID.
-    pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a, C> {
+    pub fn unhide(&self, application_id: &str, player_id: &str) -> PlayerUnhideCall<'a> {
         PlayerUnhideCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
@@ -896,15 +894,15 @@ impl<'a, C> PlayerMethods<'a, C> {
 /// let rb = hub.scores();
 /// # }
 /// ```
-pub struct ScoreMethods<'a, C>
-    where C: 'a {
+pub struct ScoreMethods<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ScoreMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ScoreMethods<'a> {}
 
-impl<'a, C> ScoreMethods<'a, C> {
+impl<'a> ScoreMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -913,7 +911,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a, C> {
+    pub fn reset(&self, leaderboard_id: &str) -> ScoreResetCall<'a> {
         ScoreResetCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -926,7 +924,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets all scores for all leaderboards for the currently authenticated players. This method is only accessible to whitelisted tester accounts for your application.
-    pub fn reset_all(&self) -> ScoreResetAllCall<'a, C> {
+    pub fn reset_all(&self) -> ScoreResetAllCall<'a> {
         ScoreResetAllCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -938,7 +936,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Resets scores for all draft leaderboards for all players. This method is only available to user accounts for your developer console.
-    pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a, C> {
+    pub fn reset_all_for_all_players(&self) -> ScoreResetAllForAllPlayerCall<'a> {
         ScoreResetAllForAllPlayerCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -954,7 +952,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// # Arguments
     ///
     /// * `leaderboardId` - The ID of the leaderboard.
-    pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a, C> {
+    pub fn reset_for_all_players(&self, leaderboard_id: &str) -> ScoreResetForAllPlayerCall<'a> {
         ScoreResetForAllPlayerCall {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
@@ -971,7 +969,7 @@ impl<'a, C> ScoreMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn reset_multiple_for_all_players(&self, request: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C> {
+    pub fn reset_multiple_for_all_players(&self, request: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a> {
         ScoreResetMultipleForAllPlayerCall {
             hub: self.hub,
             _request: request,
@@ -1022,19 +1020,19 @@ impl<'a, C> ScoreMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetCall<'a, C>
-    where C: 'a {
+pub struct AchievementResetCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementResetCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementResetCall<'a> {}
 
-impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementResetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1095,8 +1093,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1109,7 +1106,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1118,7 +1115,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1178,7 +1175,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a, C> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetCall<'a> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1188,7 +1185,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1213,7 +1210,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1233,7 +1230,7 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1277,18 +1274,18 @@ impl<'a, C> AchievementResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetAllCall<'a, C>
-    where C: 'a {
+pub struct AchievementResetAllCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementResetAllCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementResetAllCall<'a> {}
 
-impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementResetAllCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1327,8 +1324,7 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1341,7 +1337,7 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1350,7 +1346,7 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1410,7 +1406,7 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1435,7 +1431,7 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1455,7 +1451,7 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetAllCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetAllCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1499,18 +1495,18 @@ impl<'a, C> AchievementResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetAllForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct AchievementResetAllForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementResetAllForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementResetAllForAllPlayerCall<'a> {}
 
-impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementResetAllForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1548,8 +1544,7 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1562,7 +1557,7 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1571,7 +1566,7 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1621,7 +1616,7 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetAllForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1646,7 +1641,7 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetAllForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1666,7 +1661,7 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetAllForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetAllForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1710,19 +1705,19 @@ impl<'a, C> AchievementResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct AchievementResetForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _achievement_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementResetForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementResetForAllPlayerCall<'a> {}
 
-impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementResetForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1782,8 +1777,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1796,7 +1790,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1805,7 +1799,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1855,7 +1849,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a, C> {
+    pub fn achievement_id(mut self, new_value: &str) -> AchievementResetForAllPlayerCall<'a> {
         self._achievement_id = new_value.to_string();
         self
     }
@@ -1865,7 +1859,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1890,7 +1884,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1910,7 +1904,7 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1960,19 +1954,19 @@ impl<'a, C> AchievementResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Cl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AchievementResetMultipleForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct AchievementResetMultipleForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _request: AchievementResetMultipleForAllRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AchievementResetMultipleForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for AchievementResetMultipleForAllPlayerCall<'a> {}
 
-impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AchievementResetMultipleForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2021,8 +2015,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2036,7 +2029,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2047,7 +2040,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2096,7 +2089,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a, C> {
+    pub fn request(mut self, new_value: AchievementResetMultipleForAllRequest) -> AchievementResetMultipleForAllPlayerCall<'a> {
         self._request = new_value;
         self
     }
@@ -2106,7 +2099,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetMultipleForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AchievementResetMultipleForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2131,7 +2124,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetMultipleForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AchievementResetMultipleForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2151,7 +2144,7 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetMultipleForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AchievementResetMultipleForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2197,10 +2190,10 @@ impl<'a, C> AchievementResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationListHiddenCall<'a, C>
-    where C: 'a {
+pub struct ApplicationListHiddenCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _application_id: String,
     _page_token: Option<String>,
     _max_results: Option<i32>,
@@ -2209,9 +2202,9 @@ pub struct ApplicationListHiddenCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ApplicationListHiddenCall<'a, C> {}
+impl<'a> client::CallBuilder for ApplicationListHiddenCall<'a> {}
 
-impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApplicationListHiddenCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2278,8 +2271,7 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2292,7 +2284,7 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2301,7 +2293,7 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2361,21 +2353,21 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C> {
+    pub fn application_id(mut self, new_value: &str) -> ApplicationListHiddenCall<'a> {
         self._application_id = new_value.to_string();
         self
     }
     /// The token returned by the previous request.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ApplicationListHiddenCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of player resources to return in the response, used for paging. For any response, the actual number of player resources returned may be less than the specified `maxResults`.
     ///
     /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a, C> {
+    pub fn max_results(mut self, new_value: i32) -> ApplicationListHiddenCall<'a> {
         self._max_results = Some(new_value);
         self
     }
@@ -2385,7 +2377,7 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationListHiddenCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationListHiddenCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2410,7 +2402,7 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationListHiddenCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationListHiddenCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2430,7 +2422,7 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationListHiddenCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationListHiddenCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2474,19 +2466,19 @@ impl<'a, C> ApplicationListHiddenCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetCall<'a, C>
-    where C: 'a {
+pub struct EventResetCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _event_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventResetCall<'a, C> {}
+impl<'a> client::CallBuilder for EventResetCall<'a> {}
 
-impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventResetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2546,8 +2538,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2560,7 +2551,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2569,7 +2560,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2619,7 +2610,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventResetCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
@@ -2629,7 +2620,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2654,7 +2645,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2674,7 +2665,7 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2718,18 +2709,18 @@ impl<'a, C> EventResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetAllCall<'a, C>
-    where C: 'a {
+pub struct EventResetAllCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventResetAllCall<'a, C> {}
+impl<'a> client::CallBuilder for EventResetAllCall<'a> {}
 
-impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventResetAllCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2767,8 +2758,7 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2781,7 +2771,7 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2790,7 +2780,7 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2840,7 +2830,7 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2865,7 +2855,7 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2885,7 +2875,7 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetAllCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetAllCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2929,18 +2919,18 @@ impl<'a, C> EventResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetAllForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct EventResetAllForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventResetAllForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for EventResetAllForAllPlayerCall<'a> {}
 
-impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventResetAllForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2978,8 +2968,7 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2992,7 +2981,7 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3001,7 +2990,7 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3051,7 +3040,7 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetAllForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3076,7 +3065,7 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetAllForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3096,7 +3085,7 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetAllForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetAllForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3140,19 +3129,19 @@ impl<'a, C> EventResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct EventResetForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _event_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventResetForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for EventResetForAllPlayerCall<'a> {}
 
-impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventResetForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3212,8 +3201,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3226,7 +3214,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3235,7 +3223,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3285,7 +3273,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a, C> {
+    pub fn event_id(mut self, new_value: &str) -> EventResetForAllPlayerCall<'a> {
         self._event_id = new_value.to_string();
         self
     }
@@ -3295,7 +3283,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3320,7 +3308,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3340,7 +3328,7 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3390,19 +3378,19 @@ impl<'a, C> EventResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct EventResetMultipleForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct EventResetMultipleForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _request: EventsResetMultipleForAllRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for EventResetMultipleForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for EventResetMultipleForAllPlayerCall<'a> {}
 
-impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> EventResetMultipleForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3451,8 +3439,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3466,7 +3453,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3477,7 +3464,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3526,7 +3513,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a, C> {
+    pub fn request(mut self, new_value: EventsResetMultipleForAllRequest) -> EventResetMultipleForAllPlayerCall<'a> {
         self._request = new_value;
         self
     }
@@ -3536,7 +3523,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetMultipleForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EventResetMultipleForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3561,7 +3548,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EventResetMultipleForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> EventResetMultipleForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3581,7 +3568,7 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetMultipleForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> EventResetMultipleForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3625,10 +3612,10 @@ impl<'a, C> EventResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlayerHideCall<'a, C>
-    where C: 'a {
+pub struct PlayerHideCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _application_id: String,
     _player_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3636,9 +3623,9 @@ pub struct PlayerHideCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlayerHideCall<'a, C> {}
+impl<'a> client::CallBuilder for PlayerHideCall<'a> {}
 
-impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlayerHideCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3699,8 +3686,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3713,7 +3699,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3722,7 +3708,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3772,7 +3758,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a, C> {
+    pub fn application_id(mut self, new_value: &str) -> PlayerHideCall<'a> {
         self._application_id = new_value.to_string();
         self
     }
@@ -3782,7 +3768,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerHideCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
@@ -3792,7 +3778,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerHideCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerHideCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3817,7 +3803,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerHideCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerHideCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3837,7 +3823,7 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerHideCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerHideCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3881,10 +3867,10 @@ impl<'a, C> PlayerHideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct PlayerUnhideCall<'a, C>
-    where C: 'a {
+pub struct PlayerUnhideCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _application_id: String,
     _player_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3892,9 +3878,9 @@ pub struct PlayerUnhideCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for PlayerUnhideCall<'a, C> {}
+impl<'a> client::CallBuilder for PlayerUnhideCall<'a> {}
 
-impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> PlayerUnhideCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3955,8 +3941,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3969,7 +3954,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3978,7 +3963,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4028,7 +4013,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C> {
+    pub fn application_id(mut self, new_value: &str) -> PlayerUnhideCall<'a> {
         self._application_id = new_value.to_string();
         self
     }
@@ -4038,7 +4023,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a, C> {
+    pub fn player_id(mut self, new_value: &str) -> PlayerUnhideCall<'a> {
         self._player_id = new_value.to_string();
         self
     }
@@ -4048,7 +4033,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerUnhideCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> PlayerUnhideCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4073,7 +4058,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> PlayerUnhideCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> PlayerUnhideCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4093,7 +4078,7 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerUnhideCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> PlayerUnhideCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4137,19 +4122,19 @@ impl<'a, C> PlayerUnhideCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetCall<'a, C>
-    where C: 'a {
+pub struct ScoreResetCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreResetCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreResetCall<'a> {}
 
-impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreResetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4210,8 +4195,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4224,7 +4208,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4233,7 +4217,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4293,7 +4277,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -4303,7 +4287,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4328,7 +4312,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4348,7 +4332,7 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4392,18 +4376,18 @@ impl<'a, C> ScoreResetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetAllCall<'a, C>
-    where C: 'a {
+pub struct ScoreResetAllCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreResetAllCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreResetAllCall<'a> {}
 
-impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreResetAllCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4442,8 +4426,7 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4456,7 +4439,7 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4465,7 +4448,7 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4525,7 +4508,7 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4550,7 +4533,7 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4570,7 +4553,7 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetAllCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetAllCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4614,18 +4597,18 @@ impl<'a, C> ScoreResetAllCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetAllForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct ScoreResetAllForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreResetAllForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreResetAllForAllPlayerCall<'a> {}
 
-impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreResetAllForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4663,8 +4646,7 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4677,7 +4659,7 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4686,7 +4668,7 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4736,7 +4718,7 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetAllForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4761,7 +4743,7 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetAllForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4781,7 +4763,7 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetAllForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetAllForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4825,19 +4807,19 @@ impl<'a, C> ScoreResetAllForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct ScoreResetForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _leaderboard_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreResetForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreResetForAllPlayerCall<'a> {}
 
-impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreResetForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4897,8 +4879,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4911,7 +4892,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4920,7 +4901,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4970,7 +4951,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a, C> {
+    pub fn leaderboard_id(mut self, new_value: &str) -> ScoreResetForAllPlayerCall<'a> {
         self._leaderboard_id = new_value.to_string();
         self
     }
@@ -4980,7 +4961,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5005,7 +4986,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5025,7 +5006,7 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5075,19 +5056,19 @@ impl<'a, C> ScoreResetForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ScoreResetMultipleForAllPlayerCall<'a, C>
-    where C: 'a {
+pub struct ScoreResetMultipleForAllPlayerCall<'a>
+    where  {
 
-    hub: &'a GamesManagement<C>,
+    hub: &'a GamesManagement<>,
     _request: ScoresResetMultipleForAllRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ScoreResetMultipleForAllPlayerCall<'a, C> {}
+impl<'a> client::CallBuilder for ScoreResetMultipleForAllPlayerCall<'a> {}
 
-impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ScoreResetMultipleForAllPlayerCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5136,8 +5117,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5151,7 +5131,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5162,7 +5142,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5211,7 +5191,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a, C> {
+    pub fn request(mut self, new_value: ScoresResetMultipleForAllRequest) -> ScoreResetMultipleForAllPlayerCall<'a> {
         self._request = new_value;
         self
     }
@@ -5221,7 +5201,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetMultipleForAllPlayerCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ScoreResetMultipleForAllPlayerCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5246,7 +5226,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetMultipleForAllPlayerCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ScoreResetMultipleForAllPlayerCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5266,7 +5246,7 @@ impl<'a, C> ScoreResetMultipleForAllPlayerCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetMultipleForAllPlayerCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ScoreResetMultipleForAllPlayerCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

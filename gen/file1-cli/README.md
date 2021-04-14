@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-file1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/file1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/file1-cli).
 
 # Usage
 
-This documentation was generated from the *Cloud Filestore* API at revision *20210323*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Cloud Filestore* API at revision *20210323*. The CLI is at version *2.0.3*.
 
 ```bash
 file1 [options]

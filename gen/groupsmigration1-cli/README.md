@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-groupsmigration1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/groupsmigration1-cli).
 
 # Usage
 
-This documentation was generated from the *Groups Migration* API at revision *20210318*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Groups Migration* API at revision *20210318*. The CLI is at version *2.0.3*.
 
 ```bash
 groupsmigration1 [options]

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-datamigration1"
-version = "2.0.0+20210317"
+version = "2.0.3+20210317"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Database Migration Service (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/datamigration1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datamigration1"
 homepage = "https://cloud.google.com/database-migration/"
-documentation = "https://docs.rs/google-datamigration1/2.0.0+20210317"
+documentation = "https://docs.rs/google-datamigration1/2.0.3+20210317"
 license = "MIT"
 keywords = ["datamigration", "google", "protocol", "web", "api"]
 autobins = false

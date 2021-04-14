@@ -4,10 +4,10 @@
 [package]
 
 name = "google-adexchangeseller2-cli"
-version = "2.0.0+20171101"
+version = "2.0.3+20171101"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Seller (protocol v2.0)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangeseller2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangeseller2-cli"
 homepage = "https://developers.google.com/ad-exchange/seller-rest/"
 documentation = "http://byron.github.io/google-apis-rs/google_adexchangeseller2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-adexchangeseller2]
 path = "../adexchangeseller2"
-version = "2.0.0+20171101"
+version = "2.0.3+20171101"

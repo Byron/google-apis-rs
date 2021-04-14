@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,35 +104,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Cloudlatencytest<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Cloudlatencytest<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Cloudlatencytest<C> {}
+impl<'a, > client::Hub for Cloudlatencytest<> {}
 
-impl<'a, C> Cloudlatencytest<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Cloudlatencytest<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Cloudlatencytest<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Cloudlatencytest<> {
         Cloudlatencytest {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudlatencytest-pa.googleapis.com/v2/statscollection/".to_string(),
             _root_url: "https://cloudlatencytest-pa.googleapis.com/".to_string(),
         }
     }
 
-    pub fn statscollection(&'a self) -> StatscollectionMethods<'a, C> {
+    pub fn statscollection(&'a self) -> StatscollectionMethods<'a> {
         StatscollectionMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -324,15 +322,15 @@ impl client::Part for StringValue {}
 /// let rb = hub.statscollection();
 /// # }
 /// ```
-pub struct StatscollectionMethods<'a, C>
-    where C: 'a {
+pub struct StatscollectionMethods<'a>
+    where  {
 
-    hub: &'a Cloudlatencytest<C>,
+    hub: &'a Cloudlatencytest<>,
 }
 
-impl<'a, C> client::MethodsBuilder for StatscollectionMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for StatscollectionMethods<'a> {}
 
-impl<'a, C> StatscollectionMethods<'a, C> {
+impl<'a> StatscollectionMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -341,7 +339,7 @@ impl<'a, C> StatscollectionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn updateaggregatedstats(&self, request: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C> {
+    pub fn updateaggregatedstats(&self, request: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a> {
         StatscollectionUpdateaggregatedstatCall {
             hub: self.hub,
             _request: request,
@@ -358,7 +356,7 @@ impl<'a, C> StatscollectionMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn updatestats(&self, request: Stats) -> StatscollectionUpdatestatCall<'a, C> {
+    pub fn updatestats(&self, request: Stats) -> StatscollectionUpdatestatCall<'a> {
         StatscollectionUpdatestatCall {
             hub: self.hub,
             _request: request,
@@ -415,19 +413,19 @@ impl<'a, C> StatscollectionMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StatscollectionUpdateaggregatedstatCall<'a, C>
-    where C: 'a {
+pub struct StatscollectionUpdateaggregatedstatCall<'a>
+    where  {
 
-    hub: &'a Cloudlatencytest<C>,
+    hub: &'a Cloudlatencytest<>,
     _request: AggregatedStats,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StatscollectionUpdateaggregatedstatCall<'a, C> {}
+impl<'a> client::CallBuilder for StatscollectionUpdateaggregatedstatCall<'a> {}
 
-impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StatscollectionUpdateaggregatedstatCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -477,8 +475,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -492,7 +489,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -503,7 +500,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -562,7 +559,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a, C> {
+    pub fn request(mut self, new_value: AggregatedStats) -> StatscollectionUpdateaggregatedstatCall<'a> {
         self._request = new_value;
         self
     }
@@ -572,7 +569,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdateaggregatedstatCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdateaggregatedstatCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -593,7 +590,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdateaggregatedstatCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdateaggregatedstatCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -613,7 +610,7 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StatscollectionUpdateaggregatedstatCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StatscollectionUpdateaggregatedstatCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -663,19 +660,19 @@ impl<'a, C> StatscollectionUpdateaggregatedstatCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct StatscollectionUpdatestatCall<'a, C>
-    where C: 'a {
+pub struct StatscollectionUpdatestatCall<'a>
+    where  {
 
-    hub: &'a Cloudlatencytest<C>,
+    hub: &'a Cloudlatencytest<>,
     _request: Stats,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for StatscollectionUpdatestatCall<'a, C> {}
+impl<'a> client::CallBuilder for StatscollectionUpdatestatCall<'a> {}
 
-impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> StatscollectionUpdatestatCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -725,8 +722,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -740,7 +736,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -751,7 +747,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -810,7 +806,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Stats) -> StatscollectionUpdatestatCall<'a, C> {
+    pub fn request(mut self, new_value: Stats) -> StatscollectionUpdatestatCall<'a> {
         self._request = new_value;
         self
     }
@@ -820,7 +816,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdatestatCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> StatscollectionUpdatestatCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -841,7 +837,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdatestatCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> StatscollectionUpdatestatCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -861,7 +857,7 @@ impl<'a, C> StatscollectionUpdatestatCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> StatscollectionUpdatestatCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> StatscollectionUpdatestatCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

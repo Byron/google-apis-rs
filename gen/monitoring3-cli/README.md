@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-monitoring3-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli).
 
 # Usage
 
-This documentation was generated from the *Monitoring* API at revision *20210322*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Monitoring* API at revision *20210322*. The CLI is at version *2.0.3*.
 
 ```bash
 monitoring3 [options]

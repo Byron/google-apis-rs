@@ -4,10 +4,10 @@
 [package]
 
 name = "google-adsense1d4-cli"
-version = "2.0.0+20201002"
+version = "2.0.3+20201002"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdSense (protocol v1.4)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adsense1d4-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/adsense1d4-cli"
 homepage = "https://developers.google.com/adsense/management/"
 documentation = "http://byron.github.io/google-apis-rs/google_adsense1d4_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-adsense1d4]
 path = "../adsense1d4"
-version = "2.0.0+20201002"
+version = "2.0.3+20201002"

@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Memorystore for Memcached* crate version *2.0.0+20210324*, where *20210324* is the exact revision of the *memcache:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *Cloud Memorystore for Memcached* crate version *2.0.3+20210324*, where *20210324* is the exact revision of the *memcache:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *Cloud Memorystore for Memcached* *v1_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/memorystore/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/memcache1_beta2).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/memcache1_beta2).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](CloudMemorystoreForMemcached) ... 

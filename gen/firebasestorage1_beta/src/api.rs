@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -109,35 +108,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Firebasestorage<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Firebasestorage<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Firebasestorage<C> {}
+impl<'a, > client::Hub for Firebasestorage<> {}
 
-impl<'a, C> Firebasestorage<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Firebasestorage<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Firebasestorage<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Firebasestorage<> {
         Firebasestorage {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://firebasestorage.googleapis.com/".to_string(),
             _root_url: "https://firebasestorage.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -285,15 +283,15 @@ impl client::RequestValue for RemoveFirebaseRequest {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a Firebasestorage<C>,
+    hub: &'a Firebasestorage<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -303,7 +301,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket. Because bucket resource names are unique across projects, you may omit the project number, `projects/-/buckets/{bucket_id}`.
-    pub fn buckets_add_firebase(&self, request: AddFirebaseRequest, bucket: &str) -> ProjectBucketAddFirebaseCall<'a, C> {
+    pub fn buckets_add_firebase(&self, request: AddFirebaseRequest, bucket: &str) -> ProjectBucketAddFirebaseCall<'a> {
         ProjectBucketAddFirebaseCall {
             hub: self.hub,
             _request: request,
@@ -321,7 +319,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket. Because bucket resource names are unique across projects, you may omit the project number, `projects/-/buckets/{bucket_id}`.
-    pub fn buckets_get(&self, name: &str) -> ProjectBucketGetCall<'a, C> {
+    pub fn buckets_get(&self, name: &str) -> ProjectBucketGetCall<'a> {
         ProjectBucketGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -338,7 +336,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. Resource name of the parent Firebase project, `projects/{project_number}`.
-    pub fn buckets_list(&self, parent: &str) -> ProjectBucketListCall<'a, C> {
+    pub fn buckets_list(&self, parent: &str) -> ProjectBucketListCall<'a> {
         ProjectBucketListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -358,7 +356,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `bucket` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket. Because bucket resource names are unique across projects, you may omit the project number, `projects/-/buckets/{bucket_id}`.
-    pub fn buckets_remove_firebase(&self, request: RemoveFirebaseRequest, bucket: &str) -> ProjectBucketRemoveFirebaseCall<'a, C> {
+    pub fn buckets_remove_firebase(&self, request: RemoveFirebaseRequest, bucket: &str) -> ProjectBucketRemoveFirebaseCall<'a> {
         ProjectBucketRemoveFirebaseCall {
             hub: self.hub,
             _request: request,
@@ -416,10 +414,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBucketAddFirebaseCall<'a, C>
-    where C: 'a {
+pub struct ProjectBucketAddFirebaseCall<'a>
+    where  {
 
-    hub: &'a Firebasestorage<C>,
+    hub: &'a Firebasestorage<>,
     _request: AddFirebaseRequest,
     _bucket: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -427,9 +425,9 @@ pub struct ProjectBucketAddFirebaseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectBucketAddFirebaseCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectBucketAddFirebaseCall<'a> {}
 
-impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectBucketAddFirebaseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -505,8 +503,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -520,7 +517,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -531,7 +528,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -590,7 +587,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AddFirebaseRequest) -> ProjectBucketAddFirebaseCall<'a, C> {
+    pub fn request(mut self, new_value: AddFirebaseRequest) -> ProjectBucketAddFirebaseCall<'a> {
         self._request = new_value;
         self
     }
@@ -600,7 +597,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ProjectBucketAddFirebaseCall<'a, C> {
+    pub fn bucket(mut self, new_value: &str) -> ProjectBucketAddFirebaseCall<'a> {
         self._bucket = new_value.to_string();
         self
     }
@@ -610,7 +607,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketAddFirebaseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketAddFirebaseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -635,7 +632,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketAddFirebaseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketAddFirebaseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -655,7 +652,7 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketAddFirebaseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketAddFirebaseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -699,19 +696,19 @@ impl<'a, C> ProjectBucketAddFirebaseCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBucketGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectBucketGetCall<'a>
+    where  {
 
-    hub: &'a Firebasestorage<C>,
+    hub: &'a Firebasestorage<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectBucketGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectBucketGetCall<'a> {}
 
-impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectBucketGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -776,8 +773,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -790,7 +786,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -799,7 +795,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -859,7 +855,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectBucketGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectBucketGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -869,7 +865,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -894,7 +890,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -914,7 +910,7 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -960,10 +956,10 @@ impl<'a, C> ProjectBucketGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBucketListCall<'a, C>
-    where C: 'a {
+pub struct ProjectBucketListCall<'a>
+    where  {
 
-    hub: &'a Firebasestorage<C>,
+    hub: &'a Firebasestorage<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -972,9 +968,9 @@ pub struct ProjectBucketListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectBucketListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectBucketListCall<'a> {}
 
-impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectBucketListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1045,8 +1041,7 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1059,7 +1054,7 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1068,7 +1063,7 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1128,21 +1123,21 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectBucketListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectBucketListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// A page token, received from a previous `ListBuckets` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListBuckets` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectBucketListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectBucketListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of buckets to return. If not set, the server will use a reasonable default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectBucketListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectBucketListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -1152,7 +1147,7 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1177,7 +1172,7 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1197,7 +1192,7 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1247,10 +1242,10 @@ impl<'a, C> ProjectBucketListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectBucketRemoveFirebaseCall<'a, C>
-    where C: 'a {
+pub struct ProjectBucketRemoveFirebaseCall<'a>
+    where  {
 
-    hub: &'a Firebasestorage<C>,
+    hub: &'a Firebasestorage<>,
     _request: RemoveFirebaseRequest,
     _bucket: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1258,9 +1253,9 @@ pub struct ProjectBucketRemoveFirebaseCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectBucketRemoveFirebaseCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectBucketRemoveFirebaseCall<'a> {}
 
-impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectBucketRemoveFirebaseCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1336,8 +1331,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1351,7 +1345,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1362,7 +1356,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1421,7 +1415,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RemoveFirebaseRequest) -> ProjectBucketRemoveFirebaseCall<'a, C> {
+    pub fn request(mut self, new_value: RemoveFirebaseRequest) -> ProjectBucketRemoveFirebaseCall<'a> {
         self._request = new_value;
         self
     }
@@ -1431,7 +1425,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn bucket(mut self, new_value: &str) -> ProjectBucketRemoveFirebaseCall<'a, C> {
+    pub fn bucket(mut self, new_value: &str) -> ProjectBucketRemoveFirebaseCall<'a> {
         self._bucket = new_value.to_string();
         self
     }
@@ -1441,7 +1435,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketRemoveFirebaseCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectBucketRemoveFirebaseCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1466,7 +1460,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketRemoveFirebaseCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectBucketRemoveFirebaseCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1486,7 +1480,7 @@ impl<'a, C> ProjectBucketRemoveFirebaseCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketRemoveFirebaseCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectBucketRemoveFirebaseCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

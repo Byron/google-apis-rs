@@ -4,12 +4,12 @@
 [package]
 
 name = "google-fusiontables2"
-version = "2.0.0+20171117"
+version = "2.0.3+20171117"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fusiontables (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/fusiontables2"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/fusiontables2"
 homepage = "https://developers.google.com/fusiontables"
-documentation = "https://docs.rs/google-fusiontables2/2.0.0+20171117"
+documentation = "https://docs.rs/google-fusiontables2/2.0.3+20171117"
 license = "MIT"
 keywords = ["fusiontables", "google", "protocol", "web", "api"]
 autobins = false

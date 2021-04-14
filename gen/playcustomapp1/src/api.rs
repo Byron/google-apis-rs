@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -106,35 +105,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Playcustomapp<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Playcustomapp<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Playcustomapp<C> {}
+impl<'a, > client::Hub for Playcustomapp<> {}
 
-impl<'a, C> Playcustomapp<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Playcustomapp<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Playcustomapp<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Playcustomapp<> {
         Playcustomapp {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://playcustomapp.googleapis.com/".to_string(),
             _root_url: "https://playcustomapp.googleapis.com/".to_string(),
         }
     }
 
-    pub fn accounts(&'a self) -> AccountMethods<'a, C> {
+    pub fn accounts(&'a self) -> AccountMethods<'a> {
         AccountMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -222,15 +220,15 @@ impl client::ResponseResult for CustomApp {}
 /// let rb = hub.accounts();
 /// # }
 /// ```
-pub struct AccountMethods<'a, C>
-    where C: 'a {
+pub struct AccountMethods<'a>
+    where  {
 
-    hub: &'a Playcustomapp<C>,
+    hub: &'a Playcustomapp<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AccountMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AccountMethods<'a> {}
 
-impl<'a, C> AccountMethods<'a, C> {
+impl<'a> AccountMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -240,7 +238,7 @@ impl<'a, C> AccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `account` - Developer account ID.
-    pub fn custom_apps_create(&self, request: CustomApp, account: &str) -> AccountCustomAppCreateCall<'a, C> {
+    pub fn custom_apps_create(&self, request: CustomApp, account: &str) -> AccountCustomAppCreateCall<'a> {
         AccountCustomAppCreateCall {
             hub: self.hub,
             _request: request,
@@ -299,10 +297,10 @@ impl<'a, C> AccountMethods<'a, C> {
 ///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 /// # }
 /// ```
-pub struct AccountCustomAppCreateCall<'a, C>
-    where C: 'a {
+pub struct AccountCustomAppCreateCall<'a>
+    where  {
 
-    hub: &'a Playcustomapp<C>,
+    hub: &'a Playcustomapp<>,
     _request: CustomApp,
     _account: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -310,9 +308,9 @@ pub struct AccountCustomAppCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for AccountCustomAppCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for AccountCustomAppCreateCall<'a> {}
 
-impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AccountCustomAppCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -396,8 +394,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
         let mut upload_url: Option<String> = None;
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -437,7 +434,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         },
                         _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
+                    let client = &self.hub.client;
                     dlg.pre_request();
                     let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                             .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -453,7 +450,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                             .header(content_type.0, content_type.1.to_string())
                             .body(hyper::body::Body::from(body_reader_bytes));
     
-                    client.borrow_mut().request(request.unwrap()).await
+                    client.request(request.unwrap()).await
                     
                 }
             };
@@ -494,7 +491,6 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         if size > 10737418240 {
                         	return Err(client::Error::UploadSizeLimitExceeded(size, 10737418240))
                         }
-                        let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers().get("Location").expect("LOCATION header is part of protocol").to_str().unwrap();
                             if upload_url_from_server {
@@ -502,10 +498,10 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                             }
 
                             client::ResumableUploadHelper {
-                                client: &mut client.borrow_mut(),
+                                client: &self.hub.client,
                                 delegate: dlg,
                                 start_at: if upload_url_from_server { Some(0) } else { None },
-                                auth: &mut *self.hub.auth.borrow_mut(),
+                                auth: &self.hub.auth,
                                 user_agent: &self.hub._user_agent,
                                 auth_header: format!("Bearer {}", token.as_str()),
                                 url: url_str,
@@ -584,7 +580,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CustomApp) -> AccountCustomAppCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CustomApp) -> AccountCustomAppCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -594,7 +590,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn account(mut self, new_value: &str) -> AccountCustomAppCreateCall<'a, C> {
+    pub fn account(mut self, new_value: &str) -> AccountCustomAppCreateCall<'a> {
         self._account = new_value.to_string();
         self
     }
@@ -604,7 +600,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomAppCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AccountCustomAppCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -629,7 +625,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomAppCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AccountCustomAppCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -649,7 +645,7 @@ impl<'a, C> AccountCustomAppCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomAppCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountCustomAppCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

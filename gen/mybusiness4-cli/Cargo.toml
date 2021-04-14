@@ -4,10 +4,10 @@
 [package]
 
 name = "google-mybusiness4-cli"
-version = "2.0.0+0"
+version = "2.0.3+0"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with My Business (protocol v4)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/mybusiness4-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/mybusiness4-cli"
 homepage = "https://developers.google.com/my-business/"
 documentation = "http://byron.github.io/google-apis-rs/google_mybusiness4_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-mybusiness4]
 path = "../mybusiness4"
-version = "2.0.0+0"
+version = "2.0.3+0"

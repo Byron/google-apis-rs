@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,44 +104,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Recommender<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Recommender<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Recommender<C> {}
+impl<'a, > client::Hub for Recommender<> {}
 
-impl<'a, C> Recommender<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Recommender<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Recommender<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Recommender<> {
         Recommender {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://recommender.googleapis.com/".to_string(),
             _root_url: "https://recommender.googleapis.com/".to_string(),
         }
     }
 
-    pub fn billing_accounts(&'a self) -> BillingAccountMethods<'a, C> {
+    pub fn billing_accounts(&'a self) -> BillingAccountMethods<'a> {
         BillingAccountMethods { hub: &self }
     }
-    pub fn folders(&'a self) -> FolderMethods<'a, C> {
+    pub fn folders(&'a self) -> FolderMethods<'a> {
         FolderMethods { hub: &self }
     }
-    pub fn organizations(&'a self) -> OrganizationMethods<'a, C> {
+    pub fn organizations(&'a self) -> OrganizationMethods<'a> {
         OrganizationMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -642,15 +640,15 @@ impl client::Part for GoogleTypeMoney {}
 /// let rb = hub.billing_accounts();
 /// # }
 /// ```
-pub struct BillingAccountMethods<'a, C>
-    where C: 'a {
+pub struct BillingAccountMethods<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
 }
 
-impl<'a, C> client::MethodsBuilder for BillingAccountMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for BillingAccountMethods<'a> {}
 
-impl<'a, C> BillingAccountMethods<'a, C> {
+impl<'a> BillingAccountMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -659,7 +657,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_get(&self, name: &str) -> BillingAccountLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn locations_insight_types_insights_get(&self, name: &str) -> BillingAccountLocationInsightTypeInsightGetCall<'a> {
         BillingAccountLocationInsightTypeInsightGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -676,7 +674,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ INSIGHT_TYPE_ID refers to supported insight types: https://cloud.google.com/recommender/docs/insights/insight-types.)
-    pub fn locations_insight_types_insights_list(&self, parent: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a, C> {
+    pub fn locations_insight_types_insights_list(&self, parent: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a> {
         BillingAccountLocationInsightTypeInsightListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -697,7 +695,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a> {
         BillingAccountLocationInsightTypeInsightMarkAcceptedCall {
             hub: self.hub,
             _request: request,
@@ -715,7 +713,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> BillingAccountLocationRecommenderRecommendationGetCall<'a> {
         BillingAccountLocationRecommenderRecommendationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -732,7 +730,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ RECOMMENDER_ID refers to supported recommenders: https://cloud.google.com/recommender/docs/recommenders.
-    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a> {
         BillingAccountLocationRecommenderRecommendationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -753,7 +751,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a> {
         BillingAccountLocationRecommenderRecommendationMarkClaimedCall {
             hub: self.hub,
             _request: request,
@@ -772,7 +770,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a> {
         BillingAccountLocationRecommenderRecommendationMarkFailedCall {
             hub: self.hub,
             _request: request,
@@ -791,7 +789,7 @@ impl<'a, C> BillingAccountMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a> {
         BillingAccountLocationRecommenderRecommendationMarkSucceededCall {
             hub: self.hub,
             _request: request,
@@ -835,15 +833,15 @@ impl<'a, C> BillingAccountMethods<'a, C> {
 /// let rb = hub.folders();
 /// # }
 /// ```
-pub struct FolderMethods<'a, C>
-    where C: 'a {
+pub struct FolderMethods<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
 }
 
-impl<'a, C> client::MethodsBuilder for FolderMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for FolderMethods<'a> {}
 
-impl<'a, C> FolderMethods<'a, C> {
+impl<'a> FolderMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -852,7 +850,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_get(&self, name: &str) -> FolderLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn locations_insight_types_insights_get(&self, name: &str) -> FolderLocationInsightTypeInsightGetCall<'a> {
         FolderLocationInsightTypeInsightGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -869,7 +867,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ INSIGHT_TYPE_ID refers to supported insight types: https://cloud.google.com/recommender/docs/insights/insight-types.)
-    pub fn locations_insight_types_insights_list(&self, parent: &str) -> FolderLocationInsightTypeInsightListCall<'a, C> {
+    pub fn locations_insight_types_insights_list(&self, parent: &str) -> FolderLocationInsightTypeInsightListCall<'a> {
         FolderLocationInsightTypeInsightListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -890,7 +888,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a> {
         FolderLocationInsightTypeInsightMarkAcceptedCall {
             hub: self.hub,
             _request: request,
@@ -908,7 +906,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> FolderLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> FolderLocationRecommenderRecommendationGetCall<'a> {
         FolderLocationRecommenderRecommendationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -925,7 +923,7 @@ impl<'a, C> FolderMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ RECOMMENDER_ID refers to supported recommenders: https://cloud.google.com/recommender/docs/recommenders.
-    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> FolderLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> FolderLocationRecommenderRecommendationListCall<'a> {
         FolderLocationRecommenderRecommendationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -946,7 +944,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a> {
         FolderLocationRecommenderRecommendationMarkClaimedCall {
             hub: self.hub,
             _request: request,
@@ -965,7 +963,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a> {
         FolderLocationRecommenderRecommendationMarkFailedCall {
             hub: self.hub,
             _request: request,
@@ -984,7 +982,7 @@ impl<'a, C> FolderMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a> {
         FolderLocationRecommenderRecommendationMarkSucceededCall {
             hub: self.hub,
             _request: request,
@@ -1028,15 +1026,15 @@ impl<'a, C> FolderMethods<'a, C> {
 /// let rb = hub.organizations();
 /// # }
 /// ```
-pub struct OrganizationMethods<'a, C>
-    where C: 'a {
+pub struct OrganizationMethods<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OrganizationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OrganizationMethods<'a> {}
 
-impl<'a, C> OrganizationMethods<'a, C> {
+impl<'a> OrganizationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1045,7 +1043,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_get(&self, name: &str) -> OrganizationLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn locations_insight_types_insights_get(&self, name: &str) -> OrganizationLocationInsightTypeInsightGetCall<'a> {
         OrganizationLocationInsightTypeInsightGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1062,7 +1060,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ INSIGHT_TYPE_ID refers to supported insight types: https://cloud.google.com/recommender/docs/insights/insight-types.)
-    pub fn locations_insight_types_insights_list(&self, parent: &str) -> OrganizationLocationInsightTypeInsightListCall<'a, C> {
+    pub fn locations_insight_types_insights_list(&self, parent: &str) -> OrganizationLocationInsightTypeInsightListCall<'a> {
         OrganizationLocationInsightTypeInsightListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1083,7 +1081,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a> {
         OrganizationLocationInsightTypeInsightMarkAcceptedCall {
             hub: self.hub,
             _request: request,
@@ -1101,7 +1099,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> OrganizationLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> OrganizationLocationRecommenderRecommendationGetCall<'a> {
         OrganizationLocationRecommenderRecommendationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1118,7 +1116,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ RECOMMENDER_ID refers to supported recommenders: https://cloud.google.com/recommender/docs/recommenders.
-    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a> {
         OrganizationLocationRecommenderRecommendationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1139,7 +1137,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a> {
         OrganizationLocationRecommenderRecommendationMarkClaimedCall {
             hub: self.hub,
             _request: request,
@@ -1158,7 +1156,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a> {
         OrganizationLocationRecommenderRecommendationMarkFailedCall {
             hub: self.hub,
             _request: request,
@@ -1177,7 +1175,7 @@ impl<'a, C> OrganizationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a> {
         OrganizationLocationRecommenderRecommendationMarkSucceededCall {
             hub: self.hub,
             _request: request,
@@ -1221,15 +1219,15 @@ impl<'a, C> OrganizationMethods<'a, C> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1238,7 +1236,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_get(&self, name: &str) -> ProjectLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn locations_insight_types_insights_get(&self, name: &str) -> ProjectLocationInsightTypeInsightGetCall<'a> {
         ProjectLocationInsightTypeInsightGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1255,7 +1253,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/insightTypes/[INSIGHT_TYPE_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ INSIGHT_TYPE_ID refers to supported insight types: https://cloud.google.com/recommender/docs/insights/insight-types.)
-    pub fn locations_insight_types_insights_list(&self, parent: &str) -> ProjectLocationInsightTypeInsightListCall<'a, C> {
+    pub fn locations_insight_types_insights_list(&self, parent: &str) -> ProjectLocationInsightTypeInsightListCall<'a> {
         ProjectLocationInsightTypeInsightListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1276,7 +1274,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the insight.
-    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn locations_insight_types_insights_mark_accepted(&self, request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest, name: &str) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a> {
         ProjectLocationInsightTypeInsightMarkAcceptedCall {
             hub: self.hub,
             _request: request,
@@ -1294,7 +1292,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> ProjectLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn locations_recommenders_recommendations_get(&self, name: &str) -> ProjectLocationRecommenderRecommendationGetCall<'a> {
         ProjectLocationRecommenderRecommendationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1311,7 +1309,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - Required. The container resource on which to execute the request. Acceptable formats: 1. `projects/[PROJECT_NUMBER]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 2. `billingAccounts/[BILLING_ACCOUNT_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 3. `folders/[FOLDER_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` 4. `organizations/[ORGANIZATION_ID]/locations/[LOCATION]/recommenders/[RECOMMENDER_ID]` LOCATION here refers to GCP Locations: https://cloud.google.com/about/locations/ RECOMMENDER_ID refers to supported recommenders: https://cloud.google.com/recommender/docs/recommenders.
-    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> ProjectLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn locations_recommenders_recommendations_list(&self, parent: &str) -> ProjectLocationRecommenderRecommendationListCall<'a> {
         ProjectLocationRecommenderRecommendationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1332,7 +1330,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_claimed(&self, request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a> {
         ProjectLocationRecommenderRecommendationMarkClaimedCall {
             hub: self.hub,
             _request: request,
@@ -1351,7 +1349,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_failed(&self, request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a> {
         ProjectLocationRecommenderRecommendationMarkFailedCall {
             hub: self.hub,
             _request: request,
@@ -1370,7 +1368,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Required. Name of the recommendation.
-    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn locations_recommenders_recommendations_mark_succeeded(&self, request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest, name: &str) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a> {
         ProjectLocationRecommenderRecommendationMarkSucceededCall {
             hub: self.hub,
             _request: request,
@@ -1422,19 +1420,19 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationInsightTypeInsightGetCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationInsightTypeInsightGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationInsightTypeInsightGetCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationInsightTypeInsightGetCall<'a> {}
 
-impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationInsightTypeInsightGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1499,8 +1497,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1513,7 +1510,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1522,7 +1519,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1582,7 +1579,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -1592,7 +1589,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationInsightTypeInsightGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1617,7 +1614,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationInsightTypeInsightGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationInsightTypeInsightGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1637,7 +1634,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationInsightTypeInsightGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationInsightTypeInsightGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1684,10 +1681,10 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightGetCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationInsightTypeInsightListCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationInsightTypeInsightListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -1697,9 +1694,9 @@ pub struct BillingAccountLocationInsightTypeInsightListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationInsightTypeInsightListCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationInsightTypeInsightListCall<'a> {}
 
-impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationInsightTypeInsightListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1773,8 +1770,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1787,7 +1783,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1796,7 +1792,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1856,28 +1852,28 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BillingAccountLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> BillingAccountLocationInsightTypeInsightListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filter expression to restrict the insights returned. Supported filter fields: state Eg: `state:"DISMISSED" or state:"ACTIVE"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -1887,7 +1883,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationInsightTypeInsightListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationInsightTypeInsightListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1912,7 +1908,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationInsightTypeInsightListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationInsightTypeInsightListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1932,7 +1928,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationInsightTypeInsightListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationInsightTypeInsightListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1982,10 +1978,10 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightListCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1993,9 +1989,9 @@ pub struct BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a> {}
 
-impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2071,8 +2067,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2086,7 +2081,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2097,7 +2092,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2156,7 +2151,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._request = new_value;
         self
     }
@@ -2166,7 +2161,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2176,7 +2171,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2201,7 +2196,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2221,7 +2216,7 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2265,19 +2260,19 @@ impl<'a, C> BillingAccountLocationInsightTypeInsightMarkAcceptedCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationRecommenderRecommendationGetCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationRecommenderRecommendationGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationRecommenderRecommendationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationRecommenderRecommendationGetCall<'a> {}
 
-impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationRecommenderRecommendationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2342,8 +2337,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2356,7 +2350,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2365,7 +2359,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2425,7 +2419,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2435,7 +2429,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2460,7 +2454,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2480,7 +2474,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2527,10 +2521,10 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationGetCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationRecommenderRecommendationListCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationRecommenderRecommendationListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2540,9 +2534,9 @@ pub struct BillingAccountLocationRecommenderRecommendationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationRecommenderRecommendationListCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationRecommenderRecommendationListCall<'a> {}
 
-impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationRecommenderRecommendationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2616,8 +2610,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2630,7 +2623,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2639,7 +2632,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2699,28 +2692,28 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> BillingAccountLocationRecommenderRecommendationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Filter expression to restrict the recommendations returned. Supported filter fields: state_info.state Eg: `state_info.state:"DISMISSED" or state_info.state:"FAILED"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -2730,7 +2723,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2755,7 +2748,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2775,7 +2768,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2825,10 +2818,10 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationListCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2836,9 +2829,9 @@ pub struct BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a> {}
 
-impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2914,8 +2907,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2929,7 +2921,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2940,7 +2932,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2999,7 +2991,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._request = new_value;
         self
     }
@@ -3009,7 +3001,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3019,7 +3011,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3044,7 +3036,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3064,7 +3056,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3114,10 +3106,10 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkClaimedCall<'a, C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3125,9 +3117,9 @@ pub struct BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a> {}
 
-impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3203,8 +3195,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3218,7 +3209,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3229,7 +3220,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3288,7 +3279,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._request = new_value;
         self
     }
@@ -3298,7 +3289,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3308,7 +3299,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3333,7 +3324,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3353,7 +3344,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3403,10 +3394,10 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkFailedCall<'a, C>
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C>
-    where C: 'a {
+pub struct BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3414,9 +3405,9 @@ pub struct BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, 
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C> {}
+impl<'a> client::CallBuilder for BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a> {}
 
-impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3492,8 +3483,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3507,7 +3497,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3518,7 +3508,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3577,7 +3567,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._request = new_value;
         self
     }
@@ -3587,7 +3577,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3597,7 +3587,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3622,7 +3612,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3642,7 +3632,7 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3686,19 +3676,19 @@ impl<'a, C> BillingAccountLocationRecommenderRecommendationMarkSucceededCall<'a,
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationInsightTypeInsightGetCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationInsightTypeInsightGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationInsightTypeInsightGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationInsightTypeInsightGetCall<'a> {}
 
-impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationInsightTypeInsightGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3763,8 +3753,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3777,7 +3766,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3786,7 +3775,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3846,7 +3835,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationInsightTypeInsightGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3856,7 +3845,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationInsightTypeInsightGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3881,7 +3870,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationInsightTypeInsightGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationInsightTypeInsightGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3901,7 +3890,7 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationInsightTypeInsightGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationInsightTypeInsightGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3948,10 +3937,10 @@ impl<'a, C> FolderLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationInsightTypeInsightListCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationInsightTypeInsightListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -3961,9 +3950,9 @@ pub struct FolderLocationInsightTypeInsightListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationInsightTypeInsightListCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationInsightTypeInsightListCall<'a> {}
 
-impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationInsightTypeInsightListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4037,8 +4026,7 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4051,7 +4039,7 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4060,7 +4048,7 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4120,28 +4108,28 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderLocationInsightTypeInsightListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filter expression to restrict the insights returned. Supported filter fields: state Eg: `state:"DISMISSED" or state:"ACTIVE"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> FolderLocationInsightTypeInsightListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4151,7 +4139,7 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationInsightTypeInsightListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationInsightTypeInsightListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4176,7 +4164,7 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationInsightTypeInsightListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationInsightTypeInsightListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4196,7 +4184,7 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationInsightTypeInsightListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationInsightTypeInsightListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4246,10 +4234,10 @@ impl<'a, C> FolderLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationInsightTypeInsightMarkAcceptedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4257,9 +4245,9 @@ pub struct FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationInsightTypeInsightMarkAcceptedCall<'a> {}
 
-impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationInsightTypeInsightMarkAcceptedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4335,8 +4323,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4350,7 +4337,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4361,7 +4348,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4420,7 +4407,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._request = new_value;
         self
     }
@@ -4430,7 +4417,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4440,7 +4427,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4465,7 +4452,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4485,7 +4472,7 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4529,19 +4516,19 @@ impl<'a, C> FolderLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationRecommenderRecommendationGetCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationRecommenderRecommendationGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationRecommenderRecommendationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationRecommenderRecommendationGetCall<'a> {}
 
-impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationRecommenderRecommendationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4606,8 +4593,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4620,7 +4606,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4629,7 +4615,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4689,7 +4675,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4699,7 +4685,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4724,7 +4710,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4744,7 +4730,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4791,10 +4777,10 @@ impl<'a, C> FolderLocationRecommenderRecommendationGetCall<'a, C> where C: Borro
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationRecommenderRecommendationListCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationRecommenderRecommendationListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4804,9 +4790,9 @@ pub struct FolderLocationRecommenderRecommendationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationRecommenderRecommendationListCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationRecommenderRecommendationListCall<'a> {}
 
-impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationRecommenderRecommendationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4880,8 +4866,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4894,7 +4879,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4903,7 +4888,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4963,28 +4948,28 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> FolderLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> FolderLocationRecommenderRecommendationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Filter expression to restrict the recommendations returned. Supported filter fields: state_info.state Eg: `state_info.state:"DISMISSED" or state_info.state:"FAILED"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -4994,7 +4979,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5019,7 +5004,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5039,7 +5024,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5089,10 +5074,10 @@ impl<'a, C> FolderLocationRecommenderRecommendationListCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationRecommenderRecommendationMarkClaimedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5100,9 +5085,9 @@ pub struct FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationRecommenderRecommendationMarkClaimedCall<'a> {}
 
-impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationRecommenderRecommendationMarkClaimedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5178,8 +5163,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5193,7 +5177,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5204,7 +5188,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5263,7 +5247,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._request = new_value;
         self
     }
@@ -5273,7 +5257,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5283,7 +5267,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5308,7 +5292,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5328,7 +5312,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5378,10 +5362,10 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkClaimedCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationRecommenderRecommendationMarkFailedCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationRecommenderRecommendationMarkFailedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5389,9 +5373,9 @@ pub struct FolderLocationRecommenderRecommendationMarkFailedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationRecommenderRecommendationMarkFailedCall<'a> {}
 
-impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationRecommenderRecommendationMarkFailedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5467,8 +5451,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5482,7 +5465,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5493,7 +5476,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5552,7 +5535,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._request = new_value;
         self
     }
@@ -5562,7 +5545,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5572,7 +5555,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5597,7 +5580,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5617,7 +5600,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5667,10 +5650,10 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkFailedCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C>
-    where C: 'a {
+pub struct FolderLocationRecommenderRecommendationMarkSucceededCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5678,9 +5661,9 @@ pub struct FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> {}
+impl<'a> client::CallBuilder for FolderLocationRecommenderRecommendationMarkSucceededCall<'a> {}
 
-impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> FolderLocationRecommenderRecommendationMarkSucceededCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5756,8 +5739,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5771,7 +5753,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5782,7 +5764,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5841,7 +5823,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._request = new_value;
         self
     }
@@ -5851,7 +5833,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5861,7 +5843,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5886,7 +5868,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5906,7 +5888,7 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FolderLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5950,19 +5932,19 @@ impl<'a, C> FolderLocationRecommenderRecommendationMarkSucceededCall<'a, C> wher
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationInsightTypeInsightGetCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationInsightTypeInsightGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationInsightTypeInsightGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationInsightTypeInsightGetCall<'a> {}
 
-impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationInsightTypeInsightGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6027,8 +6009,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6041,7 +6022,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6050,7 +6031,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6110,7 +6091,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6120,7 +6101,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationInsightTypeInsightGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6145,7 +6126,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationInsightTypeInsightGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationInsightTypeInsightGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6165,7 +6146,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationInsightTypeInsightGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationInsightTypeInsightGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6212,10 +6193,10 @@ impl<'a, C> OrganizationLocationInsightTypeInsightGetCall<'a, C> where C: Borrow
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationInsightTypeInsightListCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationInsightTypeInsightListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -6225,9 +6206,9 @@ pub struct OrganizationLocationInsightTypeInsightListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationInsightTypeInsightListCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationInsightTypeInsightListCall<'a> {}
 
-impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationInsightTypeInsightListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6301,8 +6282,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6315,7 +6295,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6324,7 +6304,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6384,28 +6364,28 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationInsightTypeInsightListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filter expression to restrict the insights returned. Supported filter fields: state Eg: `state:"DISMISSED" or state:"ACTIVE"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6415,7 +6395,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationInsightTypeInsightListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationInsightTypeInsightListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6440,7 +6420,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationInsightTypeInsightListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationInsightTypeInsightListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6460,7 +6440,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationInsightTypeInsightListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationInsightTypeInsightListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6510,10 +6490,10 @@ impl<'a, C> OrganizationLocationInsightTypeInsightListCall<'a, C> where C: Borro
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6521,9 +6501,9 @@ pub struct OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a> {}
 
-impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6599,8 +6579,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6614,7 +6593,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6625,7 +6604,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6684,7 +6663,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._request = new_value;
         self
     }
@@ -6694,7 +6673,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6704,7 +6683,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6729,7 +6708,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6749,7 +6728,7 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6793,19 +6772,19 @@ impl<'a, C> OrganizationLocationInsightTypeInsightMarkAcceptedCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationRecommenderRecommendationGetCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationRecommenderRecommendationGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationRecommenderRecommendationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationRecommenderRecommendationGetCall<'a> {}
 
-impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationRecommenderRecommendationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6870,8 +6849,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6884,7 +6862,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6893,7 +6871,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6953,7 +6931,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6963,7 +6941,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6988,7 +6966,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7008,7 +6986,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7055,10 +7033,10 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationGetCall<'a, C> where C:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationRecommenderRecommendationListCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationRecommenderRecommendationListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7068,9 +7046,9 @@ pub struct OrganizationLocationRecommenderRecommendationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationRecommenderRecommendationListCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationRecommenderRecommendationListCall<'a> {}
 
-impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationRecommenderRecommendationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7144,8 +7122,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7158,7 +7135,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7167,7 +7144,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7227,28 +7204,28 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OrganizationLocationRecommenderRecommendationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Filter expression to restrict the recommendations returned. Supported filter fields: state_info.state Eg: `state_info.state:"DISMISSED" or state_info.state:"FAILED"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -7258,7 +7235,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7283,7 +7260,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7303,7 +7280,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7353,10 +7330,10 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationListCall<'a, C> where C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7364,9 +7341,9 @@ pub struct OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a> {}
 
-impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7442,8 +7419,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7457,7 +7433,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7468,7 +7444,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7527,7 +7503,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._request = new_value;
         self
     }
@@ -7537,7 +7513,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7547,7 +7523,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7572,7 +7548,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7592,7 +7568,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7642,10 +7618,10 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkClaimedCall<'a, C> 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationRecommenderRecommendationMarkFailedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7653,9 +7629,9 @@ pub struct OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationRecommenderRecommendationMarkFailedCall<'a> {}
 
-impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7731,8 +7707,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7746,7 +7721,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7757,7 +7732,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7816,7 +7791,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._request = new_value;
         self
     }
@@ -7826,7 +7801,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7836,7 +7811,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7861,7 +7836,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7881,7 +7856,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7931,10 +7906,10 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkFailedCall<'a, C> w
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C>
-    where C: 'a {
+pub struct OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7942,9 +7917,9 @@ pub struct OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C> {}
+impl<'a> client::CallBuilder for OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a> {}
 
-impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8020,8 +7995,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8035,7 +8009,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8046,7 +8020,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8105,7 +8079,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._request = new_value;
         self
     }
@@ -8115,7 +8089,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8125,7 +8099,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8150,7 +8124,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8170,7 +8144,7 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8214,19 +8188,19 @@ impl<'a, C> OrganizationLocationRecommenderRecommendationMarkSucceededCall<'a, C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInsightTypeInsightGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInsightTypeInsightGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInsightTypeInsightGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInsightTypeInsightGetCall<'a> {}
 
-impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInsightTypeInsightGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8291,8 +8265,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8305,7 +8278,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8314,7 +8287,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8374,7 +8347,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8384,7 +8357,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInsightTypeInsightGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInsightTypeInsightGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8409,7 +8382,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInsightTypeInsightGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInsightTypeInsightGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8429,7 +8402,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInsightTypeInsightGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInsightTypeInsightGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8476,10 +8449,10 @@ impl<'a, C> ProjectLocationInsightTypeInsightGetCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInsightTypeInsightListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInsightTypeInsightListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -8489,9 +8462,9 @@ pub struct ProjectLocationInsightTypeInsightListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInsightTypeInsightListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInsightTypeInsightListCall<'a> {}
 
-impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInsightTypeInsightListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8565,8 +8538,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8579,7 +8551,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8588,7 +8560,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8648,28 +8620,28 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationInsightTypeInsightListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationInsightTypeInsightListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Optional. Filter expression to restrict the insights returned. Supported filter fields: state Eg: `state:"DISMISSED" or state:"ACTIVE"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -8679,7 +8651,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInsightTypeInsightListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInsightTypeInsightListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8704,7 +8676,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInsightTypeInsightListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInsightTypeInsightListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8724,7 +8696,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInsightTypeInsightListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInsightTypeInsightListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8774,10 +8746,10 @@ impl<'a, C> ProjectLocationInsightTypeInsightListCall<'a, C> where C: BorrowMut<
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationInsightTypeInsightMarkAcceptedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkInsightAcceptedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8785,9 +8757,9 @@ pub struct ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationInsightTypeInsightMarkAcceptedCall<'a> {}
 
-impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8863,8 +8835,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8878,7 +8849,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8889,7 +8860,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8948,7 +8919,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkInsightAcceptedRequest) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._request = new_value;
         self
     }
@@ -8958,7 +8929,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8968,7 +8939,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8993,7 +8964,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9013,7 +8984,7 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9057,19 +9028,19 @@ impl<'a, C> ProjectLocationInsightTypeInsightMarkAcceptedCall<'a, C> where C: Bo
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRecommenderRecommendationGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRecommenderRecommendationGetCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRecommenderRecommendationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRecommenderRecommendationGetCall<'a> {}
 
-impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRecommenderRecommendationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9134,8 +9105,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9148,7 +9118,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9157,7 +9127,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9217,7 +9187,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9227,7 +9197,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9252,7 +9222,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9272,7 +9242,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9319,10 +9289,10 @@ impl<'a, C> ProjectLocationRecommenderRecommendationGetCall<'a, C> where C: Borr
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRecommenderRecommendationListCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRecommenderRecommendationListCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -9332,9 +9302,9 @@ pub struct ProjectLocationRecommenderRecommendationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRecommenderRecommendationListCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRecommenderRecommendationListCall<'a> {}
 
-impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRecommenderRecommendationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9408,8 +9378,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9422,7 +9391,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9431,7 +9400,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9491,28 +9460,28 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
     /// Optional. If present, retrieves the next batch of results from the preceding call to this method. `page_token` must be the value of `next_page_token` from the previous response. The values of other method parameters must be identical to those in the previous call.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Optional. The maximum number of results to return from this request. Non-positive values are ignored. If not specified, the server will determine the number of results to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationRecommenderRecommendationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// Filter expression to restrict the recommendations returned. Supported filter fields: state_info.state Eg: `state_info.state:"DISMISSED" or state_info.state:"FAILED"
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9522,7 +9491,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9547,7 +9516,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9567,7 +9536,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9617,10 +9586,10 @@ impl<'a, C> ProjectLocationRecommenderRecommendationListCall<'a, C> where C: Bor
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRecommenderRecommendationMarkClaimedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9628,9 +9597,9 @@ pub struct ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRecommenderRecommendationMarkClaimedCall<'a> {}
 
-impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9706,8 +9675,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9721,7 +9689,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9732,7 +9700,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9791,7 +9759,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationClaimedRequest) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._request = new_value;
         self
     }
@@ -9801,7 +9769,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9811,7 +9779,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9836,7 +9804,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9856,7 +9824,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9906,10 +9874,10 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkClaimedCall<'a, C> where
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRecommenderRecommendationMarkFailedCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationFailedRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -9917,9 +9885,9 @@ pub struct ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRecommenderRecommendationMarkFailedCall<'a> {}
 
-impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRecommenderRecommendationMarkFailedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9995,8 +9963,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10010,7 +9977,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10021,7 +9988,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10080,7 +10047,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationFailedRequest) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._request = new_value;
         self
     }
@@ -10090,7 +10057,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10100,7 +10067,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10125,7 +10092,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10145,7 +10112,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationMarkFailedCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10195,10 +10162,10 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkFailedCall<'a, C> where 
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C>
-    where C: 'a {
+pub struct ProjectLocationRecommenderRecommendationMarkSucceededCall<'a>
+    where  {
 
-    hub: &'a Recommender<C>,
+    hub: &'a Recommender<>,
     _request: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -10206,9 +10173,9 @@ pub struct ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectLocationRecommenderRecommendationMarkSucceededCall<'a> {}
 
-impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -10284,8 +10251,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -10299,7 +10265,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -10310,7 +10276,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -10369,7 +10335,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudRecommenderV1MarkRecommendationSucceededRequest) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._request = new_value;
         self
     }
@@ -10379,7 +10345,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -10389,7 +10355,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -10414,7 +10380,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10434,7 +10400,7 @@ impl<'a, C> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C> whe
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationRecommenderRecommendationMarkSucceededCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

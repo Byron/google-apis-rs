@@ -4,11 +4,11 @@
 [package]
 
 name = "google-tasks1"
-version = "2.0.0+20210329"
+version = "2.0.3+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tasks (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tasks1"
-documentation = "https://docs.rs/google-tasks1/2.0.0+20210329"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/tasks1"
+documentation = "https://docs.rs/google-tasks1/2.0.3+20210329"
 license = "MIT"
 keywords = ["tasks", "google", "protocol", "web", "api"]
 autobins = false

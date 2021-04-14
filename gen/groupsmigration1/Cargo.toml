@@ -4,12 +4,12 @@
 [package]
 
 name = "google-groupsmigration1"
-version = "2.0.0+20210318"
+version = "2.0.3+20210318"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/groupsmigration1"
 homepage = "https://developers.google.com/google-apps/groups-migration/"
-documentation = "https://docs.rs/google-groupsmigration1/2.0.0+20210318"
+documentation = "https://docs.rs/google-groupsmigration1/2.0.3+20210318"
 license = "MIT"
 keywords = ["groupsmigration", "google", "protocol", "web", "api"]
 autobins = false

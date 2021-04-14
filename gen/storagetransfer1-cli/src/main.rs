@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Storagetransfer<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Storagetransfer,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -1349,7 +1348,7 @@ async fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210316")
+           .version("2.0.3+20210316")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

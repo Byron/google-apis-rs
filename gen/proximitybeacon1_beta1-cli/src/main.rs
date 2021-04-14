@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Proximitybeacon<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Proximitybeacon,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -1958,7 +1957,7 @@ async fn main() {
     
     let mut app = App::new("proximitybeacon1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20200127")
+           .version("2.0.3+20200127")
            .about("Registers, manages, indexes, and searches beacons.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli")
            .arg(Arg::with_name("url")

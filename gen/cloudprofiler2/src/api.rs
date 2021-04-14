@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -114,35 +113,34 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudProfiler<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudProfiler<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudProfiler<C> {}
+impl<'a, > client::Hub for CloudProfiler<> {}
 
-impl<'a, C> CloudProfiler<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudProfiler<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudProfiler<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudProfiler<> {
         CloudProfiler {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudprofiler.googleapis.com/".to_string(),
             _root_url: "https://cloudprofiler.googleapis.com/".to_string(),
         }
     }
 
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -277,15 +275,15 @@ impl client::ResponseResult for Profile {}
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a CloudProfiler<C>,
+    hub: &'a CloudProfiler<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -295,7 +293,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Parent project to create the profile in.
-    pub fn profiles_create(&self, request: CreateProfileRequest, parent: &str) -> ProjectProfileCreateCall<'a, C> {
+    pub fn profiles_create(&self, request: CreateProfileRequest, parent: &str) -> ProjectProfileCreateCall<'a> {
         ProjectProfileCreateCall {
             hub: self.hub,
             _request: request,
@@ -314,7 +312,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - Parent project to create the profile in.
-    pub fn profiles_create_offline(&self, request: Profile, parent: &str) -> ProjectProfileCreateOfflineCall<'a, C> {
+    pub fn profiles_create_offline(&self, request: Profile, parent: &str) -> ProjectProfileCreateOfflineCall<'a> {
         ProjectProfileCreateOfflineCall {
             hub: self.hub,
             _request: request,
@@ -333,7 +331,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - Output only. Opaque, server-assigned, unique ID for this profile.
-    pub fn profiles_patch(&self, request: Profile, name: &str) -> ProjectProfilePatchCall<'a, C> {
+    pub fn profiles_patch(&self, request: Profile, name: &str) -> ProjectProfilePatchCall<'a> {
         ProjectProfilePatchCall {
             hub: self.hub,
             _request: request,
@@ -392,10 +390,10 @@ impl<'a, C> ProjectMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProfileCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectProfileCreateCall<'a>
+    where  {
 
-    hub: &'a CloudProfiler<C>,
+    hub: &'a CloudProfiler<>,
     _request: CreateProfileRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -403,9 +401,9 @@ pub struct ProjectProfileCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectProfileCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectProfileCreateCall<'a> {}
 
-impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectProfileCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -481,8 +479,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -496,7 +493,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -507,7 +504,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -566,7 +563,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateProfileRequest) -> ProjectProfileCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateProfileRequest) -> ProjectProfileCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -576,7 +573,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -586,7 +583,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -611,7 +608,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -631,7 +628,7 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfileCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfileCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -681,10 +678,10 @@ impl<'a, C> ProjectProfileCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProfileCreateOfflineCall<'a, C>
-    where C: 'a {
+pub struct ProjectProfileCreateOfflineCall<'a>
+    where  {
 
-    hub: &'a CloudProfiler<C>,
+    hub: &'a CloudProfiler<>,
     _request: Profile,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -692,9 +689,9 @@ pub struct ProjectProfileCreateOfflineCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectProfileCreateOfflineCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectProfileCreateOfflineCall<'a> {}
 
-impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectProfileCreateOfflineCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -770,8 +767,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -785,7 +781,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -796,7 +792,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -855,7 +851,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Profile) -> ProjectProfileCreateOfflineCall<'a, C> {
+    pub fn request(mut self, new_value: Profile) -> ProjectProfileCreateOfflineCall<'a> {
         self._request = new_value;
         self
     }
@@ -865,7 +861,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateOfflineCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> ProjectProfileCreateOfflineCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -875,7 +871,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateOfflineCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfileCreateOfflineCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -900,7 +896,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateOfflineCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfileCreateOfflineCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -920,7 +916,7 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfileCreateOfflineCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfileCreateOfflineCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -971,10 +967,10 @@ impl<'a, C> ProjectProfileCreateOfflineCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectProfilePatchCall<'a, C>
-    where C: 'a {
+pub struct ProjectProfilePatchCall<'a>
+    where  {
 
-    hub: &'a CloudProfiler<C>,
+    hub: &'a CloudProfiler<>,
     _request: Profile,
     _name: String,
     _update_mask: Option<String>,
@@ -983,9 +979,9 @@ pub struct ProjectProfilePatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectProfilePatchCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectProfilePatchCall<'a> {}
 
-impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectProfilePatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1064,8 +1060,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1079,7 +1074,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1090,7 +1085,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1149,7 +1144,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Profile) -> ProjectProfilePatchCall<'a, C> {
+    pub fn request(mut self, new_value: Profile) -> ProjectProfilePatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -1159,14 +1154,14 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectProfilePatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> ProjectProfilePatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Field mask used to specify the fields to be overwritten. Currently only profile_bytes and labels fields are supported by UpdateProfile, so only those fields can be specified in the mask. When no mask is provided, all fields are overwritten.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> ProjectProfilePatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> ProjectProfilePatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -1176,7 +1171,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfilePatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectProfilePatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1201,7 +1196,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfilePatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectProfilePatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1221,7 +1216,7 @@ impl<'a, C> ProjectProfilePatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfilePatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectProfilePatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

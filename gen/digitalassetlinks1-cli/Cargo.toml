@@ -4,10 +4,10 @@
 [package]
 
 name = "google-digitalassetlinks1-cli"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with digitalassetlinks (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/digitalassetlinks1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/digitalassetlinks1-cli"
 homepage = "https://developers.google.com/digital-asset-links/"
 documentation = "http://byron.github.io/google-apis-rs/google_digitalassetlinks1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-digitalassetlinks1]
 path = "../digitalassetlinks1"
-version = "2.0.0+20210322"
+version = "2.0.3+20210322"

@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-remotebuildexecution2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/remotebuildexecution2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/remotebuildexecution2-cli).
 
 # Usage
 
-This documentation was generated from the *Remote Build Execution* API at revision *20210329*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Remote Build Execution* API at revision *20210329*. The CLI is at version *2.0.3*.
 
 ```bash
 remotebuildexecution2 [options]

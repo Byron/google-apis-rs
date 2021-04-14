@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -110,41 +109,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Testing<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Testing<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Testing<C> {}
+impl<'a, > client::Hub for Testing<> {}
 
-impl<'a, C> Testing<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Testing<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Testing<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Testing<> {
         Testing {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://testing.googleapis.com/".to_string(),
             _root_url: "https://testing.googleapis.com/".to_string(),
         }
     }
 
-    pub fn application_detail_service(&'a self) -> ApplicationDetailServiceMethods<'a, C> {
+    pub fn application_detail_service(&'a self) -> ApplicationDetailServiceMethods<'a> {
         ApplicationDetailServiceMethods { hub: &self }
     }
-    pub fn projects(&'a self) -> ProjectMethods<'a, C> {
+    pub fn projects(&'a self) -> ProjectMethods<'a> {
         ProjectMethods { hub: &self }
     }
-    pub fn test_environment_catalog(&'a self) -> TestEnvironmentCatalogMethods<'a, C> {
+    pub fn test_environment_catalog(&'a self) -> TestEnvironmentCatalogMethods<'a> {
         TestEnvironmentCatalogMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1658,15 +1656,15 @@ impl client::Part for XcodeVersion {}
 /// let rb = hub.application_detail_service();
 /// # }
 /// ```
-pub struct ApplicationDetailServiceMethods<'a, C>
-    where C: 'a {
+pub struct ApplicationDetailServiceMethods<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ApplicationDetailServiceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ApplicationDetailServiceMethods<'a> {}
 
-impl<'a, C> ApplicationDetailServiceMethods<'a, C> {
+impl<'a> ApplicationDetailServiceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1675,7 +1673,7 @@ impl<'a, C> ApplicationDetailServiceMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn get_apk_details(&self, request: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a, C> {
+    pub fn get_apk_details(&self, request: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a> {
         ApplicationDetailServiceGetApkDetailCall {
             hub: self.hub,
             _request: request,
@@ -1718,15 +1716,15 @@ impl<'a, C> ApplicationDetailServiceMethods<'a, C> {
 /// let rb = hub.projects();
 /// # }
 /// ```
-pub struct ProjectMethods<'a, C>
-    where C: 'a {
+pub struct ProjectMethods<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ProjectMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ProjectMethods<'a> {}
 
-impl<'a, C> ProjectMethods<'a, C> {
+impl<'a> ProjectMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1736,7 +1734,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `projectId` - Cloud project that owns the test.
     /// * `testMatrixId` - Test matrix that will be canceled.
-    pub fn test_matrices_cancel(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceCancelCall<'a, C> {
+    pub fn test_matrices_cancel(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceCancelCall<'a> {
         ProjectTestMatriceCancelCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1755,7 +1753,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - The GCE project under which this job will run.
-    pub fn test_matrices_create(&self, request: TestMatrix, project_id: &str) -> ProjectTestMatriceCreateCall<'a, C> {
+    pub fn test_matrices_create(&self, request: TestMatrix, project_id: &str) -> ProjectTestMatriceCreateCall<'a> {
         ProjectTestMatriceCreateCall {
             hub: self.hub,
             _request: request,
@@ -1775,7 +1773,7 @@ impl<'a, C> ProjectMethods<'a, C> {
     ///
     /// * `projectId` - Cloud project that owns the test matrix.
     /// * `testMatrixId` - Unique test matrix id which was assigned by the service.
-    pub fn test_matrices_get(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceGetCall<'a, C> {
+    pub fn test_matrices_get(&self, project_id: &str, test_matrix_id: &str) -> ProjectTestMatriceGetCall<'a> {
         ProjectTestMatriceGetCall {
             hub: self.hub,
             _project_id: project_id.to_string(),
@@ -1819,15 +1817,15 @@ impl<'a, C> ProjectMethods<'a, C> {
 /// let rb = hub.test_environment_catalog();
 /// # }
 /// ```
-pub struct TestEnvironmentCatalogMethods<'a, C>
-    where C: 'a {
+pub struct TestEnvironmentCatalogMethods<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TestEnvironmentCatalogMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TestEnvironmentCatalogMethods<'a> {}
 
-impl<'a, C> TestEnvironmentCatalogMethods<'a, C> {
+impl<'a> TestEnvironmentCatalogMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1836,7 +1834,7 @@ impl<'a, C> TestEnvironmentCatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `environmentType` - Required. The type of environment that should be listed.
-    pub fn get(&self, environment_type: &str) -> TestEnvironmentCatalogGetCall<'a, C> {
+    pub fn get(&self, environment_type: &str) -> TestEnvironmentCatalogGetCall<'a> {
         TestEnvironmentCatalogGetCall {
             hub: self.hub,
             _environment_type: environment_type.to_string(),
@@ -1894,19 +1892,19 @@ impl<'a, C> TestEnvironmentCatalogMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ApplicationDetailServiceGetApkDetailCall<'a, C>
-    where C: 'a {
+pub struct ApplicationDetailServiceGetApkDetailCall<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
     _request: FileReference,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ApplicationDetailServiceGetApkDetailCall<'a, C> {}
+impl<'a> client::CallBuilder for ApplicationDetailServiceGetApkDetailCall<'a> {}
 
-impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ApplicationDetailServiceGetApkDetailCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1956,8 +1954,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1971,7 +1968,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1982,7 +1979,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2041,7 +2038,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a, C> {
+    pub fn request(mut self, new_value: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a> {
         self._request = new_value;
         self
     }
@@ -2051,7 +2048,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationDetailServiceGetApkDetailCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ApplicationDetailServiceGetApkDetailCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2076,7 +2073,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ApplicationDetailServiceGetApkDetailCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationDetailServiceGetApkDetailCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2096,7 +2093,7 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationDetailServiceGetApkDetailCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationDetailServiceGetApkDetailCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2140,10 +2137,10 @@ impl<'a, C> ApplicationDetailServiceGetApkDetailCall<'a, C> where C: BorrowMut<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestMatriceCancelCall<'a, C>
-    where C: 'a {
+pub struct ProjectTestMatriceCancelCall<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
     _project_id: String,
     _test_matrix_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2151,9 +2148,9 @@ pub struct ProjectTestMatriceCancelCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectTestMatriceCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectTestMatriceCancelCall<'a> {}
 
-impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectTestMatriceCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2215,8 +2212,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2229,7 +2225,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2238,7 +2234,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2298,7 +2294,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2308,7 +2304,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a, C> {
+    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceCancelCall<'a> {
         self._test_matrix_id = new_value.to_string();
         self
     }
@@ -2318,7 +2314,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2343,7 +2339,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2363,7 +2359,7 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceCancelCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceCancelCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2414,10 +2410,10 @@ impl<'a, C> ProjectTestMatriceCancelCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestMatriceCreateCall<'a, C>
-    where C: 'a {
+pub struct ProjectTestMatriceCreateCall<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
     _request: TestMatrix,
     _project_id: String,
     _request_id: Option<String>,
@@ -2426,9 +2422,9 @@ pub struct ProjectTestMatriceCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectTestMatriceCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectTestMatriceCreateCall<'a> {}
 
-impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectTestMatriceCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2503,8 +2499,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2518,7 +2513,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2529,7 +2524,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2588,7 +2583,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: TestMatrix) -> ProjectTestMatriceCreateCall<'a, C> {
+    pub fn request(mut self, new_value: TestMatrix) -> ProjectTestMatriceCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2598,14 +2593,14 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
     /// A string id used to detect duplicated requests. Ids are automatically scoped to a project, so users should ensure the ID is unique per-project. A UUID is recommended. Optional, but strongly recommended.
     ///
     /// Sets the *request id* query property to the given value.
-    pub fn request_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a, C> {
+    pub fn request_id(mut self, new_value: &str) -> ProjectTestMatriceCreateCall<'a> {
         self._request_id = Some(new_value.to_string());
         self
     }
@@ -2615,7 +2610,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2640,7 +2635,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2660,7 +2655,7 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2704,10 +2699,10 @@ impl<'a, C> ProjectTestMatriceCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ProjectTestMatriceGetCall<'a, C>
-    where C: 'a {
+pub struct ProjectTestMatriceGetCall<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
     _project_id: String,
     _test_matrix_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2715,9 +2710,9 @@ pub struct ProjectTestMatriceGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ProjectTestMatriceGetCall<'a, C> {}
+impl<'a> client::CallBuilder for ProjectTestMatriceGetCall<'a> {}
 
-impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ProjectTestMatriceGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2779,8 +2774,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2793,7 +2787,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2802,7 +2796,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2862,7 +2856,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a> {
         self._project_id = new_value.to_string();
         self
     }
@@ -2872,7 +2866,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a, C> {
+    pub fn test_matrix_id(mut self, new_value: &str) -> ProjectTestMatriceGetCall<'a> {
         self._test_matrix_id = new_value.to_string();
         self
     }
@@ -2882,7 +2876,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectTestMatriceGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2907,7 +2901,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2927,7 +2921,7 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTestMatriceGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2972,10 +2966,10 @@ impl<'a, C> ProjectTestMatriceGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TestEnvironmentCatalogGetCall<'a, C>
-    where C: 'a {
+pub struct TestEnvironmentCatalogGetCall<'a>
+    where  {
 
-    hub: &'a Testing<C>,
+    hub: &'a Testing<>,
     _environment_type: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2983,9 +2977,9 @@ pub struct TestEnvironmentCatalogGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TestEnvironmentCatalogGetCall<'a, C> {}
+impl<'a> client::CallBuilder for TestEnvironmentCatalogGetCall<'a> {}
 
-impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TestEnvironmentCatalogGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3049,8 +3043,7 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3063,7 +3056,7 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3072,7 +3065,7 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3132,14 +3125,14 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn environment_type(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a, C> {
+    pub fn environment_type(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a> {
         self._environment_type = new_value.to_string();
         self
     }
     /// For authorization, the cloud project requesting the TestEnvironmentCatalog.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> TestEnvironmentCatalogGetCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3149,7 +3142,7 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestEnvironmentCatalogGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TestEnvironmentCatalogGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3174,7 +3167,7 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> TestEnvironmentCatalogGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TestEnvironmentCatalogGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3194,7 +3187,7 @@ impl<'a, C> TestEnvironmentCatalogGetCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TestEnvironmentCatalogGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TestEnvironmentCatalogGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

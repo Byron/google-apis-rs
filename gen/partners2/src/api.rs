@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -90,59 +89,58 @@ use crate::client;
 /// }
 /// # }
 /// ```
-pub struct Partners<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Partners<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Partners<C> {}
+impl<'a, > client::Hub for Partners<> {}
 
-impl<'a, C> Partners<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Partners<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Partners<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Partners<> {
         Partners {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://partners.googleapis.com/".to_string(),
             _root_url: "https://partners.googleapis.com/".to_string(),
         }
     }
 
-    pub fn analytics(&'a self) -> AnalyticMethods<'a, C> {
+    pub fn analytics(&'a self) -> AnalyticMethods<'a> {
         AnalyticMethods { hub: &self }
     }
-    pub fn client_messages(&'a self) -> ClientMessageMethods<'a, C> {
+    pub fn client_messages(&'a self) -> ClientMessageMethods<'a> {
         ClientMessageMethods { hub: &self }
     }
-    pub fn companies(&'a self) -> CompanyMethods<'a, C> {
+    pub fn companies(&'a self) -> CompanyMethods<'a> {
         CompanyMethods { hub: &self }
     }
-    pub fn leads(&'a self) -> LeadMethods<'a, C> {
+    pub fn leads(&'a self) -> LeadMethods<'a> {
         LeadMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
-    pub fn offers(&'a self) -> OfferMethods<'a, C> {
+    pub fn offers(&'a self) -> OfferMethods<'a> {
         OfferMethods { hub: &self }
     }
-    pub fn user_events(&'a self) -> UserEventMethods<'a, C> {
+    pub fn user_events(&'a self) -> UserEventMethods<'a> {
         UserEventMethods { hub: &self }
     }
-    pub fn user_states(&'a self) -> UserStateMethods<'a, C> {
+    pub fn user_states(&'a self) -> UserStateMethods<'a> {
         UserStateMethods { hub: &self }
     }
-    pub fn users(&'a self) -> UserMethods<'a, C> {
+    pub fn users(&'a self) -> UserMethods<'a> {
         UserMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1624,15 +1622,15 @@ impl client::Part for Date {}
 /// let rb = hub.user_events();
 /// # }
 /// ```
-pub struct UserEventMethods<'a, C>
-    where C: 'a {
+pub struct UserEventMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserEventMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserEventMethods<'a> {}
 
-impl<'a, C> UserEventMethods<'a, C> {
+impl<'a> UserEventMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1641,7 +1639,7 @@ impl<'a, C> UserEventMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn log(&self, request: LogUserEventRequest) -> UserEventLogCall<'a, C> {
+    pub fn log(&self, request: LogUserEventRequest) -> UserEventLogCall<'a> {
         UserEventLogCall {
             hub: self.hub,
             _request: request,
@@ -1683,15 +1681,15 @@ impl<'a, C> UserEventMethods<'a, C> {
 /// let rb = hub.client_messages();
 /// # }
 /// ```
-pub struct ClientMessageMethods<'a, C>
-    where C: 'a {
+pub struct ClientMessageMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ClientMessageMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ClientMessageMethods<'a> {}
 
-impl<'a, C> ClientMessageMethods<'a, C> {
+impl<'a> ClientMessageMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1702,7 +1700,7 @@ impl<'a, C> ClientMessageMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn log(&self, request: LogMessageRequest) -> ClientMessageLogCall<'a, C> {
+    pub fn log(&self, request: LogMessageRequest) -> ClientMessageLogCall<'a> {
         ClientMessageLogCall {
             hub: self.hub,
             _request: request,
@@ -1744,21 +1742,21 @@ impl<'a, C> ClientMessageMethods<'a, C> {
 /// let rb = hub.leads();
 /// # }
 /// ```
-pub struct LeadMethods<'a, C>
-    where C: 'a {
+pub struct LeadMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for LeadMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for LeadMethods<'a> {}
 
-impl<'a, C> LeadMethods<'a, C> {
+impl<'a> LeadMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists advertiser leads for a user's associated company.
     /// Should only be called within the context of an authorized logged in user.
-    pub fn list(&self) -> LeadListCall<'a, C> {
+    pub fn list(&self) -> LeadListCall<'a> {
         LeadListCall {
             hub: self.hub,
             _request_metadata_user_overrides_user_id: Default::default(),
@@ -1809,20 +1807,20 @@ impl<'a, C> LeadMethods<'a, C> {
 /// let rb = hub.offers();
 /// # }
 /// ```
-pub struct OfferMethods<'a, C>
-    where C: 'a {
+pub struct OfferMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OfferMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OfferMethods<'a> {}
 
-impl<'a, C> OfferMethods<'a, C> {
+impl<'a> OfferMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the Historical Offers for the current user (or user's entire company)
-    pub fn history_list(&self) -> OfferHistoryListCall<'a, C> {
+    pub fn history_list(&self) -> OfferHistoryListCall<'a> {
         OfferHistoryListCall {
             hub: self.hub,
             _request_metadata_user_overrides_user_id: Default::default(),
@@ -1844,7 +1842,7 @@ impl<'a, C> OfferMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists the Offers available for the current user
-    pub fn list(&self) -> OfferListCall<'a, C> {
+    pub fn list(&self) -> OfferListCall<'a> {
         OfferListCall {
             hub: self.hub,
             _request_metadata_user_overrides_user_id: Default::default(),
@@ -1892,21 +1890,21 @@ impl<'a, C> OfferMethods<'a, C> {
 /// let rb = hub.analytics();
 /// # }
 /// ```
-pub struct AnalyticMethods<'a, C>
-    where C: 'a {
+pub struct AnalyticMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for AnalyticMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for AnalyticMethods<'a> {}
 
-impl<'a, C> AnalyticMethods<'a, C> {
+impl<'a> AnalyticMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists analytics data for a user's associated company.
     /// Should only be called within the context of an authorized logged in user.
-    pub fn list(&self) -> AnalyticListCall<'a, C> {
+    pub fn list(&self) -> AnalyticListCall<'a> {
         AnalyticListCall {
             hub: self.hub,
             _request_metadata_user_overrides_user_id: Default::default(),
@@ -1956,20 +1954,20 @@ impl<'a, C> AnalyticMethods<'a, C> {
 /// let rb = hub.user_states();
 /// # }
 /// ```
-pub struct UserStateMethods<'a, C>
-    where C: 'a {
+pub struct UserStateMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserStateMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserStateMethods<'a> {}
 
-impl<'a, C> UserStateMethods<'a, C> {
+impl<'a> UserStateMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
     /// Lists states for current user.
-    pub fn list(&self) -> UserStateListCall<'a, C> {
+    pub fn list(&self) -> UserStateListCall<'a> {
         UserStateListCall {
             hub: self.hub,
             _request_metadata_user_overrides_user_id: Default::default(),
@@ -2017,15 +2015,15 @@ impl<'a, C> UserStateMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2034,7 +2032,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_leads(&self, request: Lead) -> MethodUpdateLeadCall<'a, C> {
+    pub fn update_leads(&self, request: Lead) -> MethodUpdateLeadCall<'a> {
         MethodUpdateLeadCall {
             hub: self.hub,
             _request: request,
@@ -2059,7 +2057,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_companies(&self, request: Company) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn update_companies(&self, request: Company) -> MethodUpdateCompanyCall<'a> {
         MethodUpdateCompanyCall {
             hub: self.hub,
             _request: request,
@@ -2080,7 +2078,7 @@ impl<'a, C> MethodMethods<'a, C> {
     ///
     /// Gets Partners Status of the logged in user's agency.
     /// Should only be called if the logged in user is the admin of the agency.
-    pub fn get_partnersstatus(&self) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn get_partnersstatus(&self) -> MethodGetPartnersstatuCall<'a> {
         MethodGetPartnersstatuCall {
             hub: self.hub,
             _request_metadata_user_overrides_user_id: Default::default(),
@@ -2128,15 +2126,15 @@ impl<'a, C> MethodMethods<'a, C> {
 /// let rb = hub.companies();
 /// # }
 /// ```
-pub struct CompanyMethods<'a, C>
-    where C: 'a {
+pub struct CompanyMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CompanyMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CompanyMethods<'a> {}
 
-impl<'a, C> CompanyMethods<'a, C> {
+impl<'a> CompanyMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2146,7 +2144,7 @@ impl<'a, C> CompanyMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `companyId` - The ID of the company to contact.
-    pub fn leads_create(&self, request: CreateLeadRequest, company_id: &str) -> CompanyLeadCreateCall<'a, C> {
+    pub fn leads_create(&self, request: CreateLeadRequest, company_id: &str) -> CompanyLeadCreateCall<'a> {
         CompanyLeadCreateCall {
             hub: self.hub,
             _request: request,
@@ -2163,7 +2161,7 @@ impl<'a, C> CompanyMethods<'a, C> {
     /// # Arguments
     ///
     /// * `companyId` - The ID of the company to retrieve.
-    pub fn get(&self, company_id: &str) -> CompanyGetCall<'a, C> {
+    pub fn get(&self, company_id: &str) -> CompanyGetCall<'a> {
         CompanyGetCall {
             hub: self.hub,
             _company_id: company_id.to_string(),
@@ -2186,7 +2184,7 @@ impl<'a, C> CompanyMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists companies.
-    pub fn list(&self) -> CompanyListCall<'a, C> {
+    pub fn list(&self) -> CompanyListCall<'a> {
         CompanyListCall {
             hub: self.hub,
             _website_url: Default::default(),
@@ -2252,15 +2250,15 @@ impl<'a, C> CompanyMethods<'a, C> {
 /// let rb = hub.users();
 /// # }
 /// ```
-pub struct UserMethods<'a, C>
-    where C: 'a {
+pub struct UserMethods<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
 }
 
-impl<'a, C> client::MethodsBuilder for UserMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for UserMethods<'a> {}
 
-impl<'a, C> UserMethods<'a, C> {
+impl<'a> UserMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2270,7 +2268,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn update_profile(&self, request: UserProfile) -> UserUpdateProfileCall<'a, C> {
+    pub fn update_profile(&self, request: UserProfile) -> UserUpdateProfileCall<'a> {
         UserUpdateProfileCall {
             hub: self.hub,
             _request: request,
@@ -2295,7 +2293,7 @@ impl<'a, C> UserMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `userId` - The ID of the user. Can be set to <code>me</code> to mean
     ///              the currently authenticated user.
-    pub fn create_company_relation(&self, request: CompanyRelation, user_id: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn create_company_relation(&self, request: CompanyRelation, user_id: &str) -> UserCreateCompanyRelationCall<'a> {
         UserCreateCompanyRelationCall {
             hub: self.hub,
             _request: request,
@@ -2320,7 +2318,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `userId` - The ID of the user. Can be set to <code>me</code> to mean
     ///              the currently authenticated user.
-    pub fn delete_company_relation(&self, user_id: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn delete_company_relation(&self, user_id: &str) -> UserDeleteCompanyRelationCall<'a> {
         UserDeleteCompanyRelationCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2344,7 +2342,7 @@ impl<'a, C> UserMethods<'a, C> {
     ///
     /// * `userId` - Identifier of the user. Can be set to <code>me</code> to mean the currently
     ///              authenticated user.
-    pub fn get(&self, user_id: &str) -> UserGetCall<'a, C> {
+    pub fn get(&self, user_id: &str) -> UserGetCall<'a> {
         UserGetCall {
             hub: self.hub,
             _user_id: user_id.to_string(),
@@ -2408,18 +2406,18 @@ impl<'a, C> UserMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserEventLogCall<'a, C>
-    where C: 'a {
+pub struct UserEventLogCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: LogUserEventRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UserEventLogCall<'a, C> {}
+impl<'a> client::CallBuilder for UserEventLogCall<'a> {}
 
-impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserEventLogCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2477,7 +2475,7 @@ impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2488,7 +2486,7 @@ impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2547,7 +2545,7 @@ impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LogUserEventRequest) -> UserEventLogCall<'a, C> {
+    pub fn request(mut self, new_value: LogUserEventRequest) -> UserEventLogCall<'a> {
         self._request = new_value;
         self
     }
@@ -2557,7 +2555,7 @@ impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserEventLogCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserEventLogCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2582,7 +2580,7 @@ impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> UserEventLogCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserEventLogCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2631,18 +2629,18 @@ impl<'a, C> UserEventLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ClientMessageLogCall<'a, C>
-    where C: 'a {
+pub struct ClientMessageLogCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: LogMessageRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for ClientMessageLogCall<'a, C> {}
+impl<'a> client::CallBuilder for ClientMessageLogCall<'a> {}
 
-impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ClientMessageLogCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2700,7 +2698,7 @@ impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2711,7 +2709,7 @@ impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2770,7 +2768,7 @@ impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: LogMessageRequest) -> ClientMessageLogCall<'a, C> {
+    pub fn request(mut self, new_value: LogMessageRequest) -> ClientMessageLogCall<'a> {
         self._request = new_value;
         self
     }
@@ -2780,7 +2778,7 @@ impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ClientMessageLogCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ClientMessageLogCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2805,7 +2803,7 @@ impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> ClientMessageLogCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ClientMessageLogCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2857,10 +2855,10 @@ impl<'a, C> ClientMessageLogCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct LeadListCall<'a, C>
-    where C: 'a {
+pub struct LeadListCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
     _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -2875,9 +2873,9 @@ pub struct LeadListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for LeadListCall<'a, C> {}
+impl<'a> client::CallBuilder for LeadListCall<'a> {}
 
-impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> LeadListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2955,7 +2953,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -2964,7 +2962,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3021,14 +3019,14 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -3037,7 +3035,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -3046,21 +3044,21 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -3068,7 +3066,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> LeadListCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -3078,7 +3076,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// ListLeads.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> LeadListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3086,7 +3084,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// If unspecified, server picks an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> LeadListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> LeadListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3094,7 +3092,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// and `create_time desc` are supported
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> LeadListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> LeadListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -3104,7 +3102,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeadListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> LeadListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3129,7 +3127,7 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> LeadListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> LeadListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3181,10 +3179,10 @@ impl<'a, C> LeadListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::H
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OfferHistoryListCall<'a, C>
-    where C: 'a {
+pub struct OfferHistoryListCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
     _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -3200,9 +3198,9 @@ pub struct OfferHistoryListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OfferHistoryListCall<'a, C> {}
+impl<'a> client::CallBuilder for OfferHistoryListCall<'a> {}
 
-impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OfferHistoryListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3283,7 +3281,7 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3292,7 +3290,7 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3349,14 +3347,14 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -3365,7 +3363,7 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -3374,21 +3372,21 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -3396,21 +3394,21 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
     /// Token to retrieve a specific page.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of rows to return per page.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OfferHistoryListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OfferHistoryListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3421,14 +3419,14 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// offer_type.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> OfferHistoryListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> OfferHistoryListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
     /// if true, show history for the entire company.  Requires user to be admin.
     ///
     /// Sets the *entire company* query property to the given value.
-    pub fn entire_company(mut self, new_value: bool) -> OfferHistoryListCall<'a, C> {
+    pub fn entire_company(mut self, new_value: bool) -> OfferHistoryListCall<'a> {
         self._entire_company = Some(new_value);
         self
     }
@@ -3438,7 +3436,7 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OfferHistoryListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OfferHistoryListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3463,7 +3461,7 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> OfferHistoryListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OfferHistoryListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3511,10 +3509,10 @@ impl<'a, C> OfferHistoryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OfferListCall<'a, C>
-    where C: 'a {
+pub struct OfferListCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
     _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -3526,9 +3524,9 @@ pub struct OfferListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for OfferListCall<'a, C> {}
+impl<'a> client::CallBuilder for OfferListCall<'a> {}
 
-impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OfferListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3597,7 +3595,7 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3606,7 +3604,7 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3663,14 +3661,14 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -3679,7 +3677,7 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -3688,21 +3686,21 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -3710,7 +3708,7 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> OfferListCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> OfferListCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -3720,7 +3718,7 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OfferListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OfferListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3745,7 +3743,7 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> OfferListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OfferListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3796,10 +3794,10 @@ impl<'a, C> OfferListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct AnalyticListCall<'a, C>
-    where C: 'a {
+pub struct AnalyticListCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
     _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -3813,9 +3811,9 @@ pub struct AnalyticListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for AnalyticListCall<'a, C> {}
+impl<'a> client::CallBuilder for AnalyticListCall<'a> {}
 
-impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> AnalyticListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3890,7 +3888,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -3899,7 +3897,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3956,14 +3954,14 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -3972,7 +3970,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -3981,21 +3979,21 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -4003,7 +4001,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -4016,7 +4014,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// If unspecified or set to "", default value is the current date.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AnalyticListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> AnalyticListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -4029,7 +4027,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Must be a non-negative integer.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AnalyticListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> AnalyticListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4039,7 +4037,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AnalyticListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AnalyticListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4064,7 +4062,7 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> AnalyticListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> AnalyticListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4112,10 +4110,10 @@ impl<'a, C> AnalyticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserStateListCall<'a, C>
-    where C: 'a {
+pub struct UserStateListCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
     _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -4127,9 +4125,9 @@ pub struct UserStateListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UserStateListCall<'a, C> {}
+impl<'a> client::CallBuilder for UserStateListCall<'a> {}
 
-impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserStateListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4198,7 +4196,7 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4207,7 +4205,7 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4264,14 +4262,14 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -4280,7 +4278,7 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -4289,21 +4287,21 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -4311,7 +4309,7 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserStateListCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserStateListCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -4321,7 +4319,7 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserStateListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserStateListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4346,7 +4344,7 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> UserStateListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserStateListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4401,10 +4399,10 @@ impl<'a, C> UserStateListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodUpdateLeadCall<'a, C>
-    where C: 'a {
+pub struct MethodUpdateLeadCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: Lead,
     _update_mask: Option<String>,
     _request_metadata_user_overrides_user_id: Option<String>,
@@ -4418,9 +4416,9 @@ pub struct MethodUpdateLeadCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodUpdateLeadCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodUpdateLeadCall<'a> {}
 
-impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodUpdateLeadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4504,7 +4502,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4515,7 +4513,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4574,7 +4572,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Lead) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request(mut self, new_value: Lead) -> MethodUpdateLeadCall<'a> {
         self._request = new_value;
         self
     }
@@ -4583,21 +4581,21 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Only `state` and `adwords_customer_id` are currently supported.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -4606,7 +4604,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -4615,21 +4613,21 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -4637,7 +4635,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> MethodUpdateLeadCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> MethodUpdateLeadCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -4647,7 +4645,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateLeadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateLeadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4672,7 +4670,7 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateLeadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateLeadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4728,10 +4726,10 @@ impl<'a, C> MethodUpdateLeadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodUpdateCompanyCall<'a, C>
-    where C: 'a {
+pub struct MethodUpdateCompanyCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: Company,
     _update_mask: Option<String>,
     _request_metadata_user_overrides_user_id: Option<String>,
@@ -4745,9 +4743,9 @@ pub struct MethodUpdateCompanyCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodUpdateCompanyCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodUpdateCompanyCall<'a> {}
 
-impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodUpdateCompanyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4831,7 +4829,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -4842,7 +4840,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4901,7 +4899,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Company) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request(mut self, new_value: Company) -> MethodUpdateCompanyCall<'a> {
         self._request = new_value;
         self
     }
@@ -4909,21 +4907,21 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Required with at least 1 value in FieldMask's paths.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -4932,7 +4930,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -4941,21 +4939,21 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -4963,7 +4961,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> MethodUpdateCompanyCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -4973,7 +4971,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateCompanyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodUpdateCompanyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4998,7 +4996,7 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateCompanyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodUpdateCompanyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5047,10 +5045,10 @@ impl<'a, C> MethodUpdateCompanyCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetPartnersstatuCall<'a, C>
-    where C: 'a {
+pub struct MethodGetPartnersstatuCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
     _request_metadata_traffic_source_traffic_sub_id: Option<String>,
@@ -5062,9 +5060,9 @@ pub struct MethodGetPartnersstatuCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for MethodGetPartnersstatuCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetPartnersstatuCall<'a> {}
 
-impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetPartnersstatuCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5133,7 +5131,7 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5142,7 +5140,7 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5199,14 +5197,14 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -5215,7 +5213,7 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -5224,21 +5222,21 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -5246,7 +5244,7 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> MethodGetPartnersstatuCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -5256,7 +5254,7 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetPartnersstatuCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetPartnersstatuCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5281,7 +5279,7 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetPartnersstatuCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetPartnersstatuCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5328,19 +5326,19 @@ impl<'a, C> MethodGetPartnersstatuCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CompanyLeadCreateCall<'a, C>
-    where C: 'a {
+pub struct CompanyLeadCreateCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: CreateLeadRequest,
     _company_id: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CompanyLeadCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CompanyLeadCreateCall<'a> {}
 
-impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CompanyLeadCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5420,7 +5418,7 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5431,7 +5429,7 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5490,7 +5488,7 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateLeadRequest) -> CompanyLeadCreateCall<'a, C> {
+    pub fn request(mut self, new_value: CreateLeadRequest) -> CompanyLeadCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5500,7 +5498,7 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn company_id(mut self, new_value: &str) -> CompanyLeadCreateCall<'a, C> {
+    pub fn company_id(mut self, new_value: &str) -> CompanyLeadCreateCall<'a> {
         self._company_id = new_value.to_string();
         self
     }
@@ -5510,7 +5508,7 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CompanyLeadCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CompanyLeadCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5535,7 +5533,7 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> CompanyLeadCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CompanyLeadCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5587,10 +5585,10 @@ impl<'a, C> CompanyLeadCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CompanyGetCall<'a, C>
-    where C: 'a {
+pub struct CompanyGetCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _company_id: String,
     _view: Option<String>,
     _request_metadata_user_overrides_user_id: Option<String>,
@@ -5607,9 +5605,9 @@ pub struct CompanyGetCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CompanyGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CompanyGetCall<'a> {}
 
-impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CompanyGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5712,7 +5710,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -5721,7 +5719,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5781,7 +5779,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn company_id(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn company_id(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._company_id = new_value.to_string();
         self
     }
@@ -5789,21 +5787,21 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// `COMPANY_VIEW_UNSPECIFIED`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -5812,7 +5810,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -5821,21 +5819,21 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -5843,7 +5841,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -5853,7 +5851,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// from given address respectively.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -5861,7 +5859,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// the converted budget is converted to this currency code.
     ///
     /// Sets the *currency code* query property to the given value.
-    pub fn currency_code(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn currency_code(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._currency_code = Some(new_value.to_string());
         self
     }
@@ -5870,7 +5868,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Used when order_by is set.
     ///
     /// Sets the *address* query property to the given value.
-    pub fn address(mut self, new_value: &str) -> CompanyGetCall<'a, C> {
+    pub fn address(mut self, new_value: &str) -> CompanyGetCall<'a> {
         self._address = Some(new_value.to_string());
         self
     }
@@ -5880,7 +5878,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CompanyGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CompanyGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5905,7 +5903,7 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> CompanyGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CompanyGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5971,10 +5969,10 @@ impl<'a, C> CompanyGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CompanyListCall<'a, C>
-    where C: 'a {
+pub struct CompanyListCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _website_url: Option<String>,
     _view: Option<String>,
     _specializations: Vec<String>,
@@ -6004,9 +6002,9 @@ pub struct CompanyListCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for CompanyListCall<'a, C> {}
+impl<'a> client::CallBuilder for CompanyListCall<'a> {}
 
-impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CompanyListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6139,7 +6137,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6148,7 +6146,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6206,7 +6204,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// .
     ///
     /// Sets the *website url* query property to the given value.
-    pub fn website_url(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn website_url(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._website_url = Some(new_value.to_string());
         self
     }
@@ -6214,7 +6212,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// `COMPANY_VIEW_UNSPECIFIED`.
     ///
     /// Sets the *view* query property to the given value.
-    pub fn view(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn view(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._view = Some(new_value.to_string());
         self
     }
@@ -6224,7 +6222,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *specializations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_specializations(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn add_specializations(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._specializations.push(new_value.to_string());
         self
     }
@@ -6234,21 +6232,21 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *services* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_services(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn add_services(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._services.push(new_value.to_string());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -6257,7 +6255,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -6266,21 +6264,21 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -6288,7 +6286,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -6298,7 +6296,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// ListCompanies.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -6306,7 +6304,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// If unspecified, server picks an appropriate default.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CompanyListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CompanyListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -6316,7 +6314,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// from given address respectively.
     ///
     /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn order_by(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._order_by = Some(new_value.to_string());
         self
     }
@@ -6324,7 +6322,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
     ///
     /// Sets the *min monthly budget.units* query property to the given value.
-    pub fn min_monthly_budget_units(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn min_monthly_budget_units(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._min_monthly_budget_units = Some(new_value.to_string());
         self
     }
@@ -6336,14 +6334,14 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
     ///
     /// Sets the *min monthly budget.nanos* query property to the given value.
-    pub fn min_monthly_budget_nanos(mut self, new_value: i32) -> CompanyListCall<'a, C> {
+    pub fn min_monthly_budget_nanos(mut self, new_value: i32) -> CompanyListCall<'a> {
         self._min_monthly_budget_nanos = Some(new_value);
         self
     }
     /// The 3-letter currency code defined in ISO 4217.
     ///
     /// Sets the *min monthly budget.currency code* query property to the given value.
-    pub fn min_monthly_budget_currency_code(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn min_monthly_budget_currency_code(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._min_monthly_budget_currency_code = Some(new_value.to_string());
         self
     }
@@ -6351,7 +6349,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
     ///
     /// Sets the *max monthly budget.units* query property to the given value.
-    pub fn max_monthly_budget_units(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn max_monthly_budget_units(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._max_monthly_budget_units = Some(new_value.to_string());
         self
     }
@@ -6363,14 +6361,14 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
     ///
     /// Sets the *max monthly budget.nanos* query property to the given value.
-    pub fn max_monthly_budget_nanos(mut self, new_value: i32) -> CompanyListCall<'a, C> {
+    pub fn max_monthly_budget_nanos(mut self, new_value: i32) -> CompanyListCall<'a> {
         self._max_monthly_budget_nanos = Some(new_value);
         self
     }
     /// The 3-letter currency code defined in ISO 4217.
     ///
     /// Sets the *max monthly budget.currency code* query property to the given value.
-    pub fn max_monthly_budget_currency_code(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn max_monthly_budget_currency_code(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._max_monthly_budget_currency_code = Some(new_value.to_string());
         self
     }
@@ -6381,7 +6379,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *language codes* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_language_codes(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn add_language_codes(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._language_codes.push(new_value.to_string());
         self
     }
@@ -6389,7 +6387,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *industries* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_industries(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn add_industries(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._industries.push(new_value.to_string());
         self
     }
@@ -6397,14 +6395,14 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     ///
     /// Append the given value to the *gps motivations* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_gps_motivations(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn add_gps_motivations(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._gps_motivations.push(new_value.to_string());
         self
     }
     /// Company name to search for.
     ///
     /// Sets the *company name* query property to the given value.
-    pub fn company_name(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn company_name(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._company_name = Some(new_value.to_string());
         self
     }
@@ -6412,7 +6410,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// If not given, the geo-located address of the request is used.
     ///
     /// Sets the *address* query property to the given value.
-    pub fn address(mut self, new_value: &str) -> CompanyListCall<'a, C> {
+    pub fn address(mut self, new_value: &str) -> CompanyListCall<'a> {
         self._address = Some(new_value.to_string());
         self
     }
@@ -6422,7 +6420,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CompanyListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CompanyListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6447,7 +6445,7 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> CompanyListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CompanyListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6502,10 +6500,10 @@ impl<'a, C> CompanyListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserUpdateProfileCall<'a, C>
-    where C: 'a {
+pub struct UserUpdateProfileCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: UserProfile,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
@@ -6518,9 +6516,9 @@ pub struct UserUpdateProfileCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UserUpdateProfileCall<'a, C> {}
+impl<'a> client::CallBuilder for UserUpdateProfileCall<'a> {}
 
-impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserUpdateProfileCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6601,7 +6599,7 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6612,7 +6610,7 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6671,21 +6669,21 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UserProfile) -> UserUpdateProfileCall<'a, C> {
+    pub fn request(mut self, new_value: UserProfile) -> UserUpdateProfileCall<'a> {
         self._request = new_value;
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -6694,7 +6692,7 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -6703,21 +6701,21 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -6725,7 +6723,7 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserUpdateProfileCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserUpdateProfileCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -6735,7 +6733,7 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserUpdateProfileCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserUpdateProfileCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6760,7 +6758,7 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> UserUpdateProfileCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserUpdateProfileCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6814,10 +6812,10 @@ impl<'a, C> UserUpdateProfileCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserCreateCompanyRelationCall<'a, C>
-    where C: 'a {
+pub struct UserCreateCompanyRelationCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _request: CompanyRelation,
     _user_id: String,
     _request_metadata_user_overrides_user_id: Option<String>,
@@ -6831,9 +6829,9 @@ pub struct UserCreateCompanyRelationCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UserCreateCompanyRelationCall<'a, C> {}
+impl<'a> client::CallBuilder for UserCreateCompanyRelationCall<'a> {}
 
-impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserCreateCompanyRelationCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6936,7 +6934,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -6947,7 +6945,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7006,7 +7004,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CompanyRelation) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request(mut self, new_value: CompanyRelation) -> UserCreateCompanyRelationCall<'a> {
         self._request = new_value;
         self
     }
@@ -7017,21 +7015,21 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -7040,7 +7038,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -7049,21 +7047,21 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -7071,7 +7069,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserCreateCompanyRelationCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -7081,7 +7079,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserCreateCompanyRelationCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserCreateCompanyRelationCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7106,7 +7104,7 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> UserCreateCompanyRelationCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserCreateCompanyRelationCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7154,10 +7152,10 @@ impl<'a, C> UserCreateCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserDeleteCompanyRelationCall<'a, C>
-    where C: 'a {
+pub struct UserDeleteCompanyRelationCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _user_id: String,
     _request_metadata_user_overrides_user_id: Option<String>,
     _request_metadata_user_overrides_ip_address: Option<String>,
@@ -7170,9 +7168,9 @@ pub struct UserDeleteCompanyRelationCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UserDeleteCompanyRelationCall<'a, C> {}
+impl<'a> client::CallBuilder for UserDeleteCompanyRelationCall<'a> {}
 
-impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserDeleteCompanyRelationCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7263,7 +7261,7 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -7272,7 +7270,7 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7333,21 +7331,21 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -7356,7 +7354,7 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -7365,21 +7363,21 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -7387,7 +7385,7 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserDeleteCompanyRelationCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -7397,7 +7395,7 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCompanyRelationCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserDeleteCompanyRelationCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7422,7 +7420,7 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCompanyRelationCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserDeleteCompanyRelationCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7471,10 +7469,10 @@ impl<'a, C> UserDeleteCompanyRelationCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct UserGetCall<'a, C>
-    where C: 'a {
+pub struct UserGetCall<'a>
+    where  {
 
-    hub: &'a Partners<C>,
+    hub: &'a Partners<>,
     _user_id: String,
     _user_view: Option<String>,
     _request_metadata_user_overrides_user_id: Option<String>,
@@ -7488,9 +7486,9 @@ pub struct UserGetCall<'a, C>
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for UserGetCall<'a, C> {}
+impl<'a> client::CallBuilder for UserGetCall<'a> {}
 
-impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> UserGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7584,7 +7582,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
 
         loop {
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -7593,7 +7591,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7654,28 +7652,28 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn user_id(mut self, new_value: &str) -> UserGetCall<'a> {
         self._user_id = new_value.to_string();
         self
     }
     /// Specifies what parts of the user information to return.
     ///
     /// Sets the *user view* query property to the given value.
-    pub fn user_view(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn user_view(mut self, new_value: &str) -> UserGetCall<'a> {
         self._user_view = Some(new_value.to_string());
         self
     }
     /// Logged-in user ID to impersonate instead of the user's ID.
     ///
     /// Sets the *request metadata.user overrides.user id* query property to the given value.
-    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn request_metadata_user_overrides_user_id(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_user_overrides_user_id = Some(new_value.to_string());
         self
     }
     /// IP address to use instead of the user's geo-located IP address.
     ///
     /// Sets the *request metadata.user overrides.ip address* query property to the given value.
-    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn request_metadata_user_overrides_ip_address(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_user_overrides_ip_address = Some(new_value.to_string());
         self
     }
@@ -7684,7 +7682,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic sub id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_sub_id(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_traffic_source_traffic_sub_id = Some(new_value.to_string());
         self
     }
@@ -7693,21 +7691,21 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// traffic to us.
     ///
     /// Sets the *request metadata.traffic source.traffic source id* query property to the given value.
-    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn request_metadata_traffic_source_traffic_source_id(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_traffic_source_traffic_source_id = Some(new_value.to_string());
         self
     }
     /// Google Partners session ID.
     ///
     /// Sets the *request metadata.partners session id* query property to the given value.
-    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn request_metadata_partners_session_id(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_partners_session_id = Some(new_value.to_string());
         self
     }
     /// Locale to use for the current request.
     ///
     /// Sets the *request metadata.locale* query property to the given value.
-    pub fn request_metadata_locale(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn request_metadata_locale(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_locale = Some(new_value.to_string());
         self
     }
@@ -7715,7 +7713,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     ///
     /// Append the given value to the *request metadata.experiment ids* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserGetCall<'a, C> {
+    pub fn add_request_metadata_experiment_ids(mut self, new_value: &str) -> UserGetCall<'a> {
         self._request_metadata_experiment_ids.push(new_value.to_string());
         self
     }
@@ -7725,7 +7723,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> UserGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7750,7 +7748,7 @@ impl<'a, C> UserGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::Ht
     /// * *$.xgafv* (query-string) - V1 error format.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *callback* (query-string) - JSONP
-    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> UserGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

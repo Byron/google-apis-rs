@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-texttospeech1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/texttospeech1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/texttospeech1-cli).
 
 # Usage
 
-This documentation was generated from the *Texttospeech* API at revision *20210326*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Texttospeech* API at revision *20210326*. The CLI is at version *2.0.3*.
 
 ```bash
 texttospeech1 [options]

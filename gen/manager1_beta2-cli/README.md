@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-manager1_beta2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/manager1_beta2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/manager1_beta2-cli).
 
 # Usage
 
-This documentation was generated from the *manager* API at revision *20140915*. The CLI is at version *2.0.0*.
+This documentation was generated from the *manager* API at revision *20140915*. The CLI is at version *2.0.3*.
 
 ```bash
 manager1-beta2 [options]

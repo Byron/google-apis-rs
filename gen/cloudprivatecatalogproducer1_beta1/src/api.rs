@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -105,38 +104,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudPrivateCatalogProducer<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudPrivateCatalogProducer<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudPrivateCatalogProducer<C> {}
+impl<'a, > client::Hub for CloudPrivateCatalogProducer<> {}
 
-impl<'a, C> CloudPrivateCatalogProducer<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudPrivateCatalogProducer<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudPrivateCatalogProducer<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudPrivateCatalogProducer<> {
         CloudPrivateCatalogProducer {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://cloudprivatecatalogproducer.googleapis.com/".to_string(),
             _root_url: "https://cloudprivatecatalogproducer.googleapis.com/".to_string(),
         }
     }
 
-    pub fn catalogs(&'a self) -> CatalogMethods<'a, C> {
+    pub fn catalogs(&'a self) -> CatalogMethods<'a> {
         CatalogMethods { hub: &self }
     }
-    pub fn operations(&'a self) -> OperationMethods<'a, C> {
+    pub fn operations(&'a self) -> OperationMethods<'a> {
         OperationMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1255,15 +1253,15 @@ impl client::Part for GoogleTypeExpr {}
 /// let rb = hub.catalogs();
 /// # }
 /// ```
-pub struct CatalogMethods<'a, C>
-    where C: 'a {
+pub struct CatalogMethods<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
 }
 
-impl<'a, C> client::MethodsBuilder for CatalogMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for CatalogMethods<'a> {}
 
-impl<'a, C> CatalogMethods<'a, C> {
+impl<'a> CatalogMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1273,7 +1271,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The `Catalog` resource's name.
-    pub fn associations_create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1CreateAssociationRequest, parent: &str) -> CatalogAssociationCreateCall<'a, C> {
+    pub fn associations_create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1CreateAssociationRequest, parent: &str) -> CatalogAssociationCreateCall<'a> {
         CatalogAssociationCreateCall {
             hub: self.hub,
             _request: request,
@@ -1291,7 +1289,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the `Association` to delete.
-    pub fn associations_delete(&self, name: &str) -> CatalogAssociationDeleteCall<'a, C> {
+    pub fn associations_delete(&self, name: &str) -> CatalogAssociationDeleteCall<'a> {
         CatalogAssociationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1308,7 +1306,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the `Association` to retrieve.
-    pub fn associations_get(&self, name: &str) -> CatalogAssociationGetCall<'a, C> {
+    pub fn associations_get(&self, name: &str) -> CatalogAssociationGetCall<'a> {
         CatalogAssociationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1326,7 +1324,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `parent` - The resource name of the `Catalog` whose `Associations` are
     ///              being retrieved. In the format `catalogs/<catalog>`.
-    pub fn associations_list(&self, parent: &str) -> CatalogAssociationListCall<'a, C> {
+    pub fn associations_list(&self, parent: &str) -> CatalogAssociationListCall<'a> {
         CatalogAssociationListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1351,7 +1349,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `product` - The resource name of the product.
-    pub fn products_icons_upload(&self, request: GoogleCloudPrivatecatalogproducerV1beta1UploadIconRequest, product: &str) -> CatalogProductIconUploadCall<'a, C> {
+    pub fn products_icons_upload(&self, request: GoogleCloudPrivatecatalogproducerV1beta1UploadIconRequest, product: &str) -> CatalogProductIconUploadCall<'a> {
         CatalogProductIconUploadCall {
             hub: self.hub,
             _request: request,
@@ -1370,7 +1368,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The product name of the new version's parent.
-    pub fn products_versions_create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Version, parent: &str) -> CatalogProductVersionCreateCall<'a, C> {
+    pub fn products_versions_create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Version, parent: &str) -> CatalogProductVersionCreateCall<'a> {
         CatalogProductVersionCreateCall {
             hub: self.hub,
             _request: request,
@@ -1388,7 +1386,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the version.
-    pub fn products_versions_delete(&self, name: &str) -> CatalogProductVersionDeleteCall<'a, C> {
+    pub fn products_versions_delete(&self, name: &str) -> CatalogProductVersionDeleteCall<'a> {
         CatalogProductVersionDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1405,7 +1403,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the version.
-    pub fn products_versions_get(&self, name: &str) -> CatalogProductVersionGetCall<'a, C> {
+    pub fn products_versions_get(&self, name: &str) -> CatalogProductVersionGetCall<'a> {
         CatalogProductVersionGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1423,7 +1421,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the parent resource.
-    pub fn products_versions_list(&self, parent: &str) -> CatalogProductVersionListCall<'a, C> {
+    pub fn products_versions_list(&self, parent: &str) -> CatalogProductVersionListCall<'a> {
         CatalogProductVersionListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1447,7 +1445,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///            A unique identifier for the version under a product, which can't
     ///            be changed after the version is created. The final segment of the name must
     ///            between 1 and 63 characters in length.
-    pub fn products_versions_patch(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Version, name: &str) -> CatalogProductVersionPatchCall<'a, C> {
+    pub fn products_versions_patch(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Version, name: &str) -> CatalogProductVersionPatchCall<'a> {
         CatalogProductVersionPatchCall {
             hub: self.hub,
             _request: request,
@@ -1467,7 +1465,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the current product that is copied from.
-    pub fn products_copy(&self, request: GoogleCloudPrivatecatalogproducerV1beta1CopyProductRequest, name: &str) -> CatalogProductCopyCall<'a, C> {
+    pub fn products_copy(&self, request: GoogleCloudPrivatecatalogproducerV1beta1CopyProductRequest, name: &str) -> CatalogProductCopyCall<'a> {
         CatalogProductCopyCall {
             hub: self.hub,
             _request: request,
@@ -1486,7 +1484,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The catalog name of the new product's parent.
-    pub fn products_create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Product, parent: &str) -> CatalogProductCreateCall<'a, C> {
+    pub fn products_create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Product, parent: &str) -> CatalogProductCreateCall<'a> {
         CatalogProductCreateCall {
             hub: self.hub,
             _request: request,
@@ -1504,7 +1502,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the product.
-    pub fn products_delete(&self, name: &str) -> CatalogProductDeleteCall<'a, C> {
+    pub fn products_delete(&self, name: &str) -> CatalogProductDeleteCall<'a> {
         CatalogProductDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1521,7 +1519,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the product.
-    pub fn products_get(&self, name: &str) -> CatalogProductGetCall<'a, C> {
+    pub fn products_get(&self, name: &str) -> CatalogProductGetCall<'a> {
         CatalogProductGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1539,7 +1537,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `parent` - The resource name of the parent resource.
-    pub fn products_list(&self, parent: &str) -> CatalogProductListCall<'a, C> {
+    pub fn products_list(&self, parent: &str) -> CatalogProductListCall<'a> {
         CatalogProductListCall {
             hub: self.hub,
             _parent: parent.to_string(),
@@ -1564,7 +1562,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///            A unique identifier for the product under a catalog, which cannot
     ///            be changed after the product is created. The final
     ///            segment of the name must between 1 and 256 characters in length.
-    pub fn products_patch(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Product, name: &str) -> CatalogProductPatchCall<'a, C> {
+    pub fn products_patch(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Product, name: &str) -> CatalogProductPatchCall<'a> {
         CatalogProductPatchCall {
             hub: self.hub,
             _request: request,
@@ -1583,7 +1581,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Catalog) -> CatalogCreateCall<'a, C> {
+    pub fn create(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Catalog) -> CatalogCreateCall<'a> {
         CatalogCreateCall {
             hub: self.hub,
             _request: request,
@@ -1604,7 +1602,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the catalog.
-    pub fn delete(&self, name: &str) -> CatalogDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> CatalogDeleteCall<'a> {
         CatalogDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1622,7 +1620,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the catalog.
-    pub fn get(&self, name: &str) -> CatalogGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> CatalogGetCall<'a> {
         CatalogGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1640,7 +1638,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `resource` - REQUIRED: The resource for which the policy is being requested.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn get_iam_policy(&self, resource: &str) -> CatalogGetIamPolicyCall<'a, C> {
+    pub fn get_iam_policy(&self, resource: &str) -> CatalogGetIamPolicyCall<'a> {
         CatalogGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
@@ -1655,7 +1653,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// Lists Catalog resources that the producer has access to, within the
     /// scope of the parent resource.
-    pub fn list(&self) -> CatalogListCall<'a, C> {
+    pub fn list(&self) -> CatalogListCall<'a> {
         CatalogListCall {
             hub: self.hub,
             _parent: Default::default(),
@@ -1678,7 +1676,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///            `catalogs/{catalog_id}'.
     ///            A unique identifier for the catalog, which is generated
     ///            by catalog service.
-    pub fn patch(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Catalog, name: &str) -> CatalogPatchCall<'a, C> {
+    pub fn patch(&self, request: GoogleCloudPrivatecatalogproducerV1beta1Catalog, name: &str) -> CatalogPatchCall<'a> {
         CatalogPatchCall {
             hub: self.hub,
             _request: request,
@@ -1699,7 +1697,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy is being specified.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn set_iam_policy(&self, request: GoogleIamV1SetIamPolicyRequest, resource: &str) -> CatalogSetIamPolicyCall<'a, C> {
+    pub fn set_iam_policy(&self, request: GoogleIamV1SetIamPolicyRequest, resource: &str) -> CatalogSetIamPolicyCall<'a> {
         CatalogSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -1719,7 +1717,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `resource` - REQUIRED: The resource for which the policy detail is being requested.
     ///                See the operation documentation for the appropriate value for this field.
-    pub fn test_iam_permissions(&self, request: GoogleIamV1TestIamPermissionsRequest, resource: &str) -> CatalogTestIamPermissionCall<'a, C> {
+    pub fn test_iam_permissions(&self, request: GoogleIamV1TestIamPermissionsRequest, resource: &str) -> CatalogTestIamPermissionCall<'a> {
         CatalogTestIamPermissionCall {
             hub: self.hub,
             _request: request,
@@ -1738,7 +1736,7 @@ impl<'a, C> CatalogMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the catalog.
-    pub fn undelete(&self, request: GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogRequest, name: &str) -> CatalogUndeleteCall<'a, C> {
+    pub fn undelete(&self, request: GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogRequest, name: &str) -> CatalogUndeleteCall<'a> {
         CatalogUndeleteCall {
             hub: self.hub,
             _request: request,
@@ -1782,15 +1780,15 @@ impl<'a, C> CatalogMethods<'a, C> {
 /// let rb = hub.operations();
 /// # }
 /// ```
-pub struct OperationMethods<'a, C>
-    where C: 'a {
+pub struct OperationMethods<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
 }
 
-impl<'a, C> client::MethodsBuilder for OperationMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for OperationMethods<'a> {}
 
-impl<'a, C> OperationMethods<'a, C> {
+impl<'a> OperationMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1809,7 +1807,7 @@ impl<'a, C> OperationMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> OperationCancelCall<'a, C> {
+    pub fn cancel(&self, request: GoogleLongrunningCancelOperationRequest, name: &str) -> OperationCancelCall<'a> {
         OperationCancelCall {
             hub: self.hub,
             _request: request,
@@ -1830,7 +1828,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C> {
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a> {
         OperationDeleteCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1849,7 +1847,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// # Arguments
     ///
     /// * `name` - The name of the operation resource.
-    pub fn get(&self, name: &str) -> OperationGetCall<'a, C> {
+    pub fn get(&self, name: &str) -> OperationGetCall<'a> {
         OperationGetCall {
             hub: self.hub,
             _name: name.to_string(),
@@ -1871,7 +1869,7 @@ impl<'a, C> OperationMethods<'a, C> {
     /// For backwards compatibility, the default name includes the operations
     /// collection id, however overriding users must ensure the name binding
     /// is the parent resource, without the operations collection id.
-    pub fn list(&self) -> OperationListCall<'a, C> {
+    pub fn list(&self) -> OperationListCall<'a> {
         OperationListCall {
             hub: self.hub,
             _page_token: Default::default(),
@@ -1931,10 +1929,10 @@ impl<'a, C> OperationMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogAssociationCreateCall<'a, C>
-    where C: 'a {
+pub struct CatalogAssociationCreateCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1CreateAssociationRequest,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1942,9 +1940,9 @@ pub struct CatalogAssociationCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogAssociationCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogAssociationCreateCall<'a> {}
 
-impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogAssociationCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2020,8 +2018,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2035,7 +2032,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2046,7 +2043,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2105,7 +2102,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1CreateAssociationRequest) -> CatalogAssociationCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1CreateAssociationRequest) -> CatalogAssociationCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2115,7 +2112,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CatalogAssociationCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogAssociationCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2125,7 +2122,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2150,7 +2147,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2170,7 +2167,7 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2214,19 +2211,19 @@ impl<'a, C> CatalogAssociationCreateCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogAssociationDeleteCall<'a, C>
-    where C: 'a {
+pub struct CatalogAssociationDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogAssociationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogAssociationDeleteCall<'a> {}
 
-impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogAssociationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2291,8 +2288,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2305,7 +2301,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2314,7 +2310,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2374,7 +2370,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogAssociationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogAssociationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2384,7 +2380,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2409,7 +2405,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2429,7 +2425,7 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2473,19 +2469,19 @@ impl<'a, C> CatalogAssociationDeleteCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogAssociationGetCall<'a, C>
-    where C: 'a {
+pub struct CatalogAssociationGetCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogAssociationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogAssociationGetCall<'a> {}
 
-impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogAssociationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2550,8 +2546,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2564,7 +2559,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2573,7 +2568,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2633,7 +2628,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogAssociationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogAssociationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -2643,7 +2638,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2668,7 +2663,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2688,7 +2683,7 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2734,10 +2729,10 @@ impl<'a, C> CatalogAssociationGetCall<'a, C> where C: BorrowMut<hyper::Client<hy
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogAssociationListCall<'a, C>
-    where C: 'a {
+pub struct CatalogAssociationListCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -2746,9 +2741,9 @@ pub struct CatalogAssociationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogAssociationListCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogAssociationListCall<'a> {}
 
-impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogAssociationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2819,8 +2814,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2833,7 +2827,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2842,7 +2836,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2903,7 +2897,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CatalogAssociationListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogAssociationListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -2911,14 +2905,14 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// `ListAssociations`.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CatalogAssociationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CatalogAssociationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of catalog associations to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CatalogAssociationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CatalogAssociationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -2928,7 +2922,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogAssociationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2953,7 +2947,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogAssociationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2973,7 +2967,7 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogAssociationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3028,10 +3022,10 @@ impl<'a, C> CatalogAssociationListCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductIconUploadCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductIconUploadCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1UploadIconRequest,
     _product: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3039,9 +3033,9 @@ pub struct CatalogProductIconUploadCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductIconUploadCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductIconUploadCall<'a> {}
 
-impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductIconUploadCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3117,8 +3111,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3132,7 +3125,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3143,7 +3136,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3202,7 +3195,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1UploadIconRequest) -> CatalogProductIconUploadCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1UploadIconRequest) -> CatalogProductIconUploadCall<'a> {
         self._request = new_value;
         self
     }
@@ -3212,7 +3205,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn product(mut self, new_value: &str) -> CatalogProductIconUploadCall<'a, C> {
+    pub fn product(mut self, new_value: &str) -> CatalogProductIconUploadCall<'a> {
         self._product = new_value.to_string();
         self
     }
@@ -3222,7 +3215,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductIconUploadCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductIconUploadCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3247,7 +3240,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductIconUploadCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductIconUploadCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3267,7 +3260,7 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductIconUploadCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductIconUploadCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3317,10 +3310,10 @@ impl<'a, C> CatalogProductIconUploadCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductVersionCreateCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductVersionCreateCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1Version,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3328,9 +3321,9 @@ pub struct CatalogProductVersionCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductVersionCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductVersionCreateCall<'a> {}
 
-impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductVersionCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3406,8 +3399,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3421,7 +3413,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3432,7 +3424,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3491,7 +3483,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Version) -> CatalogProductVersionCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Version) -> CatalogProductVersionCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -3501,7 +3493,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CatalogProductVersionCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogProductVersionCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -3511,7 +3503,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3536,7 +3528,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3556,7 +3548,7 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3600,19 +3592,19 @@ impl<'a, C> CatalogProductVersionCreateCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductVersionDeleteCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductVersionDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductVersionDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductVersionDeleteCall<'a> {}
 
-impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductVersionDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3677,8 +3669,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3691,7 +3682,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3700,7 +3691,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3760,7 +3751,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductVersionDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductVersionDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -3770,7 +3761,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3795,7 +3786,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3815,7 +3806,7 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3859,19 +3850,19 @@ impl<'a, C> CatalogProductVersionDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductVersionGetCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductVersionGetCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductVersionGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductVersionGetCall<'a> {}
 
-impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductVersionGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3936,8 +3927,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3950,7 +3940,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3959,7 +3949,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4019,7 +4009,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductVersionGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductVersionGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4029,7 +4019,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4054,7 +4044,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4074,7 +4064,7 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4121,10 +4111,10 @@ impl<'a, C> CatalogProductVersionGetCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductVersionListCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductVersionListCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -4133,9 +4123,9 @@ pub struct CatalogProductVersionListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductVersionListCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductVersionListCall<'a> {}
 
-impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductVersionListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4206,8 +4196,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4220,7 +4209,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4229,7 +4218,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4289,7 +4278,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CatalogProductVersionListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogProductVersionListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -4298,14 +4287,14 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CatalogProductVersionListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CatalogProductVersionListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of versions to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CatalogProductVersionListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CatalogProductVersionListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -4315,7 +4304,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4340,7 +4329,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4360,7 +4349,7 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4411,10 +4400,10 @@ impl<'a, C> CatalogProductVersionListCall<'a, C> where C: BorrowMut<hyper::Clien
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductVersionPatchCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductVersionPatchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1Version,
     _name: String,
     _update_mask: Option<String>,
@@ -4423,9 +4412,9 @@ pub struct CatalogProductVersionPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductVersionPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductVersionPatchCall<'a> {}
 
-impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductVersionPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4504,8 +4493,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4519,7 +4507,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4530,7 +4518,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4589,7 +4577,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Version) -> CatalogProductVersionPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Version) -> CatalogProductVersionPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -4604,14 +4592,14 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductVersionPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductVersionPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Field mask that controls which fields of the version should be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CatalogProductVersionPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CatalogProductVersionPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -4621,7 +4609,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductVersionPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4646,7 +4634,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductVersionPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4666,7 +4654,7 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductVersionPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4716,10 +4704,10 @@ impl<'a, C> CatalogProductVersionPatchCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductCopyCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductCopyCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1CopyProductRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4727,9 +4715,9 @@ pub struct CatalogProductCopyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductCopyCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductCopyCall<'a> {}
 
-impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductCopyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4805,8 +4793,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4820,7 +4807,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4831,7 +4818,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4890,7 +4877,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1CopyProductRequest) -> CatalogProductCopyCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1CopyProductRequest) -> CatalogProductCopyCall<'a> {
         self._request = new_value;
         self
     }
@@ -4900,7 +4887,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductCopyCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductCopyCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -4910,7 +4897,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductCopyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductCopyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4935,7 +4922,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductCopyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductCopyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4955,7 +4942,7 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductCopyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductCopyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5005,10 +4992,10 @@ impl<'a, C> CatalogProductCopyCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductCreateCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductCreateCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1Product,
     _parent: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5016,9 +5003,9 @@ pub struct CatalogProductCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductCreateCall<'a> {}
 
-impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5094,8 +5081,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5109,7 +5095,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5120,7 +5106,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5179,7 +5165,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Product) -> CatalogProductCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Product) -> CatalogProductCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5189,7 +5175,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CatalogProductCreateCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogProductCreateCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -5199,7 +5185,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5224,7 +5210,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5244,7 +5230,7 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5288,19 +5274,19 @@ impl<'a, C> CatalogProductCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductDeleteCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductDeleteCall<'a> {}
 
-impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5365,8 +5351,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5379,7 +5364,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5388,7 +5373,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5448,7 +5433,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5458,7 +5443,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5483,7 +5468,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5503,7 +5488,7 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5547,19 +5532,19 @@ impl<'a, C> CatalogProductDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductGetCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductGetCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductGetCall<'a> {}
 
-impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5624,8 +5609,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5638,7 +5622,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5647,7 +5631,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5707,7 +5691,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -5717,7 +5701,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5742,7 +5726,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5762,7 +5746,7 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5810,10 +5794,10 @@ impl<'a, C> CatalogProductGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductListCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductListCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -5823,9 +5807,9 @@ pub struct CatalogProductListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductListCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductListCall<'a> {}
 
-impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5899,8 +5883,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5913,7 +5896,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5922,7 +5905,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5982,7 +5965,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> CatalogProductListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogProductListCall<'a> {
         self._parent = new_value.to_string();
         self
     }
@@ -5991,14 +5974,14 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CatalogProductListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CatalogProductListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of products to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CatalogProductListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CatalogProductListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -6006,7 +5989,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// upon properties of the product.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> CatalogProductListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> CatalogProductListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -6016,7 +5999,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6041,7 +6024,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6061,7 +6044,7 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6112,10 +6095,10 @@ impl<'a, C> CatalogProductListCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogProductPatchCall<'a, C>
-    where C: 'a {
+pub struct CatalogProductPatchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1Product,
     _name: String,
     _update_mask: Option<String>,
@@ -6124,9 +6107,9 @@ pub struct CatalogProductPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogProductPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogProductPatchCall<'a> {}
 
-impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogProductPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6205,8 +6188,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6220,7 +6202,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6231,7 +6213,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6290,7 +6272,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Product) -> CatalogProductPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Product) -> CatalogProductPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -6305,14 +6287,14 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogProductPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogProductPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Field mask that controls which fields of the product should be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CatalogProductPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CatalogProductPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -6322,7 +6304,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogProductPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6347,7 +6329,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogProductPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6367,7 +6349,7 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogProductPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6417,19 +6399,19 @@ impl<'a, C> CatalogProductPatchCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogCreateCall<'a, C>
-    where C: 'a {
+pub struct CatalogCreateCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1Catalog,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogCreateCall<'a> {}
 
-impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6479,8 +6461,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6494,7 +6475,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6505,7 +6486,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6564,7 +6545,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Catalog) -> CatalogCreateCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Catalog) -> CatalogCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6574,7 +6555,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6599,7 +6580,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6619,7 +6600,7 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6668,10 +6649,10 @@ impl<'a, C> CatalogCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogDeleteCall<'a, C>
-    where C: 'a {
+pub struct CatalogDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _force: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -6679,9 +6660,9 @@ pub struct CatalogDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogDeleteCall<'a> {}
 
-impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6749,8 +6730,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6763,7 +6743,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6772,7 +6752,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6832,7 +6812,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -6841,7 +6821,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// force is not set to true, then the operation fails.
     ///
     /// Sets the *force* query property to the given value.
-    pub fn force(mut self, new_value: bool) -> CatalogDeleteCall<'a, C> {
+    pub fn force(mut self, new_value: bool) -> CatalogDeleteCall<'a> {
         self._force = Some(new_value);
         self
     }
@@ -6851,7 +6831,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6876,7 +6856,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6896,7 +6876,7 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6940,19 +6920,19 @@ impl<'a, C> CatalogDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogGetCall<'a, C>
-    where C: 'a {
+pub struct CatalogGetCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogGetCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogGetCall<'a> {}
 
-impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7017,8 +6997,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7031,7 +7010,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7040,7 +7019,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7100,7 +7079,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -7110,7 +7089,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7135,7 +7114,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7155,7 +7134,7 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7200,10 +7179,10 @@ impl<'a, C> CatalogGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogGetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct CatalogGetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _resource: String,
     _options_requested_policy_version: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -7211,9 +7190,9 @@ pub struct CatalogGetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogGetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogGetIamPolicyCall<'a> {}
 
-impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogGetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7281,8 +7260,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7295,7 +7273,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7304,7 +7282,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7365,7 +7343,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> CatalogGetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> CatalogGetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -7379,7 +7357,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// leave the field unset.
     ///
     /// Sets the *options.requested policy version* query property to the given value.
-    pub fn options_requested_policy_version(mut self, new_value: i32) -> CatalogGetIamPolicyCall<'a, C> {
+    pub fn options_requested_policy_version(mut self, new_value: i32) -> CatalogGetIamPolicyCall<'a> {
         self._options_requested_policy_version = Some(new_value);
         self
     }
@@ -7389,7 +7367,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogGetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogGetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7414,7 +7392,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogGetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogGetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7434,7 +7412,7 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogGetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogGetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7482,10 +7460,10 @@ impl<'a, C> CatalogGetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogListCall<'a, C>
-    where C: 'a {
+pub struct CatalogListCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _parent: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -7494,9 +7472,9 @@ pub struct CatalogListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogListCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogListCall<'a> {}
 
-impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7544,8 +7522,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7558,7 +7535,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7567,7 +7544,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7624,7 +7601,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// The resource name of the parent resource.
     ///
     /// Sets the *parent* query property to the given value.
-    pub fn parent(mut self, new_value: &str) -> CatalogListCall<'a, C> {
+    pub fn parent(mut self, new_value: &str) -> CatalogListCall<'a> {
         self._parent = Some(new_value.to_string());
         self
     }
@@ -7633,14 +7610,14 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// This field is optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> CatalogListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> CatalogListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The maximum number of catalogs to return.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> CatalogListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> CatalogListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -7650,7 +7627,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7675,7 +7652,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7695,7 +7672,7 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7746,10 +7723,10 @@ impl<'a, C> CatalogListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogPatchCall<'a, C>
-    where C: 'a {
+pub struct CatalogPatchCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1Catalog,
     _name: String,
     _update_mask: Option<String>,
@@ -7758,9 +7735,9 @@ pub struct CatalogPatchCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogPatchCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogPatchCall<'a> {}
 
-impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogPatchCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -7839,8 +7816,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -7854,7 +7830,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PATCH).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -7865,7 +7841,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -7924,7 +7900,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Catalog) -> CatalogPatchCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1Catalog) -> CatalogPatchCall<'a> {
         self._request = new_value;
         self
     }
@@ -7938,14 +7914,14 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogPatchCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogPatchCall<'a> {
         self._name = new_value.to_string();
         self
     }
     /// Field mask that controls which fields of the catalog should be updated.
     ///
     /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> CatalogPatchCall<'a, C> {
+    pub fn update_mask(mut self, new_value: &str) -> CatalogPatchCall<'a> {
         self._update_mask = Some(new_value.to_string());
         self
     }
@@ -7955,7 +7931,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogPatchCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogPatchCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -7980,7 +7956,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogPatchCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogPatchCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8000,7 +7976,7 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogPatchCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogPatchCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8050,10 +8026,10 @@ impl<'a, C> CatalogPatchCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogSetIamPolicyCall<'a, C>
-    where C: 'a {
+pub struct CatalogSetIamPolicyCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleIamV1SetIamPolicyRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8061,9 +8037,9 @@ pub struct CatalogSetIamPolicyCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogSetIamPolicyCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogSetIamPolicyCall<'a> {}
 
-impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogSetIamPolicyCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8139,8 +8115,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8154,7 +8129,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8165,7 +8140,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8224,7 +8199,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleIamV1SetIamPolicyRequest) -> CatalogSetIamPolicyCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleIamV1SetIamPolicyRequest) -> CatalogSetIamPolicyCall<'a> {
         self._request = new_value;
         self
     }
@@ -8235,7 +8210,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> CatalogSetIamPolicyCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> CatalogSetIamPolicyCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -8245,7 +8220,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogSetIamPolicyCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogSetIamPolicyCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8270,7 +8245,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogSetIamPolicyCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogSetIamPolicyCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8290,7 +8265,7 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogSetIamPolicyCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogSetIamPolicyCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8340,10 +8315,10 @@ impl<'a, C> CatalogSetIamPolicyCall<'a, C> where C: BorrowMut<hyper::Client<hype
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogTestIamPermissionCall<'a, C>
-    where C: 'a {
+pub struct CatalogTestIamPermissionCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleIamV1TestIamPermissionsRequest,
     _resource: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8351,9 +8326,9 @@ pub struct CatalogTestIamPermissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogTestIamPermissionCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogTestIamPermissionCall<'a> {}
 
-impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogTestIamPermissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8429,8 +8404,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8444,7 +8418,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8455,7 +8429,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8514,7 +8488,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleIamV1TestIamPermissionsRequest) -> CatalogTestIamPermissionCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleIamV1TestIamPermissionsRequest) -> CatalogTestIamPermissionCall<'a> {
         self._request = new_value;
         self
     }
@@ -8525,7 +8499,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> CatalogTestIamPermissionCall<'a, C> {
+    pub fn resource(mut self, new_value: &str) -> CatalogTestIamPermissionCall<'a> {
         self._resource = new_value.to_string();
         self
     }
@@ -8535,7 +8509,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogTestIamPermissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogTestIamPermissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8560,7 +8534,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogTestIamPermissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogTestIamPermissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8580,7 +8554,7 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogTestIamPermissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogTestIamPermissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8630,10 +8604,10 @@ impl<'a, C> CatalogTestIamPermissionCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct CatalogUndeleteCall<'a, C>
-    where C: 'a {
+pub struct CatalogUndeleteCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8641,9 +8615,9 @@ pub struct CatalogUndeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for CatalogUndeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for CatalogUndeleteCall<'a> {}
 
-impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> CatalogUndeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -8719,8 +8693,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -8734,7 +8707,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -8745,7 +8718,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -8804,7 +8777,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogRequest) -> CatalogUndeleteCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleCloudPrivatecatalogproducerV1beta1UndeleteCatalogRequest) -> CatalogUndeleteCall<'a> {
         self._request = new_value;
         self
     }
@@ -8814,7 +8787,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> CatalogUndeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> CatalogUndeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -8824,7 +8797,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogUndeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CatalogUndeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -8849,7 +8822,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> CatalogUndeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> CatalogUndeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8869,7 +8842,7 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogUndeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> CatalogUndeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8928,10 +8901,10 @@ impl<'a, C> CatalogUndeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationCancelCall<'a, C>
-    where C: 'a {
+pub struct OperationCancelCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _request: GoogleLongrunningCancelOperationRequest,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -8939,9 +8912,9 @@ pub struct OperationCancelCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationCancelCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationCancelCall<'a> {}
 
-impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationCancelCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9017,8 +8990,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9032,7 +9004,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9043,7 +9015,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9102,7 +9074,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> OperationCancelCall<'a, C> {
+    pub fn request(mut self, new_value: GoogleLongrunningCancelOperationRequest) -> OperationCancelCall<'a> {
         self._request = new_value;
         self
     }
@@ -9112,7 +9084,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9122,7 +9094,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationCancelCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9147,7 +9119,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9167,7 +9139,7 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationCancelCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationCancelCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9214,19 +9186,19 @@ impl<'a, C> OperationCancelCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationDeleteCall<'a, C>
-    where C: 'a {
+pub struct OperationDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationDeleteCall<'a> {}
 
-impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9291,8 +9263,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9305,7 +9276,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9314,7 +9285,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9374,7 +9345,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9384,7 +9355,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9409,7 +9380,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9429,7 +9400,7 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9475,19 +9446,19 @@ impl<'a, C> OperationDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationGetCall<'a, C>
-    where C: 'a {
+pub struct OperationGetCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _name: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationGetCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationGetCall<'a> {}
 
-impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9552,8 +9523,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9566,7 +9536,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9575,7 +9545,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9635,7 +9605,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a> {
         self._name = new_value.to_string();
         self
     }
@@ -9645,7 +9615,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9670,7 +9640,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9690,7 +9660,7 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -9747,10 +9717,10 @@ impl<'a, C> OperationGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct OperationListCall<'a, C>
-    where C: 'a {
+pub struct OperationListCall<'a>
+    where  {
 
-    hub: &'a CloudPrivateCatalogProducer<C>,
+    hub: &'a CloudPrivateCatalogProducer<>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _name: Option<String>,
@@ -9760,9 +9730,9 @@ pub struct OperationListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for OperationListCall<'a, C> {}
+impl<'a> client::CallBuilder for OperationListCall<'a> {}
 
-impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> OperationListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -9813,8 +9783,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -9827,7 +9796,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -9836,7 +9805,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -9893,28 +9862,28 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// The standard list page token.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> OperationListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// The standard list page size.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> OperationListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
     /// The name of the operation's parent resource.
     ///
     /// Sets the *name* query property to the given value.
-    pub fn name(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn name(mut self, new_value: &str) -> OperationListCall<'a> {
         self._name = Some(new_value.to_string());
         self
     }
     /// The standard list filter.
     ///
     /// Sets the *filter* query property to the given value.
-    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C> {
+    pub fn filter(mut self, new_value: &str) -> OperationListCall<'a> {
         self._filter = Some(new_value.to_string());
         self
     }
@@ -9924,7 +9893,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> OperationListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -9949,7 +9918,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9969,7 +9938,7 @@ impl<'a, C> OperationListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

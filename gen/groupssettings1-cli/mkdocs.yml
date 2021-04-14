@@ -1,8 +1,8 @@
-site_name: groupssettings v2.0.0+20210325
+site_name: groupssettings v2.0.3+20210325
 site_url: http://byron.github.io/google-apis-rs/google-groupssettings1-cli
 site_description: A complete library to interact with groupssettings (protocol v1)
 
-repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1-cli
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/groupssettings1-cli
 
 docs_dir: docs
 site_dir: build_html

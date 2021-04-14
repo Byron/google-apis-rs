@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -103,44 +102,43 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct Proximitybeacon<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct Proximitybeacon<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for Proximitybeacon<C> {}
+impl<'a, > client::Hub for Proximitybeacon<> {}
 
-impl<'a, C> Proximitybeacon<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > Proximitybeacon<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Proximitybeacon<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> Proximitybeacon<> {
         Proximitybeacon {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://proximitybeacon.googleapis.com/".to_string(),
             _root_url: "https://proximitybeacon.googleapis.com/".to_string(),
         }
     }
 
-    pub fn beaconinfo(&'a self) -> BeaconinfoMethods<'a, C> {
+    pub fn beaconinfo(&'a self) -> BeaconinfoMethods<'a> {
         BeaconinfoMethods { hub: &self }
     }
-    pub fn beacons(&'a self) -> BeaconMethods<'a, C> {
+    pub fn beacons(&'a self) -> BeaconMethods<'a> {
         BeaconMethods { hub: &self }
     }
-    pub fn methods(&'a self) -> MethodMethods<'a, C> {
+    pub fn methods(&'a self) -> MethodMethods<'a> {
         MethodMethods { hub: &self }
     }
-    pub fn namespaces(&'a self) -> NamespaceMethods<'a, C> {
+    pub fn namespaces(&'a self) -> NamespaceMethods<'a> {
         NamespaceMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -864,15 +862,15 @@ impl client::Part for Observation {}
 /// let rb = hub.beaconinfo();
 /// # }
 /// ```
-pub struct BeaconinfoMethods<'a, C>
-    where C: 'a {
+pub struct BeaconinfoMethods<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
 }
 
-impl<'a, C> client::MethodsBuilder for BeaconinfoMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for BeaconinfoMethods<'a> {}
 
-impl<'a, C> BeaconinfoMethods<'a, C> {
+impl<'a> BeaconinfoMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -885,7 +883,7 @@ impl<'a, C> BeaconinfoMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn getforobserved(&self, request: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a, C> {
+    pub fn getforobserved(&self, request: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a> {
         BeaconinfoGetforobservedCall {
             hub: self.hub,
             _request: request,
@@ -927,15 +925,15 @@ impl<'a, C> BeaconinfoMethods<'a, C> {
 /// let rb = hub.beacons();
 /// # }
 /// ```
-pub struct BeaconMethods<'a, C>
-    where C: 'a {
+pub struct BeaconMethods<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
 }
 
-impl<'a, C> client::MethodsBuilder for BeaconMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for BeaconMethods<'a> {}
 
-impl<'a, C> BeaconMethods<'a, C> {
+impl<'a> BeaconMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -961,7 +959,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_batch_delete(&self, beacon_name: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
+    pub fn attachments_batch_delete(&self, beacon_name: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
         BeaconAttachmentBatchDeleteCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1003,7 +1001,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_create(&self, request: BeaconAttachment, beacon_name: &str) -> BeaconAttachmentCreateCall<'a, C> {
+    pub fn attachments_create(&self, request: BeaconAttachment, beacon_name: &str) -> BeaconAttachmentCreateCall<'a> {
         BeaconAttachmentCreateCall {
             hub: self.hub,
             _request: request,
@@ -1036,7 +1034,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                      Eddystone-EID beacons, the beacon ID portion (`3!893737abc9`) may be the
     ///                      beacon's current EID, or its "stable" Eddystone-UID.
     ///                      Required.
-    pub fn attachments_delete(&self, attachment_name: &str) -> BeaconAttachmentDeleteCall<'a, C> {
+    pub fn attachments_delete(&self, attachment_name: &str) -> BeaconAttachmentDeleteCall<'a> {
         BeaconAttachmentDeleteCall {
             hub: self.hub,
             _attachment_name: attachment_name.to_string(),
@@ -1071,7 +1069,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn attachments_list(&self, beacon_name: &str) -> BeaconAttachmentListCall<'a, C> {
+    pub fn attachments_list(&self, beacon_name: &str) -> BeaconAttachmentListCall<'a> {
         BeaconAttachmentListCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1097,7 +1095,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     /// # Arguments
     ///
     /// * `beaconName` - Beacon that the diagnostics are for.
-    pub fn diagnostics_list(&self, beacon_name: &str) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn diagnostics_list(&self, beacon_name: &str) -> BeaconDiagnosticListCall<'a> {
         BeaconDiagnosticListCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1132,7 +1130,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn activate(&self, beacon_name: &str) -> BeaconActivateCall<'a, C> {
+    pub fn activate(&self, beacon_name: &str) -> BeaconActivateCall<'a> {
         BeaconActivateCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1164,7 +1162,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn deactivate(&self, beacon_name: &str) -> BeaconDeactivateCall<'a, C> {
+    pub fn deactivate(&self, beacon_name: &str) -> BeaconDeactivateCall<'a> {
         BeaconDeactivateCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1196,7 +1194,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID of the beacon's "stable" UID.
     ///                  Required.
-    pub fn decommission(&self, beacon_name: &str) -> BeaconDecommissionCall<'a, C> {
+    pub fn decommission(&self, beacon_name: &str) -> BeaconDecommissionCall<'a> {
         BeaconDecommissionCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1227,7 +1225,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn delete(&self, beacon_name: &str) -> BeaconDeleteCall<'a, C> {
+    pub fn delete(&self, beacon_name: &str) -> BeaconDeleteCall<'a> {
         BeaconDeleteCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1262,7 +1260,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  for AltBeacon. For Eddystone-EID beacons, you may use either the
     ///                  current EID or the beacon's "stable" UID.
     ///                  Required.
-    pub fn get(&self, beacon_name: &str) -> BeaconGetCall<'a, C> {
+    pub fn get(&self, beacon_name: &str) -> BeaconGetCall<'a> {
         BeaconGetCall {
             hub: self.hub,
             _beacon_name: beacon_name.to_string(),
@@ -1283,7 +1281,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    pub fn list(&self) -> BeaconListCall<'a, C> {
+    pub fn list(&self) -> BeaconListCall<'a> {
         BeaconListCall {
             hub: self.hub,
             _q: Default::default(),
@@ -1309,7 +1307,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn register(&self, request: Beacon) -> BeaconRegisterCall<'a, C> {
+    pub fn register(&self, request: Beacon) -> BeaconRegisterCall<'a> {
         BeaconRegisterCall {
             hub: self.hub,
             _request: request,
@@ -1344,7 +1342,7 @@ impl<'a, C> BeaconMethods<'a, C> {
     ///                  `3` for Eddystone, `1` for iBeacon, or `5` for AltBeacon.
     ///                  This field must be left empty when registering. After reading a beacon,
     ///                  clients can use the name for future operations.
-    pub fn update(&self, request: Beacon, beacon_name: &str) -> BeaconUpdateCall<'a, C> {
+    pub fn update(&self, request: Beacon, beacon_name: &str) -> BeaconUpdateCall<'a> {
         BeaconUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1389,15 +1387,15 @@ impl<'a, C> BeaconMethods<'a, C> {
 /// let rb = hub.namespaces();
 /// # }
 /// ```
-pub struct NamespaceMethods<'a, C>
-    where C: 'a {
+pub struct NamespaceMethods<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
 }
 
-impl<'a, C> client::MethodsBuilder for NamespaceMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for NamespaceMethods<'a> {}
 
-impl<'a, C> NamespaceMethods<'a, C> {
+impl<'a> NamespaceMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1409,7 +1407,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// token](https://developers.google.com/identity/protocols/OAuth2) from a
     /// signed-in user with **viewer**, **Is owner** or **Can edit** permissions in
     /// the Google Developers Console project.
-    pub fn list(&self) -> NamespaceListCall<'a, C> {
+    pub fn list(&self) -> NamespaceListCall<'a> {
         NamespaceListCall {
             hub: self.hub,
             _project_id: Default::default(),
@@ -1429,7 +1427,7 @@ impl<'a, C> NamespaceMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `namespaceName` - Resource name of this namespace. Namespaces names have the format:
     ///                     <code>namespaces/<var>namespace</var></code>.
-    pub fn update(&self, request: Namespace, namespace_name: &str) -> NamespaceUpdateCall<'a, C> {
+    pub fn update(&self, request: Namespace, namespace_name: &str) -> NamespaceUpdateCall<'a> {
         NamespaceUpdateCall {
             hub: self.hub,
             _request: request,
@@ -1474,15 +1472,15 @@ impl<'a, C> NamespaceMethods<'a, C> {
 /// let rb = hub.methods();
 /// # }
 /// ```
-pub struct MethodMethods<'a, C>
-    where C: 'a {
+pub struct MethodMethods<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MethodMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MethodMethods<'a> {}
 
-impl<'a, C> MethodMethods<'a, C> {
+impl<'a> MethodMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1493,7 +1491,7 @@ impl<'a, C> MethodMethods<'a, C> {
     /// to provision and register multiple beacons. However, clients should be
     /// prepared to refresh this key when they encounter an error registering an
     /// Eddystone-EID beacon.
-    pub fn get_eidparams(&self) -> MethodGetEidparamCall<'a, C> {
+    pub fn get_eidparams(&self) -> MethodGetEidparamCall<'a> {
         MethodGetEidparamCall {
             hub: self.hub,
             _delegate: Default::default(),
@@ -1553,18 +1551,18 @@ impl<'a, C> MethodMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconinfoGetforobservedCall<'a, C>
-    where C: 'a {
+pub struct BeaconinfoGetforobservedCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _request: GetInfoForObservedBeaconsRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
 }
 
-impl<'a, C> client::CallBuilder for BeaconinfoGetforobservedCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconinfoGetforobservedCall<'a> {}
 
-impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconinfoGetforobservedCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1622,7 +1620,7 @@ impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client
         loop {
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone());
@@ -1633,7 +1631,7 @@ impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1692,7 +1690,7 @@ impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a, C> {
+    pub fn request(mut self, new_value: GetInfoForObservedBeaconsRequest) -> BeaconinfoGetforobservedCall<'a> {
         self._request = new_value;
         self
     }
@@ -1702,7 +1700,7 @@ impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconinfoGetforobservedCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconinfoGetforobservedCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1727,7 +1725,7 @@ impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconinfoGetforobservedCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconinfoGetforobservedCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1781,10 +1779,10 @@ impl<'a, C> BeaconinfoGetforobservedCall<'a, C> where C: BorrowMut<hyper::Client
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentBatchDeleteCall<'a, C>
-    where C: 'a {
+pub struct BeaconAttachmentBatchDeleteCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _namespaced_type: Option<String>,
@@ -1793,9 +1791,9 @@ pub struct BeaconAttachmentBatchDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconAttachmentBatchDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconAttachmentBatchDeleteCall<'a> {}
 
-impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconAttachmentBatchDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1866,8 +1864,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1880,7 +1877,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1889,7 +1886,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1955,7 +1952,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -1967,7 +1964,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -1977,7 +1974,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Optional.
     ///
     /// Sets the *namespaced type* query property to the given value.
-    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a, C> {
+    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentBatchDeleteCall<'a> {
         self._namespaced_type = Some(new_value.to_string());
         self
     }
@@ -1987,7 +1984,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentBatchDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentBatchDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2012,7 +2009,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentBatchDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentBatchDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2032,7 +2029,7 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentBatchDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentBatchDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2099,10 +2096,10 @@ impl<'a, C> BeaconAttachmentBatchDeleteCall<'a, C> where C: BorrowMut<hyper::Cli
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentCreateCall<'a, C>
-    where C: 'a {
+pub struct BeaconAttachmentCreateCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _request: BeaconAttachment,
     _beacon_name: String,
     _project_id: Option<String>,
@@ -2111,9 +2108,9 @@ pub struct BeaconAttachmentCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconAttachmentCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconAttachmentCreateCall<'a> {}
 
-impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconAttachmentCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2192,8 +2189,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2207,7 +2203,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2218,7 +2214,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2277,7 +2273,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: BeaconAttachment) -> BeaconAttachmentCreateCall<'a, C> {
+    pub fn request(mut self, new_value: BeaconAttachment) -> BeaconAttachmentCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -2293,7 +2289,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2303,7 +2299,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentCreateCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2313,7 +2309,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2338,7 +2334,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2358,7 +2354,7 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2412,10 +2408,10 @@ impl<'a, C> BeaconAttachmentCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentDeleteCall<'a, C>
-    where C: 'a {
+pub struct BeaconAttachmentDeleteCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _attachment_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2423,9 +2419,9 @@ pub struct BeaconAttachmentDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconAttachmentDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconAttachmentDeleteCall<'a> {}
 
-impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconAttachmentDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2493,8 +2489,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2507,7 +2502,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2516,7 +2511,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2581,7 +2576,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn attachment_name(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, C> {
+    pub fn attachment_name(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a> {
         self._attachment_name = new_value.to_string();
         self
     }
@@ -2590,7 +2585,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentDeleteCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2600,7 +2595,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2625,7 +2620,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2645,7 +2640,7 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2702,10 +2697,10 @@ impl<'a, C> BeaconAttachmentDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconAttachmentListCall<'a, C>
-    where C: 'a {
+pub struct BeaconAttachmentListCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _namespaced_type: Option<String>,
@@ -2714,9 +2709,9 @@ pub struct BeaconAttachmentListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconAttachmentListCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconAttachmentListCall<'a> {}
 
-impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconAttachmentListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2787,8 +2782,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2801,7 +2795,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2810,7 +2804,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2876,7 +2870,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconAttachmentListCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -2888,7 +2882,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconAttachmentListCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -2897,7 +2891,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// "all types in all namespaces".
     ///
     /// Sets the *namespaced type* query property to the given value.
-    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentListCall<'a, C> {
+    pub fn namespaced_type(mut self, new_value: &str) -> BeaconAttachmentListCall<'a> {
         self._namespaced_type = Some(new_value.to_string());
         self
     }
@@ -2907,7 +2901,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconAttachmentListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2932,7 +2926,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconAttachmentListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2952,7 +2946,7 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconAttachmentListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3007,10 +3001,10 @@ impl<'a, C> BeaconAttachmentListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDiagnosticListCall<'a, C>
-    where C: 'a {
+pub struct BeaconDiagnosticListCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _page_token: Option<String>,
@@ -3021,9 +3015,9 @@ pub struct BeaconDiagnosticListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconDiagnosticListCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconDiagnosticListCall<'a> {}
 
-impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconDiagnosticListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3100,8 +3094,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3114,7 +3107,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3123,7 +3116,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3183,7 +3176,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3192,7 +3185,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// diagnostic records. Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3200,7 +3193,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// response to a previous request. Optional.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -3208,7 +3201,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// 10. Maximum 1000. Optional.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> BeaconDiagnosticListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -3216,7 +3209,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// beacons that have low batteries use `alert_filter=LOW_BATTERY`.
     ///
     /// Sets the *alert filter* query property to the given value.
-    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn alert_filter(mut self, new_value: &str) -> BeaconDiagnosticListCall<'a> {
         self._alert_filter = Some(new_value.to_string());
         self
     }
@@ -3226,7 +3219,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDiagnosticListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDiagnosticListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3251,7 +3244,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDiagnosticListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDiagnosticListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3271,7 +3264,7 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDiagnosticListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDiagnosticListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3324,10 +3317,10 @@ impl<'a, C> BeaconDiagnosticListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconActivateCall<'a, C>
-    where C: 'a {
+pub struct BeaconActivateCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3335,9 +3328,9 @@ pub struct BeaconActivateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconActivateCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconActivateCall<'a> {}
 
-impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconActivateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3405,8 +3398,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3419,7 +3411,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3428,7 +3420,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3494,7 +3486,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconActivateCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconActivateCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3504,7 +3496,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconActivateCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconActivateCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3514,7 +3506,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconActivateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconActivateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3539,7 +3531,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconActivateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconActivateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3559,7 +3551,7 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconActivateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconActivateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3612,10 +3604,10 @@ impl<'a, C> BeaconActivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDeactivateCall<'a, C>
-    where C: 'a {
+pub struct BeaconDeactivateCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3623,9 +3615,9 @@ pub struct BeaconDeactivateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconDeactivateCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconDeactivateCall<'a> {}
 
-impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconDeactivateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3693,8 +3685,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3707,7 +3698,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3716,7 +3707,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3782,7 +3773,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeactivateCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeactivateCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -3792,7 +3783,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDeactivateCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDeactivateCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -3802,7 +3793,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeactivateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeactivateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3827,7 +3818,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeactivateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeactivateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3847,7 +3838,7 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDeactivateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDeactivateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3900,10 +3891,10 @@ impl<'a, C> BeaconDeactivateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_r
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDecommissionCall<'a, C>
-    where C: 'a {
+pub struct BeaconDecommissionCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -3911,9 +3902,9 @@ pub struct BeaconDecommissionCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconDecommissionCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconDecommissionCall<'a> {}
 
-impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconDecommissionCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3981,8 +3972,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3995,7 +3985,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4004,7 +3994,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4070,7 +4060,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDecommissionCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDecommissionCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4080,7 +4070,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDecommissionCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDecommissionCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4090,7 +4080,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDecommissionCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDecommissionCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4115,7 +4105,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDecommissionCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDecommissionCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4135,7 +4125,7 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDecommissionCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDecommissionCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4187,10 +4177,10 @@ impl<'a, C> BeaconDecommissionCall<'a, C> where C: BorrowMut<hyper::Client<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconDeleteCall<'a, C>
-    where C: 'a {
+pub struct BeaconDeleteCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4198,9 +4188,9 @@ pub struct BeaconDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconDeleteCall<'a> {}
 
-impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4268,8 +4258,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4282,7 +4271,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4291,7 +4280,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4357,7 +4346,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeleteCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconDeleteCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4366,7 +4355,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconDeleteCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconDeleteCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4376,7 +4365,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4401,7 +4390,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4421,7 +4410,7 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4477,10 +4466,10 @@ impl<'a, C> BeaconDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconGetCall<'a, C>
-    where C: 'a {
+pub struct BeaconGetCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _beacon_name: String,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4488,9 +4477,9 @@ pub struct BeaconGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconGetCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconGetCall<'a> {}
 
-impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4558,8 +4547,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4572,7 +4560,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4581,7 +4569,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4647,7 +4635,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconGetCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconGetCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -4657,7 +4645,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconGetCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconGetCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -4667,7 +4655,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -4692,7 +4680,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -4712,7 +4700,7 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4767,10 +4755,10 @@ impl<'a, C> BeaconGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconListCall<'a, C>
-    where C: 'a {
+pub struct BeaconListCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _q: Option<String>,
     _project_id: Option<String>,
     _page_token: Option<String>,
@@ -4780,9 +4768,9 @@ pub struct BeaconListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconListCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconListCall<'a> {}
 
-impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -4833,8 +4821,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -4847,7 +4834,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -4856,7 +4843,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -4980,7 +4967,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// /v1beta1/beacons?q=status:active%20lat:51.123%20lng:-1.095%20radius:1000`
     ///
     /// Sets the *q* query property to the given value.
-    pub fn q(mut self, new_value: &str) -> BeaconListCall<'a, C> {
+    pub fn q(mut self, new_value: &str) -> BeaconListCall<'a> {
         self._q = Some(new_value.to_string());
         self
     }
@@ -4989,14 +4976,14 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconListCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconListCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
     /// A pagination token obtained from a previous request to list beacons.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> BeaconListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> BeaconListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
@@ -5004,7 +4991,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// server-defined upper limit.
     ///
     /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> BeaconListCall<'a, C> {
+    pub fn page_size(mut self, new_value: i32) -> BeaconListCall<'a> {
         self._page_size = Some(new_value);
         self
     }
@@ -5014,7 +5001,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5039,7 +5026,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5059,7 +5046,7 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5116,10 +5103,10 @@ impl<'a, C> BeaconListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls:
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconRegisterCall<'a, C>
-    where C: 'a {
+pub struct BeaconRegisterCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _request: Beacon,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -5127,9 +5114,9 @@ pub struct BeaconRegisterCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconRegisterCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconRegisterCall<'a> {}
 
-impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconRegisterCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5182,8 +5169,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5197,7 +5183,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5208,7 +5194,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5267,7 +5253,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Beacon) -> BeaconRegisterCall<'a, C> {
+    pub fn request(mut self, new_value: Beacon) -> BeaconRegisterCall<'a> {
         self._request = new_value;
         self
     }
@@ -5277,7 +5263,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconRegisterCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconRegisterCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -5287,7 +5273,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconRegisterCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconRegisterCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5312,7 +5298,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconRegisterCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconRegisterCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5332,7 +5318,7 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconRegisterCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconRegisterCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5394,10 +5380,10 @@ impl<'a, C> BeaconRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rus
 ///              .doit().await;
 /// # }
 /// ```
-pub struct BeaconUpdateCall<'a, C>
-    where C: 'a {
+pub struct BeaconUpdateCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _request: Beacon,
     _beacon_name: String,
     _project_id: Option<String>,
@@ -5406,9 +5392,9 @@ pub struct BeaconUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for BeaconUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for BeaconUpdateCall<'a> {}
 
-impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> BeaconUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5487,8 +5473,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5502,7 +5487,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5513,7 +5498,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5572,7 +5557,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Beacon) -> BeaconUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Beacon) -> BeaconUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -5588,7 +5573,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn beacon_name(mut self, new_value: &str) -> BeaconUpdateCall<'a, C> {
+    pub fn beacon_name(mut self, new_value: &str) -> BeaconUpdateCall<'a> {
         self._beacon_name = new_value.to_string();
         self
     }
@@ -5598,7 +5583,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> BeaconUpdateCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> BeaconUpdateCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -5608,7 +5593,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> BeaconUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5633,7 +5618,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> BeaconUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> BeaconUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5653,7 +5638,7 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> BeaconUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5705,19 +5690,19 @@ impl<'a, C> BeaconUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceListCall<'a, C>
-    where C: 'a {
+pub struct NamespaceListCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _project_id: Option<String>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceListCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceListCall<'a> {}
 
-impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -5759,8 +5744,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -5773,7 +5757,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -5782,7 +5766,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -5840,7 +5824,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> NamespaceListCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> NamespaceListCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -5850,7 +5834,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -5875,7 +5859,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5895,7 +5879,7 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5947,10 +5931,10 @@ impl<'a, C> NamespaceListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct NamespaceUpdateCall<'a, C>
-    where C: 'a {
+pub struct NamespaceUpdateCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _request: Namespace,
     _namespace_name: String,
     _project_id: Option<String>,
@@ -5959,9 +5943,9 @@ pub struct NamespaceUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for NamespaceUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for NamespaceUpdateCall<'a> {}
 
-impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> NamespaceUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6040,8 +6024,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6055,7 +6038,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6066,7 +6049,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6125,7 +6108,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Namespace) -> NamespaceUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: Namespace) -> NamespaceUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -6136,7 +6119,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn namespace_name(mut self, new_value: &str) -> NamespaceUpdateCall<'a, C> {
+    pub fn namespace_name(mut self, new_value: &str) -> NamespaceUpdateCall<'a> {
         self._namespace_name = new_value.to_string();
         self
     }
@@ -6146,7 +6129,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Optional.
     ///
     /// Sets the *project id* query property to the given value.
-    pub fn project_id(mut self, new_value: &str) -> NamespaceUpdateCall<'a, C> {
+    pub fn project_id(mut self, new_value: &str) -> NamespaceUpdateCall<'a> {
         self._project_id = Some(new_value.to_string());
         self
     }
@@ -6156,7 +6139,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> NamespaceUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6181,7 +6164,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> NamespaceUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> NamespaceUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6201,7 +6184,7 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> NamespaceUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6251,18 +6234,18 @@ impl<'a, C> NamespaceUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_ru
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MethodGetEidparamCall<'a, C>
-    where C: 'a {
+pub struct MethodGetEidparamCall<'a>
+    where  {
 
-    hub: &'a Proximitybeacon<C>,
+    hub: &'a Proximitybeacon<>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MethodGetEidparamCall<'a, C> {}
+impl<'a> client::CallBuilder for MethodGetEidparamCall<'a> {}
 
-impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MethodGetEidparamCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -6301,8 +6284,7 @@ impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -6315,7 +6297,7 @@ impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -6324,7 +6306,7 @@ impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -6384,7 +6366,7 @@ impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEidparamCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MethodGetEidparamCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -6409,7 +6391,7 @@ impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEidparamCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MethodGetEidparamCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6429,7 +6411,7 @@ impl<'a, C> MethodGetEidparamCall<'a, C> where C: BorrowMut<hyper::Client<hyper_
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetEidparamCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodGetEidparamCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

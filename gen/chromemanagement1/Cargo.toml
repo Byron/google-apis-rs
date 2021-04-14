@@ -4,12 +4,12 @@
 [package]
 
 name = "google-chromemanagement1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Chrome Management (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/chromemanagement1"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/chromemanagement1"
 homepage = "http://developers.google.com/chrome/management/"
-documentation = "https://docs.rs/google-chromemanagement1/2.0.0+20210330"
+documentation = "https://docs.rs/google-chromemanagement1/2.0.3+20210330"
 license = "MIT"
 keywords = ["chromemanagement", "google", "protocol", "web", "api"]
 autobins = false

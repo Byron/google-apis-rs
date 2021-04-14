@@ -18,11 +18,11 @@ Install the command-line interface with cargo using:
 cargo install google-cloudlatencytest2-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlatencytest2-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudlatencytest2-cli).
 
 # Usage
 
-This documentation was generated from the *cloudlatencytest* API at revision *20160309*. The CLI is at version *2.0.0*.
+This documentation was generated from the *cloudlatencytest* API at revision *20160309*. The CLI is at version *2.0.3*.
 
 ```bash
 cloudlatencytest2 [options]

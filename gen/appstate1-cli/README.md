@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-appstate1-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/appstate1-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/appstate1-cli).
 
 # Usage
 
-This documentation was generated from the *App State* API at revision *20190627*. The CLI is at version *2.0.0*.
+This documentation was generated from the *App State* API at revision *20190627*. The CLI is at version *2.0.3*.
 
 ```bash
 appstate1 [options]

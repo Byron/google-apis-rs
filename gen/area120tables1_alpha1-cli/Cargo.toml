@@ -4,10 +4,10 @@
 [package]
 
 name = "google-area120tables1_alpha1-cli"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Area120 Tables (protocol v1alpha1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/area120tables1_alpha1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/area120tables1_alpha1-cli"
 homepage = "https://support.google.com/area120-tables/answer/10011390"
 documentation = "http://byron.github.io/google-apis-rs/google_area120tables1_alpha1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-area120tables1_alpha1]
 path = "../area120tables1_alpha1"
-version = "2.0.0+20210330"
+version = "2.0.3+20210330"

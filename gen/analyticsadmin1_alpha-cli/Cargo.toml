@@ -4,10 +4,10 @@
 [package]
 
 name = "google-analyticsadmin1_alpha-cli"
-version = "2.0.0+20210331"
+version = "2.0.3+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Google Analytics Admin (protocol v1alpha)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analyticsadmin1_alpha-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsadmin1_alpha-cli"
 homepage = "http://code.google.com/apis/analytics/docs/mgmt/home.html"
 documentation = "http://byron.github.io/google-apis-rs/google_analyticsadmin1_alpha_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-analyticsadmin1_alpha]
 path = "../analyticsadmin1_alpha"
-version = "2.0.0+20210331"
+version = "2.0.3+20210331"

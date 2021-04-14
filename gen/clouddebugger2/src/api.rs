@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -111,38 +110,37 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudDebugger<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudDebugger<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudDebugger<C> {}
+impl<'a, > client::Hub for CloudDebugger<> {}
 
-impl<'a, C> CloudDebugger<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudDebugger<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudDebugger<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudDebugger<> {
         CloudDebugger {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://clouddebugger.googleapis.com/".to_string(),
             _root_url: "https://clouddebugger.googleapis.com/".to_string(),
         }
     }
 
-    pub fn controller(&'a self) -> ControllerMethods<'a, C> {
+    pub fn controller(&'a self) -> ControllerMethods<'a> {
         ControllerMethods { hub: &self }
     }
-    pub fn debugger(&'a self) -> DebuggerMethods<'a, C> {
+    pub fn debugger(&'a self) -> DebuggerMethods<'a> {
         DebuggerMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -771,15 +769,15 @@ impl client::Part for Variable {}
 /// let rb = hub.controller();
 /// # }
 /// ```
-pub struct ControllerMethods<'a, C>
-    where C: 'a {
+pub struct ControllerMethods<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
 }
 
-impl<'a, C> client::MethodsBuilder for ControllerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for ControllerMethods<'a> {}
 
-impl<'a, C> ControllerMethods<'a, C> {
+impl<'a> ControllerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -788,7 +786,7 @@ impl<'a, C> ControllerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `debuggeeId` - Required. Identifies the debuggee.
-    pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> ControllerDebuggeeBreakpointListCall<'a, C> {
+    pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> ControllerDebuggeeBreakpointListCall<'a> {
         ControllerDebuggeeBreakpointListCall {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
@@ -810,7 +808,7 @@ impl<'a, C> ControllerMethods<'a, C> {
     /// * `request` - No description provided.
     /// * `debuggeeId` - Required. Identifies the debuggee being debugged.
     /// * `id` - Breakpoint identifier, unique in the scope of the debuggee.
-    pub fn debuggees_breakpoints_update(&self, request: UpdateActiveBreakpointRequest, debuggee_id: &str, id: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a, C> {
+    pub fn debuggees_breakpoints_update(&self, request: UpdateActiveBreakpointRequest, debuggee_id: &str, id: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a> {
         ControllerDebuggeeBreakpointUpdateCall {
             hub: self.hub,
             _request: request,
@@ -829,7 +827,7 @@ impl<'a, C> ControllerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    pub fn debuggees_register(&self, request: RegisterDebuggeeRequest) -> ControllerDebuggeeRegisterCall<'a, C> {
+    pub fn debuggees_register(&self, request: RegisterDebuggeeRequest) -> ControllerDebuggeeRegisterCall<'a> {
         ControllerDebuggeeRegisterCall {
             hub: self.hub,
             _request: request,
@@ -872,15 +870,15 @@ impl<'a, C> ControllerMethods<'a, C> {
 /// let rb = hub.debugger();
 /// # }
 /// ```
-pub struct DebuggerMethods<'a, C>
-    where C: 'a {
+pub struct DebuggerMethods<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
 }
 
-impl<'a, C> client::MethodsBuilder for DebuggerMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for DebuggerMethods<'a> {}
 
-impl<'a, C> DebuggerMethods<'a, C> {
+impl<'a> DebuggerMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -890,7 +888,7 @@ impl<'a, C> DebuggerMethods<'a, C> {
     ///
     /// * `debuggeeId` - Required. ID of the debuggee whose breakpoint to delete.
     /// * `breakpointId` - Required. ID of the breakpoint to delete.
-    pub fn debuggees_breakpoints_delete(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C> {
+    pub fn debuggees_breakpoints_delete(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a> {
         DebuggerDebuggeeBreakpointDeleteCall {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
@@ -910,7 +908,7 @@ impl<'a, C> DebuggerMethods<'a, C> {
     ///
     /// * `debuggeeId` - Required. ID of the debuggee whose breakpoint to get.
     /// * `breakpointId` - Required. ID of the breakpoint to get.
-    pub fn debuggees_breakpoints_get(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C> {
+    pub fn debuggees_breakpoints_get(&self, debuggee_id: &str, breakpoint_id: &str) -> DebuggerDebuggeeBreakpointGetCall<'a> {
         DebuggerDebuggeeBreakpointGetCall {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
@@ -929,7 +927,7 @@ impl<'a, C> DebuggerMethods<'a, C> {
     /// # Arguments
     ///
     /// * `debuggeeId` - Required. ID of the debuggee whose breakpoints to list.
-    pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn debuggees_breakpoints_list(&self, debuggee_id: &str) -> DebuggerDebuggeeBreakpointListCall<'a> {
         DebuggerDebuggeeBreakpointListCall {
             hub: self.hub,
             _debuggee_id: debuggee_id.to_string(),
@@ -953,7 +951,7 @@ impl<'a, C> DebuggerMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `debuggeeId` - Required. ID of the debuggee where the breakpoint is to be set.
-    pub fn debuggees_breakpoints_set(&self, request: Breakpoint, debuggee_id: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C> {
+    pub fn debuggees_breakpoints_set(&self, request: Breakpoint, debuggee_id: &str) -> DebuggerDebuggeeBreakpointSetCall<'a> {
         DebuggerDebuggeeBreakpointSetCall {
             hub: self.hub,
             _request: request,
@@ -969,7 +967,7 @@ impl<'a, C> DebuggerMethods<'a, C> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all the debuggees that the user has access to.
-    pub fn debuggees_list(&self) -> DebuggerDebuggeeListCall<'a, C> {
+    pub fn debuggees_list(&self) -> DebuggerDebuggeeListCall<'a> {
         DebuggerDebuggeeListCall {
             hub: self.hub,
             _project: Default::default(),
@@ -1025,10 +1023,10 @@ impl<'a, C> DebuggerMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ControllerDebuggeeBreakpointListCall<'a, C>
-    where C: 'a {
+pub struct ControllerDebuggeeBreakpointListCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _debuggee_id: String,
     _wait_token: Option<String>,
     _success_on_timeout: Option<bool>,
@@ -1038,9 +1036,9 @@ pub struct ControllerDebuggeeBreakpointListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ControllerDebuggeeBreakpointListCall<'a, C> {}
+impl<'a> client::CallBuilder for ControllerDebuggeeBreakpointListCall<'a> {}
 
-impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ControllerDebuggeeBreakpointListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1110,8 +1108,7 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1124,7 +1121,7 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1133,7 +1130,7 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1193,28 +1190,28 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn debuggee_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C> {
+    pub fn debuggee_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a> {
         self._debuggee_id = new_value.to_string();
         self
     }
     /// A token that, if specified, blocks the method call until the list of active breakpoints has changed, or a server-selected timeout has expired. The value should be set from the `next_wait_token` field in the last response. The initial value should be set to `"init"`.
     ///
     /// Sets the *wait token* query property to the given value.
-    pub fn wait_token(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C> {
+    pub fn wait_token(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a> {
         self._wait_token = Some(new_value.to_string());
         self
     }
     /// If set to `true` (recommended), returns `google.rpc.Code.OK` status and sets the `wait_expired` response field to `true` when the server-selected timeout has expired. If set to `false` (deprecated), returns `google.rpc.Code.ABORTED` status when the server-selected timeout has expired.
     ///
     /// Sets the *success on timeout* query property to the given value.
-    pub fn success_on_timeout(mut self, new_value: bool) -> ControllerDebuggeeBreakpointListCall<'a, C> {
+    pub fn success_on_timeout(mut self, new_value: bool) -> ControllerDebuggeeBreakpointListCall<'a> {
         self._success_on_timeout = Some(new_value);
         self
     }
     /// Identifies the agent. This is the ID returned in the RegisterDebuggee response.
     ///
     /// Sets the *agent id* query property to the given value.
-    pub fn agent_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a, C> {
+    pub fn agent_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointListCall<'a> {
         self._agent_id = Some(new_value.to_string());
         self
     }
@@ -1224,7 +1221,7 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ControllerDebuggeeBreakpointListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ControllerDebuggeeBreakpointListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1249,7 +1246,7 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1269,7 +1266,7 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ControllerDebuggeeBreakpointListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ControllerDebuggeeBreakpointListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1319,10 +1316,10 @@ impl<'a, C> ControllerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ControllerDebuggeeBreakpointUpdateCall<'a, C>
-    where C: 'a {
+pub struct ControllerDebuggeeBreakpointUpdateCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _request: UpdateActiveBreakpointRequest,
     _debuggee_id: String,
     _id: String,
@@ -1331,9 +1328,9 @@ pub struct ControllerDebuggeeBreakpointUpdateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ControllerDebuggeeBreakpointUpdateCall<'a, C> {}
+impl<'a> client::CallBuilder for ControllerDebuggeeBreakpointUpdateCall<'a> {}
 
-impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ControllerDebuggeeBreakpointUpdateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1406,8 +1403,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1421,7 +1417,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::PUT).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1432,7 +1428,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1491,7 +1487,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateActiveBreakpointRequest) -> ControllerDebuggeeBreakpointUpdateCall<'a, C> {
+    pub fn request(mut self, new_value: UpdateActiveBreakpointRequest) -> ControllerDebuggeeBreakpointUpdateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1501,7 +1497,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn debuggee_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a, C> {
+    pub fn debuggee_id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a> {
         self._debuggee_id = new_value.to_string();
         self
     }
@@ -1511,7 +1507,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a, C> {
+    pub fn id(mut self, new_value: &str) -> ControllerDebuggeeBreakpointUpdateCall<'a> {
         self._id = new_value.to_string();
         self
     }
@@ -1521,7 +1517,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ControllerDebuggeeBreakpointUpdateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ControllerDebuggeeBreakpointUpdateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1546,7 +1542,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointUpdateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1566,7 +1562,7 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ControllerDebuggeeBreakpointUpdateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1616,19 +1612,19 @@ impl<'a, C> ControllerDebuggeeBreakpointUpdateCall<'a, C> where C: BorrowMut<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct ControllerDebuggeeRegisterCall<'a, C>
-    where C: 'a {
+pub struct ControllerDebuggeeRegisterCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _request: RegisterDebuggeeRequest,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for ControllerDebuggeeRegisterCall<'a, C> {}
+impl<'a> client::CallBuilder for ControllerDebuggeeRegisterCall<'a> {}
 
-impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> ControllerDebuggeeRegisterCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1678,8 +1674,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1693,7 +1688,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1704,7 +1699,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1763,7 +1758,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: RegisterDebuggeeRequest) -> ControllerDebuggeeRegisterCall<'a, C> {
+    pub fn request(mut self, new_value: RegisterDebuggeeRequest) -> ControllerDebuggeeRegisterCall<'a> {
         self._request = new_value;
         self
     }
@@ -1773,7 +1768,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ControllerDebuggeeRegisterCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ControllerDebuggeeRegisterCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1798,7 +1793,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeRegisterCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeRegisterCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1818,7 +1813,7 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ControllerDebuggeeRegisterCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ControllerDebuggeeRegisterCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1863,10 +1858,10 @@ impl<'a, C> ControllerDebuggeeRegisterCall<'a, C> where C: BorrowMut<hyper::Clie
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DebuggerDebuggeeBreakpointDeleteCall<'a, C>
-    where C: 'a {
+pub struct DebuggerDebuggeeBreakpointDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _debuggee_id: String,
     _breakpoint_id: String,
     _client_version: Option<String>,
@@ -1875,9 +1870,9 @@ pub struct DebuggerDebuggeeBreakpointDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DebuggerDebuggeeBreakpointDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for DebuggerDebuggeeBreakpointDeleteCall<'a> {}
 
-impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DebuggerDebuggeeBreakpointDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1942,8 +1937,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1956,7 +1950,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1965,7 +1959,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2025,7 +2019,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C> {
+    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a> {
         self._debuggee_id = new_value.to_string();
         self
     }
@@ -2035,14 +2029,14 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C> {
+    pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a> {
         self._breakpoint_id = new_value.to_string();
         self
     }
     /// Required. The client version making the call. Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C> {
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointDeleteCall<'a> {
         self._client_version = Some(new_value.to_string());
         self
     }
@@ -2052,7 +2046,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2077,7 +2071,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2097,7 +2091,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2142,10 +2136,10 @@ impl<'a, C> DebuggerDebuggeeBreakpointDeleteCall<'a, C> where C: BorrowMut<hyper
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DebuggerDebuggeeBreakpointGetCall<'a, C>
-    where C: 'a {
+pub struct DebuggerDebuggeeBreakpointGetCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _debuggee_id: String,
     _breakpoint_id: String,
     _client_version: Option<String>,
@@ -2154,9 +2148,9 @@ pub struct DebuggerDebuggeeBreakpointGetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DebuggerDebuggeeBreakpointGetCall<'a, C> {}
+impl<'a> client::CallBuilder for DebuggerDebuggeeBreakpointGetCall<'a> {}
 
-impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DebuggerDebuggeeBreakpointGetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2221,8 +2215,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2235,7 +2228,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2244,7 +2237,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2304,7 +2297,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C> {
+    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a> {
         self._debuggee_id = new_value.to_string();
         self
     }
@@ -2314,14 +2307,14 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C> {
+    pub fn breakpoint_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a> {
         self._breakpoint_id = new_value.to_string();
         self
     }
     /// Required. The client version making the call. Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a, C> {
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointGetCall<'a> {
         self._client_version = Some(new_value.to_string());
         self
     }
@@ -2331,7 +2324,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointGetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointGetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2356,7 +2349,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointGetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2376,7 +2369,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointGetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2426,10 +2419,10 @@ impl<'a, C> DebuggerDebuggeeBreakpointGetCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DebuggerDebuggeeBreakpointListCall<'a, C>
-    where C: 'a {
+pub struct DebuggerDebuggeeBreakpointListCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _debuggee_id: String,
     _wait_token: Option<String>,
     _strip_results: Option<bool>,
@@ -2442,9 +2435,9 @@ pub struct DebuggerDebuggeeBreakpointListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DebuggerDebuggeeBreakpointListCall<'a, C> {}
+impl<'a> client::CallBuilder for DebuggerDebuggeeBreakpointListCall<'a> {}
 
-impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DebuggerDebuggeeBreakpointListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2523,8 +2516,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2537,7 +2529,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2546,7 +2538,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2606,49 +2598,49 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._debuggee_id = new_value.to_string();
         self
     }
     /// A wait token that, if specified, blocks the call until the breakpoints list has changed, or a server selected timeout has expired. The value should be set from the last response. The error code `google.rpc.Code.ABORTED` (RPC) is returned on wait timeout, which should be called again with the same `wait_token`.
     ///
     /// Sets the *wait token* query property to the given value.
-    pub fn wait_token(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn wait_token(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._wait_token = Some(new_value.to_string());
         self
     }
     /// This field is deprecated. The following fields are always stripped out of the result: `stack_frames`, `evaluated_expressions` and `variable_table`.
     ///
     /// Sets the *strip results* query property to the given value.
-    pub fn strip_results(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn strip_results(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._strip_results = Some(new_value);
         self
     }
     /// When set to `true`, the response includes active and inactive breakpoints. Otherwise, it includes only active breakpoints.
     ///
     /// Sets the *include inactive* query property to the given value.
-    pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._include_inactive = Some(new_value);
         self
     }
     /// When set to `true`, the response includes the list of breakpoints set by any user. Otherwise, it includes only breakpoints set by the caller.
     ///
     /// Sets the *include all users* query property to the given value.
-    pub fn include_all_users(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn include_all_users(mut self, new_value: bool) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._include_all_users = Some(new_value);
         self
     }
     /// Required. The client version making the call. Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._client_version = Some(new_value.to_string());
         self
     }
     /// Only breakpoints with the specified action will pass the filter.
     ///
     /// Sets the *action.value* query property to the given value.
-    pub fn action_value(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn action_value(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._action_value = Some(new_value.to_string());
         self
     }
@@ -2658,7 +2650,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2683,7 +2675,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2703,7 +2695,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2755,10 +2747,10 @@ impl<'a, C> DebuggerDebuggeeBreakpointListCall<'a, C> where C: BorrowMut<hyper::
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DebuggerDebuggeeBreakpointSetCall<'a, C>
-    where C: 'a {
+pub struct DebuggerDebuggeeBreakpointSetCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _request: Breakpoint,
     _debuggee_id: String,
     _client_version: Option<String>,
@@ -2768,9 +2760,9 @@ pub struct DebuggerDebuggeeBreakpointSetCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DebuggerDebuggeeBreakpointSetCall<'a, C> {}
+impl<'a> client::CallBuilder for DebuggerDebuggeeBreakpointSetCall<'a> {}
 
-impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DebuggerDebuggeeBreakpointSetCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2848,8 +2840,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2863,7 +2854,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2874,7 +2865,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2933,7 +2924,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Breakpoint) -> DebuggerDebuggeeBreakpointSetCall<'a, C> {
+    pub fn request(mut self, new_value: Breakpoint) -> DebuggerDebuggeeBreakpointSetCall<'a> {
         self._request = new_value;
         self
     }
@@ -2943,21 +2934,21 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C> {
+    pub fn debuggee_id(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a> {
         self._debuggee_id = new_value.to_string();
         self
     }
     /// Required. The client version making the call. Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C> {
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a> {
         self._client_version = Some(new_value.to_string());
         self
     }
     /// The canary option set by the user upon setting breakpoint.
     ///
     /// Sets the *canary option* query property to the given value.
-    pub fn canary_option(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a, C> {
+    pub fn canary_option(mut self, new_value: &str) -> DebuggerDebuggeeBreakpointSetCall<'a> {
         self._canary_option = Some(new_value.to_string());
         self
     }
@@ -2967,7 +2958,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointSetCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeBreakpointSetCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2992,7 +2983,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointSetCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3012,7 +3003,7 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeBreakpointSetCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3059,10 +3050,10 @@ impl<'a, C> DebuggerDebuggeeBreakpointSetCall<'a, C> where C: BorrowMut<hyper::C
 ///              .doit().await;
 /// # }
 /// ```
-pub struct DebuggerDebuggeeListCall<'a, C>
-    where C: 'a {
+pub struct DebuggerDebuggeeListCall<'a>
+    where  {
 
-    hub: &'a CloudDebugger<C>,
+    hub: &'a CloudDebugger<>,
     _project: Option<String>,
     _include_inactive: Option<bool>,
     _client_version: Option<String>,
@@ -3071,9 +3062,9 @@ pub struct DebuggerDebuggeeListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for DebuggerDebuggeeListCall<'a, C> {}
+impl<'a> client::CallBuilder for DebuggerDebuggeeListCall<'a> {}
 
-impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> DebuggerDebuggeeListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -3121,8 +3112,7 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -3135,7 +3125,7 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -3144,7 +3134,7 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -3201,21 +3191,21 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Required. Project number of a Google Cloud project whose debuggees to list.
     ///
     /// Sets the *project* query property to the given value.
-    pub fn project(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a> {
         self._project = Some(new_value.to_string());
         self
     }
     /// When set to `true`, the result includes all debuggees. Otherwise, the result includes only debuggees that are active.
     ///
     /// Sets the *include inactive* query property to the given value.
-    pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeListCall<'a, C> {
+    pub fn include_inactive(mut self, new_value: bool) -> DebuggerDebuggeeListCall<'a> {
         self._include_inactive = Some(new_value);
         self
     }
     /// Required. The client version making the call. Schema: `domain/type/version` (e.g., `google.com/intellij/v1`).
     ///
     /// Sets the *client version* query property to the given value.
-    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a, C> {
+    pub fn client_version(mut self, new_value: &str) -> DebuggerDebuggeeListCall<'a> {
         self._client_version = Some(new_value.to_string());
         self
     }
@@ -3225,7 +3215,7 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> DebuggerDebuggeeListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -3250,7 +3240,7 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -3270,7 +3260,7 @@ impl<'a, C> DebuggerDebuggeeListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> DebuggerDebuggeeListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

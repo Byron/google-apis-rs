@@ -2,11 +2,11 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *2.0.0+20200331*, where *20200331* is the exact revision of the *sql:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.0*.
+//! This documentation was generated from *SQL Admin* crate version *2.0.3+20200331*, where *20200331* is the exact revision of the *sql:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/).
-//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/sql1_beta4).
+//! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/sql1_beta4).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](SQLAdmin) ... 

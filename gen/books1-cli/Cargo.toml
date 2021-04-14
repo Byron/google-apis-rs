@@ -4,10 +4,10 @@
 [package]
 
 name = "google-books1-cli"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with books (protocol v1)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/books1-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/books1-cli"
 homepage = "https://code.google.com/apis/books/docs/v1/getting_started.html"
 documentation = "http://byron.github.io/google-apis-rs/google_books1_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-books1]
 path = "../books1"
-version = "2.0.0+20210326"
+version = "2.0.3+20210326"

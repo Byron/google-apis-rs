@@ -4,10 +4,10 @@
 [package]
 
 name = "google-partners2-cli"
-version = "2.0.0+20180925"
+version = "2.0.3+20180925"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Partners (protocol v2)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/partners2-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/partners2-cli"
 homepage = "https://developers.google.com/partners/"
 documentation = "http://byron.github.io/google-apis-rs/google_partners2_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-partners2]
 path = "../partners2"
-version = "2.0.0+20180925"
+version = "2.0.3+20180925"

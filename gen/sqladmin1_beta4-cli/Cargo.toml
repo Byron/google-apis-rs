@@ -4,10 +4,10 @@
 [package]
 
 name = "google-sqladmin1_beta4-cli"
-version = "2.0.0+20210321"
+version = "2.0.3+20210321"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
-repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sqladmin1_beta4-cli"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sqladmin1_beta4-cli"
 homepage = "https://developers.google.com/cloud-sql/"
 documentation = "http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli"
 license = "MIT"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-sqladmin1_beta4]
 path = "../sqladmin1_beta4"
-version = "2.0.0+20210321"
+version = "2.0.3+20210321"

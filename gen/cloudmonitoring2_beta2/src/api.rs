@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::cell::RefCell;
-use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -112,41 +111,40 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
-pub struct CloudMonitoring<C> {
-    client: RefCell<C>,
-    auth: RefCell<oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>>,
+pub struct CloudMonitoring<> {
+    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
 }
 
-impl<'a, C> client::Hub for CloudMonitoring<C> {}
+impl<'a, > client::Hub for CloudMonitoring<> {}
 
-impl<'a, C> CloudMonitoring<C>
-    where  C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a, > CloudMonitoring<> {
 
-    pub fn new(client: C, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudMonitoring<C> {
+    pub fn new(client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>, authenticator: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>) -> CloudMonitoring<> {
         CloudMonitoring {
-            client: RefCell::new(client),
-            auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/2.0.0".to_string(),
+            client,
+            auth: authenticator,
+            _user_agent: "google-api-rust-client/2.0.3".to_string(),
             _base_url: "https://www.googleapis.com/cloudmonitoring/v2beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
     }
 
-    pub fn metric_descriptors(&'a self) -> MetricDescriptorMethods<'a, C> {
+    pub fn metric_descriptors(&'a self) -> MetricDescriptorMethods<'a> {
         MetricDescriptorMethods { hub: &self }
     }
-    pub fn timeseries(&'a self) -> TimeseryMethods<'a, C> {
+    pub fn timeseries(&'a self) -> TimeseryMethods<'a> {
         TimeseryMethods { hub: &self }
     }
-    pub fn timeseries_descriptors(&'a self) -> TimeseriesDescriptorMethods<'a, C> {
+    pub fn timeseries_descriptors(&'a self) -> TimeseriesDescriptorMethods<'a> {
         TimeseriesDescriptorMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.0`.
+    /// It defaults to `google-api-rust-client/2.0.3`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -614,15 +612,15 @@ impl client::ResponseResult for WriteTimeseriesResponse {}
 /// let rb = hub.metric_descriptors();
 /// # }
 /// ```
-pub struct MetricDescriptorMethods<'a, C>
-    where C: 'a {
+pub struct MetricDescriptorMethods<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
 }
 
-impl<'a, C> client::MethodsBuilder for MetricDescriptorMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for MetricDescriptorMethods<'a> {}
 
-impl<'a, C> MetricDescriptorMethods<'a, C> {
+impl<'a> MetricDescriptorMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -632,7 +630,7 @@ impl<'a, C> MetricDescriptorMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn create(&self, request: MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a, C> {
+    pub fn create(&self, request: MetricDescriptor, project: &str) -> MetricDescriptorCreateCall<'a> {
         MetricDescriptorCreateCall {
             hub: self.hub,
             _request: request,
@@ -651,7 +649,7 @@ impl<'a, C> MetricDescriptorMethods<'a, C> {
     ///
     /// * `project` - The project ID to which the metric belongs.
     /// * `metric` - Name of the metric.
-    pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a, C> {
+    pub fn delete(&self, project: &str, metric: &str) -> MetricDescriptorDeleteCall<'a> {
         MetricDescriptorDeleteCall {
             hub: self.hub,
             _project: project.to_string(),
@@ -670,7 +668,7 @@ impl<'a, C> MetricDescriptorMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project id. The value can be the numeric project ID or string-based project name.
-    pub fn list(&self, request: ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a, C> {
+    pub fn list(&self, request: ListMetricDescriptorsRequest, project: &str) -> MetricDescriptorListCall<'a> {
         MetricDescriptorListCall {
             hub: self.hub,
             _request: request,
@@ -717,15 +715,15 @@ impl<'a, C> MetricDescriptorMethods<'a, C> {
 /// let rb = hub.timeseries();
 /// # }
 /// ```
-pub struct TimeseryMethods<'a, C>
-    where C: 'a {
+pub struct TimeseryMethods<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TimeseryMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TimeseryMethods<'a> {}
 
-impl<'a, C> TimeseryMethods<'a, C> {
+impl<'a> TimeseryMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -737,7 +735,7 @@ impl<'a, C> TimeseryMethods<'a, C> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a, C> {
+    pub fn list(&self, request: ListTimeseriesRequest, project: &str, metric: &str, youngest: &str) -> TimeseryListCall<'a> {
         TimeseryListCall {
             hub: self.hub,
             _request: request,
@@ -765,7 +763,7 @@ impl<'a, C> TimeseryMethods<'a, C> {
     ///
     /// * `request` - No description provided.
     /// * `project` - The project ID. The value can be the numeric project ID or string-based project name.
-    pub fn write(&self, request: WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a, C> {
+    pub fn write(&self, request: WriteTimeseriesRequest, project: &str) -> TimeseryWriteCall<'a> {
         TimeseryWriteCall {
             hub: self.hub,
             _request: request,
@@ -809,15 +807,15 @@ impl<'a, C> TimeseryMethods<'a, C> {
 /// let rb = hub.timeseries_descriptors();
 /// # }
 /// ```
-pub struct TimeseriesDescriptorMethods<'a, C>
-    where C: 'a {
+pub struct TimeseriesDescriptorMethods<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
 }
 
-impl<'a, C> client::MethodsBuilder for TimeseriesDescriptorMethods<'a, C> {}
+impl<'a> client::MethodsBuilder for TimeseriesDescriptorMethods<'a> {}
 
-impl<'a, C> TimeseriesDescriptorMethods<'a, C> {
+impl<'a> TimeseriesDescriptorMethods<'a> {
     
     /// Create a builder to help you perform the following task:
     ///
@@ -829,7 +827,7 @@ impl<'a, C> TimeseriesDescriptorMethods<'a, C> {
     /// * `project` - The project ID to which this time series belongs. The value can be the numeric project ID or string-based project name.
     /// * `metric` - Metric names are protocol-free URLs as listed in the Supported Metrics page. For example, compute.googleapis.com/instance/disk/read_ops_count.
     /// * `youngest` - End of the time interval (inclusive), which is expressed as an RFC 3339 timestamp.
-    pub fn list(&self, request: ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn list(&self, request: ListTimeseriesDescriptorsRequest, project: &str, metric: &str, youngest: &str) -> TimeseriesDescriptorListCall<'a> {
         TimeseriesDescriptorListCall {
             hub: self.hub,
             _request: request,
@@ -896,10 +894,10 @@ impl<'a, C> TimeseriesDescriptorMethods<'a, C> {
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetricDescriptorCreateCall<'a, C>
-    where C: 'a {
+pub struct MetricDescriptorCreateCall<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
     _request: MetricDescriptor,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -907,9 +905,9 @@ pub struct MetricDescriptorCreateCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MetricDescriptorCreateCall<'a, C> {}
+impl<'a> client::CallBuilder for MetricDescriptorCreateCall<'a> {}
 
-impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MetricDescriptorCreateCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -981,8 +979,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -996,7 +993,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1007,7 +1004,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1066,7 +1063,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: MetricDescriptor) -> MetricDescriptorCreateCall<'a, C> {
+    pub fn request(mut self, new_value: MetricDescriptor) -> MetricDescriptorCreateCall<'a> {
         self._request = new_value;
         self
     }
@@ -1076,7 +1073,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorCreateCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1086,7 +1083,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorCreateCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorCreateCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1107,7 +1104,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorCreateCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1127,7 +1124,7 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorCreateCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorCreateCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1171,10 +1168,10 @@ impl<'a, C> MetricDescriptorCreateCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetricDescriptorDeleteCall<'a, C>
-    where C: 'a {
+pub struct MetricDescriptorDeleteCall<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
     _project: String,
     _metric: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1182,9 +1179,9 @@ pub struct MetricDescriptorDeleteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MetricDescriptorDeleteCall<'a, C> {}
+impl<'a> client::CallBuilder for MetricDescriptorDeleteCall<'a> {}
 
-impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MetricDescriptorDeleteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1246,8 +1243,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1260,7 +1256,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                 }
             };
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::DELETE).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1269,7 +1265,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
                         let request = req_builder
                         .body(hyper::body::Body::empty());
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1329,7 +1325,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1339,7 +1335,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a, C> {
+    pub fn metric(mut self, new_value: &str) -> MetricDescriptorDeleteCall<'a> {
         self._metric = new_value.to_string();
         self
     }
@@ -1349,7 +1345,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorDeleteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorDeleteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1370,7 +1366,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorDeleteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1390,7 +1386,7 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorDeleteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1443,10 +1439,10 @@ impl<'a, C> MetricDescriptorDeleteCall<'a, C> where C: BorrowMut<hyper::Client<h
 ///              .doit().await;
 /// # }
 /// ```
-pub struct MetricDescriptorListCall<'a, C>
-    where C: 'a {
+pub struct MetricDescriptorListCall<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
     _request: ListMetricDescriptorsRequest,
     _project: String,
     _query: Option<String>,
@@ -1457,9 +1453,9 @@ pub struct MetricDescriptorListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for MetricDescriptorListCall<'a, C> {}
+impl<'a> client::CallBuilder for MetricDescriptorListCall<'a> {}
 
-impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> MetricDescriptorListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1540,8 +1536,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1555,7 +1550,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1566,7 +1561,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1625,7 +1620,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a, C> {
+    pub fn request(mut self, new_value: ListMetricDescriptorsRequest) -> MetricDescriptorListCall<'a> {
         self._request = new_value;
         self
     }
@@ -1635,28 +1630,28 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> MetricDescriptorListCall<'a> {
         self._project = new_value.to_string();
         self
     }
     /// The query used to search against existing metrics. Separate keywords with a space; the service joins all keywords with AND, meaning that all keywords must match for a metric to be returned. If this field is omitted, all metrics are returned. If an empty string is passed with this field, no metrics are returned.
     ///
     /// Sets the *query* query property to the given value.
-    pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C> {
+    pub fn query(mut self, new_value: &str) -> MetricDescriptorListCall<'a> {
         self._query = Some(new_value.to_string());
         self
     }
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> MetricDescriptorListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Maximum number of metric descriptors per page. Used for pagination. If not specified, count = 100.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a, C> {
+    pub fn count(mut self, new_value: i32) -> MetricDescriptorListCall<'a> {
         self._count = Some(new_value);
         self
     }
@@ -1666,7 +1661,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> MetricDescriptorListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -1687,7 +1682,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> MetricDescriptorListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1707,7 +1702,7 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MetricDescriptorListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1764,10 +1759,10 @@ impl<'a, C> MetricDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyp
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimeseryListCall<'a, C>
-    where C: 'a {
+pub struct TimeseryListCall<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
     _request: ListTimeseriesRequest,
     _project: String,
     _metric: String,
@@ -1784,9 +1779,9 @@ pub struct TimeseryListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TimeseryListCall<'a, C> {}
+impl<'a> client::CallBuilder for TimeseryListCall<'a> {}
 
-impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TimeseryListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -1883,8 +1878,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -1898,7 +1892,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -1909,7 +1903,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -1968,7 +1962,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListTimeseriesRequest) -> TimeseryListCall<'a, C> {
+    pub fn request(mut self, new_value: ListTimeseriesRequest) -> TimeseryListCall<'a> {
         self._request = new_value;
         self
     }
@@ -1978,7 +1972,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -1988,7 +1982,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn metric(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._metric = new_value.to_string();
         self
     }
@@ -1998,7 +1992,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn youngest(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._youngest = new_value.to_string();
         self
     }
@@ -2009,7 +2003,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     ///
     /// Sets the *window* query property to the given value.
-    pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn window(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._window = Some(new_value.to_string());
         self
     }
@@ -2023,21 +2017,21 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
     ///
     /// Sets the *timespan* query property to the given value.
-    pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn timespan(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._timespan = Some(new_value.to_string());
         self
     }
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
     ///
     /// Sets the *oldest* query property to the given value.
-    pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn oldest(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._oldest = Some(new_value.to_string());
         self
     }
@@ -2050,21 +2044,21 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     ///
     /// Append the given value to the *labels* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn add_labels(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._labels.push(new_value.to_string());
         self
     }
     /// Maximum number of data points per page, which is used for pagination of results.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a, C> {
+    pub fn count(mut self, new_value: i32) -> TimeseryListCall<'a> {
         self._count = Some(new_value);
         self
     }
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     ///
     /// Sets the *aggregator* query property to the given value.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a, C> {
+    pub fn aggregator(mut self, new_value: &str) -> TimeseryListCall<'a> {
         self._aggregator = Some(new_value.to_string());
         self
     }
@@ -2074,7 +2068,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2095,7 +2089,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseryListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2115,7 +2109,7 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseryListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseryListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2165,10 +2159,10 @@ impl<'a, C> TimeseryListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustl
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimeseryWriteCall<'a, C>
-    where C: 'a {
+pub struct TimeseryWriteCall<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
     _request: WriteTimeseriesRequest,
     _project: String,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -2176,9 +2170,9 @@ pub struct TimeseryWriteCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TimeseryWriteCall<'a, C> {}
+impl<'a> client::CallBuilder for TimeseryWriteCall<'a> {}
 
-impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TimeseryWriteCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2250,8 +2244,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2265,7 +2258,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::POST).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2276,7 +2269,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2335,7 +2328,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: WriteTimeseriesRequest) -> TimeseryWriteCall<'a, C> {
+    pub fn request(mut self, new_value: WriteTimeseriesRequest) -> TimeseryWriteCall<'a> {
         self._request = new_value;
         self
     }
@@ -2345,7 +2338,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TimeseryWriteCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2355,7 +2348,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryWriteCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseryWriteCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2376,7 +2369,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseryWriteCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2396,7 +2389,7 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseryWriteCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseryWriteCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2453,10 +2446,10 @@ impl<'a, C> TimeseryWriteCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rust
 ///              .doit().await;
 /// # }
 /// ```
-pub struct TimeseriesDescriptorListCall<'a, C>
-    where C: 'a {
+pub struct TimeseriesDescriptorListCall<'a>
+    where  {
 
-    hub: &'a CloudMonitoring<C>,
+    hub: &'a CloudMonitoring<>,
     _request: ListTimeseriesDescriptorsRequest,
     _project: String,
     _metric: String,
@@ -2473,9 +2466,9 @@ pub struct TimeseriesDescriptorListCall<'a, C>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C> client::CallBuilder for TimeseriesDescriptorListCall<'a, C> {}
+impl<'a> client::CallBuilder for TimeseriesDescriptorListCall<'a> {}
 
-impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>> {
+impl<'a> TimeseriesDescriptorListCall<'a> {
 
 
     /// Perform the operation you have build so far.
@@ -2572,8 +2565,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
 
 
         loop {
-            let authenticator = self.hub.auth.borrow_mut();
-            let token = match authenticator.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
+            let token = match self.hub.auth.token(&self._scopes.keys().collect::<Vec<_>>()[..]).await {
                 Ok(token) => token.clone(),
                 Err(err) => {
                     match  dlg.token(&err) {
@@ -2587,7 +2579,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
             };
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
+                let client = &self.hub.client;
                 dlg.pre_request();
                 let mut req_builder = hyper::Request::builder().method(hyper::Method::GET).uri(url.clone().into_string())
                         .header(USER_AGENT, self.hub._user_agent.clone())                            .header(AUTHORIZATION, format!("Bearer {}", token.as_str()));
@@ -2598,7 +2590,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
                         .header(CONTENT_LENGTH, request_size as u64)
                         .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
 
-                client.borrow_mut().request(request.unwrap()).await
+                client.request(request.unwrap()).await
                 
             };
 
@@ -2657,7 +2649,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn request(mut self, new_value: ListTimeseriesDescriptorsRequest) -> TimeseriesDescriptorListCall<'a> {
         self._request = new_value;
         self
     }
@@ -2667,7 +2659,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn project(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._project = new_value.to_string();
         self
     }
@@ -2677,7 +2669,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn metric(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._metric = new_value.to_string();
         self
     }
@@ -2687,7 +2679,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn youngest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._youngest = new_value.to_string();
         self
     }
@@ -2698,7 +2690,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     /// - w: week  Examples: 3m, 4w. Only one unit is allowed, for example: 2w3d is not allowed; you should use 17d instead.
     ///
     /// Sets the *window* query property to the given value.
-    pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn window(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._window = Some(new_value.to_string());
         self
     }
@@ -2712,21 +2704,21 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     /// If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest].
     ///
     /// Sets the *timespan* query property to the given value.
-    pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn timespan(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._timespan = Some(new_value.to_string());
         self
     }
     /// The pagination token, which is used to page through large result sets. Set this value to the value of the nextPageToken to retrieve the next page of results.
     ///
     /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn page_token(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._page_token = Some(new_value.to_string());
         self
     }
     /// Start of the time interval (exclusive), which is expressed as an RFC 3339 timestamp. If neither oldest nor timespan is specified, the default time interval will be (youngest - 4 hours, youngest]
     ///
     /// Sets the *oldest* query property to the given value.
-    pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn oldest(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._oldest = Some(new_value.to_string());
         self
     }
@@ -2739,21 +2731,21 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     ///
     /// Append the given value to the *labels* query property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn add_labels(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._labels.push(new_value.to_string());
         self
     }
     /// Maximum number of time series descriptors per page. Used for pagination. If not specified, count = 100.
     ///
     /// Sets the *count* query property to the given value.
-    pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn count(mut self, new_value: i32) -> TimeseriesDescriptorListCall<'a> {
         self._count = Some(new_value);
         self
     }
     /// The aggregation function that will reduce the data points in each window to a single point. This parameter is only valid for non-cumulative metrics with a value type of INT64 or DOUBLE.
     ///
     /// Sets the *aggregator* query property to the given value.
-    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn aggregator(mut self, new_value: &str) -> TimeseriesDescriptorListCall<'a> {
         self._aggregator = Some(new_value.to_string());
         self
     }
@@ -2763,7 +2755,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseriesDescriptorListCall<'a, C> {
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> TimeseriesDescriptorListCall<'a> {
         self._delegate = Some(new_value);
         self
     }
@@ -2784,7 +2776,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a, C>
+    pub fn param<T>(mut self, name: T, value: T) -> TimeseriesDescriptorListCall<'a>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2804,7 +2796,7 @@ impl<'a, C> TimeseriesDescriptorListCall<'a, C> where C: BorrowMut<hyper::Client
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a, C>
+    pub fn add_scope<T, S>(mut self, scope: T) -> TimeseriesDescriptorListCall<'a>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

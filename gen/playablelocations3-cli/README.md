@@ -21,11 +21,11 @@ Install the command-line interface with cargo using:
 cargo install google-playablelocations3-cli
 ```
 
-Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/playablelocations3-cli).
+Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/playablelocations3-cli).
 
 # Usage
 
-This documentation was generated from the *Playable Locations* API at revision *20200707*. The CLI is at version *2.0.0*.
+This documentation was generated from the *Playable Locations* API at revision *20200707*. The CLI is at version *2.0.3*.
 
 ```bash
 playablelocations3 [options]

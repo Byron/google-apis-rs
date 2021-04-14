@@ -34,8 +34,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: api::Fitness<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: api::Fitness,
     gp: Vec<&'static str>,
     gpm: Vec<(&'static str, &'static str)>,
 }
@@ -1460,7 +1459,7 @@ async fn main() {
     
     let mut app = App::new("fitness1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.0+20210323")
+           .version("2.0.3+20210323")
            .about("The Fitness API for managing users' fitness tracking data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fitness1_cli")
            .arg(Arg::with_name("url")
