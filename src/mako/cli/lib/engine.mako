@@ -48,8 +48,7 @@ enum DoitError {
 
 struct Engine<'n> {
     opt: ArgMatches<'n>,
-    hub: ${hub_type_name}<hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>
-    >,
+    hub: ${hub_type_name},
     gp: ${"Vec<&'static str>"},
     gpm: Vec<(&'static str, &'static str)>,
 }
