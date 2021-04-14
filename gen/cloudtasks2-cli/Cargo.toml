@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudtasks2-cli"
-version = "2.0.3+20210315"
+version = "2.0.4+20210315"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Tasks (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtasks2-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-cloudtasks2]
 path = "../cloudtasks2"
-version = "2.0.3+20210315"
+version = "2.0.4+20210315"

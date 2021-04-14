@@ -4,7 +4,7 @@
 [package]
 
 name = "google-accesscontextmanager1_beta-cli"
-version = "2.0.3+20210319"
+version = "2.0.4+20210319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Access Context Manager (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/accesscontextmanager1_beta-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-accesscontextmanager1_beta]
 path = "../accesscontextmanager1_beta"
-version = "2.0.3+20210319"
+version = "2.0.4+20210319"

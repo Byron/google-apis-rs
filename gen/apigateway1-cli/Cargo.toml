@@ -4,7 +4,7 @@
 [package]
 
 name = "google-apigateway1-cli"
-version = "2.0.3+20210318"
+version = "2.0.4+20210318"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with apigateway (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/apigateway1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-apigateway1]
 path = "../apigateway1"
-version = "2.0.3+20210318"
+version = "2.0.4+20210318"

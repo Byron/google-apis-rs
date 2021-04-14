@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Groups Migration* API at revision *20210318*. The CLI is at version *2.0.3*.
+This documentation was generated from the *Groups Migration* API at revision *20210318*. The CLI is at version *2.0.4*.
 
 ```bash
 groupsmigration1 [options]

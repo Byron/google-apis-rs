@@ -4,12 +4,12 @@
 [package]
 
 name = "google-urlshortener1"
-version = "2.0.3+20150519"
+version = "2.0.4+20150519"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with urlshortener (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/urlshortener1"
 homepage = "https://developers.google.com/url-shortener/v1/getting_started"
-documentation = "https://docs.rs/google-urlshortener1/2.0.3+20150519"
+documentation = "https://docs.rs/google-urlshortener1/2.0.4+20150519"
 license = "MIT"
 keywords = ["urlshortener", "google", "protocol", "web", "api"]
 autobins = false

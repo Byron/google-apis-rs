@@ -4,12 +4,12 @@
 [package]
 
 name = "google-memcache1_beta2"
-version = "2.0.3+20210324"
+version = "2.0.4+20210324"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Memorystore for Memcached (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/memcache1_beta2"
 homepage = "https://cloud.google.com/memorystore/"
-documentation = "https://docs.rs/google-memcache1_beta2/2.0.3+20210324"
+documentation = "https://docs.rs/google-memcache1_beta2/2.0.4+20210324"
 license = "MIT"
 keywords = ["memcache", "google", "protocol", "web", "api"]
 autobins = false

@@ -1,4 +1,4 @@
-site_name: Bigtable Admin v2.0.3+20210323
+site_name: Bigtable Admin v2.0.4+20210323
 site_url: http://byron.github.io/google-apis-rs/google-bigtableadmin2-cli
 site_description: A complete library to interact with Bigtable Admin (protocol v2)
 

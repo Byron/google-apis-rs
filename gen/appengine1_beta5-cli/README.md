@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20181005*. The CLI is at version *2.0.3*.
+This documentation was generated from the *appengine* API at revision *20181005*. The CLI is at version *2.0.4*.
 
 ```bash
 appengine1-beta5 [options]

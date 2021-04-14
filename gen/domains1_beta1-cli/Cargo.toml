@@ -4,7 +4,7 @@
 [package]
 
 name = "google-domains1_beta1-cli"
-version = "2.0.3+20210216"
+version = "2.0.4+20210216"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Domains (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/domains1_beta1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-domains1_beta1]
 path = "../domains1_beta1"
-version = "2.0.3+20210216"
+version = "2.0.4+20210216"

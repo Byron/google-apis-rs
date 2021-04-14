@@ -4,12 +4,12 @@
 [package]
 
 name = "google-analyticsdata1_beta"
-version = "2.0.3+20210329"
+version = "2.0.4+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AnalyticsData (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsdata1_beta"
 homepage = "https://developers.google.com/analytics/devguides/reporting/data/v1/"
-documentation = "https://docs.rs/google-analyticsdata1_beta/2.0.3+20210329"
+documentation = "https://docs.rs/google-analyticsdata1_beta/2.0.4+20210329"
 license = "MIT"
 keywords = ["analyticsdata", "google", "protocol", "web", "api"]
 autobins = false

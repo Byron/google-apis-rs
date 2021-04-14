@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Asset* API at revision *20210319*. The CLI is at version *2.0.3*.
+This documentation was generated from the *Cloud Asset* API at revision *20210319*. The CLI is at version *2.0.4*.
 
 ```bash
 cloudasset1 [options]

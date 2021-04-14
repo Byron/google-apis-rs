@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdMob* crate version *2.0.3+20210331*, where *20210331* is the exact revision of the *admob:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *AdMob* crate version *2.0.4+20210331*, where *20210331* is the exact revision of the *admob:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *AdMob* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/admob/api/).

@@ -19684,7 +19684,7 @@ async fn main() {
     
     let mut app = App::new("apigee1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210319")
+           .version("2.0.4+20210319")
            .about("Use the Apigee API to programmatically develop and manage APIs with a set of RESTful operations. Develop and secure API proxies, deploy and undeploy API proxy revisions, monitor APIs, configure environments, manage users, and more. Note: This product is available as a free trial for a time period of 60 days.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_apigee1_cli")
            .arg(Arg::with_name("url")

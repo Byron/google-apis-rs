@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Smart Device Management* crate version *2.0.3+20210319*, where *20210319* is the exact revision of the *smartdevicemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *Smart Device Management* crate version *2.0.4+20210319*, where *20210319* is the exact revision of the *smartdevicemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *Smart Device Management* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/nest/device-access).

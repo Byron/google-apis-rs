@@ -1,4 +1,4 @@
-site_name: GKE Hub v2.0.3+20210322
+site_name: GKE Hub v2.0.4+20210322
 site_url: http://byron.github.io/google-apis-rs/google-gkehub1-cli
 site_description: A complete library to interact with GKE Hub (protocol v1)
 

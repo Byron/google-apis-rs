@@ -377,7 +377,7 @@ async fn main() {
     
     let mut app = App::new("vectortile1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210331")
+           .version("2.0.4+20210331")
            .about("Serves vector tiles containing geospatial data. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vectortile1_cli")
            .arg(Arg::with_name("folder")

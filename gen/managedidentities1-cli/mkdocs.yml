@@ -1,4 +1,4 @@
-site_name: Managed Service for Microsoft Active Directory Consumer API v2.0.3+20210324
+site_name: Managed Service for Microsoft Active Directory Consumer API v2.0.4+20210324
 site_url: http://byron.github.io/google-apis-rs/google-managedidentities1-cli
 site_description: A complete library to interact with Managed Service for Microsoft Active Directory Consumer API (protocol v1)
 

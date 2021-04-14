@@ -4,12 +4,12 @@
 [package]
 
 name = "google-workflows1"
-version = "2.0.3+20210318"
+version = "2.0.4+20210318"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Workflows (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/workflows1"
 homepage = "https://cloud.google.com/workflows"
-documentation = "https://docs.rs/google-workflows1/2.0.3+20210318"
+documentation = "https://docs.rs/google-workflows1/2.0.4+20210318"
 license = "MIT"
 keywords = ["workflows", "google", "protocol", "web", "api"]
 autobins = false

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Drive Activity* crate version *2.0.3+20210326*, where *20210326* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *Drive Activity* crate version *2.0.4+20210326*, where *20210326* is the exact revision of the *driveactivity:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *Drive Activity* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/activity/).

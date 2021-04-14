@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *2.0.3+20210315*, where *20210315* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *Cloud Tasks* crate version *2.0.4+20210315*, where *20210315* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/tasks/).

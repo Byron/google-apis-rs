@@ -2071,7 +2071,7 @@ async fn main() {
     
     let mut app = App::new("orgpolicy2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210330")
+           .version("2.0.4+20210330")
            .about("The Org Policy API allows users to configure governance ruleson their GCP resources across the Cloud Resource Hierarchy.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli")
            .arg(Arg::with_name("url")

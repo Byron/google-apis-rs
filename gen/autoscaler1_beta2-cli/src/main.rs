@@ -1177,7 +1177,7 @@ async fn main() {
     
     let mut app = App::new("autoscaler1-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20150629")
+           .version("2.0.4+20150629")
            .about("The Google Compute Engine Autoscaler API provides autoscaling for groups of Cloud VMs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_autoscaler1_beta2_cli")
            .arg(Arg::with_name("url")

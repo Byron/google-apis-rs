@@ -92,7 +92,7 @@ impl<'a, > Discovery<> {
         Discovery {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.3".to_string(),
+            _user_agent: "google-api-rust-client/2.0.4".to_string(),
             _base_url: "https://www.googleapis.com/discovery/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -103,7 +103,7 @@ impl<'a, > Discovery<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.3`.
+    /// It defaults to `google-api-rust-client/2.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

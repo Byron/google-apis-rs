@@ -24047,7 +24047,7 @@ async fn main() {
     
     let mut app = App::new("dfareporting3d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210210")
+           .version("2.0.4+20210210")
            .about("Build applications to efficiently manage large or complex trafficking, reporting, and attribution workflows for Campaign Manager 360.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3d4_cli")
            .arg(Arg::with_name("url")

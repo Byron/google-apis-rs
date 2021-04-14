@@ -1,4 +1,4 @@
-site_name: verifiedaccess v2.0.3+20210302
+site_name: verifiedaccess v2.0.4+20210302
 site_url: http://byron.github.io/google-apis-rs/google-verifiedaccess1-cli
 site_description: A complete library to interact with verifiedaccess (protocol v1)
 

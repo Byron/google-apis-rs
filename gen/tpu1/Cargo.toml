@@ -4,12 +4,12 @@
 [package]
 
 name = "google-tpu1"
-version = "2.0.3+20210217"
+version = "2.0.4+20210217"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with TPU (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/tpu1"
 homepage = "https://cloud.google.com/tpu/"
-documentation = "https://docs.rs/google-tpu1/2.0.3+20210217"
+documentation = "https://docs.rs/google-tpu1/2.0.4+20210217"
 license = "MIT"
 keywords = ["tpu", "google", "protocol", "web", "api"]
 autobins = false

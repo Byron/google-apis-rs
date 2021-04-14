@@ -4,7 +4,7 @@
 [package]
 
 name = "google-taskqueue1_beta2-cli"
-version = "2.0.3+20160428"
+version = "2.0.4+20160428"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with taskqueue (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/taskqueue1_beta2-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-taskqueue1_beta2]
 path = "../taskqueue1_beta2"
-version = "2.0.3+20160428"
+version = "2.0.4+20160428"

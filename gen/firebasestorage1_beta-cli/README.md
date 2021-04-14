@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebasestorage* API at revision *20210329*. The CLI is at version *2.0.3*.
+This documentation was generated from the *Firebasestorage* API at revision *20210329*. The CLI is at version *2.0.4*.
 
 ```bash
 firebasestorage1-beta [options]

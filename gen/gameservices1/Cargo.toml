@@ -4,12 +4,12 @@
 [package]
 
 name = "google-gameservices1"
-version = "2.0.3+20210312"
+version = "2.0.4+20210312"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Game Services (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/gameservices1"
 homepage = "https://cloud.google.com/solutions/gaming/"
-documentation = "https://docs.rs/google-gameservices1/2.0.3+20210312"
+documentation = "https://docs.rs/google-gameservices1/2.0.4+20210312"
 license = "MIT"
 keywords = ["gameservices", "google", "protocol", "web", "api"]
 autobins = false

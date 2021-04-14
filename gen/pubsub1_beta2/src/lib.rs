@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *2.0.3+20210322*, where *20210322* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *Pubsub* crate version *2.0.4+20210322*, where *20210322* is the exact revision of the *pubsub:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *Pubsub* *v1_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).

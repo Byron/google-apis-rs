@@ -4,12 +4,12 @@
 [package]
 
 name = "google-docs1"
-version = "2.0.3+20210323"
+version = "2.0.4+20210323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Docs (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/docs1"
 homepage = "https://developers.google.com/docs/"
-documentation = "https://docs.rs/google-docs1/2.0.3+20210323"
+documentation = "https://docs.rs/google-docs1/2.0.4+20210323"
 license = "MIT"
 keywords = ["docs", "google", "protocol", "web", "api"]
 autobins = false

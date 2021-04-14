@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Remote Build Execution* crate version *2.0.3+20210329*, where *20210329* is the exact revision of the *remotebuildexecution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *Remote Build Execution* crate version *2.0.4+20210329*, where *20210329* is the exact revision of the *remotebuildexecution:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *Remote Build Execution* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/remote-build-execution/docs/).

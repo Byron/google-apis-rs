@@ -633,7 +633,7 @@ async fn main() {
     
     let mut app = App::new("translate2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20170525")
+           .version("2.0.4+20170525")
            .about("The Google Cloud Translation API lets websites and programs integrate with
                Google Translate programmatically.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_translate2_cli")

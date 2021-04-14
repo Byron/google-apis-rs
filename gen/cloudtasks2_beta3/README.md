@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-cloudtasks2_beta3` library allows access to all features of the *Google Cloud Tasks* service.
 
-This documentation was generated from *Cloud Tasks* crate version *2.0.3+20210315*, where *20210315* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+This documentation was generated from *Cloud Tasks* crate version *2.0.4+20210315*, where *20210315* is the exact revision of the *cloudtasks:v2beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 
 Everything else about the *Cloud Tasks* *v2_beta3* API can be found at the
 [official documentation site](https://cloud.google.com/tasks/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/CloudTasks) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/CloudTasks) ... 
 
 * projects
- * [*locations get*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationListCall), [*locations queues create*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueCreateCall), [*locations queues delete*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueDeleteCall), [*locations queues get*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueGetCall), [*locations queues get iam policy*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueGetIamPolicyCall), [*locations queues list*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueListCall), [*locations queues patch*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueuePatchCall), [*locations queues pause*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueuePauseCall), [*locations queues purge*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueuePurgeCall), [*locations queues resume*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueResumeCall), [*locations queues set iam policy*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueSetIamPolicyCall), [*locations queues tasks create*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskCreateCall), [*locations queues tasks delete*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskDeleteCall), [*locations queues tasks get*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskGetCall), [*locations queues tasks list*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskListCall), [*locations queues tasks run*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskRunCall) and [*locations queues test iam permissions*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTestIamPermissionCall)
+ * [*locations get*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationListCall), [*locations queues create*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueCreateCall), [*locations queues delete*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueDeleteCall), [*locations queues get*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueGetCall), [*locations queues get iam policy*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueGetIamPolicyCall), [*locations queues list*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueListCall), [*locations queues patch*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueuePatchCall), [*locations queues pause*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueuePauseCall), [*locations queues purge*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueuePurgeCall), [*locations queues resume*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueResumeCall), [*locations queues set iam policy*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueSetIamPolicyCall), [*locations queues tasks create*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskCreateCall), [*locations queues tasks delete*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskDeleteCall), [*locations queues tasks get*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskGetCall), [*locations queues tasks list*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskListCall), [*locations queues tasks run*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTaskRunCall) and [*locations queues test iam permissions*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/api::ProjectLocationQueueTestIamPermissionCall)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/CloudTasks)**
+* **[Hub](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/CloudTasks)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::CallBuilder)
-* **[Resources](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::CallBuilder)
+* **[Resources](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Part)**
+    * **[Parts](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -138,17 +138,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -158,29 +158,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::RequestValue) and 
-[decodable](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::RequestValue) and 
+[decodable](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-cloudtasks2_beta3/2.0.3+20210315/google_cloudtasks2_beta3/client::RequestValue) are moved
+* [request values](https://docs.rs/google-cloudtasks2_beta3/2.0.4+20210315/google_cloudtasks2_beta3/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

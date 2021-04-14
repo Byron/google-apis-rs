@@ -5987,7 +5987,7 @@ async fn main() {
     
     let mut app = App::new("analyticsadmin1-alpha")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210331")
+           .version("2.0.4+20210331")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analyticsadmin1_alpha_cli")
            .arg(Arg::with_name("url")

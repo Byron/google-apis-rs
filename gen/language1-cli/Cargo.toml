@@ -4,7 +4,7 @@
 [package]
 
 name = "google-language1-cli"
-version = "2.0.3+20210326"
+version = "2.0.4+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Natural Language (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/language1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-language1]
 path = "../language1"
-version = "2.0.3+20210326"
+version = "2.0.4+20210326"

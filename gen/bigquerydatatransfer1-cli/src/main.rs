@@ -3036,7 +3036,7 @@ async fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210324")
+           .version("2.0.4+20210324")
            .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")

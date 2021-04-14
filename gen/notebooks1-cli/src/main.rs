@@ -3914,7 +3914,7 @@ async fn main() {
     
     let mut app = App::new("notebooks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210305")
+           .version("2.0.4+20210305")
            .about("AI Platform Notebooks API is used to manage notebook resources in Google Cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_notebooks1_cli")
            .arg(Arg::with_name("url")

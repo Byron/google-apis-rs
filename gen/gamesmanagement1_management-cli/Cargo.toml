@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesmanagement1_management-cli"
-version = "2.0.3+20210325"
+version = "2.0.4+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Management (protocol v1management)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/gamesmanagement1_management-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-gamesmanagement1_management]
 path = "../gamesmanagement1_management"
-version = "2.0.3+20210325"
+version = "2.0.4+20210325"

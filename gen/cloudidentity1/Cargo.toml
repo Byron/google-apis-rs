@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudidentity1"
-version = "2.0.3+20210310"
+version = "2.0.4+20210310"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Identity (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudidentity1"
 homepage = "https://cloud.google.com/identity/"
-documentation = "https://docs.rs/google-cloudidentity1/2.0.3+20210310"
+documentation = "https://docs.rs/google-cloudidentity1/2.0.4+20210310"
 license = "MIT"
 keywords = ["cloudidentity", "google", "protocol", "web", "api"]
 autobins = false

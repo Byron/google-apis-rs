@@ -4,12 +4,12 @@
 [package]
 
 name = "google-clouddebugger2"
-version = "2.0.3+20210326"
+version = "2.0.4+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Debugger (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/clouddebugger2"
 homepage = "https://cloud.google.com/debugger"
-documentation = "https://docs.rs/google-clouddebugger2/2.0.3+20210326"
+documentation = "https://docs.rs/google-clouddebugger2/2.0.4+20210326"
 license = "MIT"
 keywords = ["clouddebugger", "google", "protocol", "web", "api"]
 autobins = false

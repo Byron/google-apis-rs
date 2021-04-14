@@ -1,4 +1,4 @@
-site_name: Android Publisher v2.0.3+20200331
+site_name: Android Publisher v2.0.4+20200331
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: A complete library to interact with Android Publisher (protocol v2)
 

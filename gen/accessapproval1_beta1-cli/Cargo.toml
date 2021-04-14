@@ -4,7 +4,7 @@
 [package]
 
 name = "google-accessapproval1_beta1-cli"
-version = "2.0.3+20200708"
+version = "2.0.4+20200708"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Access Approval (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/accessapproval1_beta1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-accessapproval1_beta1]
 path = "../accessapproval1_beta1"
-version = "2.0.3+20200708"
+version = "2.0.4+20200708"

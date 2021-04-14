@@ -1176,7 +1176,7 @@ async fn main() {
     
     let mut app = App::new("remotebuildexecution2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.3+20210329")
+           .version("2.0.4+20210329")
            .about("Supplies a Remote Execution API service for tools such as bazel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_remotebuildexecution2_cli")
            .arg(Arg::with_name("url")

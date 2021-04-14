@@ -4,12 +4,12 @@
 [package]
 
 name = "google-pagespeedonline4"
-version = "2.0.3+20191206"
+version = "2.0.4+20191206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pagespeedonline (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pagespeedonline4"
 homepage = "https://developers.google.com/speed/docs/insights/v4/getting-started"
-documentation = "https://docs.rs/google-pagespeedonline4/2.0.3+20191206"
+documentation = "https://docs.rs/google-pagespeedonline4/2.0.4+20191206"
 license = "MIT"
 keywords = ["pagespeedonline", "google", "protocol", "web", "api"]
 autobins = false

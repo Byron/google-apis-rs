@@ -4,12 +4,12 @@
 [package]
 
 name = "google-sasportal1_alpha1"
-version = "2.0.3+20210330"
+version = "2.0.4+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with sasportal (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sasportal1_alpha1"
 homepage = "https://developers.google.com/spectrum-access-system/"
-documentation = "https://docs.rs/google-sasportal1_alpha1/2.0.3+20210330"
+documentation = "https://docs.rs/google-sasportal1_alpha1/2.0.4+20210330"
 license = "MIT"
 keywords = ["sasportal", "google", "protocol", "web", "api"]
 autobins = false

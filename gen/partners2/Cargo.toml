@@ -4,12 +4,12 @@
 [package]
 
 name = "google-partners2"
-version = "2.0.3+20180925"
+version = "2.0.4+20180925"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Partners (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/partners2"
 homepage = "https://developers.google.com/partners/"
-documentation = "https://docs.rs/google-partners2/2.0.3+20180925"
+documentation = "https://docs.rs/google-partners2/2.0.4+20180925"
 license = "MIT"
 keywords = ["partners", "google", "protocol", "web", "api"]
 autobins = false

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-tagmanager1"
-version = "2.0.3+20210330"
+version = "2.0.4+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Tag Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/tagmanager1"
 homepage = "https://developers.google.com/tag-manager"
-documentation = "https://docs.rs/google-tagmanager1/2.0.3+20210330"
+documentation = "https://docs.rs/google-tagmanager1/2.0.4+20210330"
 license = "MIT"
 keywords = ["tagmanager", "google", "protocol", "web", "api"]
 autobins = false

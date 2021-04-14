@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebasedatabase1_beta"
-version = "2.0.3+20210329"
+version = "2.0.4+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Realtime Database (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebasedatabase1_beta"
 homepage = "https://firebase.google.com/docs/reference/rest/database/database-management/rest/"
-documentation = "https://docs.rs/google-firebasedatabase1_beta/2.0.3+20210329"
+documentation = "https://docs.rs/google-firebasedatabase1_beta/2.0.4+20210329"
 license = "MIT"
 keywords = ["firebasedatabase", "google", "protocol", "web", "api"]
 autobins = false

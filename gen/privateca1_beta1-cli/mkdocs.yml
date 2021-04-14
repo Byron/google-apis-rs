@@ -1,4 +1,4 @@
-site_name: Certificate Authority Service v2.0.3+20210322
+site_name: Certificate Authority Service v2.0.4+20210322
 site_url: http://byron.github.io/google-apis-rs/google-privateca1_beta1-cli
 site_description: A complete library to interact with Certificate Authority Service (protocol v1beta1)
 

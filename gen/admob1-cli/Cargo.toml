@@ -4,7 +4,7 @@
 [package]
 
 name = "google-admob1-cli"
-version = "2.0.3+20210331"
+version = "2.0.4+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdMob (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/admob1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-admob1]
 path = "../admob1"
-version = "2.0.3+20210331"
+version = "2.0.4+20210331"

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-domainsrdap1"
-version = "2.0.3+20210331"
+version = "2.0.4+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Domains RDAP (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/domainsrdap1"
 homepage = "https://developers.google.com/domains/rdap/"
-documentation = "https://docs.rs/google-domainsrdap1/2.0.3+20210331"
+documentation = "https://docs.rs/google-domainsrdap1/2.0.4+20210331"
 license = "MIT"
 keywords = ["domainsrdap", "google", "protocol", "web", "api"]
 autobins = false

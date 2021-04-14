@@ -4,12 +4,12 @@
 [package]
 
 name = "google-sheets4"
-version = "2.0.3+20210322"
+version = "2.0.4+20210322"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Sheets (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sheets4"
 homepage = "https://developers.google.com/sheets/"
-documentation = "https://docs.rs/google-sheets4/2.0.3+20210322"
+documentation = "https://docs.rs/google-sheets4/2.0.4+20210322"
 license = "MIT"
 keywords = ["sheets", "google", "protocol", "web", "api"]
 autobins = false

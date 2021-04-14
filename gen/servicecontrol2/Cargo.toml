@@ -4,12 +4,12 @@
 [package]
 
 name = "google-servicecontrol2"
-version = "2.0.3+20210326"
+version = "2.0.4+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Control (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/servicecontrol2"
 homepage = "https://cloud.google.com/service-control/"
-documentation = "https://docs.rs/google-servicecontrol2/2.0.3+20210326"
+documentation = "https://docs.rs/google-servicecontrol2/2.0.4+20210326"
 license = "MIT"
 keywords = ["servicecontrol", "google", "protocol", "web", "api"]
 autobins = false

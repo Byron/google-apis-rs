@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *webmasters* crate version *2.0.3+20190428*, where *20190428* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.3*.
+//! This documentation was generated from *webmasters* crate version *2.0.4+20190428*, where *20190428* is the exact revision of the *webmasters:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
 //! 
 //! Everything else about the *webmasters* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/webmaster-tools/).
