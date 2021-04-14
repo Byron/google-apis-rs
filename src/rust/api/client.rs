@@ -103,7 +103,7 @@ pub struct ServerMessage {
 ///
 /// It contains methods to deal with all common issues, as well with the ones related to
 /// uploading media
-pub trait Delegate {
+pub trait Delegate: Send {
     /// Called at the beginning of any API request. The delegate should store the method
     /// information if he is interesting in knowing more context when further calls to it
     /// are made.

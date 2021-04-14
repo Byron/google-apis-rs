@@ -97,6 +97,15 @@ bar\r\n\
             Ok(Chunk { first: 2, last: 42 })
         )
     }
+
+    #[test]
+    fn dyn_delegate_is_send() {
+        fn with_send(x: impl Send) {}
+
+        let mut dd = DefaultDelegate::default();
+        let dlg: &mut dyn Delegate = &mut dd;
+        with_send(dlg);
+    }
 }
 
 #[cfg(test)]
