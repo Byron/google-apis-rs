@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SecTrust","A type representing a trust evaluation for a certificate."],["TrustResult","The result of trust evaluation."]]});

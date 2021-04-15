@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["poll_fn","Create an `Accept` with a polling function."]],"trait":[["Accept","Asynchronously accept incoming connections."]]});

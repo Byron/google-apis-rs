@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["SecIdentityExt","An extension trait adding OSX specific functionality to `SecIdentity`."]]});

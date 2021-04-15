@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Builder","A builder for digest transform operations."],["DigestType","A type of digest."]]});

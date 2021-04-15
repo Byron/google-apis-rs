@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SecPolicy","A type representing a certificate validation policy."]]});

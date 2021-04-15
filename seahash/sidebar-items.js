@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["hash","Hash some buffer."],["hash_seeded","Hash some buffer according to a chosen seed."]],"mod":[["reference","A slow, but clear reference implementation of SeaHash."]],"struct":[["SeaHasher","The streaming version of the algorithm."],["State","A SeaHash state."]]});

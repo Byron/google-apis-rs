@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SecIdentity","A type representing an identity."]]});

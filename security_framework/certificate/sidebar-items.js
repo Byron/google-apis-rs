@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["SecCertificate","A type representing a certificate."]]});

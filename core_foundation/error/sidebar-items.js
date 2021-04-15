@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["CFErrorCopyDescription",""],["CFErrorGetCode",""],["CFErrorGetDomain",""],["CFErrorGetTypeID",""]],"static":[["kCFErrorDomainCocoa",""],["kCFErrorDomainMach",""],["kCFErrorDomainOSStatus",""],["kCFErrorDomainPOSIX",""]],"struct":[["CFError","An error value."],["__CFError",""]],"type":[["CFErrorRef",""]]});

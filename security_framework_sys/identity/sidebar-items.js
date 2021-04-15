@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["SecIdentityCopyCertificate",""],["SecIdentityCopyPrivateKey",""],["SecIdentityCreateWithCertificate",""],["SecIdentityGetTypeID",""]]});
