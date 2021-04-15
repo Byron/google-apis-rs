@@ -1,8 +1,24 @@
-This repository holds [mako][mako] scripts to generate all google APIs as described by the [google discovery service][api-discovery].
+This repository holds [mako][mako] scripts to generate all Google APIs as described by the [google discovery service][api-discovery].
 
 The generate source code of each google API can be found in the `gen` subdirectory. Each google API resides in it's own crate which can be used as any other crate.
 
 To find a library of your interest, you might want to proceed looking at the [API documentation index][api-index].
+
+# Maintenance Mode
+
+These crates are considered done and only minimal time will be invested to keep them relevant. This includes the following tasks:
+
+- reply to issues, triage them
+- provide support for PRs
+- occasional updates of all crates to update them with the latest API definitions, probably no more than twice a year
+- dependency updates to avoid security issues and keep the crates usable in modern projects
+
+New features will not be implemented but PRs are welcome. Please feel free to [start a discussion][discussions] to talk about desired features.
+
+**Please be aware of the [alternative implementation][all-rust-org]** of these crates, which may be better suited for you.
+
+[discussions]: https://github.com/Byron/google-apis-rs/discussions
+[all-rust-org]: http://github.com/google-apis-rs
 
 # Project Features
 
@@ -32,7 +48,7 @@ To generate the APIs yourself, you will need to meet the following prerequisites
 The makefile is written to be self-documenting. Just calling `make` will yield a list of all valid targets.
 
 ```bash
-➜  google-apis-rs git:(master) make
+➜  google-apis-rs git:(main) make
 using template engine: '.pyenv/bin/python etc/bin/mako-render'
 
 Targets
@@ -109,9 +125,9 @@ The previous call will have created plenty of marker files, which need to be com
 attempt multiple publishes of the same version.
 
 ```bash
-$ git add .
-$ git commit -m "chore(cargo): publish latest version to crates.io"
-$ git push origin master
+git add .
+git commit -m "chore(cargo): publish latest version to crates.io"
+git push origin main
 ```
 
 # Build Documentation and post it onto GitHub
