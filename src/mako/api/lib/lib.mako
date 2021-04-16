@@ -176,9 +176,6 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 ${util.crate_name()} = "*"
-# This project intentionally uses an old version of Hyper. See
-# https://github.com/Byron/google-apis-rs/issues/173 for more
-# information.
 hyper = "^0.14"
 hyper-rustls = "^0.22"
 serde = "^1.0"
