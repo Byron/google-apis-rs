@@ -721,7 +721,6 @@ else {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())
