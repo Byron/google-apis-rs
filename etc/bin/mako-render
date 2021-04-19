@@ -233,7 +233,7 @@ def load_data(datafiles):
             if not imported_yaml:
                 import yaml
                 imported_yaml = True
-            data = yaml.load_all(open(filename, 'r'))
+            data = yaml.load_all(open(filename, 'r'), Loader=yaml.loader.FullLoader)
             data = list(data)[0]
         else:
             raise ValueError("Invalid data-file '%s', must be .json, .yaml or .yml" % filename)
