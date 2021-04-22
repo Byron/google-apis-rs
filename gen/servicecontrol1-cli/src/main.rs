@@ -496,7 +496,7 @@ async fn main() {
     
     let mut app = App::new("servicecontrol1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210326")
+           .version("2.0.5+20210326")
            .about("Provides admission control and telemetry reporting for services integrated with Service Infrastructure. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_servicecontrol1_cli")
            .arg(Arg::with_name("url")

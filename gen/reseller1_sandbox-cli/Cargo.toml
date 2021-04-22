@@ -4,7 +4,7 @@
 [package]
 
 name = "google-reseller1_sandbox-cli"
-version = "2.0.4+20160329"
+version = "2.0.5+20160329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with reseller (protocol v1sandbox)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/reseller1_sandbox-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-reseller1_sandbox]
 path = "../reseller1_sandbox"
-version = "2.0.4+20160329"
+version = "2.0.5+20160329"

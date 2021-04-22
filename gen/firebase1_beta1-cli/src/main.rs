@@ -3106,7 +3106,7 @@ async fn main() {
     
     let mut app = App::new("firebase1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210329")
+           .version("2.0.5+20210329")
            .about("The Firebase Management API enables programmatic setup and management of Firebase projects, including a project's Firebase resources and Firebase apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebase1_beta1_cli")
            .arg(Arg::with_name("url")

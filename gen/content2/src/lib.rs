@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *2.0.4+20210325*, where *20210325* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *Shopping Content* crate version *2.0.5+20210325*, where *20210325* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content/v2/).
@@ -113,9 +113,6 @@
 //! ```toml
 //! [dependencies]
 //! google-content2 = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

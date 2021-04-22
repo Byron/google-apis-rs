@@ -4,7 +4,7 @@
 [package]
 
 name = "google-memcache1-cli"
-version = "2.0.4+20210324"
+version = "2.0.5+20210324"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Memorystore for Memcached (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/memcache1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-memcache1]
 path = "../memcache1"
-version = "2.0.4+20210324"
+version = "2.0.5+20210324"

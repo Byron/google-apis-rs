@@ -2668,7 +2668,7 @@ async fn main() {
     
     let mut app = App::new("jobs4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210309")
+           .version("2.0.5+20210309")
            .about("Cloud Talent Solution provides the capability to create, read, update, and delete job postings, as well as search jobs based on keywords and filters. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_jobs4_cli")
            .arg(Arg::with_name("url")

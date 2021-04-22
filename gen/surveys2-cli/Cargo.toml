@@ -4,7 +4,7 @@
 [package]
 
 name = "google-surveys2-cli"
-version = "2.0.4+20180508"
+version = "2.0.5+20180508"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Surveys (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/surveys2-cli"
@@ -36,4 +36,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-surveys2]
 path = "../surveys2"
-version = "2.0.4+20180508"
+version = "2.0.5+20180508"

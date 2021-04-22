@@ -4,12 +4,12 @@
 [package]
 
 name = "google-webrisk1"
-version = "2.0.4+20210319"
+version = "2.0.5+20210319"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Web Risk (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/webrisk1"
 homepage = "https://cloud.google.com/web-risk/"
-documentation = "https://docs.rs/google-webrisk1/2.0.4+20210319"
+documentation = "https://docs.rs/google-webrisk1/2.0.5+20210319"
 license = "MIT"
 keywords = ["webrisk", "google", "protocol", "web", "api"]
 autobins = false

@@ -1,4 +1,4 @@
-site_name: AI Platform Notebooks v2.0.4+20210305
+site_name: AI Platform Notebooks v2.0.5+20210305
 site_url: http://byron.github.io/google-apis-rs/google-notebooks1-cli
 site_description: A complete library to interact with AI Platform Notebooks (protocol v1)
 

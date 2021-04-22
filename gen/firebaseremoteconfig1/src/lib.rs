@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Remote Config* crate version *2.0.4+20171129*, where *20171129* is the exact revision of the *firebaseremoteconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *Firebase Remote Config* crate version *2.0.5+20171129*, where *20171129* is the exact revision of the *firebaseremoteconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! 
 //! Everything else about the *Firebase Remote Config* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/remote-config/).
@@ -65,9 +65,6 @@
 //! ```toml
 //! [dependencies]
 //! google-firebaseremoteconfig1 = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

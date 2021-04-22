@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *2.0.4+20210321*, where *20210321* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *SQL Admin* crate version *2.0.5+20210321*, where *20210321* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/).
@@ -111,9 +111,6 @@
 //! ```toml
 //! [dependencies]
 //! google-sqladmin1_beta4 = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

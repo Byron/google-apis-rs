@@ -4,12 +4,12 @@
 [package]
 
 name = "google-customsearch1"
-version = "2.0.4+20210330"
+version = "2.0.5+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with CustomSearch API (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/customsearch1"
 homepage = "https://developers.google.com/custom-search/v1/introduction"
-documentation = "https://docs.rs/google-customsearch1/2.0.4+20210330"
+documentation = "https://docs.rs/google-customsearch1/2.0.5+20210330"
 license = "MIT"
 keywords = ["customsearch", "google", "protocol", "web", "api"]
 autobins = false

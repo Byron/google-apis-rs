@@ -1,4 +1,4 @@
-site_name: Service Directory v2.0.4+20210316
+site_name: Service Directory v2.0.5+20210316
 site_url: http://byron.github.io/google-apis-rs/google-servicedirectory1_beta1-cli
 site_description: A complete library to interact with Service Directory (protocol v1beta1)
 

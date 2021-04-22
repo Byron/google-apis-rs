@@ -4,7 +4,7 @@
 [package]
 
 name = "google-manufacturers1-cli"
-version = "2.0.4+20210325"
+version = "2.0.5+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Manufacturer Center (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/manufacturers1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-manufacturers1]
 path = "../manufacturers1"
-version = "2.0.4+20210325"
+version = "2.0.5+20210325"

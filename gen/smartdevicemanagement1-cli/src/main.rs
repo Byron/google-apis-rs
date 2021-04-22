@@ -737,7 +737,7 @@ async fn main() {
     
     let mut app = App::new("smartdevicemanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210319")
+           .version("2.0.5+20210319")
            .about("Allow select enterprise partners to access, control, and manage Google and Nest devices programmatically.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_smartdevicemanagement1_cli")
            .arg(Arg::with_name("url")

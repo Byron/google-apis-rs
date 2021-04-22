@@ -1,4 +1,4 @@
-site_name: Service Registry v2.0.4+20160401
+site_name: Service Registry v2.0.5+20160401
 site_url: http://byron.github.io/google-apis-rs/google-serviceregistryalpha-cli
 site_description: A complete library to interact with Service Registry (protocol alpha)
 

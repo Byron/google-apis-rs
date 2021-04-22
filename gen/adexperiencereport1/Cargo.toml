@@ -4,12 +4,12 @@
 [package]
 
 name = "google-adexperiencereport1"
-version = "2.0.4+20210329"
+version = "2.0.5+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Experience Report (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/adexperiencereport1"
 homepage = "https://developers.google.com/ad-experience-report/"
-documentation = "https://docs.rs/google-adexperiencereport1/2.0.4+20210329"
+documentation = "https://docs.rs/google-adexperiencereport1/2.0.5+20210329"
 license = "MIT"
 keywords = ["adexperiencereport", "google", "protocol", "web", "api"]
 autobins = false

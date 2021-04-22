@@ -1676,7 +1676,7 @@ async fn main() {
     
     let mut app = App::new("accesscontextmanager1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210319")
+           .version("2.0.5+20210319")
            .about("An API for setting attribute based access control to requests to GCP services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accesscontextmanager1_beta_cli")
            .arg(Arg::with_name("url")

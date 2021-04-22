@@ -648,7 +648,7 @@ async fn main() {
     
     let mut app = App::new("billingbudgets1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210326")
+           .version("2.0.5+20210326")
            .about("The Cloud Billing Budget API stores Cloud Billing budgets, which define a budget plan and the rules to execute as spend is tracked against that plan.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_billingbudgets1_cli")
            .arg(Arg::with_name("url")

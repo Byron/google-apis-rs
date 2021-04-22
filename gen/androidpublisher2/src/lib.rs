@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *2.0.4+20200331*, where *20200331* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *Android Publisher* crate version *2.0.5+20200331*, where *20200331* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -83,9 +83,6 @@
 //! ```toml
 //! [dependencies]
 //! google-androidpublisher2 = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

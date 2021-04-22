@@ -3606,7 +3606,7 @@ async fn main() {
     
     let mut app = App::new("realtimebidding1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210331")
+           .version("2.0.5+20210331")
            .about("Allows external bidders to manage their RTB integration with Google. This includes managing bidder endpoints, QPS quotas, configuring what ad inventory to receive via pretargeting, submitting creatives for verification, and accessing creative metadata such as approval status.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_realtimebidding1_cli")
            .arg(Arg::with_name("url")

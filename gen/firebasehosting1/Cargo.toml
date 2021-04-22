@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebasehosting1"
-version = "2.0.4+20210315"
+version = "2.0.5+20210315"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Hosting (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebasehosting1"
 homepage = "https://firebase.google.com/docs/hosting/"
-documentation = "https://docs.rs/google-firebasehosting1/2.0.4+20210315"
+documentation = "https://docs.rs/google-firebasehosting1/2.0.5+20210315"
 license = "MIT"
 keywords = ["firebasehosting", "google", "protocol", "web", "api"]
 autobins = false

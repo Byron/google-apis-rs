@@ -1,4 +1,4 @@
-site_name: Cloud Identity v2.0.4+20210310
+site_name: Cloud Identity v2.0.5+20210310
 site_url: http://byron.github.io/google-apis-rs/google-cloudidentity1-cli
 site_description: A complete library to interact with Cloud Identity (protocol v1)
 

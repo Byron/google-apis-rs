@@ -1,4 +1,4 @@
-site_name: Real-time Bidding v2.0.4+20210331
+site_name: Real-time Bidding v2.0.5+20210331
 site_url: http://byron.github.io/google-apis-rs/google-realtimebidding1-cli
 site_description: A complete library to interact with Real-time Bidding (protocol v1)
 

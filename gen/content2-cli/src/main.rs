@@ -9569,7 +9569,7 @@ async fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210325")
+           .version("2.0.5+20210325")
            .about("Manage your product listings and accounts for Google Shopping")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

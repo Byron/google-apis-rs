@@ -1,4 +1,4 @@
-site_name: Cloud Domains v2.0.4+20210216
+site_name: Cloud Domains v2.0.5+20210216
 site_url: http://byron.github.io/google-apis-rs/google-domains1_beta1-cli
 site_description: A complete library to interact with Cloud Domains (protocol v1beta1)
 

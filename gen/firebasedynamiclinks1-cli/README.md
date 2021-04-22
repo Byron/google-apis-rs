@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Dynamic Links* API at revision *20210329*. The CLI is at version *2.0.4*.
+This documentation was generated from the *Firebase Dynamic Links* API at revision *20210329*. The CLI is at version *2.0.5*.
 
 ```bash
 firebasedynamiclinks1 [options]

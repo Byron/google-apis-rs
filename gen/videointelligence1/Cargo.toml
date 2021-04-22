@@ -4,12 +4,12 @@
 [package]
 
 name = "google-videointelligence1"
-version = "2.0.4+20210325"
+version = "2.0.5+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Video Intelligence (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/videointelligence1"
 homepage = "https://cloud.google.com/video-intelligence/docs/"
-documentation = "https://docs.rs/google-videointelligence1/2.0.4+20210325"
+documentation = "https://docs.rs/google-videointelligence1/2.0.5+20210325"
 license = "MIT"
 keywords = ["videointelligence", "google", "protocol", "web", "api"]
 autobins = false

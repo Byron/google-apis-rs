@@ -4,12 +4,12 @@
 [package]
 
 name = "google-metastore1_beta"
-version = "2.0.4+20210325"
+version = "2.0.5+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dataproc Metastore (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/metastore1_beta"
 homepage = "https://cloud.google.com/dataproc-metastore/docs"
-documentation = "https://docs.rs/google-metastore1_beta/2.0.4+20210325"
+documentation = "https://docs.rs/google-metastore1_beta/2.0.5+20210325"
 license = "MIT"
 keywords = ["metastore", "google", "protocol", "web", "api"]
 autobins = false

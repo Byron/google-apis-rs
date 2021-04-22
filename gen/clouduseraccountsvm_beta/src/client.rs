@@ -721,6 +721,7 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                 .client
                 .request(
                     hyper::Request::builder()
+                        .uri(self.url)
                         .method(hyper::Method::POST)
                         .header("Content-Range", range_header.header_value())
                         .header(CONTENT_TYPE, format!("{}", self.media_type))

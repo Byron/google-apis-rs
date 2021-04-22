@@ -1792,7 +1792,7 @@ async fn main() {
     
     let mut app = App::new("secretmanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210319")
+           .version("2.0.5+20210319")
            .about("Stores sensitive data such as API keys, passwords, and certificates. Provides convenience while improving security. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_secretmanager1_beta1_cli")
            .arg(Arg::with_name("url")

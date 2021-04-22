@@ -4,12 +4,12 @@
 [package]
 
 name = "google-playablelocations3"
-version = "2.0.4+20200707"
+version = "2.0.5+20200707"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Playable Locations (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/playablelocations3"
 homepage = "https://developers.google.com/maps/contact-sales/"
-documentation = "https://docs.rs/google-playablelocations3/2.0.4+20200707"
+documentation = "https://docs.rs/google-playablelocations3/2.0.5+20200707"
 license = "MIT"
 keywords = ["playablelocations", "google", "protocol", "web", "api"]
 autobins = false

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-documentai1-cli"
-version = "2.0.4+20210329"
+version = "2.0.5+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Document (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/documentai1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-documentai1]
 path = "../documentai1"
-version = "2.0.4+20210329"
+version = "2.0.5+20210329"

@@ -1,4 +1,4 @@
-site_name: manager v2.0.4+20140915
+site_name: manager v2.0.5+20140915
 site_url: http://byron.github.io/google-apis-rs/google-manager1_beta2-cli
 site_description: A complete library to interact with manager (protocol v1beta2)
 

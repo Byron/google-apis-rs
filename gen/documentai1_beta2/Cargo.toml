@@ -4,12 +4,12 @@
 [package]
 
 name = "google-documentai1_beta2"
-version = "2.0.4+20210329"
+version = "2.0.5+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Document (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/documentai1_beta2"
 homepage = "https://cloud.google.com/document-ai/docs/"
-documentation = "https://docs.rs/google-documentai1_beta2/2.0.4+20210329"
+documentation = "https://docs.rs/google-documentai1_beta2/2.0.5+20210329"
 license = "MIT"
 keywords = ["documentai", "google", "protocol", "web", "api"]
 autobins = false

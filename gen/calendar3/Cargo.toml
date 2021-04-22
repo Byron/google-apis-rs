@@ -4,12 +4,12 @@
 [package]
 
 name = "google-calendar3"
-version = "2.0.4+20210327"
+version = "2.0.5+20210327"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with calendar (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/calendar3"
 homepage = "https://developers.google.com/google-apps/calendar/firstapp"
-documentation = "https://docs.rs/google-calendar3/2.0.4+20210327"
+documentation = "https://docs.rs/google-calendar3/2.0.5+20210327"
 license = "MIT"
 keywords = ["calendar", "google", "protocol", "web", "api"]
 autobins = false

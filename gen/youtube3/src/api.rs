@@ -150,7 +150,7 @@ impl<'a, > YouTube<> {
         YouTube {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.4".to_string(),
+            _user_agent: "google-api-rust-client/2.0.5".to_string(),
             _base_url: "https://youtube.googleapis.com/".to_string(),
             _root_url: "https://youtube.googleapis.com/".to_string(),
         }
@@ -245,7 +245,7 @@ impl<'a, > YouTube<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.4`.
+    /// It defaults to `google-api-rust-client/2.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -9944,7 +9944,6 @@ impl<'a> CaptionInsertCall<'a> {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())
@@ -10693,7 +10692,6 @@ impl<'a> CaptionUpdateCall<'a> {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())
@@ -11119,7 +11117,6 @@ impl<'a> ChannelBannerInsertCall<'a> {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())
@@ -27379,7 +27376,6 @@ impl<'a> ThumbnailSetCall<'a> {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())
@@ -28806,7 +28802,6 @@ impl<'a> VideoInsertCall<'a> {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())
@@ -30380,7 +30375,6 @@ impl<'a> WatermarkSetCall<'a> {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(url::Url::parse(s).unwrap())).unwrap();
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
                         .header("Localtion", upload_url.as_ref().unwrap().clone())

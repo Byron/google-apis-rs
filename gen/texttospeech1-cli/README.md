@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Texttospeech* API at revision *20210326*. The CLI is at version *2.0.4*.
+This documentation was generated from the *Texttospeech* API at revision *20210326*. The CLI is at version *2.0.5*.
 
 ```bash
 texttospeech1 [options]

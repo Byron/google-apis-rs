@@ -4,12 +4,12 @@
 [package]
 
 name = "google-notebooks1"
-version = "2.0.4+20210305"
+version = "2.0.5+20210305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AI Platform Notebooks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/notebooks1"
 homepage = "https://cloud.google.com/ai-platform/notebooks/docs/"
-documentation = "https://docs.rs/google-notebooks1/2.0.4+20210305"
+documentation = "https://docs.rs/google-notebooks1/2.0.5+20210305"
 license = "MIT"
 keywords = ["notebooks", "google", "protocol", "web", "api"]
 autobins = false

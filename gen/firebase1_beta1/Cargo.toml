@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebase1_beta1"
-version = "2.0.4+20210329"
+version = "2.0.5+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Management (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebase1_beta1"
 homepage = "https://firebase.google.com"
-documentation = "https://docs.rs/google-firebase1_beta1/2.0.4+20210329"
+documentation = "https://docs.rs/google-firebase1_beta1/2.0.5+20210329"
 license = "MIT"
 keywords = ["firebase", "google", "protocol", "web", "api"]
 autobins = false

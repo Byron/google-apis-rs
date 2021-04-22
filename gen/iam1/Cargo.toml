@@ -4,12 +4,12 @@
 [package]
 
 name = "google-iam1"
-version = "2.0.4+20210325"
+version = "2.0.5+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Iam (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/iam1"
 homepage = "https://cloud.google.com/iam/"
-documentation = "https://docs.rs/google-iam1/2.0.4+20210325"
+documentation = "https://docs.rs/google-iam1/2.0.5+20210325"
 license = "MIT"
 keywords = ["iam", "google", "protocol", "web", "api"]
 autobins = false

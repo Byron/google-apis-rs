@@ -1,4 +1,4 @@
-site_name: Artifact Registry v2.0.4+20210324
+site_name: Artifact Registry v2.0.5+20210324
 site_url: http://byron.github.io/google-apis-rs/google-artifactregistry1-cli
 site_description: A complete library to interact with Artifact Registry (protocol v1)
 

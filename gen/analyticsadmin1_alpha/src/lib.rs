@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Google Analytics Admin* crate version *2.0.4+20210331*, where *20210331* is the exact revision of the *analyticsadmin:v1alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *Google Analytics Admin* crate version *2.0.5+20210331*, where *20210331* is the exact revision of the *analyticsadmin:v1alpha* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! 
 //! Everything else about the *Google Analytics Admin* *v1_alpha* API can be found at the
 //! [official documentation site](http://code.google.com/apis/analytics/docs/mgmt/home.html).
@@ -78,9 +78,6 @@
 //! ```toml
 //! [dependencies]
 //! google-analyticsadmin1_alpha = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

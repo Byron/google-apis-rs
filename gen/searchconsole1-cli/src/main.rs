@@ -972,7 +972,7 @@ async fn main() {
     
     let mut app = App::new("searchconsole1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210325")
+           .version("2.0.5+20210325")
            .about("The Search Console API provides access to both Search Console data (verified users only) and to public information on an URL basis (anyone)")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_searchconsole1_cli")
            .arg(Arg::with_name("url")

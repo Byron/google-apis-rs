@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Surveys* crate version *2.0.4+20180508*, where *20180508* is the exact revision of the *surveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *Surveys* crate version *2.0.5+20180508*, where *20180508* is the exact revision of the *surveys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/surveys2).
 //! # Features
 //! 
@@ -73,9 +73,6 @@
 //! ```toml
 //! [dependencies]
 //! google-surveys2 = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

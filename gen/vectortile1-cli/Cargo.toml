@@ -4,7 +4,7 @@
 [package]
 
 name = "google-vectortile1-cli"
-version = "2.0.4+20210331"
+version = "2.0.5+20210331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Semantic Tile (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/vectortile1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-vectortile1]
 path = "../vectortile1"
-version = "2.0.4+20210331"
+version = "2.0.5+20210331"

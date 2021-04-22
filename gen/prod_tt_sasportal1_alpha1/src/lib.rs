@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SAS Portal Testing* crate version *2.0.4+20210330*, where *20210330* is the exact revision of the *prod_tt_sasportal:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.4*.
+//! This documentation was generated from *SAS Portal Testing* crate version *2.0.5+20210330*, where *20210330* is the exact revision of the *prod_tt_sasportal:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
 //! 
 //! Everything else about the *SAS Portal Testing* *v1_alpha1* API can be found at the
 //! [official documentation site](https://developers.google.com/spectrum-access-system/).
@@ -92,9 +92,6 @@
 //! ```toml
 //! [dependencies]
 //! google-prod_tt_sasportal1_alpha1 = "*"
-//! # This project intentionally uses an old version of Hyper. See
-//! # https://github.com/Byron/google-apis-rs/issues/173 for more
-//! # information.
 //! hyper = "^0.14"
 //! hyper-rustls = "^0.22"
 //! serde = "^1.0"

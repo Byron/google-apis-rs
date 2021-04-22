@@ -4,12 +4,12 @@
 [package]
 
 name = "google-mybusinessaccountmanagement1"
-version = "2.0.4+20210330"
+version = "2.0.5+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with My Business Account Management (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessaccountmanagement1"
 homepage = "https://developers.google.com/my-business/"
-documentation = "https://docs.rs/google-mybusinessaccountmanagement1/2.0.4+20210330"
+documentation = "https://docs.rs/google-mybusinessaccountmanagement1/2.0.5+20210330"
 license = "MIT"
 keywords = ["mybusinessaccountman", "google", "protocol", "web", "api"]
 autobins = false

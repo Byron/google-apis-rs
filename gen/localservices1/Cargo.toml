@@ -4,12 +4,12 @@
 [package]
 
 name = "google-localservices1"
-version = "2.0.4+20210330"
+version = "2.0.5+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Localservices (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/localservices1"
 homepage = "https://ads.google.com/local-services-ads/"
-documentation = "https://docs.rs/google-localservices1/2.0.4+20210330"
+documentation = "https://docs.rs/google-localservices1/2.0.5+20210330"
 license = "MIT"
 keywords = ["localservices", "google", "protocol", "web", "api"]
 autobins = false

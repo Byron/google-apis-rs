@@ -4,7 +4,7 @@
 [package]
 
 name = "google-analyticsreporting4-cli"
-version = "2.0.4+20210310"
+version = "2.0.5+20210310"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AnalyticsReporting (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsreporting4-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-analyticsreporting4]
 path = "../analyticsreporting4"
-version = "2.0.4+20210310"
+version = "2.0.5+20210310"

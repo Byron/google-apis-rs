@@ -2661,7 +2661,7 @@ async fn main() {
     
     let mut app = App::new("cloudbuild1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.4+20210329")
+           .version("2.0.5+20210329")
            .about("Creates and manages builds on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudbuild1_cli")
            .arg(Arg::with_name("url")
