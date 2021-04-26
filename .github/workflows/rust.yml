@@ -2,22 +2,22 @@ name: Rust
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-test:
-
     runs-on: ubuntu-latest
     env:
       TRAVIS: true # emulate CI, some code depends on it to do less work
     steps:
-    - uses: actions/checkout@v2
-    - name: Run tests
-      run: |
-        source ~/.profile
-        make test-gen
-        make gen-all-cli cargo-api ARGS=test
-        make cargo-api ARGS=doc
-        cargo test
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          source ~/.profile
+          make test-gen
+          make gen-all-cli cargo-api ARGS=test
+          make cargo-api ARGS=doc
+          make docs-all
+          cargo test
