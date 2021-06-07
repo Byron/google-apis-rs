@@ -696,8 +696,9 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
             _ => MIN_CHUNK_SIZE,
         };
 
-        self.reader.seek(SeekFrom::Start(start)).unwrap();
         loop {
+            self.reader.seek(SeekFrom::Start(start)).unwrap();
+
             let request_size = match self.content_length - start {
                 rs if rs > chunk_size => chunk_size,
                 rs => rs,
@@ -713,7 +714,6 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                 }),
                 total_length: self.content_length,
             };
-            start += request_size;
             if self.delegate.cancel_chunk_upload(&range_header) {
                 return None;
             }
@@ -732,6 +732,8 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                 .await;
             match res {
                 Ok(res) => {
+                    start += request_size;
+
                     if res.status() == StatusCode::PERMANENT_REDIRECT {
                         continue;
                     }
