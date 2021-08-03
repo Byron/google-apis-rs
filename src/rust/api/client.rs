@@ -403,7 +403,7 @@ impl<'a> MultiPartReader<'a> {
     pub fn mime_type(&self) -> Mime {
         Mime(
             TopLevel::Multipart,
-            SubLevel::Ext("Related".to_string()),
+            SubLevel::Ext("related".to_string()),
             vec![(
                 Attr::Ext("boundary".to_string()),
                 Value::Ext(BOUNDARY.to_string()),
@@ -447,9 +447,11 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
+                // TODO: The first line ending should be omitted for the first part,
+                // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
-                    "{}--{}{}{}{}",
+                    "{}--{}{}{}{}{}",
                     LINE_ENDING,
                     BOUNDARY,
                     LINE_ENDING,
@@ -457,7 +459,8 @@ impl<'a> Read for MultiPartReader<'a> {
                         .iter()
                         .map(|(k, v)| format!("{}: {}", k, v.to_str().unwrap()))
                         .join(LINE_ENDING),
-                    LINE_ENDING
+                    LINE_ENDING,
+                    LINE_ENDING,
                 ))
                 .unwrap();
                 c.seek(SeekFrom::Start(0)).unwrap();
@@ -480,7 +483,7 @@ impl<'a> Read for MultiPartReader<'a> {
                         // before clearing the last part, we will add the boundary that
                         // will be written last
                         self.last_part_boundary = Some(Cursor::new(
-                            format!("{}--{}--", LINE_ENDING, BOUNDARY).into_bytes(),
+                            format!("{}--{}--{}", LINE_ENDING, BOUNDARY, LINE_ENDING).into_bytes(),
                         ))
                     }
                     // We are depleted - this can trigger the next part to come in
