@@ -47,6 +47,7 @@ ${lib.scope_enum()}
 <%block filter="rust_doc_comment">\
 ${lib.hub_usage_example(c)}\
 </%block>
+#[derive(Clone)]
 pub struct ${hub_type}${ht_params} {
     client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
     auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
