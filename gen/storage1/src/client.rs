@@ -1,3 +1,5 @@
+// COPY OF 'src/rust/api/client.rs'
+// DO NOT EDIT
 use std::error;
 use std::fmt::{self, Display};
 use std::io::{self, Cursor, Read, Seek, SeekFrom, Write};
@@ -59,8 +61,8 @@ pub trait Part {}
 pub trait NestedType {}
 
 /// A utility to specify reader types which provide seeking capabilities too
-pub trait ReadSeek: Seek + Read {}
-impl<T: Seek + Read> ReadSeek for T {}
+pub trait ReadSeek: Seek + Read + Send {}
+impl<T: Seek + Read + Send> ReadSeek for T {}
 
 /// A trait for all types that can convert themselves into a *parts* string
 pub trait ToParts {
