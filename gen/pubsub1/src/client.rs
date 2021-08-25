@@ -61,8 +61,8 @@ pub trait Part {}
 pub trait NestedType {}
 
 /// A utility to specify reader types which provide seeking capabilities too
-pub trait ReadSeek: Seek + Read {}
-impl<T: Seek + Read> ReadSeek for T {}
+pub trait ReadSeek: Seek + Read + Send {}
+impl<T: Seek + Read + Send> ReadSeek for T {}
 
 /// A trait for all types that can convert themselves into a *parts* string
 pub trait ToParts {
@@ -405,7 +405,7 @@ impl<'a> MultiPartReader<'a> {
     pub fn mime_type(&self) -> Mime {
         Mime(
             TopLevel::Multipart,
-            SubLevel::Ext("Related".to_string()),
+            SubLevel::Ext("related".to_string()),
             vec![(
                 Attr::Ext("boundary".to_string()),
                 Value::Ext(BOUNDARY.to_string()),
@@ -449,9 +449,11 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
+                // TODO: The first line ending should be omitted for the first part,
+                // fortunately Google's API serves don't seem to mind.
                 (write!(
                     &mut c,
-                    "{}--{}{}{}{}",
+                    "{}--{}{}{}{}{}",
                     LINE_ENDING,
                     BOUNDARY,
                     LINE_ENDING,
@@ -459,7 +461,8 @@ impl<'a> Read for MultiPartReader<'a> {
                         .iter()
                         .map(|(k, v)| format!("{}: {}", k, v.to_str().unwrap()))
                         .join(LINE_ENDING),
-                    LINE_ENDING
+                    LINE_ENDING,
+                    LINE_ENDING,
                 ))
                 .unwrap();
                 c.seek(SeekFrom::Start(0)).unwrap();
@@ -482,7 +485,7 @@ impl<'a> Read for MultiPartReader<'a> {
                         // before clearing the last part, we will add the boundary that
                         // will be written last
                         self.last_part_boundary = Some(Cursor::new(
-                            format!("{}--{}--", LINE_ENDING, BOUNDARY).into_bytes(),
+                            format!("{}--{}--{}", LINE_ENDING, BOUNDARY, LINE_ENDING).into_bytes(),
                         ))
                     }
                     // We are depleted - this can trigger the next part to come in
@@ -696,8 +699,9 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
             _ => MIN_CHUNK_SIZE,
         };
 
-        self.reader.seek(SeekFrom::Start(start)).unwrap();
         loop {
+            self.reader.seek(SeekFrom::Start(start)).unwrap();
+
             let request_size = match self.content_length - start {
                 rs if rs > chunk_size => chunk_size,
                 rs => rs,
@@ -713,7 +717,6 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                 }),
                 total_length: self.content_length,
             };
-            start += request_size;
             if self.delegate.cancel_chunk_upload(&range_header) {
                 return None;
             }
@@ -732,6 +735,8 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                 .await;
             match res {
                 Ok(res) => {
+                    start += request_size;
+
                     if res.status() == StatusCode::PERMANENT_REDIRECT {
                         continue;
                     }
