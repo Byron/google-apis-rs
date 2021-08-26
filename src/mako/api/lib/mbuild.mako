@@ -738,9 +738,9 @@ else {
                         mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                  .add_part(&mut reader, size, reader_mime_type.clone());
                         let mime_type = mp_reader.mime_type();
-                        (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                        (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                     },
-                    _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                    _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                 };
             % endif
                 let client = &self.hub.client;
