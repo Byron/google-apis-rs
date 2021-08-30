@@ -61,8 +61,8 @@ pub trait Part {}
 pub trait NestedType {}
 
 /// A utility to specify reader types which provide seeking capabilities too
-pub trait ReadSeek: Seek + Read {}
-impl<T: Seek + Read> ReadSeek for T {}
+pub trait ReadSeek: Seek + Read + Send {}
+impl<T: Seek + Read + Send> ReadSeek for T {}
 
 /// A trait for all types that can convert themselves into a *parts* string
 pub trait ToParts {
@@ -362,8 +362,8 @@ const BOUNDARY: &str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 /// to google APIs, and might not be a fully-featured implementation.
 #[derive(Default)]
 pub struct MultiPartReader<'a> {
-    raw_parts: Vec<(HeaderMap, &'a mut dyn Read)>,
-    current_part: Option<(Cursor<Vec<u8>>, &'a mut dyn Read)>,
+    raw_parts: Vec<(HeaderMap, &'a mut (dyn Read + Send))>,
+    current_part: Option<(Cursor<Vec<u8>>, &'a mut (dyn Read + Send))>,
     last_part_boundary: Option<Cursor<Vec<u8>>>,
 }
 
@@ -386,7 +386,7 @@ impl<'a> MultiPartReader<'a> {
     /// `mime`    - It will be put onto the content type
     pub fn add_part(
         &mut self,
-        reader: &'a mut dyn Read,
+        reader: &'a mut (dyn Read + Send),
         size: u64,
         mime_type: Mime,
     ) -> &mut MultiPartReader<'a> {
