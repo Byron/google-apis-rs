@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Broker* crate version *2.0.5+20190624*, where *20190624* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *Service Broker* crate version *2.0.8+20190624*, where *20190624* is the exact revision of the *servicebroker:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *Service Broker* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/kubernetes-engine/docs/concepts/add-on/service-broker).

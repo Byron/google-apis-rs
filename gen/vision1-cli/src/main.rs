@@ -4016,7 +4016,7 @@ async fn main() {
     
     let mut app = App::new("vision1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20210319")
+           .version("2.0.8+20210319")
            .about("Integrates Google Vision features, including image labeling, face, logo, and landmark detection, optical character recognition (OCR), and detection of explicit content, into applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vision1_cli")
            .arg(Arg::with_name("url")

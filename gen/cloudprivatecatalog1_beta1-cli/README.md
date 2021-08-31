@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Private Catalog* API at revision *20200405*. The CLI is at version *2.0.5*.
+This documentation was generated from the *Cloud Private Catalog* API at revision *20200405*. The CLI is at version *2.0.8*.
 
 ```bash
 cloudprivatecatalog1-beta1 [options]

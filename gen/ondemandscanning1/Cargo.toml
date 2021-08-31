@@ -4,12 +4,12 @@
 [package]
 
 name = "google-ondemandscanning1"
-version = "2.0.5+20210329"
+version = "2.0.8+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with On-Demand Scanning (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ondemandscanning1"
 homepage = "https://cloud.google.com/container-analysis/docs/on-demand-scanning/"
-documentation = "https://docs.rs/google-ondemandscanning1/2.0.5+20210329"
+documentation = "https://docs.rs/google-ondemandscanning1/2.0.8+20210329"
 license = "MIT"
 keywords = ["ondemandscanning", "google", "protocol", "web", "api"]
 autobins = false

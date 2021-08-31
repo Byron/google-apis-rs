@@ -4,12 +4,12 @@
 [package]
 
 name = "google-dlp2"
-version = "2.0.5+20210326"
+version = "2.0.8+20210326"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DLP (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dlp2"
 homepage = "https://cloud.google.com/dlp/docs/"
-documentation = "https://docs.rs/google-dlp2/2.0.5+20210326"
+documentation = "https://docs.rs/google-dlp2/2.0.8+20210326"
 license = "MIT"
 keywords = ["dlp", "google", "protocol", "web", "api"]
 autobins = false

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gamesconfiguration1_configuration-cli"
-version = "2.0.5+20210325"
+version = "2.0.8+20210325"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Games Configuration (protocol v1configuration)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/gamesconfiguration1_configuration-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-gamesconfiguration1_configuration]
 path = "../gamesconfiguration1_configuration"
-version = "2.0.5+20210325"
+version = "2.0.8+20210325"

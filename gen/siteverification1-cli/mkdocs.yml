@@ -1,4 +1,4 @@
-site_name: siteVerification v2.0.5+20191119
+site_name: siteVerification v2.0.8+20191119
 site_url: http://byron.github.io/google-apis-rs/google-siteverification1-cli
 site_description: A complete library to interact with siteVerification (protocol v1)
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-pagespeedonline2-cli"
-version = "2.0.5+20191206"
+version = "2.0.8+20191206"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with pagespeedonline (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pagespeedonline2-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-pagespeedonline2]
 path = "../pagespeedonline2"
-version = "2.0.5+20191206"
+version = "2.0.8+20191206"

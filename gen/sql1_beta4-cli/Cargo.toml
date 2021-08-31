@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sql1_beta4-cli"
-version = "2.0.5+20200331"
+version = "2.0.8+20200331"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SQL Admin (protocol v1beta4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sql1_beta4-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-sql1_beta4]
 path = "../sql1_beta4"
-version = "2.0.5+20200331"
+version = "2.0.8+20200331"

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AnalyticsReporting* crate version *2.0.5+20210310*, where *20210310* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *AnalyticsReporting* crate version *2.0.8+20210310*, where *20210310* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *AnalyticsReporting* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/devguides/reporting/core/v4/).

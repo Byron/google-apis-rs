@@ -1248,7 +1248,7 @@ async fn main() {
     
     let mut app = App::new("consumersurveys2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20170407")
+           .version("2.0.8+20170407")
            .about("Creates and conducts surveys, lists the surveys that an authenticated user owns, and retrieves survey results and information about specified surveys.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_consumersurveys2_cli")
            .arg(Arg::with_name("url")

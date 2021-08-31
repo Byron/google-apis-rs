@@ -944,7 +944,7 @@ async fn main() {
     
     let mut app = App::new("prediction1d6")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20160511")
+           .version("2.0.8+20160511")
            .about("Lets you access a cloud hosted machine learning service that makes it easy to build smart apps")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_prediction1d6_cli")
            .arg(Arg::with_name("url")

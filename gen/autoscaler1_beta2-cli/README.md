@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *autoscaler* API at revision *20150629*. The CLI is at version *2.0.5*.
+This documentation was generated from the *autoscaler* API at revision *20150629*. The CLI is at version *2.0.8*.
 
 ```bash
 autoscaler1-beta2 [options]

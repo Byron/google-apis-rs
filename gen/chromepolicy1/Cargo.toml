@@ -4,12 +4,12 @@
 [package]
 
 name = "google-chromepolicy1"
-version = "2.0.5+20210329"
+version = "2.0.8+20210329"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Chrome Policy (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/chromepolicy1"
 homepage = "http://developers.google.com/chrome/policy"
-documentation = "https://docs.rs/google-chromepolicy1/2.0.5+20210329"
+documentation = "https://docs.rs/google-chromepolicy1/2.0.8+20210329"
 license = "MIT"
 keywords = ["chromepolicy", "google", "protocol", "web", "api"]
 autobins = false

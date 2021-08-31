@@ -4,7 +4,7 @@
 [package]
 
 name = "google-indexing3-cli"
-version = "2.0.5+20210323"
+version = "2.0.8+20210323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Indexing (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/indexing3-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-indexing3]
 path = "../indexing3"
-version = "2.0.5+20210323"
+version = "2.0.8+20210323"

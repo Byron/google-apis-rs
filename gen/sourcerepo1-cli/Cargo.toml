@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sourcerepo1-cli"
-version = "2.0.5+20210125"
+version = "2.0.8+20210125"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Source Repositories (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sourcerepo1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-sourcerepo1]
 path = "../sourcerepo1"
-version = "2.0.5+20210125"
+version = "2.0.8+20210125"

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tasks* crate version *2.0.5+20210329*, where *20210329* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *Tasks* crate version *2.0.8+20210329*, where *20210329* is the exact revision of the *tasks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/tasks1).
 //! # Features
 //! 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pagespeed Insights* crate version *2.0.5+20210330*, where *20210330* is the exact revision of the *pagespeedonline:v5* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *Pagespeed Insights* crate version *2.0.8+20210330*, where *20210330* is the exact revision of the *pagespeedonline:v5* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *Pagespeed Insights* *v5* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v5/about).

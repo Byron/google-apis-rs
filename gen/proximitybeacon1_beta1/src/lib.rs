@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *proximitybeacon* crate version *2.0.5+20200127*, where *20200127* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *proximitybeacon* crate version *2.0.8+20200127*, where *20200127* is the exact revision of the *proximitybeacon:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *proximitybeacon* *v1_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/beacons/proximity/).

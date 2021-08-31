@@ -4,7 +4,7 @@
 [package]
 
 name = "google-chromeuxreport1-cli"
-version = "2.0.5+20210330"
+version = "2.0.8+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Chrome UX Report (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/chromeuxreport1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-chromeuxreport1]
 path = "../chromeuxreport1"
-version = "2.0.5+20210330"
+version = "2.0.8+20210330"

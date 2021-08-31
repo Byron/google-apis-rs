@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *2.0.5+20210325*, where *20210325* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *groupssettings* crate version *2.0.8+20210325*, where *20210325* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).

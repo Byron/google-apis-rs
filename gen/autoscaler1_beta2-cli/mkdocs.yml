@@ -1,4 +1,4 @@
-site_name: autoscaler v2.0.5+20150629
+site_name: autoscaler v2.0.8+20150629
 site_url: http://byron.github.io/google-apis-rs/google-autoscaler1_beta2-cli
 site_description: A complete library to interact with autoscaler (protocol v1beta2)
 

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-ml1"
-version = "2.0.5+20210317"
+version = "2.0.8+20210317"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Machine Learning Engine (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ml1"
 homepage = "https://cloud.google.com/ml/"
-documentation = "https://docs.rs/google-ml1/2.0.5+20210317"
+documentation = "https://docs.rs/google-ml1/2.0.8+20210317"
 license = "MIT"
 keywords = ["ml", "google", "protocol", "web", "api"]
 autobins = false

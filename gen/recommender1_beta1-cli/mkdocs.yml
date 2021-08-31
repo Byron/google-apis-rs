@@ -1,4 +1,4 @@
-site_name: Recommender v2.0.5+20210319
+site_name: Recommender v2.0.8+20210319
 site_url: http://byron.github.io/google-apis-rs/google-recommender1_beta1-cli
 site_description: A complete library to interact with Recommender (protocol v1beta1)
 

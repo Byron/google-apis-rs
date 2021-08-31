@@ -161,6 +161,7 @@ impl Default for Scope {
 /// }
 /// # }
 /// ```
+#[derive(Clone)]
 pub struct Gmail<> {
     client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
     auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
@@ -177,7 +178,7 @@ impl<'a, > Gmail<> {
         Gmail {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.5".to_string(),
+            _user_agent: "google-api-rust-client/2.0.8".to_string(),
             _base_url: "https://gmail.googleapis.com/".to_string(),
             _root_url: "https://gmail.googleapis.com/".to_string(),
         }
@@ -188,7 +189,7 @@ impl<'a, > Gmail<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.5`.
+    /// It defaults to `google-api-rust-client/2.0.8`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -2800,9 +2801,9 @@ impl<'a> UserDraftCreateCall<'a> {
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                         },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
@@ -4033,9 +4034,9 @@ impl<'a> UserDraftSendCall<'a> {
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                         },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
@@ -4433,9 +4434,9 @@ impl<'a> UserDraftUpdateCall<'a> {
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                         },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
@@ -8201,9 +8202,9 @@ impl<'a> UserMessageImportCall<'a> {
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                         },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
@@ -8637,9 +8638,9 @@ impl<'a> UserMessageInsertCall<'a> {
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                         },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();
@@ -9662,9 +9663,9 @@ impl<'a> UserMessageSendCall<'a> {
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut dyn io::Read, (CONTENT_TYPE, mime_type.to_string()))
+                            (&mut mp_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, mime_type.to_string()))
                         },
-                        _ => (&mut request_value_reader as &mut dyn io::Read, (CONTENT_TYPE, json_mime_type.to_string())),
+                        _ => (&mut request_value_reader as &mut (dyn io::Read + Send), (CONTENT_TYPE, json_mime_type.to_string())),
                     };
                     let client = &self.hub.client;
                     dlg.pre_request();

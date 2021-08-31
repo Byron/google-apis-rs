@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting3-cli"
-version = "2.0.5+20180830"
+version = "2.0.8+20180830"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v3.0)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-dfareporting3]
 path = "../dfareporting3"
-version = "2.0.5+20180830"
+version = "2.0.8+20180830"

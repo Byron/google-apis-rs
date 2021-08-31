@@ -884,7 +884,7 @@ async fn main() {
     
     let mut app = App::new("analyticsdata1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20210329")
+           .version("2.0.8+20210329")
            .about("Accesses report data in Google Analytics.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analyticsdata1_beta_cli")
            .arg(Arg::with_name("url")

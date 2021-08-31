@@ -4,7 +4,7 @@
 [package]
 
 name = "google-notebooks1-cli"
-version = "2.0.5+20210305"
+version = "2.0.8+20210305"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AI Platform Notebooks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/notebooks1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-notebooks1]
 path = "../notebooks1"
-version = "2.0.5+20210305"
+version = "2.0.8+20210305"

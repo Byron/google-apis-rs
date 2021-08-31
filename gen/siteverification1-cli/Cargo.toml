@@ -4,7 +4,7 @@
 [package]
 
 name = "google-siteverification1-cli"
-version = "2.0.5+20191119"
+version = "2.0.8+20191119"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with siteVerification (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/siteverification1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-siteverification1]
 path = "../siteverification1"
-version = "2.0.5+20191119"
+version = "2.0.8+20191119"

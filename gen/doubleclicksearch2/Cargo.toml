@@ -4,12 +4,12 @@
 [package]
 
 name = "google-doubleclicksearch2"
-version = "2.0.5+20210323"
+version = "2.0.8+20210323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Doubleclicksearch (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/doubleclicksearch2"
 homepage = "https://developers.google.com/search-ads"
-documentation = "https://docs.rs/google-doubleclicksearch2/2.0.5+20210323"
+documentation = "https://docs.rs/google-doubleclicksearch2/2.0.8+20210323"
 license = "MIT"
 keywords = ["doubleclicksearch", "google", "protocol", "web", "api"]
 autobins = false

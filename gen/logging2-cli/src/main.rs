@@ -14148,7 +14148,7 @@ async fn main() {
     
     let mut app = App::new("logging2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20210325")
+           .version("2.0.8+20210325")
            .about("Writes log entries and manages your Cloud Logging configuration. The table entries below are presented in alphabetical order, not in order of common use. For explanations of the concepts found in the table entries, read the documentation at https://cloud.google.com/logging/docs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_cli")
            .arg(Arg::with_name("url")

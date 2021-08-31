@@ -4,7 +4,7 @@
 [package]
 
 name = "google-pubsublite1-cli"
-version = "2.0.5+20210322"
+version = "2.0.8+20210322"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with PubsubLite (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pubsublite1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-pubsublite1]
 path = "../pubsublite1"
-version = "2.0.5+20210322"
+version = "2.0.8+20210322"

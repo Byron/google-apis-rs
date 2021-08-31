@@ -4,12 +4,12 @@
 [package]
 
 name = "google-fitness1"
-version = "2.0.5+20210323"
+version = "2.0.8+20210323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with fitness (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/fitness1"
 homepage = "https://developers.google.com/fit/rest/v1/get-started"
-documentation = "https://docs.rs/google-fitness1/2.0.5+20210323"
+documentation = "https://docs.rs/google-fitness1/2.0.8+20210323"
 license = "MIT"
 keywords = ["fitness", "google", "protocol", "web", "api"]
 autobins = false

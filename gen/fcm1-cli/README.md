@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Cloud Messaging* API at revision *20210329*. The CLI is at version *2.0.5*.
+This documentation was generated from the *Firebase Cloud Messaging* API at revision *20210329*. The CLI is at version *2.0.8*.
 
 ```bash
 fcm1 [options]

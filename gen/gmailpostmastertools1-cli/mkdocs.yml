@@ -1,4 +1,4 @@
-site_name: Postmaster Tools v2.0.5+20210330
+site_name: Postmaster Tools v2.0.8+20210330
 site_url: http://byron.github.io/google-apis-rs/google-gmailpostmastertools1-cli
 site_description: A complete library to interact with Postmaster Tools (protocol v1)
 

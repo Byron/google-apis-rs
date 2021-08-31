@@ -5473,7 +5473,7 @@ async fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.7+20210322")
+           .version("2.0.8+20210322")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")

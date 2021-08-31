@@ -1,4 +1,4 @@
-site_name: Firebase Cloud Messaging v2.0.5+20210329
+site_name: Firebase Cloud Messaging v2.0.8+20210329
 site_url: http://byron.github.io/google-apis-rs/google-fcm1-cli
 site_description: A complete library to interact with Firebase Cloud Messaging (protocol v1)
 

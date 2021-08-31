@@ -864,7 +864,7 @@ async fn main() {
     
     let mut app = App::new("transcoder1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20210323")
+           .version("2.0.8+20210323")
            .about("This API converts video files into formats suitable for consumer distribution. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_transcoder1_beta1_cli")
            .arg(Arg::with_name("url")

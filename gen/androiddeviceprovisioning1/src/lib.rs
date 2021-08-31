@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Provisioning Partner* crate version *2.0.5+20210331*, where *20210331* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *Android Provisioning Partner* crate version *2.0.8+20210331*, where *20210331* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *Android Provisioning Partner* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/zero-touch/).

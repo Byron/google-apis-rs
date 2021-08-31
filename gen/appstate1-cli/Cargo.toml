@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appstate1-cli"
-version = "2.0.5+20190627"
+version = "2.0.8+20190627"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with App State (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/appstate1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-appstate1]
 path = "../appstate1"
-version = "2.0.5+20190627"
+version = "2.0.8+20190627"

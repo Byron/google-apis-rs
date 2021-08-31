@@ -1,4 +1,4 @@
-site_name: Vault v2.0.5+20210316
+site_name: Vault v2.0.8+20210316
 site_url: http://byron.github.io/google-apis-rs/google-vault1-cli
 site_description: A complete library to interact with Vault (protocol v1)
 

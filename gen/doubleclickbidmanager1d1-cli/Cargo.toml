@@ -4,7 +4,7 @@
 [package]
 
 name = "google-doubleclickbidmanager1d1-cli"
-version = "2.0.5+20210323"
+version = "2.0.8+20210323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with DoubleClick Bid Manager (protocol v1.1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/doubleclickbidmanager1d1-cli"
@@ -37,4 +37,4 @@ tokio = { version = "^ 1.0", features = ["full"] }
 
 [dependencies.google-doubleclickbidmanager1d1]
 path = "../doubleclickbidmanager1d1"
-version = "2.0.5+20210323"
+version = "2.0.8+20210323"

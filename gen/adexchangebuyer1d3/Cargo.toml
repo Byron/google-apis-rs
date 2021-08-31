@@ -4,12 +4,12 @@
 [package]
 
 name = "google-adexchangebuyer1d3"
-version = "2.0.5+20210330"
+version = "2.0.8+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Buyer (protocol v1.3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer1d3"
 homepage = "https://developers.google.com/ad-exchange/buyer-rest"
-documentation = "https://docs.rs/google-adexchangebuyer1d3/2.0.5+20210330"
+documentation = "https://docs.rs/google-adexchangebuyer1d3/2.0.8+20210330"
 license = "MIT"
 keywords = ["adexchangebuyer", "google", "protocol", "web", "api"]
 autobins = false

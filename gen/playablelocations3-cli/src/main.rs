@@ -480,7 +480,7 @@ async fn main() {
     
     let mut app = App::new("playablelocations3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("2.0.5+20200707")
+           .version("2.0.8+20200707")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playablelocations3_cli")
            .arg(Arg::with_name("folder")

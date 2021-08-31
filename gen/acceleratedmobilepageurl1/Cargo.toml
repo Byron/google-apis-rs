@@ -4,12 +4,12 @@
 [package]
 
 name = "google-acceleratedmobilepageurl1"
-version = "2.0.5+20210330"
+version = "2.0.8+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Acceleratedmobilepageurl (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/acceleratedmobilepageurl1"
 homepage = "https://developers.google.com/amp/cache/"
-documentation = "https://docs.rs/google-acceleratedmobilepageurl1/2.0.5+20210330"
+documentation = "https://docs.rs/google-acceleratedmobilepageurl1/2.0.8+20210330"
 license = "MIT"
 keywords = ["acceleratedmobilepag", "google", "protocol", "web", "api"]
 autobins = false

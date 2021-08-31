@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dfareporting* crate version *2.0.5+20210210*, where *20210210* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.5*.
+//! This documentation was generated from *Dfareporting* crate version *2.0.8+20210210*, where *20210210* is the exact revision of the *dfareporting:v3.3* schema built by the [mako](http://www.makotemplates.org/) code generator *v2.0.8*.
 //! 
 //! Everything else about the *Dfareporting* *v3d3* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
