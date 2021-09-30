@@ -3099,10 +3099,19 @@ impl client::ResponseResult for Table {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct TableCell {
     /// no description provided
-    pub v: Option<String>,
+    pub v: Content
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum Content {
+    Value(String),
+    Struct(TableRow),
+    Repeated(Box<Vec<TableCell>>),
+    Null,
 }
 
 impl client::Part for TableCell {}
