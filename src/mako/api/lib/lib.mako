@@ -180,7 +180,6 @@ hyper = "^0.14"
 hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
-yup-oauth2 = "^5.0"
 ```
 
 ${'##'} A complete example
@@ -246,8 +245,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
-use oauth2;
-use ${util.library_name()}::${hub_type};
+use ${util.library_name()}::{${hub_type}, oauth2};
 
 % if comments:
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
@@ -261,9 +259,9 @@ let secret: oauth2::ApplicationSecret = Default::default();
 // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 // retrieve them from storage.
 % endif
-let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+let auth = oauth2::InstalledFlowAuthenticator::builder(
         secret,
-        yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+        oauth2::InstalledFlowReturnMethod::HTTPRedirect,
     ).build().await.unwrap();
 let mut hub = ${hub_type}::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);\
 </%def>

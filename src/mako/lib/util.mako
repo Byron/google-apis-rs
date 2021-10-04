@@ -44,7 +44,6 @@ ${util.crate_version(cargo.build_version, revision)}\
 <%def name="test_prelude()">\
 extern crate hyper;
 extern crate hyper_rustls;
-extern crate yup_oauth2 as oauth2;
 extern crate ${util.to_extern_crate_name(self.crate_name())} as ${self.library_name()};
 </%def>
 
