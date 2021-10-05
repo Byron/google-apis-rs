@@ -46,6 +46,8 @@ extern crate serde_derive;
 extern crate hyper;
 extern crate serde;
 extern crate serde_json;
+// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
+pub extern crate yup_oauth2 as oauth2;
 extern crate mime;
 extern crate url;
 
@@ -55,5 +57,3 @@ pub mod client;
 // Re-export the hub type and some basic client structs
 pub use api::${hub_type};
 pub use client::{Result, Error, Delegate};
-// Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
-pub extern crate yup_oauth2 as oauth2;
