@@ -116,7 +116,7 @@ ${gen_root_stamp}: $(MAKO_RENDER) ${' '.join(i[0] for i in sds)} ${api_json_inpu
 ${api_target}: ${api_common}
 
 ${api_crate_publish_file}:
-	cd ${gen_root} && cargo smart-release --execute
+	cd ${gen_root} && cargo smart-release --execute --no-changelog
 	@mkdir -p ${os.path.dirname(api_crate_publish_file)}
 	touch $@
 
