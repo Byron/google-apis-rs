@@ -723,7 +723,7 @@ else {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
