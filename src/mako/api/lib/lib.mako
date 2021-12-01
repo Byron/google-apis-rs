@@ -176,8 +176,6 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 ${util.crate_name()} = "*"
-hyper = "^0.14"
-hyper-rustls = "^0.22"
 serde = "^1.0"
 serde_json = "^1.0"
 ```
@@ -245,7 +243,7 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 ###############################################################################################
 <%def name="test_hub(hub_type, comments=True)">\
 use std::default::Default;
-use ${util.library_name()}::{${hub_type}, oauth2};
+use ${util.library_name()}::{${hub_type}, oauth2, hyper, hyper_rustls};
 
 % if comments:
 // Get an ApplicationSecret instance by some means. It contains the `client_id` and 

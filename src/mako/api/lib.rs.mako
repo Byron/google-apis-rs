@@ -43,7 +43,9 @@ ${lib.docs(c)}
 #[macro_use]
 extern crate serde_derive;
 
-extern crate hyper;
+// Re-export the hyper and hyper_rustls crate, they are required to build the hub
+pub extern crate hyper;
+pub extern crate hyper_rustls;
 extern crate serde;
 extern crate serde_json;
 // Re-export the yup_oauth2 crate, that is required to call some methods of the hub and the client
