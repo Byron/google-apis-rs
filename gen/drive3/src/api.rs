@@ -84,7 +84,7 @@ impl Default for Scope {
 /// use drive3::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -140,8 +140,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct DriveHub<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -155,7 +155,7 @@ impl<'a, > DriveHub<> {
         DriveHub {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.9".to_string(),
+            _user_agent: "google-api-rust-client/2.0.10".to_string(),
             _base_url: "https://www.googleapis.com/drive/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -193,7 +193,7 @@ impl<'a, > DriveHub<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.9`.
+    /// It defaults to `google-api-rust-client/2.0.10`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1809,7 +1809,7 @@ impl client::Part for TeamDriveRestrictions {}
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1862,7 +1862,7 @@ impl<'a> AboutMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -1979,7 +1979,7 @@ impl<'a> ChangeMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2037,7 +2037,7 @@ impl<'a> ChannelMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2178,7 +2178,7 @@ impl<'a> CommentMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2343,7 +2343,7 @@ impl<'a> DriveMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2599,7 +2599,7 @@ impl<'a> FileMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2760,7 +2760,7 @@ impl<'a> PermissionMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -2910,7 +2910,7 @@ impl<'a> ReplyMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3030,7 +3030,7 @@ impl<'a> RevisionMethods<'a> {
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use drive3::{DriveHub, oauth2};
+/// use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
 /// let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3168,7 +3168,7 @@ impl<'a> TeamdriveMethods<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3383,7 +3383,7 @@ impl<'a> AboutGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -3646,7 +3646,7 @@ impl<'a> ChangeGetStartPageTokenCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4018,7 +4018,7 @@ impl<'a> ChangeListCall<'a> {
 /// use drive3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4419,7 +4419,7 @@ impl<'a> ChangeWatchCall<'a> {
 /// use drive3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4653,7 +4653,7 @@ impl<'a> ChannelStopCall<'a> {
 /// use drive3::api::Comment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -4930,7 +4930,7 @@ impl<'a> CommentCreateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5179,7 +5179,7 @@ impl<'a> CommentDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5451,7 +5451,7 @@ impl<'a> CommentGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -5748,7 +5748,7 @@ impl<'a> CommentListCall<'a> {
 /// use drive3::api::Comment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6038,7 +6038,7 @@ impl<'a> CommentUpdateCall<'a> {
 /// use drive3::api::Drive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6294,7 +6294,7 @@ impl<'a> DriveCreateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6531,7 +6531,7 @@ impl<'a> DriveDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -6791,7 +6791,7 @@ impl<'a> DriveGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7039,7 +7039,7 @@ impl<'a> DriveHideCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7302,7 +7302,7 @@ impl<'a> DriveListCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7551,7 +7551,7 @@ impl<'a> DriveUnhideCall<'a> {
 /// use drive3::api::Drive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -7841,7 +7841,7 @@ impl<'a> DriveUpdateCall<'a> {
 /// use drive3::api::File;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8204,7 +8204,7 @@ impl<'a> FileCopyCall<'a> {
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8357,7 +8357,7 @@ impl<'a> FileCreateCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -8657,7 +8657,7 @@ impl<'a> FileCreateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -8930,7 +8930,7 @@ impl<'a> FileDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9149,7 +9149,7 @@ impl<'a> FileEmptyTrashCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9398,7 +9398,7 @@ impl<'a> FileExportCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9642,7 +9642,7 @@ impl<'a> FileGenerateIdCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -9954,7 +9954,7 @@ impl<'a> FileGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10339,7 +10339,7 @@ impl<'a> FileListCall<'a> {
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -10695,7 +10695,7 @@ impl<'a> FileUpdateCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -11018,7 +11018,7 @@ impl<'a> FileUpdateCall<'a> {
 /// use drive3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11360,7 +11360,7 @@ impl<'a> FileWatchCall<'a> {
 /// use drive3::api::Permission;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -11733,7 +11733,7 @@ impl<'a> PermissionCreateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12018,7 +12018,7 @@ impl<'a> PermissionDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12314,7 +12314,7 @@ impl<'a> PermissionGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12635,7 +12635,7 @@ impl<'a> PermissionListCall<'a> {
 /// use drive3::api::Permission;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -12985,7 +12985,7 @@ impl<'a> PermissionUpdateCall<'a> {
 /// use drive3::api::Reply;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13274,7 +13274,7 @@ impl<'a> ReplyCreateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13535,7 +13535,7 @@ impl<'a> ReplyDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -13819,7 +13819,7 @@ impl<'a> ReplyGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14116,7 +14116,7 @@ impl<'a> ReplyListCall<'a> {
 /// use drive3::api::Reply;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14417,7 +14417,7 @@ impl<'a> ReplyUpdateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14671,7 +14671,7 @@ impl<'a> RevisionDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -14959,7 +14959,7 @@ impl<'a> RevisionGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15232,7 +15232,7 @@ impl<'a> RevisionListCall<'a> {
 /// use drive3::api::Revision;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15522,7 +15522,7 @@ impl<'a> RevisionUpdateCall<'a> {
 /// use drive3::api::TeamDrive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -15778,7 +15778,7 @@ impl<'a> TeamdriveCreateCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16015,7 +16015,7 @@ impl<'a> TeamdriveDeleteCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16275,7 +16275,7 @@ impl<'a> TeamdriveGetCall<'a> {
 /// # extern crate google_drive3 as drive3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
@@ -16539,7 +16539,7 @@ impl<'a> TeamdriveListCall<'a> {
 /// use drive3::api::TeamDrive;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use drive3::{DriveHub, oauth2};
+/// # use drive3::{DriveHub, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
 /// # let auth = oauth2::InstalledFlowAuthenticator::builder(
