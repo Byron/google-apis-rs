@@ -76,13 +76,11 @@ impl Default for Scope {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// use youtube3::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
 /// // `client_secret`, among other things.
@@ -92,9 +90,9 @@ impl Default for Scope {
 /// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -136,8 +134,8 @@ impl Default for Scope {
 /// ```
 #[derive(Clone)]
 pub struct YouTube<> {
-    client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
-    auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
+    pub client: hyper::Client<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>, hyper::body::Body>,
+    pub auth: oauth2::authenticator::Authenticator<hyper_rustls::HttpsConnector<hyper::client::connect::HttpConnector>>,
     _user_agent: String,
     _base_url: String,
     _root_url: String,
@@ -151,7 +149,7 @@ impl<'a, > YouTube<> {
         YouTube {
             client,
             auth: authenticator,
-            _user_agent: "google-api-rust-client/2.0.8".to_string(),
+            _user_agent: "google-api-rust-client/2.0.10".to_string(),
             _base_url: "https://youtube.googleapis.com/".to_string(),
             _root_url: "https://youtube.googleapis.com/".to_string(),
         }
@@ -246,7 +244,7 @@ impl<'a, > YouTube<> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/2.0.8`.
+    /// It defaults to `google-api-rust-client/2.0.10`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -5833,18 +5831,16 @@ impl client::Part for ChannelContentDetailsRelatedPlaylists {}
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -5896,18 +5892,16 @@ impl<'a> AbuseReportMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -5964,18 +5958,16 @@ impl<'a> ActivityMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6115,18 +6107,16 @@ impl<'a> CaptionMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6178,18 +6168,16 @@ impl<'a> ChannelBannerMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6304,18 +6292,16 @@ impl<'a> ChannelSectionMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6395,18 +6381,16 @@ impl<'a> ChannelMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6505,18 +6489,16 @@ impl<'a> CommentThreadMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6664,18 +6646,16 @@ impl<'a> CommentMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6725,18 +6705,16 @@ impl<'a> I18nLanguageMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6786,18 +6764,16 @@ impl<'a> I18nRegionMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -6962,18 +6938,16 @@ impl<'a> LiveBroadcastMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7042,18 +7016,16 @@ impl<'a> LiveChatBanMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7145,18 +7117,16 @@ impl<'a> LiveChatMessageMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7246,18 +7216,16 @@ impl<'a> LiveChatModeratorMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7375,18 +7343,16 @@ impl<'a> LiveStreamMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7440,18 +7406,16 @@ impl<'a> MemberMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7500,18 +7464,16 @@ impl<'a> MembershipsLevelMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7626,18 +7588,16 @@ impl<'a> PlaylistItemMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7755,18 +7715,16 @@ impl<'a> PlaylistMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7845,18 +7803,16 @@ impl<'a> SearchMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -7953,18 +7909,16 @@ impl<'a> SubscriptionMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8016,18 +7970,16 @@ impl<'a> SuperChatEventMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8079,18 +8031,16 @@ impl<'a> TestMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8197,18 +8147,16 @@ impl<'a> ThirdPartyLinkMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8258,18 +8206,16 @@ impl<'a> ThumbnailMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8319,18 +8265,16 @@ impl<'a> VideoAbuseReportReasonMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8382,18 +8326,16 @@ impl<'a> VideoCategoryMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8573,18 +8515,16 @@ impl<'a> VideoMethods<'a> {
 /// ```test_harness,no_run
 /// extern crate hyper;
 /// extern crate hyper_rustls;
-/// extern crate yup_oauth2 as oauth2;
 /// extern crate google_youtube3 as youtube3;
 /// 
 /// # async fn dox() {
 /// use std::default::Default;
-/// use oauth2;
-/// use youtube3::YouTube;
+/// use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
 ///         secret,
-///         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
@@ -8662,18 +8602,16 @@ impl<'a> WatermarkMethods<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::AbuseReport;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -8936,17 +8874,15 @@ impl<'a> AbuseReportInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -9264,17 +9200,15 @@ impl<'a> ActivityListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -9512,17 +9446,15 @@ impl<'a> CaptionDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -9803,19 +9735,17 @@ impl<'a> CaptionDownloadCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Caption;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -9947,7 +9877,7 @@ impl<'a> CaptionInsertCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -10241,17 +10171,15 @@ impl<'a> CaptionInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -10549,19 +10477,17 @@ impl<'a> CaptionListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Caption;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -10695,7 +10621,7 @@ impl<'a> CaptionUpdateCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -10985,19 +10911,17 @@ impl<'a> CaptionUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::ChannelBannerResource;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -11120,7 +11044,7 @@ impl<'a> ChannelBannerInsertCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -11386,17 +11310,15 @@ impl<'a> ChannelBannerInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -11634,18 +11556,16 @@ impl<'a> ChannelSectionDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::ChannelSection;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -11961,17 +11881,15 @@ impl<'a> ChannelSectionInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -12283,18 +12201,16 @@ impl<'a> ChannelSectionListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::ChannelSection;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -12581,17 +12497,15 @@ impl<'a> ChannelSectionUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -12942,18 +12856,16 @@ impl<'a> ChannelListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Channel;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -13228,18 +13140,16 @@ impl<'a> ChannelUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::CommentThread;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -13502,17 +13412,15 @@ impl<'a> CommentThreadInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -13862,18 +13770,16 @@ impl<'a> CommentThreadListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::CommentThread;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -14136,17 +14042,15 @@ impl<'a> CommentThreadUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -14357,18 +14261,16 @@ impl<'a> CommentDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Comment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -14631,17 +14533,15 @@ impl<'a> CommentInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -14932,17 +14832,15 @@ impl<'a> CommentListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15159,17 +15057,15 @@ impl<'a> CommentMarkAsSpamCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15410,18 +15306,16 @@ impl<'a> CommentSetModerationStatuCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Comment;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -15684,17 +15578,15 @@ impl<'a> CommentUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -15933,17 +15825,15 @@ impl<'a> I18nLanguageListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -16198,17 +16088,15 @@ impl<'a> I18nRegionListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -16491,17 +16379,15 @@ impl<'a> LiveBroadcastBindCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -16753,18 +16639,16 @@ impl<'a> LiveBroadcastDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveBroadcast;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -17087,17 +16971,15 @@ impl<'a> LiveBroadcastInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -17447,17 +17329,15 @@ impl<'a> LiveBroadcastListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -17756,18 +17636,16 @@ impl<'a> LiveBroadcastTransitionCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveBroadcast;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -18072,17 +17950,15 @@ impl<'a> LiveBroadcastUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -18293,18 +18169,16 @@ impl<'a> LiveChatBanDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveChatBan;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -18567,17 +18441,15 @@ impl<'a> LiveChatBanInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -18788,18 +18660,16 @@ impl<'a> LiveChatMessageDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveChatMessage;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -19077,17 +18947,15 @@ impl<'a> LiveChatMessageInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -19380,17 +19248,15 @@ impl<'a> LiveChatMessageListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -19601,18 +19467,16 @@ impl<'a> LiveChatModeratorDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveChatModerator;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -19890,17 +19754,15 @@ impl<'a> LiveChatModeratorInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -20169,17 +20031,15 @@ impl<'a> LiveChatModeratorListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -20431,18 +20291,16 @@ impl<'a> LiveStreamDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveStream;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -20766,17 +20624,15 @@ impl<'a> LiveStreamInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -21101,18 +20957,16 @@ impl<'a> LiveStreamListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::LiveStream;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -21417,17 +21271,15 @@ impl<'a> LiveStreamUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -21726,17 +21578,15 @@ impl<'a> MemberListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -21969,17 +21819,15 @@ impl<'a> MembershipsLevelListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -22202,18 +22050,16 @@ impl<'a> PlaylistItemDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::PlaylistItem;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -22488,17 +22334,15 @@ impl<'a> PlaylistItemInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -22800,18 +22644,16 @@ impl<'a> PlaylistItemListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::PlaylistItem;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -23086,17 +22928,15 @@ impl<'a> PlaylistItemUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -23319,18 +23159,16 @@ impl<'a> PlaylistDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Playlist;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -23617,17 +23455,15 @@ impl<'a> PlaylistInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -23954,18 +23790,16 @@ impl<'a> PlaylistListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Playlist;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -24240,17 +24074,15 @@ impl<'a> PlaylistUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -24841,17 +24673,15 @@ impl<'a> SearchListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -25062,18 +24892,16 @@ impl<'a> SubscriptionDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Subscription;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -25336,17 +25164,15 @@ impl<'a> SubscriptionInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -25723,17 +25549,15 @@ impl<'a> SubscriptionListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -26002,18 +25826,16 @@ impl<'a> SuperChatEventListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::TestItem;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -26275,17 +26097,15 @@ impl<'a> TestInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -26501,18 +26321,16 @@ impl<'a> ThirdPartyLinkDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::ThirdPartyLink;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -26767,17 +26585,15 @@ impl<'a> ThirdPartyLinkInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -27012,18 +26828,16 @@ impl<'a> ThirdPartyLinkListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::ThirdPartyLink;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -27271,18 +27085,16 @@ impl<'a> ThirdPartyLinkUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -27379,7 +27191,7 @@ impl<'a> ThumbnailSetCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -27640,17 +27452,15 @@ impl<'a> ThumbnailSetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -27894,17 +27704,15 @@ impl<'a> VideoAbuseReportReasonListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -28169,17 +27977,15 @@ impl<'a> VideoCategoryListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -28402,17 +28208,15 @@ impl<'a> VideoDeleteCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -28651,19 +28455,17 @@ impl<'a> VideoGetRatingCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Video;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -28805,7 +28607,7 @@ impl<'a> VideoInsertCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -29099,17 +28901,15 @@ impl<'a> VideoInsertCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -29482,17 +29282,15 @@ impl<'a> VideoListCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
@@ -29714,18 +29512,16 @@ impl<'a> VideoRateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::VideoAbuseReport;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -29966,18 +29762,16 @@ impl<'a> VideoReportAbuseCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::Video;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -30252,19 +30046,17 @@ impl<'a> VideoUpdateCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// use youtube3::api::InvideoBranding;
 /// use std::fs;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
@@ -30378,7 +30170,7 @@ impl<'a> WatermarkSetCall<'a> {
                     upload_url_from_server = false;
                     Ok(hyper::Response::builder()
                         .status(hyper::StatusCode::OK)
-                        .header("Localtion", upload_url.as_ref().unwrap().clone())
+                        .header("Location", upload_url.as_ref().unwrap().clone())
                         .body(hyper::body::Body::empty())
                         .unwrap())
                 } else {
@@ -30629,17 +30421,15 @@ impl<'a> WatermarkSetCall<'a> {
 /// ```test_harness,no_run
 /// # extern crate hyper;
 /// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_youtube3 as youtube3;
 /// # async fn dox() {
 /// # use std::default::Default;
-/// # use oauth2;
-/// # use youtube3::YouTube;
+/// # use youtube3::{YouTube, oauth2, hyper, hyper_rustls};
 /// 
 /// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = yup_oauth2::InstalledFlowAuthenticator::builder(
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
 /// #         secret,
-/// #         yup_oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
 /// # let mut hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnector::with_native_roots()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
