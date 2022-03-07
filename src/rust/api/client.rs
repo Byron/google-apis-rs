@@ -67,37 +67,6 @@ pub trait ToParts {
     fn to_parts(&self) -> String;
 }
 
-/// A utility type which can decode a server response that indicates error
-#[derive(Deserialize)]
-pub struct JsonServerError {
-    pub error: String,
-    pub error_description: Option<String>,
-}
-
-/// A utility to represent detailed errors we might see in case there are BadRequests.
-/// The latter happen if the sent parameters or request structures are unsound
-#[derive(Deserialize, Serialize, Debug)]
-pub struct ErrorResponse {
-    pub error: ServerError,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct ServerError {
-    pub errors: Vec<ServerMessage>,
-    pub code: u16,
-    pub message: String,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-pub struct ServerMessage {
-    pub domain: String,
-    pub reason: String,
-    pub message: String,
-    #[serde(rename = "locationType")]
-    pub location_type: Option<String>,
-    pub location: Option<String>,
-}
-
 /// A trait specifying functionality to help controlling any request performed by the API.
 /// The trait has a conservative default implementation.
 ///
@@ -188,8 +157,7 @@ pub trait Delegate: Send {
     fn http_failure(
         &mut self,
         _: &hyper::Response<hyper::body::Body>,
-        _err: Option<JsonServerError>,
-        _: Option<ServerError>,
+        _err: Option<serde_json::Value>,
     ) -> Retry {
         Retry::Abort
     }
@@ -246,7 +214,7 @@ pub enum Error {
 
     /// Represents information about a request that was not understood by the server.
     /// Details are included.
-    BadRequest(ErrorResponse),
+    BadRequest(serde_json::Value),
 
     /// We needed an API key for authentication, but didn't obtain one.
     /// Neither through the authenticator, nor through the Delegate.
@@ -293,21 +261,8 @@ impl Display for Error {
                     "It is used as there are no Scopes defined for this method."
                 )
             }
-            Error::BadRequest(ref err) => {
-                writeln!(f, "Bad Request ({}): {}", err.error.code, err.error.message)?;
-                for err in err.error.errors.iter() {
-                    writeln!(
-                        f,
-                        "    {}: {}, {}{}",
-                        err.domain,
-                        err.message,
-                        err.reason,
-                        match err.location {
-                            Some(ref loc) => format!("@{}", loc),
-                            None => String::new(),
-                        }
-                    )?;
-                }
+            Error::BadRequest(ref message) => {
+                writeln!(f, "Bad Request: {}", message)?;
                 Ok(())
             }
             Error::MissingToken(ref err) => {
@@ -659,7 +614,7 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                             RangeResponseHeader::from_bytes(hh.as_bytes())
                         }
                         None | Some(_) => {
-                            if let Retry::After(d) = self.delegate.http_failure(&r, None, None) {
+                            if let Retry::After(d) = self.delegate.http_failure(&r, None) {
                                 sleep(d);
                                 continue;
                             }
@@ -754,7 +709,6 @@ impl<'a, A> ResumableUploadHelper<'a, A> {
                     if !reconstructed_result.status().is_success() {
                         if let Retry::After(d) = self.delegate.http_failure(
                             &reconstructed_result,
-                            json::from_str(&res_body_string).ok(),
                             json::from_str(&res_body_string).ok(),
                         ) {
                             sleep(d);

@@ -811,22 +811,22 @@ else {
                 Ok(mut res) => {
                     if !res.status().is_success() {
                         let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
 
-                        let json_server_error = json::from_str::<client::JsonServerError>(&res_body_string).ok();
-                        let server_error = json::from_str::<client::ServerError>(&res_body_string)
-                            .or_else(|_| json::from_str::<client::ErrorResponse>(&res_body_string).map(|r| r.error))
-                            .ok();
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
 
-                        if let client::Retry::After(d) = dlg.http_failure(&res,
-                                                              json_server_error,
-                                                              server_error) {
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
                             sleep(d);
                             continue;
                         }
+
                         ${delegate_finish}(false);
-                        return match json::from_str::<client::ErrorResponse>(&res_body_string){
-                            Err(_) => Err(client::Error::Failure(res)),
-                            Ok(serr) => Err(client::Error::BadRequest(serr))
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
                         }
                     }
                     % if resumable_media_param:
